@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "mythic_age:block/egyptian_statue_pedestal"
+  }
+}

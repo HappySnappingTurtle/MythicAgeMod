@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "statue_state=empty": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_empty"
+    },
+    "statue_state=slave": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_slave"
+    },
+    "statue_state=citizen": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_citizen"
+    },
+    "statue_state=soldier": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_soldier"
+    },
+    "statue_state=queen": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_queen"
+    },
+    "statue_state=king": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_king"
+    },
+    "statue_state=royal_couple": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_royal_couple"
+    },
+    "statue_state=pharaoh": {
+      "model": "mythic_age:block/egyptian_statue_pedestal_pharaoh"
+    }
+  }
+} 

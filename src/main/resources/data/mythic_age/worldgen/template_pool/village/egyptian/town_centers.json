@@ -1,0 +1,33 @@
+{
+  "name": "mythic_age:village/egyptian/town_centers",
+  "fallback": "minecraft:village/plains/town_centers",
+  "elements": [
+    {
+      "weight": 10,
+      "element": {
+        "location": "mythic_age:village/egyptian/temple_large",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "location": "mythic_age:village/egyptian/temple_medium",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 3,
+      "element": {
+        "location": "mythic_age:village/egyptian/temple_small",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+} 

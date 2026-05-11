@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "mythic_age:block/temple_atlantean_stairs",
+    "top": "mythic_age:block/temple_atlantean_stairs",
+    "side": "mythic_age:block/temple_atlantean_stairs"
+  }
+}

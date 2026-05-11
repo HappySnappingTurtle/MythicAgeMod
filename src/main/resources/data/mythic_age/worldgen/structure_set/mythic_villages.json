@@ -1,0 +1,30 @@
+{
+  "structures": [
+    {
+      "structure": "mythic_age:greek_temple",
+      "weight": 25
+    },
+    {
+      "structure": "mythic_age:egyptian_temple",
+      "weight": 20
+    },
+    {
+      "structure": "mythic_age:chinese_temple",
+      "weight": 20
+    },
+    {
+      "structure": "mythic_age:atlantean_temple",
+      "weight": 15
+    },
+    {
+      "structure": "mythic_age:nordic_temple",
+      "weight": 15
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 34,
+    "separation": 8,
+    "salt": 10387312
+  }
+} 

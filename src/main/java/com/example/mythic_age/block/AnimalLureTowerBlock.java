@@ -1,0 +1,75 @@
+package com.example.mythic_age.block;
+
+import com.example.mythic_age.block.entity.AnimalLureTowerBlockEntity;
+import com.example.mythic_age.block.entity.ModBlockEntities;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * 动物招引塔方块
+ * 
+ * 动物招引法术生成的多方块结构的核心方块，支持朝向性。
+ * 负责持有和管理AnimalLureTowerBlockEntity。
+ * 
+ * @author MythicAge Development Team
+ * @version 1.0.0
+ * @since 1.20.1
+ */
+public class AnimalLureTowerBlock extends BlockWithEntity implements BlockEntityProvider {
+
+    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+
+    public AnimalLureTowerBlock(Settings settings) {
+        super(settings);
+        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new AnimalLureTowerBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return checkType(type, ModBlockEntities.ANIMAL_LURE_TOWER, AnimalLureTowerBlockEntity::tick);
+    }
+} 

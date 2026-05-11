@@ -1,0 +1,6 @@
+{
+  "parent": "mythic_age:block/egyptian_statue_pedestal_queen",
+  "textures": {
+    "statue": "mythic_age:block/egyptian_statue_king"
+  }
+} 

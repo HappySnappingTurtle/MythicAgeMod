@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "type=bottom,waterlogged=false": {
+      "model": "mythic_age:block/temple_atlantean_slab"
+    },
+    "type=bottom,waterlogged=true": {
+      "model": "mythic_age:block/temple_atlantean_slab"
+    },
+    "type=top,waterlogged=false": {
+      "model": "mythic_age:block/temple_atlantean_slab_top"
+    },
+    "type=top,waterlogged=true": {
+      "model": "mythic_age:block/temple_atlantean_slab_top"
+    },
+    "type=double,waterlogged=false": {
+      "model": "mythic_age:block/temple_atlantean_slab_double"
+    },
+    "type=double,waterlogged=true": {
+      "model": "mythic_age:block/temple_atlantean_slab_double"
+    }
+  }
+}

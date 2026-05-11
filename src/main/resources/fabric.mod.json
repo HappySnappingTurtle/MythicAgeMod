@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "mythic_age",
+  "version": "0.1.0",
+  "name": "Mythic Age",
+  "description": "A Minecraft mod based on the Microsoft game Age of Mythology.",
+  "authors": [
+    "YourName" 
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+  "license": "MIT",
+  "icon": "assets/mythic_age/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.mythic_age.MythicAgeMod"
+    ],
+    "client": [
+      "com.example.mythic_age.MythicAgeModClient"
+    ]
+  },
+  "mixins": [
+    "mythic_age.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric": "*",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
+

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "mythic_age:block/statue_chinese_head"
+  }
+} 

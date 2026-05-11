@@ -1,0 +1,63 @@
+{
+  "parent": "mythic_age:block/egyptian_statue_pedestal_empty",
+  "textures": {
+    "particle": "mythic_age:block/egyptian_statue_pedestal",
+    "base": "mythic_age:block/egyptian_statue_pedestal",
+    "top": "mythic_age:block/egyptian_statue_pedestal_top",
+    "statue": "mythic_age:block/egyptian_statue_slave"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [2, 0, 2],
+      "to": [14, 2, 14],
+      "faces": {
+        "north": {"uv": [2, 14, 14, 16], "texture": "#base"},
+        "east": {"uv": [2, 14, 14, 16], "texture": "#base"},
+        "south": {"uv": [2, 14, 14, 16], "texture": "#base"},
+        "west": {"uv": [2, 14, 14, 16], "texture": "#base"},
+        "up": {"uv": [2, 2, 14, 14], "texture": "#top"},
+        "down": {"uv": [2, 2, 14, 14], "texture": "#base"}
+      }
+    },
+    {
+      "name": "middle",
+      "from": [3, 2, 3],
+      "to": [13, 4, 13],
+      "faces": {
+        "north": {"uv": [3, 12, 13, 14], "texture": "#base"},
+        "east": {"uv": [3, 12, 13, 14], "texture": "#base"},
+        "south": {"uv": [3, 12, 13, 14], "texture": "#base"},
+        "west": {"uv": [3, 12, 13, 14], "texture": "#base"},
+        "up": {"uv": [3, 3, 13, 13], "texture": "#top"},
+        "down": {"uv": [3, 3, 13, 13], "texture": "#base"}
+      }
+    },
+    {
+      "name": "pillar",
+      "from": [4, 4, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "north": {"uv": [4, 0, 12, 12], "texture": "#base"},
+        "east": {"uv": [4, 0, 12, 12], "texture": "#base"},
+        "south": {"uv": [4, 0, 12, 12], "texture": "#base"},
+        "west": {"uv": [4, 0, 12, 12], "texture": "#base"},
+        "up": {"uv": [4, 4, 12, 12], "texture": "#top"},
+        "down": {"uv": [4, 4, 12, 12], "texture": "#base"}
+      }
+    },
+    {
+      "name": "statue",
+      "from": [5, 16, 5],
+      "to": [11, 24, 11],
+      "faces": {
+        "north": {"uv": [0, 0, 6, 8], "texture": "#statue"},
+        "east": {"uv": [0, 0, 6, 8], "texture": "#statue"},
+        "south": {"uv": [0, 0, 6, 8], "texture": "#statue"},
+        "west": {"uv": [0, 0, 6, 8], "texture": "#statue"},
+        "up": {"uv": [5, 5, 11, 11], "texture": "#statue"},
+        "down": {"uv": [5, 5, 11, 11], "texture": "#statue"}
+      }
+    }
+  ]
+} 

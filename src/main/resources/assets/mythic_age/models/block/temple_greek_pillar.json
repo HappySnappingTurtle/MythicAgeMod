@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "mythic_age:block/temple_greek_pillar_top",
+    "side": "mythic_age:block/temple_greek_pillar"
+  }
+} 

@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "mythic_age:item/spellbook_lightning_bolt"
+  }
+}
+

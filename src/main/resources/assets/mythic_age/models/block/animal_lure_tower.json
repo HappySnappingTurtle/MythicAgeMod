@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "north": "mythic_age:block/animal_lure_tower_front",
+    "south": "mythic_age:block/animal_lure_tower_side",
+    "east": "mythic_age:block/animal_lure_tower_side", 
+    "west": "mythic_age:block/animal_lure_tower_side",
+    "up": "mythic_age:block/animal_lure_tower_side",
+    "down": "mythic_age:block/animal_lure_tower_side",
+    "particle": "mythic_age:block/animal_lure_tower_front"
+  }
+} 

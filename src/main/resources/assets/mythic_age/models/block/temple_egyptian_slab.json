@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "mythic_age:block/temple_egyptian_slab",
+    "top": "mythic_age:block/temple_egyptian_slab",
+    "side": "mythic_age:block/temple_egyptian_slab"
+  }
+} 

@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "up": "mythic_age:block/abundance_altar_brick_gold_h",
+    "down": "mythic_age:block/abundance_altar_brick_gold_h",
+    "north": "mythic_age:block/abundance_altar_brick_gold_h",
+    "south": "mythic_age:block/abundance_altar_brick_gold_h",
+    "east": "mythic_age:block/abundance_altar_wall",
+    "west": "mythic_age:block/abundance_altar_wall"
+  }
+} 
