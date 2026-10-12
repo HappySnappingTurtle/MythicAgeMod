@@ -2,6 +2,7 @@ package com.example.mythic_age.network;
 
 import com.example.mythic_age.MythicAgeMod;
 import com.example.mythic_age.client.gui.CustomTempleGuardianTradeScreen;
+import com.example.mythic_age.client.gui.GodPowerGuideScreen;
 import com.example.mythic_age.entity.CustomTempleGuardianEntity;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -71,6 +72,14 @@ public class ModNetworkClient {
                         System.out.println("[调试] 警告: 无法找到实体ID " + entityId + " 对应的CustomTempleGuardianEntity");
                     }
                 });
+            });
+
+        ClientPlayNetworking.registerGlobalReceiver(ModNetworking.OPEN_GOD_POWER_GUIDE_SCREEN,
+            (client, handler, buf, responseSender) -> {
+                String civilization = buf.readString();
+                client.execute(() -> MinecraftClient.getInstance().setScreen(
+                        new GodPowerGuideScreen(civilization, client.player)
+                ));
             });
     }
 }

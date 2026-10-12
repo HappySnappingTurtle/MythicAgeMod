@@ -10,10 +10,13 @@ import com.example.mythic_age.event.VillageGenerationEventHandler;
 import com.example.mythic_age.item.ModItems;
 import com.example.mythic_age.item.ModItemGroups;
 import com.example.mythic_age.network.ModNetworking;
+import com.example.mythic_age.particle.ModParticles;
 import com.example.mythic_age.sound.ModSounds;
+import com.example.mythic_age.system.ChineseCertificateManager;
 import com.example.mythic_age.system.GodPowerCertificateManager;
-import com.example.mythic_age.util.EarthquakeManager;
-import com.example.mythic_age.util.LightningStormManager;
+import com.example.mythic_age.util.GodPowerTaskScheduler;
+import com.example.mythic_age.validation.ValidationCommand;
+import com.example.mythic_age.world.MythicAgeWorldState;
 import com.example.mythic_age.worldgen.MythicVillageTypes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -71,6 +74,9 @@ public class MythicAgeMod implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Initializing Mythic Age Mod");
 
+        // 初始化法术注册表
+        com.example.mythic_age.item.spell.SpellRegistry.init();
+
         // 注册物品：法术书、圣物等核心物品
         ModItems.registerModItems();
         
@@ -88,6 +94,9 @@ public class MythicAgeMod implements ModInitializer {
         
         // 注册音效：法术效果、环境音效等
         ModSounds.registerModSounds();
+
+        // 注册粒子：神话生物技能和神力的自定义视觉效果
+        ModParticles.registerModParticles();
         
         // 注册物品组：创造模式标签页分类
         ModItemGroups.registerItemGroups();
@@ -106,13 +115,18 @@ public class MythicAgeMod implements ModInitializer {
         
         // 注册网络数据包
         ModNetworking.registerNetworkPackets();
+
+        // 注册本地验证命令；命令本身要求权限等级 2，普通游玩不自动执行。
+        ValidationCommand.register();
         
         // 注册服务器tick事件：用于更新法术效果管理器
         ServerTickEvents.START_WORLD_TICK.register(world -> {
             if (!world.isClient()) {
-                EarthquakeManager.getInstance().tick(world);
-                LightningStormManager.getInstance().tick(world);
+                MythicAgeWorldState.get(world.getServer()).tick(world);
                 GodPowerCertificateManager.getInstance().tickEgyptianStatues(world);
+                GodPowerCertificateManager.getInstance().tickChinesePopulation(world);
+                ChineseCertificateManager.getInstance().tickVillagerWork(world);
+                GodPowerTaskScheduler.tick(world);
             }
         });
         

@@ -18,7 +18,7 @@ public class CyclopsEntityRenderer extends MobEntityRenderer<CyclopsEntity, Cycl
 
     @Override
     protected void scale(CyclopsEntity entity, MatrixStack matrices, float amount) {
-        matrices.scale(1.05F, 1.05F, 1.05F);
+        matrices.scale(1.34F, 1.34F, 1.34F);
     }
 
     @Override

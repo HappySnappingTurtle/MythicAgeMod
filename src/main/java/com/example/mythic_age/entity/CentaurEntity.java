@@ -1,5 +1,6 @@
 package com.example.mythic_age.entity;
 
+import com.example.mythic_age.entity.ai.goal.CentaurRangedAttackGoal;
 import com.example.mythic_age.sound.ModSounds;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -20,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -43,8 +45,9 @@ public class CentaurEntity extends GreekMythEntity implements RangedAttackMob {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new ProjectileAttackGoal(this, 1.05D, 34, 18.0F));
-        this.goalSelector.add(2, new MeleeAttackGoal(this, 1.12D, false));
+        this.goalSelector.add(1, new CentaurRangedAttackGoal(this));
+        this.goalSelector.add(2, new ProjectileAttackGoal(this, 1.05D, 34, 18.0F));
+        this.goalSelector.add(3, new MeleeAttackGoal(this, 1.12D, false));
         this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.9D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 10.0F));
         this.goalSelector.add(7, new LookAroundGoal(this));
@@ -65,6 +68,7 @@ public class CentaurEntity extends GreekMythEntity implements RangedAttackMob {
 
         this.playSpecialSound(ModSounds.ENTITY_CENTAUR_SPECIAL);
         this.swingHand(Hand.MAIN_HAND);
+        this.spawnParticles(ParticleTypes.CRIT, this.getX(), this.getBodyY(0.78D), this.getZ(), 8, 0.35D, 0.04D);
         this.getWorld().spawnEntity(arrow);
     }
 

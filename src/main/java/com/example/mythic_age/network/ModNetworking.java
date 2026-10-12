@@ -21,6 +21,9 @@ public class ModNetworking {
 
     public static final Identifier EXECUTE_CUSTOM_TEMPLE_GUARDIAN_TRADE =
         new Identifier(MythicAgeMod.MOD_ID, "execute_custom_temple_guardian_trade");
+
+    public static final Identifier OPEN_GOD_POWER_GUIDE_SCREEN =
+        new Identifier(MythicAgeMod.MOD_ID, "open_god_power_guide_screen");
     
     /**
      * 注册所有网络数据包处理器

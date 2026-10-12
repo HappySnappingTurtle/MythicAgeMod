@@ -299,11 +299,11 @@ public class MythicVillageProcessor {
      */
     private static String getTempleNBTPath(MythicVillageTypes.VillageType villageType) {
         return switch (villageType) {
-            case GREEK -> "structures/temple/greek/greek_temple_small.nbt";
-            case EGYPTIAN -> null; // 暂时没有埃及神殿NBT文件，使用代码生成
-            case CHINESE -> null; // 暂时没有中国神殿NBT文件，使用代码生成
-            case ATLANTEAN -> null; // 暂时没有亚特兰蒂斯神殿NBT文件，使用代码生成
-            case NORDIC -> null; // 暂时没有北欧神殿NBT文件，使用代码生成
+            case GREEK -> "structures/village/greek/temple_small.nbt";
+            case EGYPTIAN -> "structures/village/egyptian/temple_small.nbt";
+            case CHINESE -> "structures/village/chinese/temple_small.nbt";
+            case ATLANTEAN -> "structures/village/atlantean/temple_small.nbt";
+            case NORDIC -> "structures/village/nordic/temple_small.nbt";
         };
     }
     

@@ -1,0 +1,24 @@
+# NBT Roundtrip Source Probe Snapshot
+
+- Current objective: continue MythicAgeMod 1.0 development with code, models, actions, textures, UI, art, particles, and NBT persistence.
+- Completed in this slice:
+  - Closed the last NBT target row by marking `MythicAge_Summoner` as covered through `WalkingTreeEntity.walkingTreeSummoner`, vanilla tameable owner NBT, and runtime-only temporary summons.
+  - Added immediate `MythicAgeWorldState.markDirty()` wiring for certificate production state, lightning storms, earthquakes, and long-running weather god powers.
+  - Added `tools/nbt_roundtrip_probe_pipeline.py` as a source-level contract probe for world persistent state write/read symmetry and dirty-state wiring.
+  - Integrated the new NBT roundtrip probe into `tools/mythic_age_1_0_gap_audit.py`.
+- Validation:
+  - `python3 tools/nbt_target_validation_pipeline.py audit` PASS, 21 covered, 48 runtime_only, 0 required, 0 missing.
+  - `python3 tools/entity_validation_pipeline.py audit` PASS.
+  - `python3 tools/nbt_roundtrip_probe_pipeline.py audit` PASS.
+  - `python3 tools/structure_validation_pipeline.py audit` PASS.
+  - `python3 tools/particle_validation_pipeline.py audit` PASS.
+  - `python3 tools/god_power_particle_validation_pipeline.py audit` PASS.
+  - `python3 tools/ui_validation_pipeline.py audit` PASS.
+  - `python3 tools/mythic_age_1_0_gap_audit.py audit` NOT READY by design, with 8 remaining release gaps.
+  - `./gradlew build --offline` PASS with approved escalation for external Gradle wrapper cache.
+- Current evidence:
+  - `docs/preview_assets/nbt_roundtrip_validation/nbt_roundtrip_report.json`
+  - `docs/preview_assets/nbt_target_validation/nbt_target_report.json`
+  - `docs/preview_assets/1_0_gap_audit/gap_report.json`
+- Next concrete action:
+  - Build a real audio validation gate for 30 civilization creatures, then use it to quantify and drive non-Greek creature sound implementation.

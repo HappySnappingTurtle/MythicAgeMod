@@ -16,6 +16,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,9 +31,10 @@ import java.util.Map;
  * 
  * 兑换系统：
  * - 希腊神力证明 -> 希腊神明法术书
- * - 埃及神力证明 -> 埃及神明法术书 (待实现)
- * - 中国神力证明 -> 中国神明法术书 (待实现)
- * - 亚特兰蒂斯神力证明 -> 亚特兰蒂斯法术书 (待实现)
+ * - 埃及神力证明 -> 埃及神明法术书
+ * - 中国神力证明 -> 中国神明法术书
+ * - 亚特兰蒂斯神力证明 -> 亚特兰蒂斯法术书
+ * - 北欧神力证明 -> 北欧神明法术书
  * 
  * 多方块结构：
  * - 中心为神像核心方块
@@ -43,23 +45,70 @@ public class StatueBlock extends Block {
     
     private final GodPowerCertificateItem.MythologyType mythologyType;
     
-    // 兑换价格表 (神力证明数量 -> 法术书)
-    private static final Map<Item, Integer> EXCHANGE_PRICES = new HashMap<>();
+    // 兑换价格表 (文明 -> 法术书 -> 神力证明数量)，与 GodPowerGuideScreen 的 1.0 图鉴矩阵保持一致。
+    private static final Map<GodPowerCertificateItem.MythologyType, Map<Item, Integer>> EXCHANGE_PRICES = new EnumMap<>(GodPowerCertificateItem.MythologyType.class);
     
     static {
-        // 希腊神明法术书兑换价格
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_LIGHTNING_STORM, 3);      // 闪电风暴 - 3个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_RESTORATION, 2);          // 复原术 - 2个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_LURE, 2);                 // 动物招引 - 2个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_UNDERWORLD_ARMY, 5);      // 冥府军团 - 5个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_PESTILENCE, 3);           // 瘟疫 - 3个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_CURSE, 4);                // 诅咒 - 4个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_EARTHQUAKE, 6);           // 地震 - 6个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_CEASEFIRE, 3);            // 停火 - 3个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_BRONZE, 3);               // 青铜 - 3个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_UNDERWORLD_PASSAGE, 7);   // 冥界通道 - 7个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_LIGHTNING_STORM_HERA, 4); // 赫拉雷暴 - 4个证明
-        EXCHANGE_PRICES.put(ModItems.SPELLBOOK_PLENTY, 5);               // 丰饶 - 5个证明
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_RESTORATION, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_LURE, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_LIGHTNING_STORM, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_PESTILENCE, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_BRONZE, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_CEASEFIRE, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_CURSE, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_LIGHTNING_STORM_HERA, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_UNDERWORLD_ARMY, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_PLENTY, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_EARTHQUAKE, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.GREEK, ModItems.SPELLBOOK_UNDERWORLD_PASSAGE, 7);
+
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_RA_RADIANCE, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_DESERT_STORM, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_EYE_OF_HORUS, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_SUN_RAIN, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_PROSPERITY, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_ANUBIS_JUDGMENT, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_LOCUST_SWARM, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_TORNADO, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_ISIS_RESURRECTION, 7);
+        registerExchange(GodPowerCertificateItem.MythologyType.EGYPTIAN, ModItems.SPELLBOOK_METEOR, 8);
+
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_RAIN_PRAYER, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_EARTH_GOD_BLESSING, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_FIVE_THUNDER, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_ENLIGHTENMENT, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_ABUNDANCE, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_CRANE_BLESSING, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_FLOOD, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_CALL_TO_ARMS, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_TAIJI_SHIELD, 7);
+        registerExchange(GodPowerCertificateItem.MythologyType.CHINESE, ModItems.SPELLBOOK_RECREATION, 8);
+
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_TIDAL_SURGE, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_ABYSSAL_CURRENT, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_CRYSTAL_BARRIER, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_PEARL_HARVEST, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_ORICHALCUM_FORGE, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_SIREN_SONG, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_LEVIATHAN_CALL, 7);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_ABYSSAL_RIFT, 7);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_CHRONO_STASIS, 8);
+        registerExchange(GodPowerCertificateItem.MythologyType.ATLANTEAN, ModItems.SPELLBOOK_OCEANIC_WRATH, 8);
+
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_FENRIR_HOWL, 2);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_ODIN_EYE, 3);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_THOR_WRATH, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_GREAT_HUNT, 4);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_DWARVEN_MINE, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_VALHALLA_CALL, 5);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_FROST, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_WALKING_WOODS, 6);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_RAGNAROK, 7);
+        registerExchange(GodPowerCertificateItem.MythologyType.NORDIC, ModItems.SPELLBOOK_FIMBULWINTER, 8);
+    }
+
+    private static void registerExchange(GodPowerCertificateItem.MythologyType mythologyType, Item spellbook, int price) {
+        EXCHANGE_PRICES.computeIfAbsent(mythologyType, ignored -> new HashMap<>()).put(spellbook, price);
     }
     
     /**
@@ -139,26 +188,21 @@ public class StatueBlock extends Block {
             .formatted(Formatting.GREEN), false);
         
         boolean hasExchange = false;
+        Map<Item, Integer> exchangePrices = getExchangePrices();
         
         // 遍历所有可兑换的法术书
-        for (Map.Entry<Item, Integer> entry : EXCHANGE_PRICES.entrySet()) {
+        for (Map.Entry<Item, Integer> entry : exchangePrices.entrySet()) {
             Item spellbook = entry.getKey();
             int price = entry.getValue();
-            
-            // 只显示希腊神明的法术书 (目前只实现了希腊系统)
-            if (mythologyType == GodPowerCertificateItem.MythologyType.GREEK) {
-                String spellbookName = spellbook.getName().getString();
-                
-                if (handStack.getCount() >= price) {
-                    // 可以兑换
-                    player.sendMessage(Text.translatable("mythic_age.statue.exchange_option", 
-                        spellbookName, price).formatted(Formatting.YELLOW), false);
-                    hasExchange = true;
-                } else {
-                    // 证明不足
-                    player.sendMessage(Text.translatable("mythic_age.statue.exchange_insufficient", 
-                        spellbookName, price, handStack.getCount()).formatted(Formatting.GRAY), false);
-                }
+            String spellbookName = spellbook.getName().getString();
+
+            if (handStack.getCount() >= price) {
+                player.sendMessage(Text.translatable("mythic_age.statue.exchange_option",
+                    spellbookName, price).formatted(Formatting.YELLOW), false);
+                hasExchange = true;
+            } else {
+                player.sendMessage(Text.translatable("mythic_age.statue.exchange_insufficient",
+                    spellbookName, price, handStack.getCount()).formatted(Formatting.GRAY), false);
             }
         }
         
@@ -185,25 +229,25 @@ public class StatueBlock extends Block {
         player.sendMessage(Text.translatable("mythic_age.statue.menu.title")
             .formatted(Formatting.GOLD), false);
         
-        // 显示当前可用的兑换选项
-        if (mythologyType == GodPowerCertificateItem.MythologyType.GREEK) {
-            player.sendMessage(Text.translatable("mythic_age.statue.menu.greek_powers")
-                .formatted(Formatting.BLUE), false);
-            
-            // 显示部分法术书作为示例
-            player.sendMessage(Text.literal("- 闪电风暴法术书: 3个希腊神力证明")
-                .formatted(Formatting.WHITE), false);
-            player.sendMessage(Text.literal("- 复原术法术书: 2个希腊神力证明")
-                .formatted(Formatting.WHITE), false);
-            player.sendMessage(Text.literal("- 地震法术书: 6个希腊神力证明")
-                .formatted(Formatting.WHITE), false);
-        } else {
-            player.sendMessage(Text.translatable("mythic_age.statue.menu.coming_soon")
-                .formatted(Formatting.GRAY), false);
+        player.sendMessage(Text.translatable("mythic_age.statue.menu.civilization_powers", mythologyType.getChineseName())
+            .formatted(Formatting.BLUE), false);
+
+        int shown = 0;
+        for (Map.Entry<Item, Integer> entry : getExchangePrices().entrySet()) {
+            player.sendMessage(Text.translatable("mythic_age.statue.exchange_option",
+                entry.getKey().getName().getString(), entry.getValue()).formatted(Formatting.WHITE), false);
+            shown++;
+            if (shown >= 4) {
+                break;
+            }
         }
         
         player.sendMessage(Text.translatable("mythic_age.statue.menu.instruction")
             .formatted(Formatting.YELLOW), false);
+    }
+
+    private Map<Item, Integer> getExchangePrices() {
+        return EXCHANGE_PRICES.getOrDefault(mythologyType, Map.of());
     }
     
     /**
@@ -224,4 +268,4 @@ public class StatueBlock extends Block {
         // 目前简单检查下方是否为固体方块
         return baseState.isSolidBlock(world, basePos);
     }
-} 
+}

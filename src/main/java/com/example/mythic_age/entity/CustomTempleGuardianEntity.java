@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class CustomTempleGuardianEntity extends MobEntity {
     
-    private final GodPowerCertificateItem.MythologyType mythologyType;
+    private GodPowerCertificateItem.MythologyType mythologyType;
     private BlockPos templePos;
     private int certificateGenerationTimer = 0;
     private static final int CERTIFICATE_GENERATION_INTERVAL = 1200;
@@ -58,7 +58,7 @@ public class CustomTempleGuardianEntity extends MobEntity {
     public CustomTempleGuardianEntity(EntityType<? extends MobEntity> entityType, World world) {
         super(entityType, world);
         this.mythologyType = GodPowerCertificateItem.MythologyType.GREEK;
-        this.setCustomName(Text.translatable("entity.mythic_age.custom_temple_guardian_" + mythologyType.name().toLowerCase()));
+        refreshCivilizationName();
     }
     
     /**
@@ -69,7 +69,7 @@ public class CustomTempleGuardianEntity extends MobEntity {
         super(entityType, world);
         this.mythologyType = mythologyType != null ? mythologyType : GodPowerCertificateItem.MythologyType.GREEK;
         this.templePos = templePos;
-        this.setCustomName(Text.translatable("entity.mythic_age.custom_temple_guardian_" + this.mythologyType.name().toLowerCase()));
+        refreshCivilizationName();
     }
     
     /**
@@ -256,14 +256,30 @@ public class CustomTempleGuardianEntity extends MobEntity {
                 safeAddTrade(certificate, 3, ModItems.SPELLBOOK_BRONZE, "青铜护甲");
                 safeAddTrade(certificate, 7, ModItems.SPELLBOOK_UNDERWORLD_PASSAGE, "冥界通道");
                 safeAddTrade(certificate, 4, ModItems.SPELLBOOK_LIGHTNING_STORM_HERA, "赫拉雷暴");
-                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_EARTHQUAKE, "地震");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_PLENTY, "丰饶");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_EARTHQUAKE, "地震");
                 safeAddTrade(certificate, 5, ModItems.CENTAUR_SPAWN_EGG, "半人马召唤蛋");
                 safeAddTrade(certificate, 6, ModItems.MEDUSA_SPAWN_EGG, "美杜莎召唤蛋");
                 safeAddTrade(certificate, 7, ModItems.CYCLOPS_SPAWN_EGG, "独眼巨人召唤蛋");
                 safeAddTrade(certificate, 8, ModItems.HYDRA_SPAWN_EGG, "九头蛇召唤蛋");
+                safeAddTrade(certificate, 6, ModItems.NEMEAN_LION_SPAWN_EGG, "尼米亚狮召唤蛋");
+                safeAddTrade(certificate, 7, ModItems.MANTICORE_SPAWN_EGG, "蝎尾狮召唤蛋");
+                safeAddTrade(certificate, 8, ModItems.CHIMERA_SPAWN_EGG, "奇美拉召唤蛋");
+                safeAddTrade(certificate, 10, ModItems.COLOSSUS_SPAWN_EGG, "青铜巨像召唤蛋");
+                safeAddTrade(certificate, 8, ModItems.PEGASUS_SPAWN_EGG, "天马召唤蛋");
             }
             case EGYPTIAN -> {
                 safeAddTrade(certificate, 3, ModItems.SPELLBOOK_GENERATE_EGYPTIAN_TEMPLE, "埃及神殿生成");
+                safeAddTrade(certificate, 2, ModItems.SPELLBOOK_RA_RADIANCE, "拉神光辉");
+                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_DESERT_STORM, "沙漠风暴");
+                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_EYE_OF_HORUS, "荷鲁斯之眼");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_SUN_RAIN, "太阳雨");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_PROSPERITY, "繁荣");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_ANUBIS_JUDGMENT, "阿努比斯审判");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_LOCUST_SWARM, "蝗虫群");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_TORNADO, "龙卷风");
+                safeAddTrade(certificate, 7, ModItems.SPELLBOOK_ISIS_RESURRECTION, "伊西斯复活");
+                safeAddTrade(certificate, 8, ModItems.SPELLBOOK_METEOR, "流星");
                 tradeOffers.put(new ItemStack(Items.GOLD_INGOT, 1), certificate.copy());
                 tradeOffers.put(new ItemStack(certificate.getItem(), 2), new ItemStack(Items.GOLDEN_APPLE));
             }
@@ -271,18 +287,47 @@ public class CustomTempleGuardianEntity extends MobEntity {
                 tradeOffers.put(new ItemStack(Items.PAPER, 12), certificate.copy());
 
                 safeAddTrade(certificate, 3, ModItems.SPELLBOOK_GENERATE_CHINESE_TEMPLE, "中国神殿生成");
-                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_PLENTY, "丰饶");
+                safeAddTrade(certificate, 2, ModItems.SPELLBOOK_RAIN_PRAYER, "祈雨");
+                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_EARTH_GOD_BLESSING, "土地神祝福");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_FIVE_THUNDER, "五雷正法");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_ENLIGHTENMENT, "启迪");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_ABUNDANCE, "富饶");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_CRANE_BLESSING, "仙鹤赐福");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_FLOOD, "洪水");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_CALL_TO_ARMS, "动员令");
+                safeAddTrade(certificate, 7, ModItems.SPELLBOOK_TAIJI_SHIELD, "太极护盾");
+                safeAddTrade(certificate, 8, ModItems.SPELLBOOK_RECREATION, "女娲再造");
                 tradeOffers.put(new ItemStack(certificate.getItem(), 1), new ItemStack(Items.COOKED_BEEF, 8));
                 tradeOffers.put(new ItemStack(certificate.getItem(), 2), new ItemStack(Items.VILLAGER_SPAWN_EGG));
             }
             case ATLANTEAN -> {
                 safeAddTrade(certificate, 3, ModItems.SPELLBOOK_GENERATE_ATLANTEAN_TEMPLE, "亚特兰蒂斯神殿生成");
+                safeAddTrade(certificate, 2, ModItems.SPELLBOOK_TIDAL_SURGE, "潮汐奔流");
+                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_ABYSSAL_CURRENT, "深流跃迁");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_CRYSTAL_BARRIER, "水晶屏障");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_PEARL_HARVEST, "珍珠丰收");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_ORICHALCUM_FORGE, "山铜熔炉");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_SIREN_SONG, "海妖之歌");
+                safeAddTrade(certificate, 7, ModItems.SPELLBOOK_LEVIATHAN_CALL, "利维坦召唤");
+                safeAddTrade(certificate, 7, ModItems.SPELLBOOK_ABYSSAL_RIFT, "深渊裂隙");
+                safeAddTrade(certificate, 8, ModItems.SPELLBOOK_CHRONO_STASIS, "时滞静域");
+                safeAddTrade(certificate, 8, ModItems.SPELLBOOK_OCEANIC_WRATH, "海洋震怒");
                 tradeOffers.put(new ItemStack(Items.PRISMARINE_SHARD, 16), certificate.copy());
-                tradeOffers.put(new ItemStack(certificate.getItem(), 2), new ItemStack(Items.POTION));
+                tradeOffers.put(new ItemStack(certificate.getItem(), 9), new ItemStack(Items.POTION));
                 tradeOffers.put(new ItemStack(certificate.getItem(), 1), new ItemStack(Items.SEA_LANTERN, 4));
             }
             case NORDIC -> {
                 safeAddTrade(certificate, 3, ModItems.SPELLBOOK_GENERATE_NORDIC_TEMPLE, "北欧神殿生成");
+                safeAddTrade(certificate, 2, ModItems.SPELLBOOK_FENRIR_HOWL, "芬里尔嚎叫");
+                safeAddTrade(certificate, 3, ModItems.SPELLBOOK_ODIN_EYE, "奥丁之眼");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_THOR_WRATH, "雷神之怒");
+                safeAddTrade(certificate, 4, ModItems.SPELLBOOK_GREAT_HUNT, "大狩猎");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_DWARVEN_MINE, "矮人矿脉");
+                safeAddTrade(certificate, 5, ModItems.SPELLBOOK_VALHALLA_CALL, "英灵殿召唤");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_FROST, "霜冻");
+                safeAddTrade(certificate, 6, ModItems.SPELLBOOK_WALKING_WOODS, "行走森林");
+                safeAddTrade(certificate, 7, ModItems.SPELLBOOK_RAGNAROK, "诸神黄昏");
+                safeAddTrade(certificate, 8, ModItems.SPELLBOOK_FIMBULWINTER, "芬布尔之冬");
                 tradeOffers.put(new ItemStack(certificate.getItem(), 2), new ItemStack(Items.IRON_AXE));
                 tradeOffers.put(new ItemStack(certificate.getItem(), 2), new ItemStack(Items.IRON_SWORD));
                 tradeOffers.put(new ItemStack(certificate.getItem(), 4), new ItemStack(Items.DIAMOND_SWORD));
@@ -453,10 +498,29 @@ public class CustomTempleGuardianEntity extends MobEntity {
         if (output.isOf(ModItems.CYCLOPS_SPAWN_EGG)
                 || output.isOf(ModItems.CENTAUR_SPAWN_EGG)
                 || output.isOf(ModItems.HYDRA_SPAWN_EGG)
-                || output.isOf(ModItems.MEDUSA_SPAWN_EGG)) {
+                || output.isOf(ModItems.MEDUSA_SPAWN_EGG)
+                || output.isOf(ModItems.NEMEAN_LION_SPAWN_EGG)
+                || output.isOf(ModItems.MANTICORE_SPAWN_EGG)
+                || output.isOf(ModItems.CHIMERA_SPAWN_EGG)
+                || output.isOf(ModItems.COLOSSUS_SPAWN_EGG)
+                || output.isOf(ModItems.PEGASUS_SPAWN_EGG)) {
             return output.getItem().toString();
         }
         return null;
+    }
+
+    public boolean hasCooldown(ItemStack output) {
+        return getCooldownKey(output) != null;
+    }
+
+    public long getTradeCooldownSeconds(ItemStack output) {
+        String cooldownKey = getCooldownKey(output);
+        if (cooldownKey == null) {
+            return 0L;
+        }
+        long readyAt = tradeCooldowns.getOrDefault(cooldownKey, 0L);
+        long remainingTicks = readyAt - this.getWorld().getTime();
+        return Math.max(0L, (remainingTicks + 19L) / 20L);
     }
     
     /**
@@ -549,6 +613,10 @@ public class CustomTempleGuardianEntity extends MobEntity {
             case NORDIC -> "欢迎来到北欧神殿！勇士的荣耀在战斗中获得！";
         };
     }
+
+    private void refreshCivilizationName() {
+        this.setCustomName(Text.translatable("entity.mythic_age.custom_temple_guardian_" + this.mythologyType.name().toLowerCase()));
+    }
     
     /**
      * NBT数据序列化 - 保存实体数据到NBT
@@ -619,6 +687,15 @@ public class CustomTempleGuardianEntity extends MobEntity {
         System.out.println("[调试] CustomTempleGuardian 开始读取NBT数据");
         
         // 读取基本数据
+        if (nbt.contains("mythologyType")) {
+            try {
+                this.mythologyType = GodPowerCertificateItem.MythologyType.valueOf(nbt.getString("mythologyType"));
+                refreshCivilizationName();
+            } catch (IllegalArgumentException ignored) {
+                this.mythologyType = GodPowerCertificateItem.MythologyType.GREEK;
+                refreshCivilizationName();
+            }
+        }
         certificateGenerationTimer = nbt.getInt("certificateGenerationTimer");
         hasInitializedTrades = nbt.getBoolean("hasInitializedTrades");
         

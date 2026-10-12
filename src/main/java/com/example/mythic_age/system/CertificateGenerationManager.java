@@ -119,6 +119,17 @@ public class CertificateGenerationManager {
         int certificatesToGenerate = calculateCertificateAmount(civilizedVillagerCount);
         
         if (certificatesToGenerate > 0) {
+            GodPowerCertificateManager certificateManager = GodPowerCertificateManager.getInstance();
+            if (!certificateManager.canGenerateCivilizationProduction(
+                    world,
+                    "temple_villager",
+                    mythologyType.name(),
+                    templePos,
+                    GENERATION_INTERVAL
+            )) {
+                return;
+            }
+
             // 寻找附近对应文明的神像基座
             BlockPos statueBasePos = findNearestStatueBase(world, templePos, mythologyType);
             
@@ -140,6 +151,13 @@ public class CertificateGenerationManager {
                     templePos, getCivilizationName(mythologyType), certificatesToGenerate
                 ));
             }
+            certificateManager.recordCivilizationProduction(
+                    world,
+                    "temple_villager",
+                    mythologyType.name(),
+                    templePos,
+                    certificatesToGenerate
+            );
         }
     }
     

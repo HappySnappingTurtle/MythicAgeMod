@@ -1,0 +1,21 @@
+# Creature Audio Technical Gate Snapshot
+
+- Current objective: continue MythicAgeMod 1.0 development and reduce real release gaps across code, art, audio, UI, particles, and NBT.
+- Completed in this slice:
+  - Added `tools/audio_validation_pipeline.py` to validate 30 civilization creatures across required audio events.
+  - Added `tools/generate_creature_audio_first_pass.py` to generate deterministic first-pass OGG resources and wire code references.
+  - Generated first-pass audio for 20 non-Greek creatures: Egyptian, Nordic, Chinese, and Atlantean rosters.
+  - Added non-Greek creature sound constants in `ModSounds`, `sounds.json` entries, and entity-level `ModSounds` references.
+  - Integrated the audio report into `tools/mythic_age_1_0_gap_audit.py`.
+- Validation:
+  - `python3 tools/audio_validation_pipeline.py audit` PASS.
+  - `python3 tools/mythic_age_1_0_gap_audit.py audit` NOT READY by design.
+  - `python3 -m py_compile tools/audio_validation_pipeline.py tools/generate_creature_audio_first_pass.py tools/mythic_age_1_0_gap_audit.py` PASS.
+  - `./gradlew build --offline` PASS with approved escalation for external Gradle wrapper cache.
+- Current evidence:
+  - `docs/preview_assets/audio_validation/audio_report.json`
+  - `docs/preview_assets/1_0_gap_audit/gap_report.json`
+- Important caveat:
+  - Audio is technically complete but not final art. The report marks 20 generated non-Greek creatures as `procedural_first_pass`; these need final mix/aesthetic replacement before 1.0 release.
+- Next concrete action:
+  - Continue reducing 1.0 release gaps, likely by adding a UI scope plan/gate or by moving model visual acceptance from pending human review toward design-corrected higher fidelity passes.

@@ -9,3 +9,11 @@ out/
 *.log.gz
 *.tmp
 .DS_Store
+
+# Generated visual review artifacts that are not part of the Blockbench-only gate
+docs/preview_assets/greek_creatures/*/minecraft/
+docs/preview_assets/greek_creatures/*/blockbench/three_quarter.png
+docs/preview_assets/entity_validation/minecraft/
+
+# 预览/验收图（136MB，可由 tools 重新生成，不入版本控制）
+docs/preview_assets/

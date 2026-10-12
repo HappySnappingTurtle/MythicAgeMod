@@ -1,7 +1,12 @@
 package com.example.mythic_age.util;
 
+import com.example.mythic_age.particle.MythicParticleEffects;
+import com.example.mythic_age.world.MythicAgeWorldState;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -66,7 +71,14 @@ public class EarthquakeManager {
      * 启动一个新地震
      */
     public void startEarthquake(World world, BlockPos epicenter, String earthquakeId, float playerYaw) {
-        activeEarthquakes.put(earthquakeId, new EarthquakeData(epicenter, 0, 0, playerYaw));
+        MythicAgeWorldState worldState = null;
+        if (world instanceof ServerWorld serverWorld) {
+            worldState = MythicAgeWorldState.get(serverWorld.getServer());
+        }
+        activeEarthquakes.put(earthquakeId, new EarthquakeData(world.getRegistryKey().getValue().toString(), epicenter, 0, 0, playerYaw));
+        if (worldState != null) {
+            worldState.markDirty();
+        }
         
         // 立即进行第一次地震效果
         performEarthquakeEffect(world, epicenter, playerYaw);
@@ -75,14 +87,19 @@ public class EarthquakeManager {
     /**
      * 每tick调用的更新方法
      */
-    public void tick(World world) {
-        if (world.isClient) return;
+    public boolean tick(World world) {
+        if (world.isClient) return false;
+
+        boolean dirty = false;
         
         Iterator<Map.Entry<String, EarthquakeData>> iterator = activeEarthquakes.entrySet().iterator();
         
         while (iterator.hasNext()) {
             Map.Entry<String, EarthquakeData> entry = iterator.next();
             EarthquakeData data = entry.getValue();
+            if (!data.dimension.equals(world.getRegistryKey().getValue().toString())) {
+                continue;
+            }
             
             data.ticksAlive++;
             data.intervalTimer++;
@@ -92,6 +109,7 @@ public class EarthquakeManager {
                 // 地震结束
                 performEarthquakeEndEffect(world, data.epicenter);
                 iterator.remove();
+                dirty = true;
                 continue;
             }
             
@@ -100,6 +118,49 @@ public class EarthquakeManager {
                 data.intervalTimer = 0;
                 performEarthquakeEffect(world, data.epicenter, data.playerYaw);
             }
+            dirty = true;
+        }
+        return dirty;
+    }
+
+    public NbtCompound writePersistentState() {
+        NbtCompound root = new NbtCompound();
+        NbtList earthquakes = new NbtList();
+        for (Map.Entry<String, EarthquakeData> entry : activeEarthquakes.entrySet()) {
+            NbtCompound earthquake = new NbtCompound();
+            EarthquakeData data = entry.getValue();
+            earthquake.putString("Id", entry.getKey());
+            earthquake.putString("Dimension", data.dimension);
+            earthquake.putLong("Epicenter", data.epicenter.asLong());
+            earthquake.putInt("TicksAlive", data.ticksAlive);
+            earthquake.putInt("RemainingTicks", Math.max(0, EARTHQUAKE_DURATION - data.ticksAlive));
+            earthquake.putInt("IntervalTimer", data.intervalTimer);
+            earthquake.putFloat("PlayerYaw", data.playerYaw);
+            earthquakes.add(earthquake);
+        }
+        root.put("ActiveEarthquakes", earthquakes);
+        return root;
+    }
+
+    public void readPersistentState(NbtCompound nbt) {
+        activeEarthquakes.clear();
+        NbtList earthquakes = nbt.getList("ActiveEarthquakes", NbtElement.COMPOUND_TYPE);
+        for (int i = 0; i < earthquakes.size(); i++) {
+            NbtCompound earthquake = earthquakes.getCompound(i);
+            String id = earthquake.getString("Id");
+            String dimension = earthquake.getString("Dimension");
+            if (id.isEmpty() || dimension.isEmpty() || !earthquake.contains("Epicenter", NbtElement.LONG_TYPE)) {
+                continue;
+            }
+            int ticksAlive = earthquake.contains("TicksAlive", NbtElement.INT_TYPE)
+                    ? earthquake.getInt("TicksAlive")
+                    : Math.max(0, EARTHQUAKE_DURATION - earthquake.getInt("RemainingTicks"));
+            if (ticksAlive >= EARTHQUAKE_DURATION) {
+                continue;
+            }
+            int intervalTimer = earthquake.getInt("IntervalTimer");
+            float playerYaw = earthquake.getFloat("PlayerYaw");
+            activeEarthquakes.put(id, new EarthquakeData(dimension, BlockPos.fromLong(earthquake.getLong("Epicenter")), ticksAlive, intervalTimer, playerYaw));
         }
     }
     
@@ -151,14 +212,14 @@ public class EarthquakeManager {
                 int offsetX = (int)(forward * forwardX + right * rightX);
                 int offsetZ = (int)(forward * forwardZ + right * rightZ);
                 
-                serverWorld.spawnParticles(ParticleTypes.EXPLOSION,
+                MythicParticleEffects.spawnAmbient(serverWorld, ParticleTypes.EXPLOSION,
                     epicenter.getX() + offsetX, epicenter.getY() + 1, epicenter.getZ() + offsetZ, 
                     2, 0.5, 0.5, 0.5, 0.1);
             }
         }
         
         // 震中强烈爆炸效果
-        serverWorld.spawnParticles(ParticleTypes.EXPLOSION_EMITTER,
+        MythicParticleEffects.spawnUltimate(serverWorld, ParticleTypes.EXPLOSION_EMITTER,
             epicenter.getX() + 0.5, epicenter.getY() + 1, epicenter.getZ() + 0.5,
             1, 0, 0, 0, 0);
         
@@ -170,7 +231,7 @@ public class EarthquakeManager {
             int offsetX = (int)(randomForward * forwardX + randomRight * rightX);
             int offsetZ = (int)(randomForward * forwardZ + randomRight * rightZ);
             
-            serverWorld.spawnParticles(ParticleTypes.CRIT,
+            MythicParticleEffects.spawnAmbient(serverWorld, ParticleTypes.CRIT,
                 epicenter.getX() + offsetX, epicenter.getY(), epicenter.getZ() + offsetZ,
                 3, 0.3, 0.1, 0.3, 0.1);
         }
@@ -193,7 +254,7 @@ public class EarthquakeManager {
         ServerWorld serverWorld = (ServerWorld) world;
         
         // 地震平息效果
-        serverWorld.spawnParticles(ParticleTypes.CLOUD,
+        MythicParticleEffects.spawnMajor(serverWorld, ParticleTypes.CLOUD,
             epicenter.getX() + 0.5, epicenter.getY() + 2, epicenter.getZ() + 0.5,
             50, EARTHQUAKE_WIDTH, 2.0, EARTHQUAKE_LENGTH / 2, 0.1);
         
@@ -206,12 +267,14 @@ public class EarthquakeManager {
      * 地震数据类
      */
     private static class EarthquakeData {
+        public final String dimension;
         public final BlockPos epicenter;
         public final float playerYaw;
         public int ticksAlive;
         public int intervalTimer;
         
-        public EarthquakeData(BlockPos epicenter, int ticksAlive, int intervalTimer, float playerYaw) {
+        public EarthquakeData(String dimension, BlockPos epicenter, int ticksAlive, int intervalTimer, float playerYaw) {
+            this.dimension = dimension;
             this.epicenter = epicenter;
             this.ticksAlive = ticksAlive;
             this.intervalTimer = intervalTimer;

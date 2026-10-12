@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -71,7 +72,7 @@ public class ModEntities {
      * 
      * 实体规格：
      * - 生成组：MONSTER (怪物组，会在黑暗环境中生成)
-     * - 碰撞箱：0.9格宽 x 2.1格高 (比玩家稍宽稍高)
+     * - 碰撞箱：1.35格宽 x 2.75格高 (大型迷宫怪，明显高于玩家)
      * - 工厂方法：MinotaurEntity::new (创建实体实例)
      * 
      * 游戏特性：
@@ -85,7 +86,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             new Identifier(MythicAgeMod.MOD_ID, "minotaur"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, MinotaurEntity::new)
-                    .dimensions(EntityDimensions.fixed(0.9f, 2.1f)) // 宽0.9格，高2.1格
+                    .dimensions(EntityDimensions.fixed(1.35f, 2.75f))
                     .build()
     );
 
@@ -93,7 +94,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             new Identifier(MythicAgeMod.MOD_ID, "cyclops"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, CyclopsEntity::new)
-                    .dimensions(EntityDimensions.fixed(1.35f, 3.2f))
+                    .dimensions(EntityDimensions.fixed(1.8f, 4.0f))
                     .build()
     );
 
@@ -101,7 +102,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             new Identifier(MythicAgeMod.MOD_ID, "centaur"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, CentaurEntity::new)
-                    .dimensions(EntityDimensions.fixed(1.2f, 2.45f))
+                    .dimensions(EntityDimensions.fixed(1.9f, 3.0f))
                     .build()
     );
 
@@ -109,7 +110,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             new Identifier(MythicAgeMod.MOD_ID, "hydra"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, HydraEntity::new)
-                    .dimensions(EntityDimensions.fixed(2.4f, 2.35f))
+                    .dimensions(EntityDimensions.fixed(3.5f, 4.0f))
                     .build()
     );
 
@@ -117,7 +118,210 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             new Identifier(MythicAgeMod.MOD_ID, "medusa"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, MedusaEntity::new)
-                    .dimensions(EntityDimensions.fixed(0.75f, 2.05f))
+                    .dimensions(EntityDimensions.fixed(1.1f, 2.55f))
+                    .build()
+    );
+
+    public static final EntityType<NemeanLionEntity> NEMEAN_LION = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "nemean_lion"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, NemeanLionEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.9f, 1.8f))
+                    .build()
+    );
+
+    public static final EntityType<ManticoreEntity> MANTICORE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "manticore"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ManticoreEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.0f, 2.05f))
+                    .build()
+    );
+
+    public static final EntityType<ChimeraEntity> CHIMERA = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "chimera"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ChimeraEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.3f, 2.25f))
+                    .build()
+    );
+
+    public static final EntityType<ColossusEntity> COLOSSUS = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "colossus"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ColossusEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.7f, 4.2f))
+                    .build()
+    );
+
+    public static final EntityType<PegasusEntity> PEGASUS = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "pegasus"),
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PegasusEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.7f, 2.1f))
+                    .trackRangeBlocks(10)
+                    .build()
+    );
+
+    public static final EntityType<AnubisWarriorEntity> ANUBIS_WARRIOR = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "anubis_warrior"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, AnubisWarriorEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.9f, 2.3f))
+                    .build()
+    );
+
+    public static final EntityType<ScarabGuardianEntity> SCARAB_GUARDIAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "scarab_guardian"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ScarabGuardianEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.8f, 1.2f))
+                    .build()
+    );
+
+    public static final EntityType<MummySoldierEntity> MUMMY_SOLDIER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "mummy_soldier"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, MummySoldierEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.8f, 2.1f))
+                    .build()
+    );
+
+    public static final EntityType<SphinxSentinelEntity> SPHINX_SENTINEL = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "sphinx_sentinel"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SphinxSentinelEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.2f, 1.8f))
+                    .build()
+    );
+
+    public static final EntityType<SunFalconEntity> SUN_FALCON = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "sun_falcon"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SunFalconEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.2f, 1.3f))
+                    .build()
+    );
+
+    public static final EntityType<FrostGiantEntity> FROST_GIANT = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "frost_giant"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, FrostGiantEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.8f, 3.9f))
+                    .build()
+    );
+
+    public static final EntityType<DraugrWarriorEntity> DRAUGR_WARRIOR = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "draugr_warrior"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, DraugrWarriorEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.85f, 2.2f))
+                    .build()
+    );
+
+    public static final EntityType<ValkyrieEntity> VALKYRIE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "valkyrie"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ValkyrieEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.9f, 2.35f))
+                    .trackRangeBlocks(10)
+                    .build()
+    );
+
+    public static final EntityType<FenrirWolfEntity> FENRIR_WOLF = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "fenrir_wolf"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, FenrirWolfEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.1f, 1.8f))
+                    .build()
+    );
+
+    public static final EntityType<DwarfBerserkerEntity> DWARF_BERSERKER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "dwarf_berserker"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, DwarfBerserkerEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.95f, 1.45f))
+                    .build()
+    );
+
+    public static final EntityType<AzureDragonEntity> AZURE_DRAGON = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "azure_dragon"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, AzureDragonEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.6f, 2.2f))
+                    .build()
+    );
+
+    public static final EntityType<QilinGuardianEntity> QILIN_GUARDIAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "qilin_guardian"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, QilinGuardianEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.5f, 2.0f))
+                    .build()
+    );
+
+    public static final EntityType<JiangshiEntity> JIANGSHI = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "jiangshi"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, JiangshiEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.8f, 2.1f))
+                    .build()
+    );
+
+    public static final EntityType<NineTailedFoxEntity> NINE_TAILED_FOX = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "nine_tailed_fox"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, NineTailedFoxEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.2f, 1.4f))
+                    .build()
+    );
+
+    public static final EntityType<StoneLionGuardianEntity> STONE_LION_GUARDIAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "stone_lion_guardian"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, StoneLionGuardianEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.6f, 1.7f))
+                    .build()
+    );
+
+    public static final EntityType<CrystalLeviathanEntity> CRYSTAL_LEVIATHAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "crystal_leviathan"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, CrystalLeviathanEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.4f, 2.4f))
+                    .build()
+    );
+
+    public static final EntityType<OrichalcumGolemEntity> ORICHALCUM_GOLEM = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "orichalcum_golem"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, OrichalcumGolemEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.7f, 3.2f))
+                    .build()
+    );
+
+    public static final EntityType<SirenPriestessEntity> SIREN_PRIESTESS = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "siren_priestess"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SirenPriestessEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.9f, 2.2f))
+                    .build()
+    );
+
+    public static final EntityType<TidalGuardianEntity> TIDAL_GUARDIAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "tidal_guardian"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, TidalGuardianEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.0f, 1.4f))
+                    .build()
+    );
+
+    public static final EntityType<AbyssalRayEntity> ABYSSAL_RAY = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(MythicAgeMod.MOD_ID, "abyssal_ray"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, AbyssalRayEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.6f, 0.9f))
+                    .trackRangeBlocks(10)
                     .build()
     );
 
@@ -327,11 +531,37 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(CENTAUR, CentaurEntity.createCentaurAttributes());
         FabricDefaultAttributeRegistry.register(HYDRA, HydraEntity.createHydraAttributes());
         FabricDefaultAttributeRegistry.register(MEDUSA, MedusaEntity.createMedusaAttributes());
+        FabricDefaultAttributeRegistry.register(NEMEAN_LION, NemeanLionEntity.createNemeanLionAttributes());
+        FabricDefaultAttributeRegistry.register(MANTICORE, ManticoreEntity.createManticoreAttributes());
+        FabricDefaultAttributeRegistry.register(CHIMERA, ChimeraEntity.createChimeraAttributes());
+        FabricDefaultAttributeRegistry.register(COLOSSUS, ColossusEntity.createColossusAttributes());
+        FabricDefaultAttributeRegistry.register(PEGASUS, PegasusEntity.createPegasusAttributes());
+        FabricDefaultAttributeRegistry.register(ANUBIS_WARRIOR, AnubisWarriorEntity.createAnubisWarriorAttributes());
+        FabricDefaultAttributeRegistry.register(SCARAB_GUARDIAN, ScarabGuardianEntity.createScarabGuardianAttributes());
+        FabricDefaultAttributeRegistry.register(MUMMY_SOLDIER, MummySoldierEntity.createMummySoldierAttributes());
+        FabricDefaultAttributeRegistry.register(SPHINX_SENTINEL, SphinxSentinelEntity.createSphinxSentinelAttributes());
+        FabricDefaultAttributeRegistry.register(SUN_FALCON, SunFalconEntity.createSunFalconAttributes());
+        FabricDefaultAttributeRegistry.register(FROST_GIANT, FrostGiantEntity.createFrostGiantAttributes());
+        FabricDefaultAttributeRegistry.register(DRAUGR_WARRIOR, DraugrWarriorEntity.createDraugrWarriorAttributes());
+        FabricDefaultAttributeRegistry.register(VALKYRIE, ValkyrieEntity.createValkyrieAttributes());
+        FabricDefaultAttributeRegistry.register(FENRIR_WOLF, FenrirWolfEntity.createFenrirWolfAttributes());
+        FabricDefaultAttributeRegistry.register(DWARF_BERSERKER, DwarfBerserkerEntity.createDwarfBerserkerAttributes());
+        FabricDefaultAttributeRegistry.register(AZURE_DRAGON, AzureDragonEntity.createAzureDragonAttributes());
+        FabricDefaultAttributeRegistry.register(QILIN_GUARDIAN, QilinGuardianEntity.createQilinGuardianAttributes());
+        FabricDefaultAttributeRegistry.register(JIANGSHI, JiangshiEntity.createJiangshiAttributes());
+        FabricDefaultAttributeRegistry.register(NINE_TAILED_FOX, NineTailedFoxEntity.createNineTailedFoxAttributes());
+        FabricDefaultAttributeRegistry.register(STONE_LION_GUARDIAN, StoneLionGuardianEntity.createStoneLionGuardianAttributes());
+        FabricDefaultAttributeRegistry.register(CRYSTAL_LEVIATHAN, CrystalLeviathanEntity.createCrystalLeviathanAttributes());
+        FabricDefaultAttributeRegistry.register(ORICHALCUM_GOLEM, OrichalcumGolemEntity.createOrichalcumGolemAttributes());
+        FabricDefaultAttributeRegistry.register(SIREN_PRIESTESS, SirenPriestessEntity.createSirenPriestessAttributes());
+        FabricDefaultAttributeRegistry.register(TIDAL_GUARDIAN, TidalGuardianEntity.createTidalGuardianAttributes());
+        FabricDefaultAttributeRegistry.register(ABYSSAL_RAY, AbyssalRayEntity.createAbyssalRayAttributes());
         
         // 注册行走树的默认属性
         FabricDefaultAttributeRegistry.register(WALKING_TREE, WalkingTreeEntity.createWalkingTreeAttributes());
         
         // 注册神殿守护者的默认属性 (使用村民属性)
+        FabricDefaultAttributeRegistry.register(TEMPLE_GUARDIAN, TempleGuardianEntity.createVillagerAttributes());
         FabricDefaultAttributeRegistry.register(TEMPLE_GUARDIAN_GREEK, TempleGuardianEntity.createVillagerAttributes());
         FabricDefaultAttributeRegistry.register(TEMPLE_GUARDIAN_EGYPTIAN, TempleGuardianEntity.createVillagerAttributes());
         FabricDefaultAttributeRegistry.register(TEMPLE_GUARDIAN_CHINESE, TempleGuardianEntity.createVillagerAttributes());
@@ -347,15 +577,31 @@ public class ModEntities {
         
         MythicAgeMod.LOGGER.info("Successfully registered entities:");
         MythicAgeMod.LOGGER.info("- 1 mythic creature: Minotaur (40 HP, 8 ATK, 0.25 Speed)");
-        MythicAgeMod.LOGGER.info("- 4 Greek myth creatures: Cyclops, Centaur, Hydra, Medusa");
+        MythicAgeMod.LOGGER.info("- 9 Greek myth creatures: Cyclops, Centaur, Hydra, Medusa, Nemean Lion, Manticore, Chimera, Colossus, Pegasus");
+        MythicAgeMod.LOGGER.info("- 5 Egyptian myth creatures: Anubis Warrior, Scarab Guardian, Mummy Soldier, Sphinx Sentinel, Sun Falcon");
+        MythicAgeMod.LOGGER.info("- 5 Nordic myth creatures: Frost Giant, Draugr Warrior, Valkyrie, Fenrir Wolf, Dwarf Berserker");
+        MythicAgeMod.LOGGER.info("- 5 Chinese myth creatures: Azure Dragon, Qilin Guardian, Jiangshi, Nine-tailed Fox, Stone Lion Guardian");
+        MythicAgeMod.LOGGER.info("- 5 Atlantean myth creatures: Crystal Leviathan, Orichalcum Golem, Siren Priestess, Tidal Guardian, Abyssal Ray");
         MythicAgeMod.LOGGER.info("- 5 village temple guardians (20 HP, Villager type)");
         MythicAgeMod.LOGGER.info("- 5 custom temple guardians (30 HP, 0.5 Speed, custom trade system)");
         MythicAgeMod.LOGGER.info("- Enhanced vanilla villagers with civilization AI through Mixin");
 
         registerGreekMythSpawns();
+        registerEgyptianMythSpawns();
+        registerNordicMythSpawns();
+        registerChineseMythSpawns();
+        registerAtlanteanMythSpawns();
     }
 
     private static void registerGreekMythSpawns() {
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.PLAINS, BiomeKeys.DARK_FOREST),
+                SpawnGroup.MONSTER,
+                MINOTAUR,
+                6,
+                1,
+                1
+        );
         BiomeModifications.addSpawn(
                 BiomeSelectors.tag(BiomeTags.IS_MOUNTAIN),
                 SpawnGroup.MONSTER,
@@ -388,11 +634,253 @@ public class ModEntities {
                 1,
                 1
         );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.tag(BiomeTags.IS_SAVANNA),
+                SpawnGroup.MONSTER,
+                NEMEAN_LION,
+                8,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.tag(BiomeTags.IS_BADLANDS),
+                SpawnGroup.MONSTER,
+                MANTICORE,
+                7,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.tag(BiomeTags.IS_JUNGLE),
+                SpawnGroup.MONSTER,
+                CHIMERA,
+                5,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.tag(BiomeTags.IS_MOUNTAIN),
+                SpawnGroup.MONSTER,
+                COLOSSUS,
+                3,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.tag(BiomeTags.IS_MOUNTAIN),
+                SpawnGroup.CREATURE,
+                PEGASUS,
+                4,
+                1,
+                1
+        );
 
+        SpawnRestriction.register(MINOTAUR, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
         SpawnRestriction.register(CYCLOPS, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
         SpawnRestriction.register(CENTAUR, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
         SpawnRestriction.register(HYDRA, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
         SpawnRestriction.register(MEDUSA, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(NEMEAN_LION, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(MANTICORE, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(CHIMERA, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(COLOSSUS, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(PEGASUS, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::isValidNaturalSpawn);
+    }
+
+    private static void registerEgyptianMythSpawns() {
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DESERT, BiomeKeys.BADLANDS, BiomeKeys.ERODED_BADLANDS, BiomeKeys.WOODED_BADLANDS),
+                SpawnGroup.MONSTER,
+                ANUBIS_WARRIOR,
+                7,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DESERT, BiomeKeys.BADLANDS, BiomeKeys.ERODED_BADLANDS, BiomeKeys.WOODED_BADLANDS),
+                SpawnGroup.MONSTER,
+                SCARAB_GUARDIAN,
+                9,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DESERT),
+                SpawnGroup.MONSTER,
+                MUMMY_SOLDIER,
+                12,
+                1,
+                3
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DESERT, BiomeKeys.BADLANDS),
+                SpawnGroup.MONSTER,
+                SPHINX_SENTINEL,
+                4,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DESERT, BiomeKeys.SAVANNA, BiomeKeys.SAVANNA_PLATEAU),
+                SpawnGroup.MONSTER,
+                SUN_FALCON,
+                7,
+                1,
+                2
+        );
+
+        SpawnRestriction.register(ANUBIS_WARRIOR, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(SCARAB_GUARDIAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(MUMMY_SOLDIER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(SPHINX_SENTINEL, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(SUN_FALCON, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+    }
+
+    private static void registerNordicMythSpawns() {
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.SNOWY_PLAINS, BiomeKeys.ICE_SPIKES, BiomeKeys.SNOWY_SLOPES, BiomeKeys.FROZEN_PEAKS, BiomeKeys.JAGGED_PEAKS),
+                SpawnGroup.MONSTER,
+                FROST_GIANT,
+                5,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.SNOWY_PLAINS, BiomeKeys.SNOWY_TAIGA, BiomeKeys.OLD_GROWTH_PINE_TAIGA, BiomeKeys.TAIGA, BiomeKeys.DEEP_DARK),
+                SpawnGroup.MONSTER,
+                DRAUGR_WARRIOR,
+                12,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.SNOWY_SLOPES, BiomeKeys.FROZEN_PEAKS, BiomeKeys.JAGGED_PEAKS, BiomeKeys.STONY_PEAKS),
+                SpawnGroup.MONSTER,
+                VALKYRIE,
+                5,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.SNOWY_TAIGA, BiomeKeys.OLD_GROWTH_PINE_TAIGA, BiomeKeys.TAIGA, BiomeKeys.DARK_FOREST, BiomeKeys.SNOWY_PLAINS),
+                SpawnGroup.MONSTER,
+                FENRIR_WOLF,
+                6,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.STONY_PEAKS, BiomeKeys.JAGGED_PEAKS, BiomeKeys.WINDSWEPT_HILLS, BiomeKeys.OLD_GROWTH_PINE_TAIGA, BiomeKeys.TAIGA),
+                SpawnGroup.MONSTER,
+                DWARF_BERSERKER,
+                9,
+                1,
+                2
+        );
+
+        SpawnRestriction.register(FROST_GIANT, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(DRAUGR_WARRIOR, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(VALKYRIE, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(FENRIR_WOLF, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(DWARF_BERSERKER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+    }
+
+    private static void registerChineseMythSpawns() {
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.JUNGLE, BiomeKeys.BAMBOO_JUNGLE, BiomeKeys.CHERRY_GROVE, BiomeKeys.WINDSWEPT_FOREST),
+                SpawnGroup.MONSTER,
+                AZURE_DRAGON,
+                4,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.CHERRY_GROVE, BiomeKeys.BAMBOO_JUNGLE, BiomeKeys.JUNGLE, BiomeKeys.WINDSWEPT_FOREST, BiomeKeys.MEADOW),
+                SpawnGroup.MONSTER,
+                QILIN_GUARDIAN,
+                5,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.SWAMP, createBiomeKey("mangrove_swamp"), BiomeKeys.DARK_FOREST, BiomeKeys.BAMBOO_JUNGLE),
+                SpawnGroup.MONSTER,
+                JIANGSHI,
+                10,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.CHERRY_GROVE, BiomeKeys.BAMBOO_JUNGLE, BiomeKeys.FLOWER_FOREST, BiomeKeys.TAIGA, BiomeKeys.OLD_GROWTH_PINE_TAIGA),
+                SpawnGroup.MONSTER,
+                NINE_TAILED_FOX,
+                7,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.STONY_PEAKS, BiomeKeys.WINDSWEPT_HILLS, BiomeKeys.WINDSWEPT_GRAVELLY_HILLS, BiomeKeys.JUNGLE, BiomeKeys.BAMBOO_JUNGLE),
+                SpawnGroup.MONSTER,
+                STONE_LION_GUARDIAN,
+                5,
+                1,
+                1
+        );
+
+        SpawnRestriction.register(AZURE_DRAGON, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(QILIN_GUARDIAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(JIANGSHI, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(NINE_TAILED_FOX, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(STONE_LION_GUARDIAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+    }
+
+    private static void registerAtlanteanMythSpawns() {
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.OCEAN, BiomeKeys.DEEP_OCEAN, BiomeKeys.WARM_OCEAN, BiomeKeys.LUKEWARM_OCEAN, BiomeKeys.COLD_OCEAN),
+                SpawnGroup.MONSTER,
+                CRYSTAL_LEVIATHAN,
+                4,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.BEACH, BiomeKeys.STONY_SHORE, BiomeKeys.OCEAN, BiomeKeys.DEEP_OCEAN),
+                SpawnGroup.MONSTER,
+                ORICHALCUM_GOLEM,
+                5,
+                1,
+                1
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.BEACH, BiomeKeys.WARM_OCEAN, BiomeKeys.LUKEWARM_OCEAN, BiomeKeys.OCEAN),
+                SpawnGroup.MONSTER,
+                SIREN_PRIESTESS,
+                7,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.BEACH, BiomeKeys.STONY_SHORE, BiomeKeys.WARM_OCEAN, BiomeKeys.LUKEWARM_OCEAN),
+                SpawnGroup.MONSTER,
+                TIDAL_GUARDIAN,
+                7,
+                1,
+                2
+        );
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(BiomeKeys.DEEP_OCEAN, BiomeKeys.OCEAN, BiomeKeys.WARM_OCEAN, BiomeKeys.LUKEWARM_OCEAN, BiomeKeys.COLD_OCEAN),
+                SpawnGroup.MONSTER,
+                ABYSSAL_RAY,
+                6,
+                1,
+                2
+        );
+
+        SpawnRestriction.register(CRYSTAL_LEVIATHAN, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(ORICHALCUM_GOLEM, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(SIREN_PRIESTESS, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(TIDAL_GUARDIAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
+        SpawnRestriction.register(ABYSSAL_RAY, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark);
     }
 
     private static RegistryKey<Biome> createBiomeKey(String name) {

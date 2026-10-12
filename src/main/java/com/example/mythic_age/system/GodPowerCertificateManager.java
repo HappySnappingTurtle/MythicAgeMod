@@ -1,10 +1,14 @@
 package com.example.mythic_age.system;
 
 import com.example.mythic_age.item.ModItems;
+import com.example.mythic_age.world.MythicAgeWorldState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -35,6 +39,7 @@ public class GodPowerCertificateManager {
     
     // 埃及神像基座数据
     private final Map<BlockPos, EgyptianStatueData> egyptianStatues = new HashMap<>();
+    private final Map<String, CivilizationProductionData> civilizationProductionState = new HashMap<>();
     
     public static GodPowerCertificateManager getInstance() {
         return INSTANCE;
@@ -127,6 +132,10 @@ public class GodPowerCertificateManager {
      * @param populationCount 人口数量
      */
     public void handleChinesePopulationGeneration(ServerWorld world, BlockPos villageCenter, int populationCount) {
+        if (!canGenerateCivilizationProduction(world, "chinese_population", "CHINESE", villageCenter, 1200)) {
+            return;
+        }
+
         // 每20个村民产出1个神力证明，每分钟检查一次
         int baseAmount = populationCount / 20;
         int bonusChance = (populationCount % 20) * 5; // 剩余人口提供概率奖励
@@ -142,9 +151,114 @@ public class GodPowerCertificateManager {
             // 在村庄中心附近掉落
             world.spawnEntity(new net.minecraft.entity.ItemEntity(world, 
                 villageCenter.getX() + 0.5, villageCenter.getY() + 1, villageCenter.getZ() + 0.5, certificate));
+            recordCivilizationProduction(world, "chinese_population", "CHINESE", villageCenter, totalAmount);
         }
     }
+
+    public boolean canGenerateCivilizationProduction(ServerWorld world, String sourceType, String civilization, BlockPos sourcePos, int intervalTicks) {
+        MythicAgeWorldState.get(world.getServer());
+        String key = productionKey(world, sourceType, civilization, sourcePos);
+        CivilizationProductionData data = civilizationProductionState.get(key);
+        return data == null || world.getTime() - data.lastGenerationTime >= intervalTicks;
+    }
+
+    public void recordCivilizationProduction(ServerWorld world, String sourceType, String civilization, BlockPos sourcePos, int generatedAmount) {
+        MythicAgeWorldState worldState = MythicAgeWorldState.get(world.getServer());
+        String key = productionKey(world, sourceType, civilization, sourcePos);
+        civilizationProductionState.put(
+                key,
+                new CivilizationProductionData(
+                        sourceType,
+                        civilization,
+                        world.getRegistryKey().getValue().toString(),
+                        sourcePos,
+                        world.getTime(),
+                        generatedAmount
+                )
+        );
+        worldState.markDirty();
+    }
+
+    public NbtCompound writePersistentState() {
+        NbtCompound root = new NbtCompound();
+        NbtList entries = new NbtList();
+        for (Map.Entry<String, CivilizationProductionData> entry : civilizationProductionState.entrySet()) {
+            CivilizationProductionData data = entry.getValue();
+            NbtCompound record = new NbtCompound();
+            record.putString("Key", entry.getKey());
+            record.putString("SourceType", data.sourceType);
+            record.putString("Civilization", data.civilization);
+            record.putString("Dimension", data.dimension);
+            record.putLong("SourcePos", data.sourcePos.asLong());
+            record.putLong("LastGenerationTime", data.lastGenerationTime);
+            record.putInt("GeneratedAmount", data.generatedAmount);
+            entries.add(record);
+        }
+        root.put("CivilizationProductionState", entries);
+        return root;
+    }
+
+    public void readPersistentState(NbtCompound nbt) {
+        civilizationProductionState.clear();
+        NbtList entries = nbt.getList("CivilizationProductionState", NbtElement.COMPOUND_TYPE);
+        for (int i = 0; i < entries.size(); i++) {
+            NbtCompound record = entries.getCompound(i);
+            String key = record.getString("Key");
+            if (key.isEmpty() || !record.contains("SourcePos", NbtElement.LONG_TYPE)) {
+                continue;
+            }
+            civilizationProductionState.put(
+                    key,
+                    new CivilizationProductionData(
+                            record.getString("SourceType"),
+                            record.getString("Civilization"),
+                            record.getString("Dimension"),
+                            BlockPos.fromLong(record.getLong("SourcePos")),
+                            record.getLong("LastGenerationTime"),
+                            record.getInt("GeneratedAmount")
+                    )
+            );
+        }
+    }
+
+    private String productionKey(ServerWorld world, String sourceType, String civilization, BlockPos sourcePos) {
+        return sourceType + "|" + civilization + "|" + world.getRegistryKey().getValue() + "|" + sourcePos.asLong();
+    }
     
+    /**
+     * 中国文明人口产出 tick 入口。
+     * 遍历世界中的中华神殿位置，根据附近中华村民人口驱动证书产出。
+     */
+    public void tickChinesePopulation(ServerWorld world) {
+        if (world.getTime() % 1200 != 0) return;
+
+        java.util.List<net.minecraft.entity.passive.VillagerEntity> allVillagers =
+            world.getEntitiesByClass(
+                net.minecraft.entity.passive.VillagerEntity.class,
+                new net.minecraft.util.math.Box(
+                    world.getWorldBorder().getBoundWest(), world.getBottomY(), world.getWorldBorder().getBoundNorth(),
+                    world.getWorldBorder().getBoundEast(), world.getTopY(), world.getWorldBorder().getBoundSouth()),
+                v -> v.isAlive()
+                    && v instanceof com.example.mythic_age.entity.CivilizedVillager cv
+                    && cv.mythicAge$getCivilization() == com.example.mythic_age.item.GodPowerCertificateItem.MythologyType.CHINESE
+            );
+
+        if (allVillagers.isEmpty()) return;
+
+        java.util.Map<BlockPos, Integer> clusters = new java.util.HashMap<>();
+        for (var villager : allVillagers) {
+            BlockPos rounded = new BlockPos(
+                villager.getBlockX() >> 5 << 5,
+                villager.getBlockY(),
+                villager.getBlockZ() >> 5 << 5);
+            clusters.merge(rounded, 1, Integer::sum);
+        }
+
+        for (var entry : clusters.entrySet()) {
+            handleChinesePopulationGeneration(world, entry.getKey(), entry.getValue());
+        }
+    }
+
     /**
      * 注册埃及神像基座
      */
@@ -236,6 +350,24 @@ public class GodPowerCertificateManager {
         
         EgyptianStatueData(EgyptianStatueType type) {
             this.type = type;
+        }
+    }
+
+    private static class CivilizationProductionData {
+        final String sourceType;
+        final String civilization;
+        final String dimension;
+        final BlockPos sourcePos;
+        final long lastGenerationTime;
+        final int generatedAmount;
+
+        CivilizationProductionData(String sourceType, String civilization, String dimension, BlockPos sourcePos, long lastGenerationTime, int generatedAmount) {
+            this.sourceType = sourceType;
+            this.civilization = civilization;
+            this.dimension = dimension;
+            this.sourcePos = sourcePos;
+            this.lastGenerationTime = lastGenerationTime;
+            this.generatedAmount = generatedAmount;
         }
     }
 }

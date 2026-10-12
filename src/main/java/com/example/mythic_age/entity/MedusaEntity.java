@@ -1,5 +1,6 @@
 package com.example.mythic_age.entity;
 
+import com.example.mythic_age.entity.ai.goal.MedusaStoneGazeGoal;
 import com.example.mythic_age.sound.ModSounds;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -44,6 +45,7 @@ public class MedusaEntity extends GreekMythEntity {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(0, new SwimGoal(this));
+        this.goalSelector.add(1, new MedusaStoneGazeGoal(this));
         this.goalSelector.add(2, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.75D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 10.0F));
@@ -53,33 +55,7 @@ public class MedusaEntity extends GreekMythEntity {
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (!this.getWorld().isClient && this.isAlive()) {
-            tryPetrifyingGaze();
-        }
-    }
-
-    private void tryPetrifyingGaze() {
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive() || !this.canUseSpecial() || !this.canSee(target)) {
-            return;
-        }
-        if (this.squaredDistanceTo(target) > 110.0D) {
-            return;
-        }
-
-        this.getLookControl().lookAt(target, 35.0F, 35.0F);
-        this.playSpecialSound(ModSounds.ENTITY_MEDUSA_SPECIAL);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 120, 4), this);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 120, 1), this);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 120, 1), this);
-        target.damage(this.getDamageSources().mobAttack(this), 2.0F);
-        this.spawnParticles(ParticleTypes.WHITE_ASH, target.getX(), target.getBodyY(0.55D), target.getZ(), 28, 0.55D, 0.02D);
-        this.spawnParticles(ParticleTypes.ENCHANT, this.getX(), this.getEyeY(), this.getZ(), 16, 0.25D, 0.04D);
-        this.setSpecialCooldown(PETRIFY_COOLDOWN);
-    }
+    // Petrifying gaze is now handled by MedusaStoneGazeGoal registered in initGoals()
 
     @Override
     protected SoundEvent getAmbientSound() {

@@ -18,4 +18,14 @@ public interface CivilizedVillager {
      * 设置村民的文明类型
      */
     void mythicAge$setCivilization(GodPowerCertificateItem.MythologyType civilization);
+
+    /**
+     * 获取劳作证书冷却剩余 tick
+     */
+    int mythicAge$getWorkCooldown();
+
+    /**
+     * 设置劳作证书冷却
+     */
+    void mythicAge$setWorkCooldown(int ticks);
 }

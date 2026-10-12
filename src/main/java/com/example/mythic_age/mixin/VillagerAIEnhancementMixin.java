@@ -28,6 +28,7 @@ public class VillagerAIEnhancementMixin implements CivilizedVillager {
     private GodPowerCertificateItem.MythologyType mythicAge$civilization = null;
     private boolean mythicAge$civilizationInitialized = false;
     private boolean mythicAge$aiInitialized = false;
+    private int mythicAge$workCertificateCooldown = 0;
     
     /**
      * 在村民初始化时设置文明类型
@@ -51,13 +52,17 @@ public class VillagerAIEnhancementMixin implements CivilizedVillager {
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
         VillagerEntity villager = (VillagerEntity) (Object) this;
-        
+
+        if (!villager.getWorld().isClient && mythicAge$workCertificateCooldown > 0) {
+            mythicAge$workCertificateCooldown--;
+        }
+
         // 只在服务器端执行，且文明已初始化但AI未初始化时
-        if (!villager.getWorld().isClient && 
-            mythicAge$civilizationInitialized && 
-            !mythicAge$aiInitialized && 
+        if (!villager.getWorld().isClient &&
+            mythicAge$civilizationInitialized &&
+            !mythicAge$aiInitialized &&
             mythicAge$civilization != null) {
-            
+
             addCivilizationAI(villager);
             mythicAge$aiInitialized = true;
         }
@@ -97,7 +102,17 @@ public class VillagerAIEnhancementMixin implements CivilizedVillager {
     public void mythicAge$setCivilization(GodPowerCertificateItem.MythologyType civilization) {
         this.mythicAge$civilization = civilization;
         this.mythicAge$civilizationInitialized = true;
-        this.mythicAge$aiInitialized = false; // 重置AI初始化状态
+        this.mythicAge$aiInitialized = false;
+    }
+
+    @Override
+    public int mythicAge$getWorkCooldown() {
+        return mythicAge$workCertificateCooldown;
+    }
+
+    @Override
+    public void mythicAge$setWorkCooldown(int ticks) {
+        this.mythicAge$workCertificateCooldown = ticks;
     }
     
     /**
@@ -117,6 +132,7 @@ public class VillagerAIEnhancementMixin implements CivilizedVillager {
         }
         nbt.putBoolean("MythicAge_CivilizationInitialized", mythicAge$civilizationInitialized);
         nbt.putBoolean("MythicAge_AIInitialized", mythicAge$aiInitialized);
+        nbt.putInt("MythicAge_WorkCertificateCooldown", mythicAge$workCertificateCooldown);
     }
     
     /**
@@ -134,5 +150,6 @@ public class VillagerAIEnhancementMixin implements CivilizedVillager {
         }
         mythicAge$civilizationInitialized = nbt.getBoolean("MythicAge_CivilizationInitialized");
         mythicAge$aiInitialized = nbt.getBoolean("MythicAge_AIInitialized");
+        mythicAge$workCertificateCooldown = nbt.getInt("MythicAge_WorkCertificateCooldown");
     }
 }

@@ -128,6 +128,18 @@ public class ModItemGroups {
                         entries.add(ModItems.SPELLBOOK_WALKING_WOODS);      // 行走的森林 - 世界树神力
                         entries.add(ModItems.SPELLBOOK_RAGNAROK);           // 诸神黄昏 - 终极神力
                         entries.add(ModItems.SPELLBOOK_FIMBULWINTER);       // 芬布尔之冬 - 终极神力
+
+                        // 亚特兰蒂斯神力法术书 - 按从小神力到终极神力排序
+                        entries.add(ModItems.SPELLBOOK_TIDAL_SURGE);        // 潮汐奔流 - 水流攻击
+                        entries.add(ModItems.SPELLBOOK_ABYSSAL_CURRENT);    // 深流跃迁 - 机动位移
+                        entries.add(ModItems.SPELLBOOK_CRYSTAL_BARRIER);    // 水晶屏障 - 防御护盾
+                        entries.add(ModItems.SPELLBOOK_PEARL_HARVEST);      // 珍珠丰收 - 海底资源
+                        entries.add(ModItems.SPELLBOOK_ORICHALCUM_FORGE);   // 山铜熔炉 - 资源与强化
+                        entries.add(ModItems.SPELLBOOK_SIREN_SONG);         // 海妖之歌 - 控制与恢复
+                        entries.add(ModItems.SPELLBOOK_LEVIATHAN_CALL);     // 利维坦召唤 - 幻影压制
+                        entries.add(ModItems.SPELLBOOK_ABYSSAL_RIFT);       // 深渊裂隙 - 拉扯伤害
+                        entries.add(ModItems.SPELLBOOK_CHRONO_STASIS);      // 时滞静域 - 终极控制
+                        entries.add(ModItems.SPELLBOOK_OCEANIC_WRATH);      // 海洋震怒 - 终极风暴
                         
                         // 神殿生成法术书 (测试用)
                         entries.add(ModItems.SPELLBOOK_GENERATE_EGYPTIAN_TEMPLE);  // 埃及神殿生成
@@ -304,6 +316,31 @@ public class ModItemGroups {
                         entries.add(ModItems.CENTAUR_SPAWN_EGG);                     // 半人马怪物蛋
                         entries.add(ModItems.HYDRA_SPAWN_EGG);                       // 九头蛇怪物蛋
                         entries.add(ModItems.MEDUSA_SPAWN_EGG);                      // 美杜莎怪物蛋
+                        entries.add(ModItems.NEMEAN_LION_SPAWN_EGG);                 // 尼米亚狮怪物蛋
+                        entries.add(ModItems.MANTICORE_SPAWN_EGG);                   // 蝎尾狮怪物蛋
+                        entries.add(ModItems.CHIMERA_SPAWN_EGG);                     // 奇美拉怪物蛋
+                        entries.add(ModItems.COLOSSUS_SPAWN_EGG);                    // 青铜巨像怪物蛋
+                        entries.add(ModItems.PEGASUS_SPAWN_EGG);                     // 天马刷怪蛋
+                        entries.add(ModItems.ANUBIS_WARRIOR_SPAWN_EGG);              // 阿努比斯战士刷怪蛋
+                        entries.add(ModItems.SCARAB_GUARDIAN_SPAWN_EGG);             // 圣甲虫守卫刷怪蛋
+                        entries.add(ModItems.MUMMY_SOLDIER_SPAWN_EGG);               // 木乃伊士兵刷怪蛋
+                        entries.add(ModItems.SPHINX_SENTINEL_SPAWN_EGG);             // 狮身人面守卫刷怪蛋
+                        entries.add(ModItems.SUN_FALCON_SPAWN_EGG);                  // 太阳隼刷怪蛋
+                        entries.add(ModItems.FROST_GIANT_SPAWN_EGG);                 // 霜巨人刷怪蛋
+                        entries.add(ModItems.DRAUGR_WARRIOR_SPAWN_EGG);              // 亡灵战士刷怪蛋
+                        entries.add(ModItems.VALKYRIE_SPAWN_EGG);                    // 女武神刷怪蛋
+                        entries.add(ModItems.FENRIR_WOLF_SPAWN_EGG);                 // 芬里尔巨狼刷怪蛋
+                        entries.add(ModItems.DWARF_BERSERKER_SPAWN_EGG);             // 矮人狂战士刷怪蛋
+                        entries.add(ModItems.AZURE_DRAGON_SPAWN_EGG);                // 青龙刷怪蛋
+                        entries.add(ModItems.QILIN_GUARDIAN_SPAWN_EGG);              // 麒麟守护者刷怪蛋
+                        entries.add(ModItems.JIANGSHI_SPAWN_EGG);                    // 僵尸刷怪蛋
+                        entries.add(ModItems.NINE_TAILED_FOX_SPAWN_EGG);             // 九尾狐刷怪蛋
+                        entries.add(ModItems.STONE_LION_GUARDIAN_SPAWN_EGG);         // 石狮守卫刷怪蛋
+                        entries.add(ModItems.CRYSTAL_LEVIATHAN_SPAWN_EGG);           // 水晶利维坦刷怪蛋
+                        entries.add(ModItems.ORICHALCUM_GOLEM_SPAWN_EGG);            // 山铜魔像刷怪蛋
+                        entries.add(ModItems.SIREN_PRIESTESS_SPAWN_EGG);             // 海妖祭司刷怪蛋
+                        entries.add(ModItems.TIDAL_GUARDIAN_SPAWN_EGG);              // 潮汐守卫刷怪蛋
+                        entries.add(ModItems.ABYSSAL_RAY_SPAWN_EGG);                 // 深渊鳐刷怪蛋
                         
                         // 神殿守护者刷怪蛋 - 按文明排序
                         entries.add(ModItems.TEMPLE_GUARDIAN_GREEK_SPAWN_EGG);       // 希腊神殿守护者刷怪蛋

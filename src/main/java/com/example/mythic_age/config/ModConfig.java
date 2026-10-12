@@ -20,6 +20,11 @@ public class ModConfig {
     // 性能设置
     public static final int MAX_METEORS_PER_SPELL = 5;
     public static final int PARTICLE_DISTANCE_THRESHOLD = 32; // 超过此距离减少粒子
+    public static final boolean PARTICLES_ENABLED = true;
+    public static final double PARTICLE_DENSITY_MULTIPLIER = 1.0D;
+    public static final double PARTICLE_FAR_DISTANCE_MULTIPLIER = 0.35D;
+    public static final int PARTICLE_MAX_RENDER_DISTANCE = 64;
+    public static final int MAX_PARTICLES_PER_BURST = 160;
     public static final int MAX_DEBUG_MESSAGES_PER_TICK = 10;
     
     // 调试计数器

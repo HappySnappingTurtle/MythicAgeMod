@@ -85,6 +85,7 @@ public class AbundanceAltarCoreBlockEntity extends BlockEntity {
             } else {
                 // 结构不完整，延迟一段时间再检查
                 blockEntity.nextGenerationTime = currentTime + 200; // 10秒后再检查
+                blockEntity.markDirty();
             }
         }
     }
@@ -338,6 +339,7 @@ public class AbundanceAltarCoreBlockEntity extends BlockEntity {
             int interval = MIN_GENERATION_INTERVAL + 
                          world.random.nextInt(MAX_GENERATION_INTERVAL - MIN_GENERATION_INTERVAL);
             nextGenerationTime = currentTime + interval;
+            markDirty();
         }
     }
 

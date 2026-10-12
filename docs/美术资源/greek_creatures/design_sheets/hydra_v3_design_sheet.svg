@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <style>
+      .bg { fill: #f3efe5; }
+      .panel { fill: #fffdf8; stroke: #51605a; stroke-width: 3; }
+      .label { font-family: Arial, sans-serif; font-size: 24px; fill: #17231d; }
+      .small { font-family: Arial, sans-serif; font-size: 18px; fill: #28362f; }
+      .note { font-family: Arial, sans-serif; font-size: 20px; fill: #1b2b22; }
+      .body { fill: #244b2f; stroke: #0e1f14; stroke-width: 5; stroke-linejoin: round; }
+      .belly { fill: #3d6a36; stroke: #0e1f14; stroke-width: 4; stroke-linejoin: round; }
+      .neck { fill: none; stroke: #1f5a31; stroke-width: 28; stroke-linecap: round; stroke-linejoin: round; }
+      .neckShadow { fill: none; stroke: #0d2515; stroke-width: 34; stroke-linecap: round; stroke-linejoin: round; }
+      .head { fill: #2d6f39; stroke: #0e1f14; stroke-width: 4; stroke-linejoin: round; }
+      .jaw { fill: #172219; stroke: #0e1f14; stroke-width: 3; }
+      .crest { fill: #78b356; stroke: #0e1f14; stroke-width: 3; }
+      .eye { fill: #e3f06b; stroke: #0e1f14; stroke-width: 2; }
+      .fang { fill: #eee7ce; stroke: #0e1f14; stroke-width: 2; }
+      .thin { stroke: #52635a; stroke-width: 3; fill: none; stroke-linecap: round; }
+      .socket { fill: #79b24e; stroke: #0e1f14; stroke-width: 3; }
+      .reject { fill: #fff3df; stroke: #a96d26; stroke-width: 3; }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1600" height="1000"/>
+  <text class="label" x="50" y="55">Hydra V3 technical design sheet - low long body, nine connected necks</text>
+
+  <rect class="panel" x="50" y="90" width="980" height="470"/>
+  <text class="label" x="80" y="130">45 degree structure: nine heads are connected, not pasted on</text>
+  <line class="thin" x1="95" y1="520" x2="985" y2="520"/>
+  <polygon class="body" points="255,350 660,320 880,365 900,440 610,475 220,440"/>
+  <polygon class="belly" points="250,400 650,382 865,420 615,465 215,432"/>
+  <polygon class="body" points="245,410 120,445 82,430 210,370"/>
+  <polygon class="body" points="850,392 1000,410 910,445"/>
+  <rect class="body" x="310" y="455" width="58" height="90" rx="8"/>
+  <rect class="body" x="655" y="450" width="58" height="95" rx="8"/>
+  <polygon class="crest" points="300,330 330,290 360,325"/>
+  <polygon class="crest" points="395,322 425,280 455,318"/>
+  <polygon class="crest" points="500,316 530,270 560,314"/>
+  <polygon class="crest" points="610,322 642,282 675,325"/>
+  <polygon class="crest" points="720,340 750,302 785,348"/>
+
+  <rect class="socket" x="360" y="320" width="38" height="32"/>
+  <rect class="socket" x="405" y="312" width="38" height="32"/>
+  <rect class="socket" x="450" y="304" width="38" height="32"/>
+  <rect class="socket" x="500" y="298" width="38" height="32"/>
+  <rect class="socket" x="552" y="298" width="38" height="32"/>
+  <rect class="socket" x="604" y="305" width="38" height="32"/>
+  <rect class="socket" x="652" y="314" width="38" height="32"/>
+  <rect class="socket" x="700" y="330" width="38" height="32"/>
+  <rect class="socket" x="744" y="350" width="38" height="32"/>
+
+  <path class="neckShadow" d="M379 326 C330 265, 285 230, 225 210"/>
+  <path class="neckShadow" d="M424 318 C375 230, 330 185, 275 145"/>
+  <path class="neckShadow" d="M469 310 C440 215, 415 150, 350 110"/>
+  <path class="neckShadow" d="M519 304 C510 205, 505 140, 465 95"/>
+  <path class="neckShadow" d="M571 304 C570 195, 590 130, 625 95"/>
+  <path class="neckShadow" d="M623 311 C645 220, 695 160, 760 130"/>
+  <path class="neckShadow" d="M671 320 C710 245, 780 205, 855 185"/>
+  <path class="neckShadow" d="M719 337 C765 275, 835 250, 910 252"/>
+  <path class="neckShadow" d="M763 357 C815 322, 875 322, 940 340"/>
+
+  <path class="neck" d="M379 326 C330 265, 285 230, 225 210"/>
+  <path class="neck" d="M424 318 C375 230, 330 185, 275 145"/>
+  <path class="neck" d="M469 310 C440 215, 415 150, 350 110"/>
+  <path class="neck" d="M519 304 C510 205, 505 140, 465 95"/>
+  <path class="neck" d="M571 304 C570 195, 590 130, 625 95"/>
+  <path class="neck" d="M623 311 C645 220, 695 160, 760 130"/>
+  <path class="neck" d="M671 320 C710 245, 780 205, 855 185"/>
+  <path class="neck" d="M719 337 C765 275, 835 250, 910 252"/>
+  <path class="neck" d="M763 357 C815 322, 875 322, 940 340"/>
+
+  <g>
+    <polygon class="head" points="190,185 236,178 270,202 232,228 190,224"/>
+    <polygon class="jaw" points="202,224 238,229 220,246"/>
+    <circle class="eye" cx="230" cy="199" r="5"/>
+    <polygon class="fang" points="238,222 246,223 242,238"/>
+  </g>
+  <g>
+    <polygon class="head" points="240,120 288,112 323,138 285,164 240,160"/>
+    <polygon class="jaw" points="252,160 292,165 272,182"/>
+    <circle class="eye" cx="282" cy="134" r="5"/>
+    <polygon class="fang" points="292,158 300,160 296,175"/>
+  </g>
+  <g>
+    <polygon class="head" points="316,82 365,74 402,102 365,128 318,122"/>
+    <polygon class="jaw" points="330,123 370,130 350,148"/>
+    <circle class="eye" cx="360" cy="98" r="5"/>
+    <polygon class="fang" points="372,122 380,124 376,140"/>
+  </g>
+  <g>
+    <polygon class="head" points="436,70 485,62 524,92 486,118 438,112"/>
+    <polygon class="jaw" points="450,112 492,120 472,138"/>
+    <circle class="eye" cx="480" cy="88" r="5"/>
+    <polygon class="fang" points="494,111 502,113 498,130"/>
+  </g>
+  <g>
+    <polygon class="head" points="598,68 650,60 690,92 650,120 600,112"/>
+    <polygon class="jaw" points="612,113 656,122 635,142"/>
+    <circle class="eye" cx="646" cy="88" r="5"/>
+    <polygon class="fang" points="660,112 668,114 664,132"/>
+  </g>
+  <g>
+    <polygon class="head" points="735,105 786,98 824,126 785,154 737,148"/>
+    <polygon class="jaw" points="750,148 790,155 770,174"/>
+    <circle class="eye" cx="780" cy="122" r="5"/>
+    <polygon class="fang" points="792,146 800,148 796,164"/>
+  </g>
+  <g>
+    <polygon class="head" points="830,160 882,154 922,181 884,210 832,203"/>
+    <polygon class="jaw" points="846,203 888,211 868,229"/>
+    <circle class="eye" cx="878" cy="177" r="5"/>
+    <polygon class="fang" points="890,202 898,204 894,220"/>
+  </g>
+  <g>
+    <polygon class="head" points="888,230 940,226 980,252 942,281 890,274"/>
+    <polygon class="jaw" points="904,274 946,282 926,300"/>
+    <circle class="eye" cx="936" cy="248" r="5"/>
+    <polygon class="fang" points="948,272 956,274 952,290"/>
+  </g>
+  <g>
+    <polygon class="head" points="918,318 970,314 1010,340 972,370 920,362"/>
+    <polygon class="jaw" points="934,362 976,370 956,388"/>
+    <circle class="eye" cx="966" cy="336" r="5"/>
+    <polygon class="fang" points="978,360 986,362 982,378"/>
+  </g>
+  <rect class="reject" x="405" y="530" width="310" height="28" rx="4"/>
+  <text class="small" x="415" y="551">all neck roots overlap visible sockets</text>
+
+  <rect class="panel" x="1070" y="90" width="480" height="470"/>
+  <text class="label" x="1100" y="130">Side view: low body, long tail</text>
+  <line class="thin" x1="1110" y1="520" x2="1515" y2="520"/>
+  <polygon class="body" points="1130,405 1405,390 1510,420 1400,455 1130,450"/>
+  <polygon class="body" points="1395,420 1535,430 1435,455"/>
+  <polygon class="body" points="1135,425 1078,440 1105,405"/>
+  <rect class="body" x="1195" y="445" width="42" height="80"/>
+  <rect class="body" x="1350" y="443" width="42" height="82"/>
+  <path class="neckShadow" d="M1210 402 C1190 320, 1160 260, 1105 225"/>
+  <path class="neckShadow" d="M1260 397 C1260 305, 1250 245, 1210 205"/>
+  <path class="neckShadow" d="M1310 395 C1340 315, 1390 260, 1450 240"/>
+  <path class="neck" d="M1210 402 C1190 320, 1160 260, 1105 225"/>
+  <path class="neck" d="M1260 397 C1260 305, 1250 245, 1210 205"/>
+  <path class="neck" d="M1310 395 C1340 315, 1390 260, 1450 240"/>
+  <polygon class="head" points="1070,205 1120,198 1155,224 1118,250 1072,244"/>
+  <circle class="eye" cx="1114" cy="220" r="5"/>
+  <polygon class="head" points="1180,180 1230,172 1268,202 1230,228 1182,222"/>
+  <circle class="eye" cx="1224" cy="196" r="5"/>
+  <polygon class="head" points="1420,215 1470,208 1508,238 1470,265 1422,258"/>
+  <circle class="eye" cx="1464" cy="233" r="5"/>
+  <text class="small" x="1110" y="555">body height stays below one third of total silhouette</text>
+
+  <rect class="panel" x="50" y="600" width="700" height="330"/>
+  <text class="label" x="80" y="640">Front view: fan, not a head wall</text>
+  <line class="thin" x1="95" y1="885" x2="710" y2="885"/>
+  <polygon class="body" points="245,735 545,720 645,785 525,840 250,825 150,780"/>
+  <rect class="socket" x="230" y="710" width="34" height="28"/>
+  <rect class="socket" x="275" y="690" width="34" height="28"/>
+  <rect class="socket" x="325" y="675" width="34" height="28"/>
+  <rect class="socket" x="380" y="665" width="34" height="28"/>
+  <rect class="socket" x="435" y="665" width="34" height="28"/>
+  <rect class="socket" x="490" y="675" width="34" height="28"/>
+  <rect class="socket" x="540" y="690" width="34" height="28"/>
+  <rect class="socket" x="585" y="710" width="34" height="28"/>
+  <path class="neckShadow" d="M247 715 C210 665, 165 640, 120 630"/>
+  <path class="neckShadow" d="M292 695 C260 630, 230 595, 190 575"/>
+  <path class="neckShadow" d="M342 680 C325 615, 300 565, 260 535"/>
+  <path class="neckShadow" d="M397 670 C395 595, 385 545, 350 505"/>
+  <path class="neckShadow" d="M452 670 C465 595, 485 545, 520 505"/>
+  <path class="neckShadow" d="M507 680 C535 620, 585 580, 640 560"/>
+  <path class="neckShadow" d="M557 695 C600 645, 655 625, 705 620"/>
+  <path class="neckShadow" d="M602 715 C650 685, 695 682, 725 700"/>
+  <path class="neck" d="M247 715 C210 665, 165 640, 120 630"/>
+  <path class="neck" d="M292 695 C260 630, 230 595, 190 575"/>
+  <path class="neck" d="M342 680 C325 615, 300 565, 260 535"/>
+  <path class="neck" d="M397 670 C395 595, 385 545, 350 505"/>
+  <path class="neck" d="M452 670 C465 595, 485 545, 520 505"/>
+  <path class="neck" d="M507 680 C535 620, 585 580, 640 560"/>
+  <path class="neck" d="M557 695 C600 645, 655 625, 705 620"/>
+  <path class="neck" d="M602 715 C650 685, 695 682, 725 700"/>
+  <text class="small" x="105" y="910">front fan must keep gaps between heads and visible neck roots</text>
+
+  <rect class="panel" x="790" y="600" width="760" height="330"/>
+  <text class="label" x="820" y="640">Design approval conditions</text>
+  <text class="note" x="830" y="685">1. Nine heads are the default; changing to five is a design decision before modeling.</text>
+  <text class="note" x="830" y="725">2. Each neck has root, mid, tip, and overlaps a named shoulder socket.</text>
+  <text class="note" x="830" y="765">3. Body is low and long; mass must not become a front-facing cube.</text>
+  <text class="note" x="830" y="805">4. Each head has eyes, jaw split, mouth line, fang, and crest or poison gland.</text>
+  <text class="note" x="830" y="845">5. 45 degree view must show staggered heads, not a single block wall.</text>
+  <text class="note" x="830" y="885">6. Animation must preserve neck-root and head-neck contact in all frames.</text>
+</svg>

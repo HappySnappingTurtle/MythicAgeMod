@@ -1,5 +1,6 @@
 package com.example.mythic_age.entity;
 
+import com.example.mythic_age.entity.ai.goal.HydraPoisonSweepGoal;
 import com.example.mythic_age.sound.ModSounds;
 import java.util.List;
 import net.minecraft.entity.EntityType;
@@ -45,7 +46,8 @@ public class HydraEntity extends GreekMythEntity {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new MeleeAttackGoal(this, 0.9D, false));
+        this.goalSelector.add(1, new HydraPoisonSweepGoal(this));
+        this.goalSelector.add(2, new MeleeAttackGoal(this, 0.9D, false));
         this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.65D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 9.0F));
         this.goalSelector.add(7, new LookAroundGoal(this));
@@ -54,43 +56,7 @@ public class HydraEntity extends GreekMythEntity {
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (!this.getWorld().isClient && this.isAlive()) {
-            tryPoisonSweep();
-        }
-    }
-
-    private void tryPoisonSweep() {
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive() || !this.canUseSpecial() || this.squaredDistanceTo(target) > 30.0D) {
-            return;
-        }
-
-        this.playSpecialSound(ModSounds.ENTITY_HYDRA_SPECIAL);
-        Box area = this.getBoundingBox().expand(4.2D, 1.0D, 4.2D);
-        List<LivingEntity> victims = this.getWorld().getEntitiesByClass(
-                LivingEntity.class,
-                area,
-                entity -> entity != this && entity.isAlive() && !(entity instanceof HydraEntity)
-        );
-
-        for (LivingEntity victim : victims) {
-            if (this.canSee(victim)) {
-                this.damageAndKnockback(victim, 5.0F, 0.75F);
-                victim.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(
-                        net.minecraft.entity.effect.StatusEffects.POISON,
-                        100,
-                        0
-                ), this);
-            }
-        }
-
-        this.spawnParticles(ParticleTypes.SNEEZE, this.getX(), this.getBodyY(0.55D), this.getZ(), 32, 1.25D, 0.05D);
-        this.spawnParticles(ParticleTypes.SWEEP_ATTACK, this.getX(), this.getBodyY(0.45D), this.getZ(), 3, 0.8D, 0.0D);
-        this.setSpecialCooldown(POISON_SWEEP_COOLDOWN);
-    }
+    // Poison sweep is now handled by HydraPoisonSweepGoal registered in initGoals()
 
     @Override
     protected SoundEvent getAmbientSound() {

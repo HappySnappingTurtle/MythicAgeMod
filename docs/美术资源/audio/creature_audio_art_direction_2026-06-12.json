@@ -1,0 +1,425 @@
+{
+  "version": 1,
+  "scope": "mythic_age_1_0_creature_audio_art_direction",
+  "status": "direction_ready_pending_final_mix",
+  "civilization_palettes": {
+    "greek": {
+      "palette": "bronze impact, marble resonance, heroic breath, mythic beast growls",
+      "mix_target": "clear combat readability with strong low-mid body and short mythic accents"
+    },
+    "egyptian": {
+      "palette": "dry sand scrape, gold chime, jackal breath, tomb air, sun flare",
+      "mix_target": "ancient, dry, percussive sounds with readable divine accents"
+    },
+    "nordic": {
+      "palette": "ice crack, cold wind, iron hit, bone rattle, rune hum",
+      "mix_target": "heavy cold transients, low rumble, and sparse ritual texture"
+    },
+    "chinese": {
+      "palette": "jade bell, silk wind, talisman snap, stone guardian grind, dragon breath",
+      "mix_target": "bright upper accents over grounded creature body sounds"
+    },
+    "atlantean": {
+      "palette": "water pressure, crystal shimmer, orichalcum resonance, abyss pulse",
+      "mix_target": "aquatic lowpass movement with luminous crystal/technology accents"
+    }
+  },
+  "final_acceptance_shared": [
+    "No event clips peak above -1 dBFS after export.",
+    "Ambient, hurt, death, attack and special/fly/charge events are distinguishable in combat.",
+    "Civilization palette is audible without masking vanilla Minecraft feedback.",
+    "Subtitle text matches the audible event and creature identity.",
+    "Loop-free one-shot events have clean starts and tails with no clicks."
+  ],
+  "creatures": {
+    "minotaur": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "bull-headed brute with stone arena footwork and aggressive breath",
+      "event_intents": {
+        "ambient": "low bull snort and chest rumble",
+        "hurt": "short angry bellow with body impact",
+        "death": "heavy fall with fading horned beast breath",
+        "charge": "hoof acceleration and forward body rush"
+      },
+      "acceptance_criteria": ["charge must read as attack replacement", "low end should not hide player hits", "arena brute identity must remain clear"]
+    },
+    "cyclops": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "one-eyed giant with stone club weight and cavernous voice",
+      "event_intents": {
+        "ambient": "single giant throat rumble",
+        "hurt": "deep giant pain bark",
+        "death": "large body collapse with stone debris",
+        "attack": "stone club swing and impact",
+        "special": "boulder lift and throw strain"
+      },
+      "acceptance_criteria": ["club attack must be heavier than normal hit", "voice must imply humanoid giant", "stone throw should be readable at distance"]
+    },
+    "centaur": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "horse-bodied archer with hooves, leather and bow accents",
+      "event_intents": {
+        "ambient": "horse breath with human readiness",
+        "hurt": "short horse-human pain sound",
+        "death": "body fall and bow gear drop",
+        "attack": "melee strike or hoof hit",
+        "special": "bow draw and arrow release"
+      },
+      "acceptance_criteria": ["horse and archer cues both present", "special must sound ranged", "footstep family should match gallop"]
+    },
+    "hydra": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "multi-headed serpent with wet venom breath",
+      "event_intents": {
+        "ambient": "layered snake hisses from multiple heads",
+        "hurt": "overlapping reptile pain",
+        "death": "multi-head collapse and final hiss",
+        "attack": "fast bite snap",
+        "special": "venom breath and throat spray"
+      },
+      "acceptance_criteria": ["must imply multiple heads", "avoid oversized body-only monster sound", "venom special should be distinct from bite"]
+    },
+    "medusa": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "snake-haired cursed humanoid with petrifying gaze",
+      "event_intents": {
+        "ambient": "quiet human whisper under snake hiss",
+        "hurt": "sharp cursed cry",
+        "death": "fading hiss and body fall",
+        "attack": "claw or dagger strike",
+        "special": "stone-forming magical gaze"
+      },
+      "acceptance_criteria": ["humanoid and snake traits both audible", "petrify must not sound like generic magic", "ambient should feel threatening but not loud"]
+    },
+    "nemean_lion": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "armored mythic lion with invulnerable hide",
+      "event_intents": {
+        "ambient": "deep lion growl with bronze hide resonance",
+        "hurt": "defiant lion pain with armor ring",
+        "death": "large feline fall",
+        "attack": "claw and bite rush",
+        "special": "pounce and armored impact"
+      },
+      "acceptance_criteria": ["lion identity must be immediate", "armored hide cue present", "pounce should feel forward-moving"]
+    },
+    "manticore": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "lion-scorpion predator with venom tail",
+      "event_intents": {
+        "ambient": "snarl with tail rattle",
+        "hurt": "predator pain bark",
+        "death": "body drop and tail scrape",
+        "attack": "claw or bite snap",
+        "special": "venom barb launch"
+      },
+      "acceptance_criteria": ["tail cue must distinguish it from lion", "special must sound projectile-like", "combat clips should stay sharp"]
+    },
+    "chimera": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "three-nature fire beast with lion, goat and serpent layers",
+      "event_intents": {
+        "ambient": "layered beast growl and goat rasp",
+        "hurt": "hybrid pain cry",
+        "death": "collapsing multi-creature body",
+        "attack": "bite and claw burst",
+        "special": "fire breath ignition and roar"
+      },
+      "acceptance_criteria": ["fire special must lead with ignition", "hybrid body should not sound like plain lion", "voice layers remain readable"]
+    },
+    "colossus": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "bronze giant statue with heavy mechanical body",
+      "event_intents": {
+        "ambient": "metal groan and bronze servo-like strain",
+        "hurt": "cracked bronze impact",
+        "death": "statue collapse and metal debris",
+        "attack": "massive bronze strike",
+        "special": "ground shockwave"
+      },
+      "acceptance_criteria": ["must be clearly larger than other creatures", "metal body cue required", "shockwave low end controlled"]
+    },
+    "pegasus": {
+      "civilization": "greek",
+      "final_asset_status": "authored_or_existing",
+      "sonic_identity": "pure white winged horse with divine air movement",
+      "event_intents": {
+        "ambient": "clean horse neigh with light divine shimmer",
+        "hurt": "horse pain without monster growl",
+        "death": "falling winged horse and fading chime",
+        "fly": "large feathered wingbeat",
+        "special": "takeoff burst and sacred air"
+      },
+      "acceptance_criteria": ["must sound like horse first", "wingbeat clearly separate from step", "divine shimmer stays subtle"]
+    },
+    "anubis_warrior": {
+      "civilization": "egyptian",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "jackal-headed tomb warrior with gold and sand accents",
+      "event_intents": {
+        "ambient": "jackal breath through tomb air",
+        "hurt": "dry warrior pain with sand scrape",
+        "death": "armor fall into dust",
+        "attack": "curved blade and gold hit",
+        "special": "underworld judgment pulse"
+      },
+      "acceptance_criteria": ["jackal identity audible", "sand/gold palette present", "not a generic zombie"]
+    },
+    "scarab_guardian": {
+      "civilization": "egyptian",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "sacred beetle guardian with chitin and stone temple body",
+      "event_intents": {
+        "ambient": "chitin clicks and low sacred hum",
+        "hurt": "shell crack tick",
+        "death": "carapace break and sand spill",
+        "attack": "claw snap and shell shove",
+        "special": "scarab swarm pulse"
+      },
+      "acceptance_criteria": ["insect shell cue required", "avoid wet monster sound", "special implies sacred swarm"]
+    },
+    "mummy_soldier": {
+      "civilization": "egyptian",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "wrapped undead soldier with linen, dust and old armor",
+      "event_intents": {
+        "ambient": "muffled undead groan through linen",
+        "hurt": "dry cloth tear and pain rasp",
+        "death": "bandage collapse and dust",
+        "attack": "old weapon swing with cloth movement",
+        "special": "curse breath from tomb"
+      },
+      "acceptance_criteria": ["linen texture must be audible", "less wet than vanilla zombie", "curse special distinct from ambient"]
+    },
+    "sphinx_sentinel": {
+      "civilization": "egyptian",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "stone sphinx with feline body and ancient riddle magic",
+      "event_intents": {
+        "ambient": "stone lion rumble and distant voice",
+        "hurt": "sandstone chip and growl",
+        "death": "stone body fracture",
+        "attack": "lion swipe with stone weight",
+        "special": "riddle-like magic tone"
+      },
+      "acceptance_criteria": ["stone and feline both present", "special must be magical not just roar", "large sentinel weight audible"]
+    },
+    "sun_falcon": {
+      "civilization": "egyptian",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "solar falcon with bright wing and sun flare",
+      "event_intents": {
+        "ambient": "falcon cry with sun shimmer",
+        "hurt": "sharp bird pain",
+        "death": "falling feathers and fading light",
+        "attack": "talon dive",
+        "special": "solar flare cry"
+      },
+      "acceptance_criteria": ["bird identity immediate", "sun cue bright but not piercing", "dive attack readable"]
+    },
+    "frost_giant": {
+      "civilization": "nordic",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "ice giant with glacier body and huge cold breath",
+      "event_intents": {
+        "ambient": "deep giant breath and ice crack",
+        "hurt": "glacier fracture pain",
+        "death": "ice body collapse",
+        "attack": "frozen fist impact",
+        "special": "cold blast and rune frost"
+      },
+      "acceptance_criteria": ["ice crack required", "must feel huge", "cold blast distinct from attack"]
+    },
+    "draugr_warrior": {
+      "civilization": "nordic",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "barrow undead warrior with iron, bone and grave air",
+      "event_intents": {
+        "ambient": "grave whisper and bone rattle",
+        "hurt": "dry undead pain",
+        "death": "armor and bone collapse",
+        "attack": "rusted weapon strike",
+        "special": "soul-draining barrow pulse"
+      },
+      "acceptance_criteria": ["barrow undead not generic skeleton", "iron and bone texture present", "special sounds supernatural"]
+    },
+    "valkyrie": {
+      "civilization": "nordic",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "divine warrior maiden with wings, spear and rune light",
+      "event_intents": {
+        "ambient": "calm warrior breath with wing cloth",
+        "hurt": "armored human pain",
+        "death": "armor fall and fading rune",
+        "attack": "spear slash",
+        "special": "valkyrie dive and rune flare"
+      },
+      "acceptance_criteria": ["humanoid warrior identity required", "wings must be audible", "special should feel heroic"]
+    },
+    "fenrir_wolf": {
+      "civilization": "nordic",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "apocalyptic wolf with chain tension and soul howl",
+      "event_intents": {
+        "ambient": "large wolf growl and chain strain",
+        "hurt": "feral wolf pain",
+        "death": "heavy wolf fall and broken chain",
+        "attack": "bite lunge",
+        "special": "doom howl"
+      },
+      "acceptance_criteria": ["wolf identity immediate", "doom howl stands apart", "chain texture present but not constant"]
+    },
+    "dwarf_berserker": {
+      "civilization": "nordic",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "short armored berserker with axe, beard and rage",
+      "event_intents": {
+        "ambient": "gruff warrior mutter",
+        "hurt": "angry short pain bark",
+        "death": "armor drop and axe clatter",
+        "attack": "axe chop",
+        "special": "berserker rage shout"
+      },
+      "acceptance_criteria": ["humanoid scale smaller than giant", "axe cue required", "rage is energetic but not comic"]
+    },
+    "azure_dragon": {
+      "civilization": "chinese",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "long celestial dragon with wind, thunder and jade resonance",
+      "event_intents": {
+        "ambient": "serpentine dragon breath and wind",
+        "hurt": "sharp celestial pain",
+        "death": "long body fall and fading jade bell",
+        "attack": "claw or bite with air rush",
+        "special": "dragon breath and thunder-jade pulse"
+      },
+      "acceptance_criteria": ["long dragon body implied", "jade/wind palette present", "special not generic fire"]
+    },
+    "qilin_guardian": {
+      "civilization": "chinese",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "auspicious horned guardian with hoof, bell and sacred breath",
+      "event_intents": {
+        "ambient": "gentle beast breath and jade bell",
+        "hurt": "noble guardian pain",
+        "death": "sacred beast fall",
+        "attack": "hoof and horn strike",
+        "special": "auspicious blessing pulse"
+      },
+      "acceptance_criteria": ["must not sound demonic", "bell accent subtle", "special sounds protective"]
+    },
+    "jiangshi": {
+      "civilization": "chinese",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "hopping talisman undead with stiff cloth and paper charm",
+      "event_intents": {
+        "ambient": "stiff undead breath and paper rustle",
+        "hurt": "dry startled rasp",
+        "death": "cloth collapse and talisman flutter",
+        "attack": "rigid hop strike",
+        "special": "talisman curse snap"
+      },
+      "acceptance_criteria": ["paper talisman cue required", "different from mummy and zombie", "hop rhythm readable"]
+    },
+    "nine_tailed_fox": {
+      "civilization": "chinese",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "mystic fox with many tails, charm magic and soft steps",
+      "event_intents": {
+        "ambient": "fox chirp with charm shimmer",
+        "hurt": "quick fox pain",
+        "death": "soft fall and fading illusion",
+        "attack": "swift bite or claw",
+        "special": "illusion charm and tail flare"
+      },
+      "acceptance_criteria": ["fox identity immediate", "special magical but delicate", "avoid wolf-like heaviness"]
+    },
+    "stone_lion_guardian": {
+      "civilization": "chinese",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "temple stone lion with carved body and guardian roar",
+      "event_intents": {
+        "ambient": "stone grind and low lion rumble",
+        "hurt": "stone chip",
+        "death": "statue crack and collapse",
+        "attack": "stone paw slam",
+        "special": "guardian roar with temple resonance"
+      },
+      "acceptance_criteria": ["stone statue cue required", "lion roar controlled", "special feels protective"]
+    },
+    "crystal_leviathan": {
+      "civilization": "atlantean",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "massive aquatic serpent with crystal plates and pressure wave",
+      "event_intents": {
+        "ambient": "underwater leviathan call and crystal ring",
+        "hurt": "deep water pain and crystal chip",
+        "death": "huge body sink and crystal break",
+        "attack": "jaw snap through water",
+        "special": "pressure wave and crystal resonance"
+      },
+      "acceptance_criteria": ["underwater scale required", "crystal accent audible", "special larger than attack"]
+    },
+    "orichalcum_golem": {
+      "civilization": "atlantean",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "ancient orichalcum construct with hydraulic sea-tech motion",
+      "event_intents": {
+        "ambient": "metal resonance and water pressure servo",
+        "hurt": "orichalcum dent",
+        "death": "construct shutdown and metal fall",
+        "attack": "heavy metal punch",
+        "special": "core pulse and forge resonance"
+      },
+      "acceptance_criteria": ["not same as bronze colossus", "water-tech cue present", "core pulse readable"]
+    },
+    "siren_priestess": {
+      "civilization": "atlantean",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "aquatic priestess with hypnotic voice and shell ornaments",
+      "event_intents": {
+        "ambient": "soft siren hum",
+        "hurt": "humanoid aquatic pain",
+        "death": "voice breaks and water fade",
+        "attack": "staff or water strike",
+        "special": "hypnotic song"
+      },
+      "acceptance_criteria": ["voice-led identity required", "song must not be long music loop", "aquatic layer present"]
+    },
+    "tidal_guardian": {
+      "civilization": "atlantean",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "armored ocean guardian with wave shield and shell armor",
+      "event_intents": {
+        "ambient": "armor creak under water pressure",
+        "hurt": "shell armor hit",
+        "death": "armor fall into surf",
+        "attack": "trident or shield bash",
+        "special": "tidal shield surge"
+      },
+      "acceptance_criteria": ["guardian armor identity clear", "wave special distinct", "impact does not mask UI sounds"]
+    },
+    "abyssal_ray": {
+      "civilization": "atlantean",
+      "final_asset_status": "procedural_first_pass_requires_replacement",
+      "sonic_identity": "deep-sea manta ray with abyss pulse and gliding movement",
+      "event_intents": {
+        "ambient": "low abyss glide and distant pulse",
+        "hurt": "soft ray pain with pressure pop",
+        "death": "sinking membrane flutter",
+        "attack": "whip-like tail or bite",
+        "special": "abyssal pulse"
+      },
+      "acceptance_criteria": ["gliding ray identity audible", "abyss pulse not too loud", "soft body distinct from leviathan"]
+    }
+  }
+}

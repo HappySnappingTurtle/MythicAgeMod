@@ -1,9 +1,14 @@
 package com.example.mythic_age.util;
 
+import com.example.mythic_age.particle.MythicParticleEffects;
+import com.example.mythic_age.world.MythicAgeWorldState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -67,12 +72,19 @@ public class LightningStormManager {
      * 启动一个新闪电风暴
      */
     public void startLightningStorm(World world, BlockPos center, String stormId) {
-        activeStorms.put(stormId, new LightningStormData(center, 0, 0));
+        MythicAgeWorldState worldState = null;
+        if (world instanceof ServerWorld serverWorld) {
+            worldState = MythicAgeWorldState.get(serverWorld.getServer());
+        }
+        activeStorms.put(stormId, new LightningStormData(world.getRegistryKey().getValue().toString(), center, 0, 0));
         
         // 改变天气为下雨
         if (!world.isClient) {
             ServerWorld serverWorld = (ServerWorld) world;
             serverWorld.setWeather(0, STORM_DURATION, true, true); // 雨天+雷暴
+            if (worldState != null) {
+                worldState.markDirty();
+            }
         }
         
         // 立即进行第一轮闪电攻击
@@ -82,14 +94,19 @@ public class LightningStormManager {
     /**
      * 每tick调用的更新方法
      */
-    public void tick(World world) {
-        if (world.isClient) return;
+    public boolean tick(World world) {
+        if (world.isClient) return false;
+
+        boolean dirty = false;
         
         Iterator<Map.Entry<String, LightningStormData>> iterator = activeStorms.entrySet().iterator();
         
         while (iterator.hasNext()) {
             Map.Entry<String, LightningStormData> entry = iterator.next();
             LightningStormData data = entry.getValue();
+            if (!data.dimension.equals(world.getRegistryKey().getValue().toString())) {
+                continue;
+            }
             
             data.ticksAlive++;
             data.lightningTimer++;
@@ -99,6 +116,7 @@ public class LightningStormManager {
                 // 风暴结束
                 performStormEndEffect(world, data.center);
                 iterator.remove();
+                dirty = true;
                 continue;
             }
             
@@ -107,6 +125,47 @@ public class LightningStormManager {
                 data.lightningTimer = 0;
                 performLightningAttack(world, data.center);
             }
+            dirty = true;
+        }
+        return dirty;
+    }
+
+    public NbtCompound writePersistentState() {
+        NbtCompound root = new NbtCompound();
+        NbtList storms = new NbtList();
+        for (Map.Entry<String, LightningStormData> entry : activeStorms.entrySet()) {
+            NbtCompound storm = new NbtCompound();
+            LightningStormData data = entry.getValue();
+            storm.putString("Id", entry.getKey());
+            storm.putString("Dimension", data.dimension);
+            storm.putLong("Center", data.center.asLong());
+            storm.putInt("TicksAlive", data.ticksAlive);
+            storm.putInt("RemainingTicks", Math.max(0, STORM_DURATION - data.ticksAlive));
+            storm.putInt("LightningTimer", data.lightningTimer);
+            storms.add(storm);
+        }
+        root.put("ActiveStorms", storms);
+        return root;
+    }
+
+    public void readPersistentState(NbtCompound nbt) {
+        activeStorms.clear();
+        NbtList storms = nbt.getList("ActiveStorms", NbtElement.COMPOUND_TYPE);
+        for (int i = 0; i < storms.size(); i++) {
+            NbtCompound storm = storms.getCompound(i);
+            String id = storm.getString("Id");
+            String dimension = storm.getString("Dimension");
+            if (id.isEmpty() || dimension.isEmpty() || !storm.contains("Center", NbtElement.LONG_TYPE)) {
+                continue;
+            }
+            int ticksAlive = storm.contains("TicksAlive", NbtElement.INT_TYPE)
+                    ? storm.getInt("TicksAlive")
+                    : Math.max(0, STORM_DURATION - storm.getInt("RemainingTicks"));
+            if (ticksAlive >= STORM_DURATION) {
+                continue;
+            }
+            int lightningTimer = storm.getInt("LightningTimer");
+            activeStorms.put(id, new LightningStormData(dimension, BlockPos.fromLong(storm.getLong("Center")), ticksAlive, lightningTimer));
         }
     }
     
@@ -140,7 +199,7 @@ public class LightningStormManager {
                 creature.damage(world.getDamageSources().lightningBolt(), Float.MAX_VALUE);
                 
                 // 死亡粒子效果
-                serverWorld.spawnParticles(ParticleTypes.SOUL,
+                MythicParticleEffects.spawnNormal(serverWorld, ParticleTypes.SOUL,
                     creaturePos.getX() + 0.5, creaturePos.getY() + 1, creaturePos.getZ() + 0.5,
                     10, 0.5, 0.5, 0.5, 0.1);
                 
@@ -167,7 +226,7 @@ public class LightningStormManager {
         }
         
         // 风暴中心的雷云效果
-        serverWorld.spawnParticles(ParticleTypes.CLOUD,
+        MythicParticleEffects.spawnMajor(serverWorld, ParticleTypes.CLOUD,
             center.getX() + 0.5, center.getY() + 20, center.getZ() + 0.5,
             15, 10.0, 3.0, 10.0, 0.1);
         
@@ -192,7 +251,7 @@ public class LightningStormManager {
         serverWorld.setWeather(6000, 0, false, false); // 晴天持续5分钟
         
         // 风暴散去效果
-        serverWorld.spawnParticles(ParticleTypes.SWEEP_ATTACK,
+        MythicParticleEffects.spawnMajor(serverWorld, ParticleTypes.SWEEP_ATTACK,
             center.getX() + 0.5, center.getY() + 10, center.getZ() + 0.5,
             20, 15.0, 5.0, 15.0, 0.2);
         
@@ -205,11 +264,13 @@ public class LightningStormManager {
      * 闪电风暴数据类
      */
     private static class LightningStormData {
+        public final String dimension;
         public final BlockPos center;
         public int ticksAlive;
         public int lightningTimer;
         
-        public LightningStormData(BlockPos center, int ticksAlive, int lightningTimer) {
+        public LightningStormData(String dimension, BlockPos center, int ticksAlive, int lightningTimer) {
+            this.dimension = dimension;
             this.center = center;
             this.ticksAlive = ticksAlive;
             this.lightningTimer = lightningTimer;

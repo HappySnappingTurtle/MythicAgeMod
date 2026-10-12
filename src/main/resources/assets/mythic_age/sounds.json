@@ -173,6 +173,186 @@
       "mythic_age:entity/medusa/special"
     ]
   },
+  "entity.nemean_lion.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.ambient",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/ambient"
+    ]
+  },
+  "entity.nemean_lion.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.hurt",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/hurt"
+    ]
+  },
+  "entity.nemean_lion.death": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.death",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/death"
+    ]
+  },
+  "entity.nemean_lion.step": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.step",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/step"
+    ]
+  },
+  "entity.nemean_lion.attack": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.attack",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/attack"
+    ]
+  },
+  "entity.nemean_lion.special": {
+    "subtitle": "subtitles.mythic_age.entity.nemean_lion.special",
+    "sounds": [
+      "mythic_age:entity/nemean_lion/special"
+    ]
+  },
+  "entity.manticore.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.ambient",
+    "sounds": [
+      "mythic_age:entity/manticore/ambient"
+    ]
+  },
+  "entity.manticore.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.hurt",
+    "sounds": [
+      "mythic_age:entity/manticore/hurt"
+    ]
+  },
+  "entity.manticore.death": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.death",
+    "sounds": [
+      "mythic_age:entity/manticore/death"
+    ]
+  },
+  "entity.manticore.step": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.step",
+    "sounds": [
+      "mythic_age:entity/manticore/step"
+    ]
+  },
+  "entity.manticore.attack": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.attack",
+    "sounds": [
+      "mythic_age:entity/manticore/attack"
+    ]
+  },
+  "entity.manticore.special": {
+    "subtitle": "subtitles.mythic_age.entity.manticore.special",
+    "sounds": [
+      "mythic_age:entity/manticore/special"
+    ]
+  },
+  "entity.chimera.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.ambient",
+    "sounds": [
+      "mythic_age:entity/chimera/ambient"
+    ]
+  },
+  "entity.chimera.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.hurt",
+    "sounds": [
+      "mythic_age:entity/chimera/hurt"
+    ]
+  },
+  "entity.chimera.death": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.death",
+    "sounds": [
+      "mythic_age:entity/chimera/death"
+    ]
+  },
+  "entity.chimera.step": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.step",
+    "sounds": [
+      "mythic_age:entity/chimera/step"
+    ]
+  },
+  "entity.chimera.attack": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.attack",
+    "sounds": [
+      "mythic_age:entity/chimera/attack"
+    ]
+  },
+  "entity.chimera.special": {
+    "subtitle": "subtitles.mythic_age.entity.chimera.special",
+    "sounds": [
+      "mythic_age:entity/chimera/special"
+    ]
+  },
+  "entity.colossus.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.ambient",
+    "sounds": [
+      "mythic_age:entity/colossus/ambient"
+    ]
+  },
+  "entity.colossus.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.hurt",
+    "sounds": [
+      "mythic_age:entity/colossus/hurt"
+    ]
+  },
+  "entity.colossus.death": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.death",
+    "sounds": [
+      "mythic_age:entity/colossus/death"
+    ]
+  },
+  "entity.colossus.step": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.step",
+    "sounds": [
+      "mythic_age:entity/colossus/step"
+    ]
+  },
+  "entity.colossus.attack": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.attack",
+    "sounds": [
+      "mythic_age:entity/colossus/attack"
+    ]
+  },
+  "entity.colossus.special": {
+    "subtitle": "subtitles.mythic_age.entity.colossus.special",
+    "sounds": [
+      "mythic_age:entity/colossus/special"
+    ]
+  },
+  "entity.pegasus.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.ambient",
+    "sounds": [
+      "mythic_age:entity/pegasus/ambient"
+    ]
+  },
+  "entity.pegasus.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.hurt",
+    "sounds": [
+      "mythic_age:entity/pegasus/hurt"
+    ]
+  },
+  "entity.pegasus.death": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.death",
+    "sounds": [
+      "mythic_age:entity/pegasus/death"
+    ]
+  },
+  "entity.pegasus.step": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.step",
+    "sounds": [
+      "mythic_age:entity/pegasus/step"
+    ]
+  },
+  "entity.pegasus.fly": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.fly",
+    "sounds": [
+      "mythic_age:entity/pegasus/fly"
+    ]
+  },
+  "entity.pegasus.special": {
+    "subtitle": "subtitles.mythic_age.entity.pegasus.special",
+    "sounds": [
+      "mythic_age:entity/pegasus/special"
+    ]
+  },
   "entity.meteor.falling": {
     "subtitle": "subtitles.mythic_age.entity.meteor.falling",
     "sounds": [
@@ -191,6 +371,606 @@
     "sounds": [
       "mythic_age:entity/meteor/impact1",
       "mythic_age:entity/meteor/impact2"
+    ]
+  },
+  "entity.anubis_warrior.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.anubis_warrior.ambient",
+    "sounds": [
+      "mythic_age:entity/anubis_warrior/ambient"
+    ]
+  },
+  "entity.anubis_warrior.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.anubis_warrior.hurt",
+    "sounds": [
+      "mythic_age:entity/anubis_warrior/hurt"
+    ]
+  },
+  "entity.anubis_warrior.death": {
+    "subtitle": "subtitles.mythic_age.entity.anubis_warrior.death",
+    "sounds": [
+      "mythic_age:entity/anubis_warrior/death"
+    ]
+  },
+  "entity.anubis_warrior.attack": {
+    "subtitle": "subtitles.mythic_age.entity.anubis_warrior.attack",
+    "sounds": [
+      "mythic_age:entity/anubis_warrior/attack"
+    ]
+  },
+  "entity.anubis_warrior.special": {
+    "subtitle": "subtitles.mythic_age.entity.anubis_warrior.special",
+    "sounds": [
+      "mythic_age:entity/anubis_warrior/special"
+    ]
+  },
+  "entity.scarab_guardian.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.scarab_guardian.ambient",
+    "sounds": [
+      "mythic_age:entity/scarab_guardian/ambient"
+    ]
+  },
+  "entity.scarab_guardian.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.scarab_guardian.hurt",
+    "sounds": [
+      "mythic_age:entity/scarab_guardian/hurt"
+    ]
+  },
+  "entity.scarab_guardian.death": {
+    "subtitle": "subtitles.mythic_age.entity.scarab_guardian.death",
+    "sounds": [
+      "mythic_age:entity/scarab_guardian/death"
+    ]
+  },
+  "entity.scarab_guardian.attack": {
+    "subtitle": "subtitles.mythic_age.entity.scarab_guardian.attack",
+    "sounds": [
+      "mythic_age:entity/scarab_guardian/attack"
+    ]
+  },
+  "entity.scarab_guardian.special": {
+    "subtitle": "subtitles.mythic_age.entity.scarab_guardian.special",
+    "sounds": [
+      "mythic_age:entity/scarab_guardian/special"
+    ]
+  },
+  "entity.mummy_soldier.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.mummy_soldier.ambient",
+    "sounds": [
+      "mythic_age:entity/mummy_soldier/ambient"
+    ]
+  },
+  "entity.mummy_soldier.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.mummy_soldier.hurt",
+    "sounds": [
+      "mythic_age:entity/mummy_soldier/hurt"
+    ]
+  },
+  "entity.mummy_soldier.death": {
+    "subtitle": "subtitles.mythic_age.entity.mummy_soldier.death",
+    "sounds": [
+      "mythic_age:entity/mummy_soldier/death"
+    ]
+  },
+  "entity.mummy_soldier.attack": {
+    "subtitle": "subtitles.mythic_age.entity.mummy_soldier.attack",
+    "sounds": [
+      "mythic_age:entity/mummy_soldier/attack"
+    ]
+  },
+  "entity.mummy_soldier.special": {
+    "subtitle": "subtitles.mythic_age.entity.mummy_soldier.special",
+    "sounds": [
+      "mythic_age:entity/mummy_soldier/special"
+    ]
+  },
+  "entity.sphinx_sentinel.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.sphinx_sentinel.ambient",
+    "sounds": [
+      "mythic_age:entity/sphinx_sentinel/ambient"
+    ]
+  },
+  "entity.sphinx_sentinel.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.sphinx_sentinel.hurt",
+    "sounds": [
+      "mythic_age:entity/sphinx_sentinel/hurt"
+    ]
+  },
+  "entity.sphinx_sentinel.death": {
+    "subtitle": "subtitles.mythic_age.entity.sphinx_sentinel.death",
+    "sounds": [
+      "mythic_age:entity/sphinx_sentinel/death"
+    ]
+  },
+  "entity.sphinx_sentinel.attack": {
+    "subtitle": "subtitles.mythic_age.entity.sphinx_sentinel.attack",
+    "sounds": [
+      "mythic_age:entity/sphinx_sentinel/attack"
+    ]
+  },
+  "entity.sphinx_sentinel.special": {
+    "subtitle": "subtitles.mythic_age.entity.sphinx_sentinel.special",
+    "sounds": [
+      "mythic_age:entity/sphinx_sentinel/special"
+    ]
+  },
+  "entity.sun_falcon.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.sun_falcon.ambient",
+    "sounds": [
+      "mythic_age:entity/sun_falcon/ambient"
+    ]
+  },
+  "entity.sun_falcon.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.sun_falcon.hurt",
+    "sounds": [
+      "mythic_age:entity/sun_falcon/hurt"
+    ]
+  },
+  "entity.sun_falcon.death": {
+    "subtitle": "subtitles.mythic_age.entity.sun_falcon.death",
+    "sounds": [
+      "mythic_age:entity/sun_falcon/death"
+    ]
+  },
+  "entity.sun_falcon.attack": {
+    "subtitle": "subtitles.mythic_age.entity.sun_falcon.attack",
+    "sounds": [
+      "mythic_age:entity/sun_falcon/attack"
+    ]
+  },
+  "entity.sun_falcon.special": {
+    "subtitle": "subtitles.mythic_age.entity.sun_falcon.special",
+    "sounds": [
+      "mythic_age:entity/sun_falcon/special"
+    ]
+  },
+  "entity.frost_giant.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.frost_giant.ambient",
+    "sounds": [
+      "mythic_age:entity/frost_giant/ambient"
+    ]
+  },
+  "entity.frost_giant.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.frost_giant.hurt",
+    "sounds": [
+      "mythic_age:entity/frost_giant/hurt"
+    ]
+  },
+  "entity.frost_giant.death": {
+    "subtitle": "subtitles.mythic_age.entity.frost_giant.death",
+    "sounds": [
+      "mythic_age:entity/frost_giant/death"
+    ]
+  },
+  "entity.frost_giant.attack": {
+    "subtitle": "subtitles.mythic_age.entity.frost_giant.attack",
+    "sounds": [
+      "mythic_age:entity/frost_giant/attack"
+    ]
+  },
+  "entity.frost_giant.special": {
+    "subtitle": "subtitles.mythic_age.entity.frost_giant.special",
+    "sounds": [
+      "mythic_age:entity/frost_giant/special"
+    ]
+  },
+  "entity.draugr_warrior.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.draugr_warrior.ambient",
+    "sounds": [
+      "mythic_age:entity/draugr_warrior/ambient"
+    ]
+  },
+  "entity.draugr_warrior.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.draugr_warrior.hurt",
+    "sounds": [
+      "mythic_age:entity/draugr_warrior/hurt"
+    ]
+  },
+  "entity.draugr_warrior.death": {
+    "subtitle": "subtitles.mythic_age.entity.draugr_warrior.death",
+    "sounds": [
+      "mythic_age:entity/draugr_warrior/death"
+    ]
+  },
+  "entity.draugr_warrior.attack": {
+    "subtitle": "subtitles.mythic_age.entity.draugr_warrior.attack",
+    "sounds": [
+      "mythic_age:entity/draugr_warrior/attack"
+    ]
+  },
+  "entity.draugr_warrior.special": {
+    "subtitle": "subtitles.mythic_age.entity.draugr_warrior.special",
+    "sounds": [
+      "mythic_age:entity/draugr_warrior/special"
+    ]
+  },
+  "entity.valkyrie.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.valkyrie.ambient",
+    "sounds": [
+      "mythic_age:entity/valkyrie/ambient"
+    ]
+  },
+  "entity.valkyrie.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.valkyrie.hurt",
+    "sounds": [
+      "mythic_age:entity/valkyrie/hurt"
+    ]
+  },
+  "entity.valkyrie.death": {
+    "subtitle": "subtitles.mythic_age.entity.valkyrie.death",
+    "sounds": [
+      "mythic_age:entity/valkyrie/death"
+    ]
+  },
+  "entity.valkyrie.attack": {
+    "subtitle": "subtitles.mythic_age.entity.valkyrie.attack",
+    "sounds": [
+      "mythic_age:entity/valkyrie/attack"
+    ]
+  },
+  "entity.valkyrie.special": {
+    "subtitle": "subtitles.mythic_age.entity.valkyrie.special",
+    "sounds": [
+      "mythic_age:entity/valkyrie/special"
+    ]
+  },
+  "entity.fenrir_wolf.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.fenrir_wolf.ambient",
+    "sounds": [
+      "mythic_age:entity/fenrir_wolf/ambient"
+    ]
+  },
+  "entity.fenrir_wolf.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.fenrir_wolf.hurt",
+    "sounds": [
+      "mythic_age:entity/fenrir_wolf/hurt"
+    ]
+  },
+  "entity.fenrir_wolf.death": {
+    "subtitle": "subtitles.mythic_age.entity.fenrir_wolf.death",
+    "sounds": [
+      "mythic_age:entity/fenrir_wolf/death"
+    ]
+  },
+  "entity.fenrir_wolf.attack": {
+    "subtitle": "subtitles.mythic_age.entity.fenrir_wolf.attack",
+    "sounds": [
+      "mythic_age:entity/fenrir_wolf/attack"
+    ]
+  },
+  "entity.fenrir_wolf.special": {
+    "subtitle": "subtitles.mythic_age.entity.fenrir_wolf.special",
+    "sounds": [
+      "mythic_age:entity/fenrir_wolf/special"
+    ]
+  },
+  "entity.dwarf_berserker.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.dwarf_berserker.ambient",
+    "sounds": [
+      "mythic_age:entity/dwarf_berserker/ambient"
+    ]
+  },
+  "entity.dwarf_berserker.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.dwarf_berserker.hurt",
+    "sounds": [
+      "mythic_age:entity/dwarf_berserker/hurt"
+    ]
+  },
+  "entity.dwarf_berserker.death": {
+    "subtitle": "subtitles.mythic_age.entity.dwarf_berserker.death",
+    "sounds": [
+      "mythic_age:entity/dwarf_berserker/death"
+    ]
+  },
+  "entity.dwarf_berserker.attack": {
+    "subtitle": "subtitles.mythic_age.entity.dwarf_berserker.attack",
+    "sounds": [
+      "mythic_age:entity/dwarf_berserker/attack"
+    ]
+  },
+  "entity.dwarf_berserker.special": {
+    "subtitle": "subtitles.mythic_age.entity.dwarf_berserker.special",
+    "sounds": [
+      "mythic_age:entity/dwarf_berserker/special"
+    ]
+  },
+  "entity.azure_dragon.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.azure_dragon.ambient",
+    "sounds": [
+      "mythic_age:entity/azure_dragon/ambient"
+    ]
+  },
+  "entity.azure_dragon.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.azure_dragon.hurt",
+    "sounds": [
+      "mythic_age:entity/azure_dragon/hurt"
+    ]
+  },
+  "entity.azure_dragon.death": {
+    "subtitle": "subtitles.mythic_age.entity.azure_dragon.death",
+    "sounds": [
+      "mythic_age:entity/azure_dragon/death"
+    ]
+  },
+  "entity.azure_dragon.attack": {
+    "subtitle": "subtitles.mythic_age.entity.azure_dragon.attack",
+    "sounds": [
+      "mythic_age:entity/azure_dragon/attack"
+    ]
+  },
+  "entity.azure_dragon.special": {
+    "subtitle": "subtitles.mythic_age.entity.azure_dragon.special",
+    "sounds": [
+      "mythic_age:entity/azure_dragon/special"
+    ]
+  },
+  "entity.qilin_guardian.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.qilin_guardian.ambient",
+    "sounds": [
+      "mythic_age:entity/qilin_guardian/ambient"
+    ]
+  },
+  "entity.qilin_guardian.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.qilin_guardian.hurt",
+    "sounds": [
+      "mythic_age:entity/qilin_guardian/hurt"
+    ]
+  },
+  "entity.qilin_guardian.death": {
+    "subtitle": "subtitles.mythic_age.entity.qilin_guardian.death",
+    "sounds": [
+      "mythic_age:entity/qilin_guardian/death"
+    ]
+  },
+  "entity.qilin_guardian.attack": {
+    "subtitle": "subtitles.mythic_age.entity.qilin_guardian.attack",
+    "sounds": [
+      "mythic_age:entity/qilin_guardian/attack"
+    ]
+  },
+  "entity.qilin_guardian.special": {
+    "subtitle": "subtitles.mythic_age.entity.qilin_guardian.special",
+    "sounds": [
+      "mythic_age:entity/qilin_guardian/special"
+    ]
+  },
+  "entity.jiangshi.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.jiangshi.ambient",
+    "sounds": [
+      "mythic_age:entity/jiangshi/ambient"
+    ]
+  },
+  "entity.jiangshi.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.jiangshi.hurt",
+    "sounds": [
+      "mythic_age:entity/jiangshi/hurt"
+    ]
+  },
+  "entity.jiangshi.death": {
+    "subtitle": "subtitles.mythic_age.entity.jiangshi.death",
+    "sounds": [
+      "mythic_age:entity/jiangshi/death"
+    ]
+  },
+  "entity.jiangshi.attack": {
+    "subtitle": "subtitles.mythic_age.entity.jiangshi.attack",
+    "sounds": [
+      "mythic_age:entity/jiangshi/attack"
+    ]
+  },
+  "entity.jiangshi.special": {
+    "subtitle": "subtitles.mythic_age.entity.jiangshi.special",
+    "sounds": [
+      "mythic_age:entity/jiangshi/special"
+    ]
+  },
+  "entity.nine_tailed_fox.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.nine_tailed_fox.ambient",
+    "sounds": [
+      "mythic_age:entity/nine_tailed_fox/ambient"
+    ]
+  },
+  "entity.nine_tailed_fox.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.nine_tailed_fox.hurt",
+    "sounds": [
+      "mythic_age:entity/nine_tailed_fox/hurt"
+    ]
+  },
+  "entity.nine_tailed_fox.death": {
+    "subtitle": "subtitles.mythic_age.entity.nine_tailed_fox.death",
+    "sounds": [
+      "mythic_age:entity/nine_tailed_fox/death"
+    ]
+  },
+  "entity.nine_tailed_fox.attack": {
+    "subtitle": "subtitles.mythic_age.entity.nine_tailed_fox.attack",
+    "sounds": [
+      "mythic_age:entity/nine_tailed_fox/attack"
+    ]
+  },
+  "entity.nine_tailed_fox.special": {
+    "subtitle": "subtitles.mythic_age.entity.nine_tailed_fox.special",
+    "sounds": [
+      "mythic_age:entity/nine_tailed_fox/special"
+    ]
+  },
+  "entity.stone_lion_guardian.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.stone_lion_guardian.ambient",
+    "sounds": [
+      "mythic_age:entity/stone_lion_guardian/ambient"
+    ]
+  },
+  "entity.stone_lion_guardian.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.stone_lion_guardian.hurt",
+    "sounds": [
+      "mythic_age:entity/stone_lion_guardian/hurt"
+    ]
+  },
+  "entity.stone_lion_guardian.death": {
+    "subtitle": "subtitles.mythic_age.entity.stone_lion_guardian.death",
+    "sounds": [
+      "mythic_age:entity/stone_lion_guardian/death"
+    ]
+  },
+  "entity.stone_lion_guardian.attack": {
+    "subtitle": "subtitles.mythic_age.entity.stone_lion_guardian.attack",
+    "sounds": [
+      "mythic_age:entity/stone_lion_guardian/attack"
+    ]
+  },
+  "entity.stone_lion_guardian.special": {
+    "subtitle": "subtitles.mythic_age.entity.stone_lion_guardian.special",
+    "sounds": [
+      "mythic_age:entity/stone_lion_guardian/special"
+    ]
+  },
+  "entity.crystal_leviathan.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.crystal_leviathan.ambient",
+    "sounds": [
+      "mythic_age:entity/crystal_leviathan/ambient"
+    ]
+  },
+  "entity.crystal_leviathan.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.crystal_leviathan.hurt",
+    "sounds": [
+      "mythic_age:entity/crystal_leviathan/hurt"
+    ]
+  },
+  "entity.crystal_leviathan.death": {
+    "subtitle": "subtitles.mythic_age.entity.crystal_leviathan.death",
+    "sounds": [
+      "mythic_age:entity/crystal_leviathan/death"
+    ]
+  },
+  "entity.crystal_leviathan.attack": {
+    "subtitle": "subtitles.mythic_age.entity.crystal_leviathan.attack",
+    "sounds": [
+      "mythic_age:entity/crystal_leviathan/attack"
+    ]
+  },
+  "entity.crystal_leviathan.special": {
+    "subtitle": "subtitles.mythic_age.entity.crystal_leviathan.special",
+    "sounds": [
+      "mythic_age:entity/crystal_leviathan/special"
+    ]
+  },
+  "entity.orichalcum_golem.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.orichalcum_golem.ambient",
+    "sounds": [
+      "mythic_age:entity/orichalcum_golem/ambient"
+    ]
+  },
+  "entity.orichalcum_golem.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.orichalcum_golem.hurt",
+    "sounds": [
+      "mythic_age:entity/orichalcum_golem/hurt"
+    ]
+  },
+  "entity.orichalcum_golem.death": {
+    "subtitle": "subtitles.mythic_age.entity.orichalcum_golem.death",
+    "sounds": [
+      "mythic_age:entity/orichalcum_golem/death"
+    ]
+  },
+  "entity.orichalcum_golem.attack": {
+    "subtitle": "subtitles.mythic_age.entity.orichalcum_golem.attack",
+    "sounds": [
+      "mythic_age:entity/orichalcum_golem/attack"
+    ]
+  },
+  "entity.orichalcum_golem.special": {
+    "subtitle": "subtitles.mythic_age.entity.orichalcum_golem.special",
+    "sounds": [
+      "mythic_age:entity/orichalcum_golem/special"
+    ]
+  },
+  "entity.siren_priestess.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.siren_priestess.ambient",
+    "sounds": [
+      "mythic_age:entity/siren_priestess/ambient"
+    ]
+  },
+  "entity.siren_priestess.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.siren_priestess.hurt",
+    "sounds": [
+      "mythic_age:entity/siren_priestess/hurt"
+    ]
+  },
+  "entity.siren_priestess.death": {
+    "subtitle": "subtitles.mythic_age.entity.siren_priestess.death",
+    "sounds": [
+      "mythic_age:entity/siren_priestess/death"
+    ]
+  },
+  "entity.siren_priestess.attack": {
+    "subtitle": "subtitles.mythic_age.entity.siren_priestess.attack",
+    "sounds": [
+      "mythic_age:entity/siren_priestess/attack"
+    ]
+  },
+  "entity.siren_priestess.special": {
+    "subtitle": "subtitles.mythic_age.entity.siren_priestess.special",
+    "sounds": [
+      "mythic_age:entity/siren_priestess/special"
+    ]
+  },
+  "entity.tidal_guardian.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.tidal_guardian.ambient",
+    "sounds": [
+      "mythic_age:entity/tidal_guardian/ambient"
+    ]
+  },
+  "entity.tidal_guardian.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.tidal_guardian.hurt",
+    "sounds": [
+      "mythic_age:entity/tidal_guardian/hurt"
+    ]
+  },
+  "entity.tidal_guardian.death": {
+    "subtitle": "subtitles.mythic_age.entity.tidal_guardian.death",
+    "sounds": [
+      "mythic_age:entity/tidal_guardian/death"
+    ]
+  },
+  "entity.tidal_guardian.attack": {
+    "subtitle": "subtitles.mythic_age.entity.tidal_guardian.attack",
+    "sounds": [
+      "mythic_age:entity/tidal_guardian/attack"
+    ]
+  },
+  "entity.tidal_guardian.special": {
+    "subtitle": "subtitles.mythic_age.entity.tidal_guardian.special",
+    "sounds": [
+      "mythic_age:entity/tidal_guardian/special"
+    ]
+  },
+  "entity.abyssal_ray.ambient": {
+    "subtitle": "subtitles.mythic_age.entity.abyssal_ray.ambient",
+    "sounds": [
+      "mythic_age:entity/abyssal_ray/ambient"
+    ]
+  },
+  "entity.abyssal_ray.hurt": {
+    "subtitle": "subtitles.mythic_age.entity.abyssal_ray.hurt",
+    "sounds": [
+      "mythic_age:entity/abyssal_ray/hurt"
+    ]
+  },
+  "entity.abyssal_ray.death": {
+    "subtitle": "subtitles.mythic_age.entity.abyssal_ray.death",
+    "sounds": [
+      "mythic_age:entity/abyssal_ray/death"
+    ]
+  },
+  "entity.abyssal_ray.attack": {
+    "subtitle": "subtitles.mythic_age.entity.abyssal_ray.attack",
+    "sounds": [
+      "mythic_age:entity/abyssal_ray/attack"
+    ]
+  },
+  "entity.abyssal_ray.special": {
+    "subtitle": "subtitles.mythic_age.entity.abyssal_ray.special",
+    "sounds": [
+      "mythic_age:entity/abyssal_ray/special"
     ]
   }
 }

@@ -426,6 +426,98 @@ public class ModItems {
             new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.EPIC), 
                              600, SpellbookItem.SpellType.FIMBULWINTER));
 
+    // ============ 亚特兰蒂斯神力法术书系统 ============
+
+    /**
+     * 潮汐奔流法术书 (亚特兰蒂斯神力)
+     * 稀有度：不常见 | 冷却：9秒 | 效果：水流冲击并减速敌人
+     * 在目标区域释放潮汐，伤害敌对生物并用海浪打乱阵型
+     */
+    public static final Item SPELLBOOK_TIDAL_SURGE = registerItem("spellbook_tidal_surge",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON),
+                             180, SpellbookItem.SpellType.TIDAL_SURGE));
+
+    /**
+     * 深流跃迁法术书 (亚特兰蒂斯神力)
+     * 稀有度：不常见 | 冷却：10秒 | 效果：短距潮流位移并提供水下机动
+     * 让施法者沿暗潮跃迁到目标位置，并获得短暂水下行动优势
+     */
+    public static final Item SPELLBOOK_ABYSSAL_CURRENT = registerItem("spellbook_abyssal_current",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON),
+                             200, SpellbookItem.SpellType.ABYSSAL_CURRENT));
+
+    /**
+     * 水晶屏障法术书 (亚特兰蒂斯神力)
+     * 稀有度：不常见 | 冷却：11秒 | 效果：为盟友提供屏障和水下适应
+     * 召唤青蓝水晶护盾，为周围玩家提供吸收、抗性和水下呼吸
+     */
+    public static final Item SPELLBOOK_CRYSTAL_BARRIER = registerItem("spellbook_crystal_barrier",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON),
+                             220, SpellbookItem.SpellType.CRYSTAL_BARRIER));
+
+    /**
+     * 珍珠丰收法术书 (亚特兰蒂斯神力)
+     * 稀有度：稀有 | 冷却：13秒 | 效果：召回海底贡藏和幸运增益
+     * 在目标区域凝聚珍珠、鹦鹉螺壳与海晶资源
+     */
+    public static final Item SPELLBOOK_PEARL_HARVEST = registerItem("spellbook_pearl_harvest",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.RARE),
+                             260, SpellbookItem.SpellType.PEARL_HARVEST));
+
+    /**
+     * 山铜熔炉法术书 (亚特兰蒂斯神力)
+     * 稀有度：稀有 | 冷却：14秒 | 效果：生成海晶与金属并强化采集
+     * 点亮失落熔炉，为施法者提供采集增益并产出山铜风格资源
+     */
+    public static final Item SPELLBOOK_ORICHALCUM_FORGE = registerItem("spellbook_orichalcum_forge",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.RARE),
+                             280, SpellbookItem.SpellType.ORICHALCUM_FORGE));
+
+    /**
+     * 海妖之歌法术书 (亚特兰蒂斯神力)
+     * 稀有度：稀有 | 冷却：16秒 | 效果：控制敌人并治愈盟友
+     * 释放海妖圣歌，让敌人迟缓虚弱，同时为盟友带来短暂恢复
+     */
+    public static final Item SPELLBOOK_SIREN_SONG = registerItem("spellbook_siren_song",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.RARE),
+                             320, SpellbookItem.SpellType.SIREN_SONG));
+
+    /**
+     * 利维坦召唤法术书 (亚特兰蒂斯神力)
+     * 稀有度：史诗 | 冷却：20秒 | 效果：召来利维坦幻影压制敌群
+     * 用深海巨兽的幻影震慑敌人，造成伤害、发光和拉扯
+     */
+    public static final Item SPELLBOOK_LEVIATHAN_CALL = registerItem("spellbook_leviathan_call",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.EPIC),
+                             400, SpellbookItem.SpellType.LEVIATHAN_CALL));
+
+    /**
+     * 深渊裂隙法术书 (亚特兰蒂斯神力)
+     * 稀有度：史诗 | 冷却：22秒 | 效果：拉扯并伤害敌人
+     * 在目标区域打开深渊裂隙，将敌人拖向中心并施加枯竭伤害
+     */
+    public static final Item SPELLBOOK_ABYSSAL_RIFT = registerItem("spellbook_abyssal_rift",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.EPIC),
+                             440, SpellbookItem.SpellType.ABYSSAL_RIFT));
+
+    /**
+     * 时滞静域法术书 (亚特兰蒂斯神力)
+     * 稀有度：史诗 | 冷却：27秒 | 效果：大范围冻结战场节奏
+     * 以失落科技停滞敌人行动，为施法者创造战术窗口
+     */
+    public static final Item SPELLBOOK_CHRONO_STASIS = registerItem("spellbook_chrono_stasis",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.EPIC),
+                             540, SpellbookItem.SpellType.CHRONO_STASIS));
+
+    /**
+     * 海洋震怒法术书 (亚特兰蒂斯神力)
+     * 稀有度：史诗 | 冷却：30秒 | 效果：召唤终极海洋风暴
+     * 引发海洋风暴、雷电和震波，大范围压制敌人并强化施法者
+     */
+    public static final Item SPELLBOOK_OCEANIC_WRATH = registerItem("spellbook_oceanic_wrath",
+            new SpellbookItem(new FabricItemSettings().maxCount(1).rarity(Rarity.EPIC),
+                             600, SpellbookItem.SpellType.OCEANIC_WRATH));
+
     // ============ 神话圣物系统 ============
     
     /** 
@@ -719,6 +811,131 @@ public class ModItems {
             new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.MEDUSA,
                                                0x2C5B46, 0xB8B8B8,
                                                new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item NEMEAN_LION_SPAWN_EGG = registerItem("nemean_lion_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.NEMEAN_LION,
+                                               0xC89032, 0xF3D27A,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item MANTICORE_SPAWN_EGG = registerItem("manticore_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.MANTICORE,
+                                               0x8B3E3A, 0x2F5B3F,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item CHIMERA_SPAWN_EGG = registerItem("chimera_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.CHIMERA,
+                                               0x4A2C22, 0xD65A31,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item COLOSSUS_SPAWN_EGG = registerItem("colossus_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.COLOSSUS,
+                                               0x7B5A3A, 0x2DBA9D,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item PEGASUS_SPAWN_EGG = registerItem("pegasus_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.PEGASUS,
+                                               0xF7F7F0, 0xCFEAFF,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item ANUBIS_WARRIOR_SPAWN_EGG = registerItem("anubis_warrior_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.ANUBIS_WARRIOR,
+                                               0x3B2B22, 0xD8B45C,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item SCARAB_GUARDIAN_SPAWN_EGG = registerItem("scarab_guardian_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.SCARAB_GUARDIAN,
+                                               0x1F4A3F, 0xD2A94B,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item MUMMY_SOLDIER_SPAWN_EGG = registerItem("mummy_soldier_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.MUMMY_SOLDIER,
+                                               0xB8A77E, 0x4A3F2B,
+                                               new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+
+    public static final Item SPHINX_SENTINEL_SPAWN_EGG = registerItem("sphinx_sentinel_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.SPHINX_SENTINEL,
+                                               0xC79A4A, 0x315F7D,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item SUN_FALCON_SPAWN_EGG = registerItem("sun_falcon_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.SUN_FALCON,
+                                               0x8F4B22, 0xF2C14E,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item FROST_GIANT_SPAWN_EGG = registerItem("frost_giant_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.FROST_GIANT,
+                                               0x8FB8D8, 0xE6F6FF,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item DRAUGR_WARRIOR_SPAWN_EGG = registerItem("draugr_warrior_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.DRAUGR_WARRIOR,
+                                               0x4F5A5B, 0x9AA7A8,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item VALKYRIE_SPAWN_EGG = registerItem("valkyrie_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.VALKYRIE,
+                                               0xD8D7CF, 0xD7B65A,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item FENRIR_WOLF_SPAWN_EGG = registerItem("fenrir_wolf_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.FENRIR_WOLF,
+                                               0x1D2028, 0xB02A2A,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item DWARF_BERSERKER_SPAWN_EGG = registerItem("dwarf_berserker_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.DWARF_BERSERKER,
+                                               0x7B4C2A, 0xC5A15C,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item AZURE_DRAGON_SPAWN_EGG = registerItem("azure_dragon_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.AZURE_DRAGON,
+                                               0x2F8F8A, 0xD8B65A,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item QILIN_GUARDIAN_SPAWN_EGG = registerItem("qilin_guardian_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.QILIN_GUARDIAN,
+                                               0xB84A36, 0xD9B84A,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item JIANGSHI_SPAWN_EGG = registerItem("jiangshi_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.JIANGSHI,
+                                               0x46605F, 0xD6B64A,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item NINE_TAILED_FOX_SPAWN_EGG = registerItem("nine_tailed_fox_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.NINE_TAILED_FOX,
+                                               0xF0D2A2, 0xE84A5F,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item STONE_LION_GUARDIAN_SPAWN_EGG = registerItem("stone_lion_guardian_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.STONE_LION_GUARDIAN,
+                                               0x8F8A7A, 0xB93A32,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item CRYSTAL_LEVIATHAN_SPAWN_EGG = registerItem("crystal_leviathan_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.CRYSTAL_LEVIATHAN,
+                                               0x1B6F7A, 0x72E6F2,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item ORICHALCUM_GOLEM_SPAWN_EGG = registerItem("orichalcum_golem_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.ORICHALCUM_GOLEM,
+                                               0x9A6C38, 0x36D6C9,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item SIREN_PRIESTESS_SPAWN_EGG = registerItem("siren_priestess_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.SIREN_PRIESTESS,
+                                               0x2C8F9E, 0xD7F7FF,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
+
+    public static final Item TIDAL_GUARDIAN_SPAWN_EGG = registerItem("tidal_guardian_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.TIDAL_GUARDIAN,
+                                               0x2F5D62, 0x48D1CC,
+                                               new FabricItemSettings().rarity(Rarity.EPIC)));
+
+    public static final Item ABYSSAL_RAY_SPAWN_EGG = registerItem("abyssal_ray_spawn_egg",
+            new net.minecraft.item.SpawnEggItem(com.example.mythic_age.entity.ModEntities.ABYSSAL_RAY,
+                                               0x183F5A, 0x7DE7FF,
+                                               new FabricItemSettings().rarity(Rarity.RARE)));
     
     /** 
      * 希腊神殿守护者刷怪蛋
@@ -905,6 +1122,6 @@ public class ModItems {
         // 静态初始化器会在类加载时自动处理物品注册
         // 这里主要用于日志记录和确保类被正确加载
         MythicAgeMod.LOGGER.info("Successfully registered " + 
-            "46 spellbooks (12 Greek + 4 Temple Generation + 10 Chinese + 10 Egyptian + 10 Nordic), 5 relics, 5 god power certificates, and multiple spawn eggs for Mythic Age Mod");
+            "56 spellbooks (12 Greek + 4 Temple Generation + 10 Chinese + 10 Egyptian + 10 Nordic + 10 Atlantean), 5 relics, 5 god power certificates, and multiple spawn eggs for Mythic Age Mod");
     }
 }

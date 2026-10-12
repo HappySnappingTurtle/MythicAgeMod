@@ -1,5 +1,7 @@
 package com.example.mythic_age.item;
 
+import com.example.mythic_age.network.ModNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,24 +29,22 @@ public class GodPowerGuideItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        
+
+        String civilization = getCivilization(itemStack);
         if (!world.isClient) {
-            // 检查物品NBT中是否有文明类型信息
-            String civilization = "general";
-            if (itemStack.hasNbt() && itemStack.getNbt().contains("civilization")) {
-                civilization = itemStack.getNbt().getString("civilization");
-            }
-            
-            // 根据文明类型创建对应的指南书
-            ItemStack book = createGuideBook(civilization);
-            
-            // 替换当前物品为书
-            user.setStackInHand(hand, book);
-            
-            return TypedActionResult.success(book);
+            ServerPlayNetworking.send((net.minecraft.server.network.ServerPlayerEntity) user,
+                    ModNetworking.OPEN_GOD_POWER_GUIDE_SCREEN,
+                    net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create().writeString(civilization));
         }
-        
-        return TypedActionResult.success(itemStack);
+
+        return TypedActionResult.success(itemStack, world.isClient());
+    }
+
+    private String getCivilization(ItemStack itemStack) {
+        if (itemStack.hasNbt() && itemStack.getNbt().contains("civilization")) {
+            return itemStack.getNbt().getString("civilization");
+        }
+        return "general";
     }
     
     /**

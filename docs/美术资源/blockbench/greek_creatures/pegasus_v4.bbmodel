@@ -1,0 +1,262 @@
+// Made with Blockbench 5.1.3
+// Exported for Minecraft version 1.17 or later with Mojang mappings
+// Paste this class into your mod and generate all required imports
+
+
+public class pegasus_v4<T extends Entity> extends EntityModel<T> {
+	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "pegasus_v4"), "main");
+	private final ModelPart body;
+	private final ModelPart body_barrel;
+	private final ModelPart chest;
+	private final ModelPart withers;
+	private final ModelPart saddle_space;
+	private final ModelPart rump;
+	private final ModelPart head_neck;
+	private final ModelPart neck_lower;
+	private final ModelPart neck_upper;
+	private final ModelPart head_core;
+	private final ModelPart muzzle;
+	private final ModelPart left_eye;
+	private final ModelPart right_eye;
+	private final ModelPart left_ear;
+	private final ModelPart right_ear;
+	private final ModelPart left_nostril;
+	private final ModelPart right_nostril;
+	private final ModelPart mouth_line;
+	private final ModelPart mane_strip;
+	private final ModelPart left_wing;
+	private final ModelPart shoulder_joint;
+	private final ModelPart upper_wing;
+	private final ModelPart secondary_wing;
+	private final ModelPart coverts;
+	private final ModelPart primary_feathers;
+	private final ModelPart right_wing;
+	private final ModelPart shoulder_joint;
+	private final ModelPart upper_wing;
+	private final ModelPart secondary_wing;
+	private final ModelPart coverts;
+	private final ModelPart primary_feathers;
+	private final ModelPart front_left;
+	private final ModelPart upper_leg;
+	private final ModelPart lower_leg;
+	private final ModelPart hoof;
+	private final ModelPart hoof;
+	private final ModelPart hoof;
+	private final ModelPart hoof;
+	private final ModelPart lower_leg;
+	private final ModelPart lower_leg;
+	private final ModelPart lower_leg;
+	private final ModelPart front_right;
+	private final ModelPart upper_leg;
+	private final ModelPart back_left;
+	private final ModelPart upper_leg;
+	private final ModelPart back_right;
+	private final ModelPart upper_leg;
+	private final ModelPart tail;
+	private final ModelPart tail_base;
+	private final ModelPart tail_plume;
+
+	public pegasus_v4(ModelPart root) {
+		this.body = root.getChild("body");
+		this.body_barrel = this.body.getChild("body_barrel");
+		this.chest = this.body.getChild("chest");
+		this.withers = this.body.getChild("withers");
+		this.saddle_space = this.body.getChild("saddle_space");
+		this.rump = this.body.getChild("rump");
+		this.head_neck = root.getChild("head_neck");
+		this.neck_lower = this.head_neck.getChild("neck_lower");
+		this.neck_upper = this.head_neck.getChild("neck_upper");
+		this.head_core = this.head_neck.getChild("head_core");
+		this.muzzle = this.head_core.getChild("muzzle");
+		this.left_eye = this.head_core.getChild("left_eye");
+		this.right_eye = this.head_core.getChild("right_eye");
+		this.left_ear = this.head_core.getChild("left_ear");
+		this.right_ear = this.head_core.getChild("right_ear");
+		this.left_nostril = this.head_core.getChild("left_nostril");
+		this.right_nostril = this.head_core.getChild("right_nostril");
+		this.mouth_line = this.head_core.getChild("mouth_line");
+		this.mane_strip = this.head_neck.getChild("mane_strip");
+		this.left_wing = root.getChild("left_wing");
+		this.shoulder_joint = this.left_wing.getChild("shoulder_joint");
+		this.upper_wing = this.left_wing.getChild("upper_wing");
+		this.secondary_wing = this.left_wing.getChild("secondary_wing");
+		this.coverts = this.left_wing.getChild("coverts");
+		this.primary_feathers = this.left_wing.getChild("primary_feathers");
+		this.right_wing = root.getChild("right_wing");
+		this.shoulder_joint = this.right_wing.getChild("shoulder_joint");
+		this.upper_wing = this.right_wing.getChild("upper_wing");
+		this.secondary_wing = this.right_wing.getChild("secondary_wing");
+		this.coverts = this.right_wing.getChild("coverts");
+		this.primary_feathers = this.right_wing.getChild("primary_feathers");
+		this.front_left = root.getChild("front_left");
+		this.upper_leg = this.front_left.getChild("upper_leg");
+		this.lower_leg = this.upper_leg.getChild("lower_leg");
+		this.hoof = this.lower_leg.getChild("hoof");
+		this.hoof = this.lower_leg.getChild("hoof");
+		this.hoof = this.lower_leg.getChild("hoof");
+		this.hoof = this.lower_leg.getChild("hoof");
+		this.lower_leg = this.upper_leg.getChild("lower_leg");
+		this.lower_leg = this.upper_leg.getChild("lower_leg");
+		this.lower_leg = this.upper_leg.getChild("lower_leg");
+		this.front_right = root.getChild("front_right");
+		this.upper_leg = this.front_right.getChild("upper_leg");
+		this.back_left = root.getChild("back_left");
+		this.upper_leg = this.back_left.getChild("upper_leg");
+		this.back_right = root.getChild("back_right");
+		this.upper_leg = this.back_right.getChild("upper_leg");
+		this.tail = root.getChild("tail");
+		this.tail_base = this.tail.getChild("tail_base");
+		this.tail_plume = this.tail.getChild("tail_plume");
+	}
+
+	public static LayerDefinition createBodyLayer() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partdefinition = meshdefinition.getRoot();
+
+		PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(0.0F, 11.0F, 0.0F));
+
+		PartDefinition body_barrel = body.addOrReplaceChild("body_barrel", CubeListBuilder.create().texOffs(0, 0).addBox(-5.0F, 8.0F, 0.0F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-5.5F, -4.0F, -9.0F, 11.0F, 8.0F, 18.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition chest = body.addOrReplaceChild("chest", CubeListBuilder.create().texOffs(0, 0).addBox(-5.0F, -3.0F, -5.0F, 10.0F, 8.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.0F, -8.0F));
+
+		PartDefinition withers = body.addOrReplaceChild("withers", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -2.0F, -3.0F, 8.0F, 2.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -4.0F, -6.0F));
+
+		PartDefinition saddle_space = body.addOrReplaceChild("saddle_space", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -1.0F, -4.0F, 8.0F, 1.5F, 9.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -5.0F, 0.0F));
+
+		PartDefinition rump = body.addOrReplaceChild("rump", CubeListBuilder.create().texOffs(0, 0).addBox(-5.0F, -4.0F, -2.0F, 10.0F, 7.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 8.0F));
+
+		PartDefinition head_neck = partdefinition.addOrReplaceChild("head_neck", CubeListBuilder.create(), PartPose.offset(0.0F, 7.0F, -10.0F));
+
+		PartDefinition neck_lower = head_neck.addOrReplaceChild("neck_lower", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -7.0F, -2.0F, 4.0F, 7.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.5236F, 0.0F, 0.0F));
+
+		PartDefinition neck_upper = head_neck.addOrReplaceChild("neck_upper", CubeListBuilder.create().texOffs(0, 0).addBox(-1.8F, -6.0F, -2.0F, 3.6F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -5.0F, -2.0F, -0.2618F, 0.0F, 0.0F));
+
+		PartDefinition head_core = head_neck.addOrReplaceChild("head_core", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -2.5F, -5.0F, 4.0F, 4.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -8.0F, -4.0F, 0.1745F, 0.0F, 0.0F));
+
+		PartDefinition muzzle = head_core.addOrReplaceChild("muzzle", CubeListBuilder.create().texOffs(0, 0).addBox(-1.2F, -1.5F, -5.0F, 2.4F, 2.5F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 1.0F, -4.0F));
+
+		PartDefinition left_eye = head_core.addOrReplaceChild("left_eye", CubeListBuilder.create().texOffs(0, 0).addBox(-0.7F, -0.3F, -2.0F, 0.7F, 0.8F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.5F, -1.0F, -1.0F));
+
+		PartDefinition right_eye = head_core.addOrReplaceChild("right_eye", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, -0.3F, -2.0F, 0.7F, 0.8F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(1.5F, -1.0F, -1.0F));
+
+		PartDefinition left_ear = head_core.addOrReplaceChild("left_ear", CubeListBuilder.create().texOffs(0, 0).addBox(-0.3F, -3.0F, -1.5F, 0.8F, 2.5F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.0F, -2.0F, 1.0F));
+
+		PartDefinition right_ear = head_core.addOrReplaceChild("right_ear", CubeListBuilder.create().texOffs(0, 0).addBox(-0.5F, -3.0F, -1.5F, 0.8F, 2.5F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(1.0F, -2.0F, 1.0F));
+
+		PartDefinition left_nostril = head_core.addOrReplaceChild("left_nostril", CubeListBuilder.create().texOffs(0, 0).addBox(-0.3F, -0.2F, -3.5F, 0.5F, 0.7F, 0.5F, new CubeDeformation(0.0F)), PartPose.offset(-0.5F, 1.0F, -6.0F));
+
+		PartDefinition right_nostril = head_core.addOrReplaceChild("right_nostril", CubeListBuilder.create().texOffs(0, 0).addBox(-0.2F, -0.2F, -3.5F, 0.5F, 0.7F, 0.5F, new CubeDeformation(0.0F)), PartPose.offset(0.5F, 1.0F, -6.0F));
+
+		PartDefinition mouth_line = head_core.addOrReplaceChild("mouth_line", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, 0.3F, -4.0F, 2.0F, 0.4F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 1.5F, -4.0F));
+
+		PartDefinition mane_strip = head_neck.addOrReplaceChild("mane_strip", CubeListBuilder.create().texOffs(0, 0).addBox(-0.8F, -8.0F, 0.0F, 1.6F, 9.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -3.0F, -1.0F));
+
+		PartDefinition left_wing = partdefinition.addOrReplaceChild("left_wing", CubeListBuilder.create(), PartPose.offset(-5.0F, 7.0F, -4.0F));
+
+		PartDefinition shoulder_joint = left_wing.addOrReplaceChild("shoulder_joint", CubeListBuilder.create().texOffs(0, 0).addBox(-1.5F, -1.0F, -2.0F, 2.5F, 2.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(9.0F, -1.0F, -2.0F, 2.5F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition upper_wing = left_wing.addOrReplaceChild("upper_wing", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -1.0F, -3.0F, 10.0F, 1.5F, 6.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(14.0F, -1.0F, -3.0F, 10.0F, 1.5F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(-3.0F, 0.0F, 2.0F));
+
+		PartDefinition secondary_wing = left_wing.addOrReplaceChild("secondary_wing", CubeListBuilder.create().texOffs(0, 0).addBox(-10.0F, -0.5F, -2.0F, 10.0F, 1.5F, 7.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(28.0F, -0.5F, -2.0F, 10.0F, 1.5F, 7.0F, new CubeDeformation(0.0F)), PartPose.offset(-9.0F, 0.0F, 4.0F));
+
+		PartDefinition coverts = left_wing.addOrReplaceChild("coverts", CubeListBuilder.create().texOffs(0, 0).addBox(-7.0F, -1.5F, -1.0F, 9.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(14.0F, -1.5F, -1.0F, 9.0F, 1.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-3.0F, -0.5F, 1.0F));
+
+		PartDefinition primary_feathers = left_wing.addOrReplaceChild("primary_feathers", CubeListBuilder.create().texOffs(0, 0).addBox(0.5F, -0.5F, 1.0F, 2.5F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-2.5F, -0.5F, 2.0F, 2.5F, 1.0F, 4.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-5.5F, -0.5F, 3.0F, 2.5F, 1.0F, 5.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-8.5F, -0.5F, 4.0F, 2.5F, 1.0F, 5.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-11.5F, -0.5F, 5.0F, 2.5F, 1.0F, 6.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-14.5F, -0.5F, 6.0F, 2.5F, 1.0F, 6.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(33.0F, -0.5F, 1.0F, 2.5F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(36.0F, -0.5F, 2.0F, 2.5F, 1.0F, 4.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(39.0F, -0.5F, 3.0F, 2.5F, 1.0F, 5.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(42.0F, -0.5F, 4.0F, 2.5F, 1.0F, 5.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(45.0F, -0.5F, 5.0F, 2.5F, 1.0F, 6.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(48.0F, -0.5F, 6.0F, 2.5F, 1.0F, 6.5F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, 1.0F, 6.0F));
+
+		PartDefinition right_wing = partdefinition.addOrReplaceChild("right_wing", CubeListBuilder.create(), PartPose.offset(5.0F, 7.0F, -4.0F));
+
+		PartDefinition shoulder_joint = right_wing.addOrReplaceChild("shoulder_joint", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition upper_wing = right_wing.addOrReplaceChild("upper_wing", CubeListBuilder.create(), PartPose.offset(3.0F, 0.0F, 2.0F));
+
+		PartDefinition secondary_wing = right_wing.addOrReplaceChild("secondary_wing", CubeListBuilder.create(), PartPose.offset(9.0F, 0.0F, 4.0F));
+
+		PartDefinition coverts = right_wing.addOrReplaceChild("coverts", CubeListBuilder.create(), PartPose.offset(3.0F, -0.5F, 1.0F));
+
+		PartDefinition primary_feathers = right_wing.addOrReplaceChild("primary_feathers", CubeListBuilder.create(), PartPose.offset(13.0F, 1.0F, 6.0F));
+
+		PartDefinition front_left = partdefinition.addOrReplaceChild("front_left", CubeListBuilder.create(), PartPose.offset(-3.0F, 13.0F, -7.0F));
+
+		PartDefinition upper_leg = front_left.addOrReplaceChild("upper_leg", CubeListBuilder.create().texOffs(0, 0).addBox(-1.5F, 0.0F, -1.5F, 3.0F, 6.0F, 3.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.5F, 0.0F, -1.5F, 3.0F, 6.0F, 3.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-1.5F, 0.0F, 12.5F, 3.0F, 6.0F, 3.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.5F, 0.0F, 12.5F, 3.0F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition lower_leg = upper_leg.addOrReplaceChild("lower_leg", CubeListBuilder.create().texOffs(0, 0).addBox(-1.2F, 0.0F, -1.2F, 2.4F, 4.0F, 2.4F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.8F, 0.0F, -1.2F, 2.4F, 4.0F, 2.4F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-1.2F, 0.0F, 12.8F, 2.4F, 4.0F, 2.4F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.8F, 0.0F, 12.8F, 2.4F, 4.0F, 2.4F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 6.0F, 0.0F));
+
+		PartDefinition hoof = lower_leg.addOrReplaceChild("hoof", CubeListBuilder.create().texOffs(0, 0).addBox(-1.5F, -1.5F, -2.0F, 3.0F, 1.5F, 3.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.5F, -1.5F, -2.0F, 3.0F, 1.5F, 3.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(-1.5F, -1.5F, 12.0F, 3.0F, 1.5F, 3.5F, new CubeDeformation(0.0F))
+		.texOffs(0, 0).addBox(4.5F, -1.5F, 12.0F, 3.0F, 1.5F, 3.5F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 5.0F, 0.0F));
+
+		PartDefinition hoof = lower_leg.addOrReplaceChild("hoof", CubeListBuilder.create(), PartPose.offset(6.0F, 5.0F, 0.0F));
+
+		PartDefinition hoof = lower_leg.addOrReplaceChild("hoof", CubeListBuilder.create(), PartPose.offset(0.0F, 5.0F, 14.0F));
+
+		PartDefinition hoof = lower_leg.addOrReplaceChild("hoof", CubeListBuilder.create(), PartPose.offset(6.0F, 5.0F, 14.0F));
+
+		PartDefinition lower_leg = upper_leg.addOrReplaceChild("lower_leg", CubeListBuilder.create(), PartPose.offset(6.0F, 6.0F, 0.0F));
+
+		PartDefinition lower_leg = upper_leg.addOrReplaceChild("lower_leg", CubeListBuilder.create(), PartPose.offset(0.0F, 6.0F, 14.0F));
+
+		PartDefinition lower_leg = upper_leg.addOrReplaceChild("lower_leg", CubeListBuilder.create(), PartPose.offset(6.0F, 6.0F, 14.0F));
+
+		PartDefinition front_right = partdefinition.addOrReplaceChild("front_right", CubeListBuilder.create(), PartPose.offset(3.0F, 13.0F, -7.0F));
+
+		PartDefinition upper_leg = front_right.addOrReplaceChild("upper_leg", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition back_left = partdefinition.addOrReplaceChild("back_left", CubeListBuilder.create(), PartPose.offset(-3.0F, 13.0F, 7.0F));
+
+		PartDefinition upper_leg = back_left.addOrReplaceChild("upper_leg", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition back_right = partdefinition.addOrReplaceChild("back_right", CubeListBuilder.create(), PartPose.offset(3.0F, 13.0F, 7.0F));
+
+		PartDefinition upper_leg = back_right.addOrReplaceChild("upper_leg", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition tail = partdefinition.addOrReplaceChild("tail", CubeListBuilder.create(), PartPose.offset(0.0F, 10.0F, 10.0F));
+
+		PartDefinition tail_base = tail.addOrReplaceChild("tail_base", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, -1.0F, 0.0F, 2.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition tail_plume = tail.addOrReplaceChild("tail_plume", CubeListBuilder.create().texOffs(0, 0).addBox(-2.5F, -2.0F, -2.0F, 5.0F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 2.0F, 6.0F));
+
+		return LayerDefinition.create(meshdefinition, 16, 16);
+	}
+
+	@Override
+	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+
+	}
+
+	@Override
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		head_neck.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		left_wing.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		right_wing.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		front_left.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		front_right.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		back_left.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		back_right.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		tail.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	}
+}

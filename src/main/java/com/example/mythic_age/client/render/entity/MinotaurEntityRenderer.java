@@ -12,14 +12,11 @@ public class MinotaurEntityRenderer extends MobEntityRenderer<MinotaurEntity, Mi
     private static final Identifier TEXTURE = new Identifier(MythicAgeMod.MOD_ID, "textures/entity/minotaur/minotaur.png");
 
     public MinotaurEntityRenderer(EntityRendererFactory.Context context) {
-        super(context, new MinotaurModel(context.getPart(ModModelLayers.MINOTAUR)), 0.7f); // Shadow radius
+        super(context, new MinotaurModel(context.getPart(ModModelLayers.MINOTAUR)), 0.95f);
     }
 
     @Override
     public Identifier getTexture(MinotaurEntity entity) {
         return TEXTURE;
     }
-
-    // You can override other methods here if needed, for example, to scale the entity or add layers.
 }
-
