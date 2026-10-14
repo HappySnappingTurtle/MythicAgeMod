@@ -21,7 +21,7 @@ import java.util.OptionalLong;
 import java.util.UUID;
 
 /**
- * 玩家活跃采集（T5 设计文档 §2）。有效输入：移动 ≥1 格、视角变化 ≥1°、与方块或实体交互、
+ * 玩家活跃采集（T5 设计文档 §2）。只在服主开启 {@code favor.idle.enabled} 时影响产出（默认关闭，A2-R1）。有效输入：移动 ≥1 格、视角变化 ≥1°、与方块或实体交互、
  * 打开容器、聊天或命令；登录也算一次。记录只在内存中，下线即清除（下线视为不活跃）。
  */
 public final class PlayerActivity {
@@ -84,12 +84,16 @@ public final class PlayerActivity {
         return e != null && !e.player.hasDisconnected() ? e.player : null;
     }
 
-    /** 主人是否活跃：在线，且距最近一次输入不足宽限期。 */
+    /**
+     * 主人是否算作「活跃」。A2-R1（2026-10-13）：默认 {@code idle.enabled=false}，在线即活跃，挂机不惩罚；
+     * 只有服主开启挂机判定时，才要求距最近一次输入不足宽限期。
+     */
     public static synchronized boolean isActive(MinecraftServer server, UUID id, long now, RuntimeConfig.Idle idle) {
-        ServerPlayer player = onlinePlayer(server, id);
+        if (onlinePlayer(server, id) == null) {
+            return false;
+        }
         Entry e = ENTRIES.get(id);
-        long last = e == null ? Long.MIN_VALUE / 2 : e.lastActiveTick;
-        return ActivityRules.isActive(player != null && e != null, now, last, idle);
+        return ActivityRules.isActive(true, now, e == null ? now : e.lastActiveTick, idle);
     }
 
     /** 清除记录（下线、测试结束）。 */

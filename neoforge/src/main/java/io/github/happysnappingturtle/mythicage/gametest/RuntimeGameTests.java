@@ -98,20 +98,29 @@ public final class RuntimeGameTests {
         });
     }
 
-    /** TC-T5-42：主人最近一次输入已超过宽限期 → 不入账。 */
+    /**
+     * TC-T5-42（A2-R1 修订）：默认配置下挂机不惩罚——最近一次输入早已超过宽限期，仍按快照入账；
+     * 服主开启挂机判定时，才按下线处理。
+     */
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
-    public static void idle_owner_gets_nothing(GameTestHelper helper) {
+    public static void idle_owner_not_penalized_by_default(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
+        RuntimeConfig.Favor cfg = ModConfigs.runtime().current().favor();
+        helper.assertTrue(!cfg.idle().enabled(), "默认应关闭挂机判定");
         FakePlayer p = owner(helper.getLevel(), "rt_idle");
         long now = WorldClock.now(server);
-        int grace = ModConfigs.runtime().current().favor().idle().graceTicks();
-        PlayerActivity.setLastActiveTick(p, now - grace - 1);
+        PlayerActivity.setLastActiveTick(p, now - 100000);
         ProducerLedger l = ledger(server, "idle", p, 24000);
-        SettlementEngine.Settlement s = RuntimeDriver.settle(server, RuntimeLedgers.get(server), l, now,
-                ModConfigs.runtime().current().favor());
-        helper.assertTrue(s.mode() == SettlementEngine.Mode.NONE, "挂机应为 NONE，实际 " + s.mode());
-        helper.assertTrue(greek(p) == 0, "挂机不应入账");
-        helper.assertTrue(l.lastSettledTick() == now, "这段时间作废，lastSettledTick 仍推进");
+        SettlementEngine.Settlement s = RuntimeDriver.settle(server, RuntimeLedgers.get(server), l, now, cfg);
+        helper.assertTrue(s.mode() == SettlementEngine.Mode.SNAPSHOT, "挂机应照常快照，实际 " + s.mode());
+        helper.assertTrue(greek(p) == 48, "挂机应照常入账 48，实际 " + greek(p));
+
+        RuntimeConfig.Favor strict = new RuntimeConfig.Favor(cfg.mode(), new RuntimeConfig.Idle(true, 12000),
+                cfg.snapshot(), cfg.offline(), cfg.catchUp());
+        l.setLastSettledTick(now - 24000);
+        SettlementEngine.Settlement s2 = RuntimeDriver.settle(server, RuntimeLedgers.get(server), l, now, strict);
+        helper.assertTrue(s2.mode() == SettlementEngine.Mode.NONE, "开启挂机判定后应为 NONE，实际 " + s2.mode());
+        helper.assertTrue(greek(p) == 48, "开启挂机判定后不应再入账");
         cleanup(server, p, l);
         helper.succeed();
     }

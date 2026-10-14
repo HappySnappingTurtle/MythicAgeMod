@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * 产出点探针：回答本区间产出点是否真实运行、主人是否在照看半径内、真实运行时的产出量。
+ * 真实运行只看区块是否加载，用 {@link ProducerProbes#chunkRunning} 判断（A2-R1）。
  * 每类产出点（神坛 T8/T10、纪念碑、水晶塔……）注册一个，按 {@link ProducerProbes#type} 分派。
  */
 @FunctionalInterface

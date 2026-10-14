@@ -25,7 +25,7 @@ class RuntimeConfigSchemaTest {
               "preset": "E",
               "favor": {
                 "mode": "online_snapshot",
-                "idle": { "enabled": true, "graceTicks": 12000 },
+                "idle": { "enabled": false, "graceTicks": 12000 },
                 "snapshot": {
                   "rateFactor": 1.0,
                   "maxTicksSinceVisit": 120000,

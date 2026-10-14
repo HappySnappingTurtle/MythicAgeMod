@@ -49,7 +49,7 @@ public final class RuntimeConfigSchema implements ConfigSchema<RuntimeConfig> {
     private static final RuntimeConfig PRESET_E = new RuntimeConfig(
             Preset.E,
             new Favor(FavorMode.ONLINE_SNAPSHOT,
-                    new Idle(true, 12000),
+                    new Idle(false, 12000),
                     new Snapshot(1.0, 120000, 600, 24000, 0.5),
                     new Offline(0.0, 1.0, OfflineClock.SERVER_TICKS),
                     new CatchUp(24000)),
