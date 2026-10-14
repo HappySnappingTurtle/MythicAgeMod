@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:has_feature/olive_tree_common",
+  "features": "mythic_age:olive_tree_common",
+  "step": "vegetal_decoration"
+}

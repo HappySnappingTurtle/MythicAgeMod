@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "item": "mythic_age:olive_log"
+    },
+    "M": {
+      "item": "mythic_age:marble"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "SLS",
+    "MMM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:olive_press"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "template": "pixels",
+  "out": "item/olive_oil",
+  "size": 16,
+  "palette": {
+    "o": "#3d160a",
+    "d": "#7f3519",
+    "m": "#a9492a",
+    "l": "#c8643b",
+    "h": "#e8936a",
+    "c": "#e2d4ac",
+    "C": "#b3a27a",
+    "s": "#6b4f30",
+    "g": "#8c8a2c",
+    "G": "#c2b84a"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      ".....oooooo.....",
+      ".....occcCo.....",
+      "......oCCo......",
+      "......osso......",
+      "..oo.ohlmmo.oo..",
+      ".o..ohllmmdo..o.",
+      ".o.ohlgGmmddo.o.",
+      "..oohlggmmddoo..",
+      "...ohlmgmmmddo..",
+      "...ohlmmmmmddo..",
+      "...omlmmmmddoo..",
+      "....omlmmmddo...",
+      ".....ommmddo....",
+      "......oooooo....",
+      "................"
+    ]
+  }
+}

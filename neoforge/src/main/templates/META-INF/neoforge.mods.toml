@@ -8,6 +8,8 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
+# T6b：船类型枚举扩展（Boat.Type）
+enumExtensions="META-INF/enumextensions.json"
 
 # T6：时代受限配方需要在合成时拿到玩家（CraftingMenu / ResultSlot）
 [[mixins]]

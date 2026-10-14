@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "fruit=0": {
+      "model": "mythic_age:block/olive_leaves"
+    },
+    "fruit=1": {
+      "model": "mythic_age:block/olive_leaves_1"
+    },
+    "fruit=2": {
+      "model": "mythic_age:block/olive_leaves_2"
+    }
+  }
+}

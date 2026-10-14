@@ -40,7 +40,7 @@ import recolor
 ROOT = Path(__file__).resolve().parents[2]
 SPEC_DIR = Path(__file__).resolve().parent / "specs"
 DEFAULT_OUT = ROOT / "neoforge/src/main/resources/assets/mythic_age/textures"
-DEFAULT_ATLAS = ROOT / "neoforge/src/main/resources" / "assets/minecraft/atlases/blocks.json"
+DEFAULT_ATLAS_DIR = ROOT / "neoforge/src/main/resources" / "assets/minecraft/atlases"
 
 RGBA = tuple[int, int, int, int]
 CLEAR: RGBA = (0, 0, 0, 0)
@@ -59,6 +59,7 @@ class Spec:
     size: int
     palette: dict[str, RGBA]
     params: dict
+    namespace: str = "mythic_age"
 
     def color(self, key: str) -> RGBA:
         return self.palette[key]
@@ -538,6 +539,91 @@ def t_plate(spec: Spec) -> Canvas:
     return canvas
 
 
+def t_tiled(spec: Spec) -> Image.Image:
+    """把一块 16×16 手绘图块（params.rows）平铺成 width×height（船、界面背景等非方形贴图）。"""
+    tile = t_pixels(spec).to_image()
+    w, h = spec.params["width"], spec.params["height"]
+    out = Image.new("RGBA", (w, h))
+    for y in range(0, h, spec.size):
+        for x in range(0, w, spec.size):
+            out.paste(tile, (x, y))
+    return out
+
+
+def t_gui_container(spec: Spec) -> Image.Image:
+    """容器界面（256×256 画布，左上 width×height 为面板）：
+    圆角面板 + 一像素亮/暗斜边、凹陷的物品槽、一支空箭头；在 (arrowFilled) 处另画一支满箭头供进度裁切。"""
+    w, h = spec.params.get("width", 176), spec.params.get("height", 166)
+    img = Image.new("RGBA", (256, 256))
+    px = img.load()
+    C = spec.color
+    for y in range(h):
+        for x in range(w):
+            edge = x in (0, w - 1) or y in (0, h - 1)
+            corner = (x in (0, w - 1)) and (y in (0, h - 1))
+            if corner:
+                continue
+            if edge:
+                px[x, y] = C("outline")
+            elif x in (1, 2) or y in (1, 2):
+                px[x, y] = C("light")
+            elif x in (w - 2, w - 3) or y in (h - 2, h - 3):
+                px[x, y] = C("dark")
+            else:
+                px[x, y] = C("panel")
+    # 面板边缘的木纹边框（4 像素宽，位于斜边之内）
+    if "frame" in spec.palette:
+        for y in range(3, h - 3):
+            for x in range(3, w - 3):
+                if x < 5 or y < 5 or x >= w - 5 or y >= h - 5:
+                    px[x, y] = C("frame")
+
+    def slot(x0, y0, size=18):
+        for y in range(size):
+            for x in range(size):
+                X, Y = x0 + x, y0 + y
+                if x == 0 or y == 0:
+                    px[X, Y] = C("dark")
+                elif x == size - 1 or y == size - 1:
+                    px[X, Y] = C("highlight")
+                else:
+                    px[X, Y] = C("slot")
+
+    for sx, sy in spec.params.get("slots", []):
+        slot(sx - 1, sy - 1)
+    for r in range(3):
+        for c in range(9):
+            slot(7 + c * 18, 83 + r * 18)
+    for c in range(9):
+        slot(7 + c * 18, 141)
+
+    ARROW = ["..........xx............",
+             "..........xxx...........",
+             "..........xxxx..........",
+             "xxxxxxxxxxxxxxx.........",
+             "xxxxxxxxxxxxxxxx........",
+             "xxxxxxxxxxxxxxxxx.......",
+             "xxxxxxxxxxxxxxxxxx......",
+             "xxxxxxxxxxxxxxxxxxx.....",
+             "xxxxxxxxxxxxxxxxxxxx....",
+             "xxxxxxxxxxxxxxxxxxx.....",
+             "xxxxxxxxxxxxxxxxxx......",
+             "xxxxxxxxxxxxxxxxx.......",
+             "xxxxxxxxxxxxxxxx........",
+             "xxxxxxxxxxxxxxx.........",
+             "..........xxxx..........",
+             "..........xxx...........",
+             "..........xx............"]
+    ax, ay = spec.params.get("arrow", [79, 37])
+    fx, fy = spec.params.get("arrowFilled", [176, 0])
+    for y, row in enumerate(ARROW):
+        for x, ch in enumerate(row):
+            if ch == "x":
+                px[ax + x, ay + y] = C("arrow_empty")
+                px[fx + x, fy + y] = C("arrow_full")
+    return img
+
+
 def t_pixels(spec: Spec) -> Canvas:
     """手绘像素：rows 为 size 行字符串，每个字符是调色板里的一个键，「.」为透明。"""
     canvas = Canvas(spec.size)
@@ -550,6 +636,8 @@ def t_pixels(spec: Spec) -> Canvas:
 
 TEMPLATES = {
     "pixels": t_pixels,
+    "tiled": t_tiled,
+    "gui_container": t_gui_container,
     "ore_overlay": t_ore_overlay,
     "ingot": t_ingot,
     "raw_chunk": t_raw_chunk,
@@ -565,6 +653,8 @@ TEMPLATES = {
 
 REQUIRED_COLORS = {
     "pixels": [],
+    "tiled": [],
+    "gui_container": ["outline", "light", "dark", "panel", "slot", "highlight", "arrow_empty", "arrow_full"],
     "ore_overlay": ["light", "mid", "dark", "shadow", "highlight"],
     "ingot": ["outline", "dark", "mid", "light", "highlight"],
     "raw_chunk": ["outline", "dark", "mid", "light"],
@@ -591,7 +681,7 @@ def load_spec(path: Path) -> Spec:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         raise SpecError(f"{path}：无法读取 JSON：{e}") from e
-    if data.get("template") == "pixels":
+    if data.get("template") in ("pixels", "tiled", "gui_container"):
         data.setdefault("seed", 0)
     for key in ("template", "out", "seed", "palette"):
         if key not in data:
@@ -616,9 +706,17 @@ def load_spec(path: Path) -> Spec:
     params = data.get("params", {})
     if not isinstance(params, dict):
         raise SpecError(f"{path}：params 应为对象")
-    if template == "pixels":
+    if template in ("pixels", "tiled"):
         check_pixels(path, palette, params, size)
-    return Spec(path, template, out, data["seed"], size, palette, params)
+    if template == "tiled":
+        for k in ("width", "height"):
+            v = params.get(k)
+            if not isinstance(v, int) or v <= 0 or v > 512 or v % size:
+                raise SpecError(f"{path}：tiled 的 {k} 应为 {size} 的整数倍且不超过 512")
+    namespace = data.get("namespace", "mythic_age")
+    if namespace not in ("mythic_age", "minecraft"):
+        raise SpecError(f"{path}：namespace 只能是 mythic_age 或 minecraft")
+    return Spec(path, template, out, data["seed"], size, palette, params, namespace)
 
 
 def check_pixels(path: Path, palette: dict, params: dict, size: int) -> None:
@@ -637,7 +735,8 @@ def check_pixels(path: Path, palette: dict, params: dict, size: int) -> None:
 
 
 def render(spec: Spec) -> Image.Image:
-    return TEMPLATES[spec.template](spec).to_image()
+    result = TEMPLATES[spec.template](spec)
+    return result if isinstance(result, Image.Image) else result.to_image()
 
 
 def write_png(img: Image.Image, target: Path, force: bool) -> str:
@@ -695,7 +794,7 @@ def is_recolor(path: Path) -> bool:
         return False
 
 
-def write_recolor(out_root: Path, atlas_file: Path, spec_dir: Path, vanilla) -> dict:
+def write_recolor(out_root: Path, atlas_dir: Path, spec_dir: Path, vanilla) -> dict:
     """换色输出总是由规格目录中的全部 recolor 规格重建（图集文件只能有一份）。"""
     specs = []
     for p in sorted(spec_dir.rglob("*.json")):
@@ -720,12 +819,19 @@ def write_recolor(out_root: Path, atlas_file: Path, spec_dir: Path, vanilla) -> 
         status = write_png(img, target, force=True)
         if status != "unchanged":
             print(f"{status:11s} {target.relative_to(out_root)}")
-    text = recolor.atlas_text(result.atlas)
-    if specs or atlas_file.exists():
+    for name, atlas in result.atlases.items():
+        atlas_file = atlas_dir / f"{name}.json"
+        text = recolor.atlas_text(atlas)
+        if not atlas["sources"]:
+            if atlas_file.exists():
+                atlas_file.unlink()
+                print(f"removed     {atlas_file.name}")
+            continue
         if not atlas_file.exists() or atlas_file.read_text(encoding="utf-8") != text:
             atlas_file.parent.mkdir(parents=True, exist_ok=True)
             atlas_file.write_text(text, encoding="utf-8")
-            print(f"updated     {atlas_file.name}（{len(specs)} 个换色）")
+            count = sum(len(src["permutations"]) for src in atlas["sources"])
+            print(f"updated     {atlas_file.name}（{count} 个换色）")
     return result.previews
 
 
@@ -733,7 +839,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Mythic Age 程序化像素贴图生成器")
     ap.add_argument("specs", nargs="*", help="只生成这些像素规格；换色规格总是全部重建")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    ap.add_argument("--atlas", type=Path, default=DEFAULT_ATLAS)
+    ap.add_argument("--atlas-dir", type=Path, default=DEFAULT_ATLAS_DIR)
     ap.add_argument("--spec-dir", type=Path, default=SPEC_DIR)
     ap.add_argument("--vanilla", type=Path, help="原版资源目录（默认读取 MDG 下载的资源 jar）")
     ap.add_argument("--force", action="store_true")
@@ -749,9 +855,10 @@ def main(argv: list[str] | None = None) -> int:
         paths = [p for p in collect_specs(a.specs, a.spec_dir) if not is_recolor(p)]
         specs = [load_spec(p) for p in paths]
         rendered = [(s, render(s)) for s in specs]
-        previews = write_recolor(a.out, a.atlas, a.spec_dir, recolor.VanillaAssets(a.vanilla))
+        previews = write_recolor(a.out, a.atlas_dir, a.spec_dir, recolor.VanillaAssets(a.vanilla))
         for s, img in rendered:
-            status = write_png(img, a.out / (s.out + ".png"), a.force)
+            root = a.out if s.namespace == "mythic_age" else a.out.parents[1] / s.namespace / "textures"
+            status = write_png(img, root / (s.out + ".png"), a.force)
             print(f"{status:11s} {s.out}.png  ({s.template}, seed {s.seed})")
     except SpecError as e:
         print(f"错误：{e}", file=sys.stderr)

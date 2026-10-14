@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/honey_curd",
+  "size": 16,
+  "palette": {
+    "o": "#3a2614",
+    "d": "#6e4a2a",
+    "m": "#946638",
+    "l": "#b9864f",
+    "w": "#f4f1e6",
+    "W": "#d9d4c4",
+    "y": "#e8a820",
+    "Y": "#f8d060"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "....oooooooo....",
+      "..ooWwwwYYwwoo..",
+      ".oWwwYyyYwwwWWo.",
+      ".olWwwwYywwWWlo.",
+      ".oldllllllllldo.",
+      "..oldlllllllddo.",
+      "...oddmmmmmddo..",
+      "....oodddddoo...",
+      "......oooo......",
+      "................",
+      "................"
+    ]
+  }
+}

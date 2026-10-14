@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "stripped_olive_log",
+  "base": "minecraft:block/stripped_acacia_log",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "note": "去皮橄榄原木侧面"
+}

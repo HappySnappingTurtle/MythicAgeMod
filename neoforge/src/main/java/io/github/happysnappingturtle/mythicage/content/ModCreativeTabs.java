@@ -15,7 +15,7 @@ public final class ModCreativeTabs {
                     .title(Component.translatable(tabKey(Civilization.GREEK)))
                     .icon(() -> new ItemStack(GreekMaterials.TIN_INGOT.get()))
                     .displayItems((params, output) -> Content.entries(Civilization.GREEK)
-                            .forEach(e -> output.accept(e.item().get())))
+                            .forEach(e -> e.item().ifPresent(i -> output.accept(i.get()))))
                     .build());
 
     private ModCreativeTabs() {

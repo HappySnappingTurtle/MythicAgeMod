@@ -3,6 +3,7 @@ package io.github.happysnappingturtle.mythicage.datagen;
 import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+import io.github.happysnappingturtle.mythicage.worldgen.ModWorldGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.BiomeTagsProvider;
@@ -27,5 +28,11 @@ public final class ModBiomeTags extends BiomeTagsProvider {
                 Biomes.SWAMP);
         tag(ModTags.regionSecondary(Civilization.GREEK)).add(Biomes.FLOWER_FOREST, Biomes.SAVANNA,
                 Biomes.JAGGED_PEAKS);
+        // 橄榄树：平原、草甸较多，风袭丘陵较少（T6b 设计文档 §3.3）
+        tag(ModWorldGen.OLIVE_COMMON_BIOMES).add(Biomes.PLAINS, Biomes.SUNFLOWER_PLAINS, Biomes.MEADOW);
+        tag(ModWorldGen.OLIVE_SPARSE_BIOMES).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS,
+                Biomes.WINDSWEPT_FOREST);
+        // 野葡萄藤：希腊主群系与繁花森林
+        tag(ModWorldGen.GRAPEVINE_BIOMES).addTag(ModTags.region(Civilization.GREEK)).add(Biomes.FLOWER_FOREST);
     }
 }

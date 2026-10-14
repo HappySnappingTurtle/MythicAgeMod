@@ -32,6 +32,10 @@ public final class ModTags {
         return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, path));
     }
 
+    public static TagKey<Biome> biome(String path) {
+        return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, path));
+    }
+
     /** 文明地域主群系（总纲 §4.1），例如 {@code mythic_age:region/greek}。 */
     public static TagKey<Biome> region(Civilization civ) {
         return TagKey.create(Registries.BIOME,

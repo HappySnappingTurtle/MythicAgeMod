@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "olive_planks",
+  "base": "minecraft:block/jungle_planks",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "note": "橄榄木板：丛林木板的细木纹，浅蜜褐色（08 号主色 #BFA470）"
+}

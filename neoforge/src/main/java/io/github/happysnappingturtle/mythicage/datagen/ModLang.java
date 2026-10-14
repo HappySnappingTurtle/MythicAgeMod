@@ -21,11 +21,13 @@ public final class ModLang extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        // 墙上告示牌等方块的名称键与其物品相同（原版 getDescriptionId 委托给物品），只写一次
+        java.util.Set<String> seen = new java.util.HashSet<>();
         for (ContentEntry e : Content.entries()) {
-            if (e.block().isPresent()) {
-                add(e.block().get().get(), e.name().get(locale));
-            } else {
-                add(e.item().get(), e.name().get(locale));
+            String key = e.block().isPresent() ? e.block().get().get().getDescriptionId()
+                    : e.item().orElseThrow().get().getDescriptionId();
+            if (seen.add(key)) {
+                add(key, e.name().get(locale));
             }
         }
         for (Map.Entry<String, Lang3> k : LangKeys.all().entrySet()) {

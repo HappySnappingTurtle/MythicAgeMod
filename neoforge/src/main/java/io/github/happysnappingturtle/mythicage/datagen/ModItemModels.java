@@ -17,17 +17,24 @@ public final class ModItemModels extends ItemModelProvider {
     @Override
     protected void registerModels() {
         for (ContentEntry e : Content.entries()) {
+            if (e.item().isEmpty()) {
+                continue;
+            }
             switch (e.itemModel()) {
                 case GENERATED -> withExistingParent(e.id(), mcLoc("item/generated"))
-                        .texture("layer0", e.texture().orElse(modLoc("item/" + e.id())));
+                        .texture("layer0", e.itemTexture().or(e::texture).orElse(modLoc("item/" + e.id())));
                 case HANDHELD -> withExistingParent(e.id(), mcLoc("item/handheld"))
                         .texture("layer0", e.texture().orElse(modLoc("item/" + e.id())));
                 case BLOCK -> {
-                    BlockModelSpec model = e.model().orElse(null);
-                    if (!(model instanceof BlockModelSpec.Manual)) {
-                        boolean wall = model instanceof BlockModelSpec.Wall;
-                        withExistingParent(e.id(), modLoc("block/" + e.id() + (wall ? "_inventory" : "")));
-                    }
+                    String parent = switch (e.model().orElseThrow()) {
+                        case BlockModelSpec.Wall w -> e.id() + "_inventory";
+                        case BlockModelSpec.Fence f -> e.id() + "_inventory";
+                        case BlockModelSpec.Button b -> e.id() + "_inventory";
+                        case BlockModelSpec.Trapdoor t -> e.id() + "_bottom";
+                        case BlockModelSpec.Leaves l -> e.id();
+                        default -> e.id();
+                    };
+                    withExistingParent(e.id(), modLoc("block/" + parent));
                 }
                 case MANUAL -> {
                 }

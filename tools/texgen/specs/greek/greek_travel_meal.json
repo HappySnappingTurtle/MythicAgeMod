@@ -1,0 +1,41 @@
+{
+  "template": "pixels",
+  "out": "item/greek_travel_meal",
+  "size": 16,
+  "palette": {
+    "o": "#3a2414",
+    "d": "#6e4a2a",
+    "m": "#946638",
+    "l": "#b9864f",
+    "b": "#d9a85a",
+    "B": "#efcb84",
+    "x": "#5a3a14",
+    "f": "#7a5a3a",
+    "F": "#b48a5a",
+    "e": "#e8d0a0",
+    "k": "#1d1226",
+    "K": "#4f6b1f",
+    "G": "#7ea23a"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "..xxxx..........",
+      ".xBBbbx...f..f..",
+      ".xBbbbx..fFffF..",
+      ".xbbbbx.fFeeFf..",
+      "..xxxx.fFFFFf...",
+      "....ooofFFfoooo.",
+      "..oollllfllllloo",
+      ".olllkKlllGklldo",
+      ".ollkkKlllKGlldo",
+      "..olllllllllldo.",
+      "...odddddddddo..",
+      "....ooooooooo...",
+      "................"
+    ]
+  }
+}

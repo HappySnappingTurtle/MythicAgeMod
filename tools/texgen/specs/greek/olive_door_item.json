@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/olive_door",
+  "size": 16,
+  "palette": {
+    "O": "#5e4529",
+    "D": "#82633c",
+    "M": "#a8845a",
+    "L": "#bf9c68",
+    "H": "#d6b783",
+    "B": "#4a3a24",
+    "b": "#b08d57",
+    "K": "#6b4f30"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "....HHHHHHHH....",
+      "....DDDDDDHO....",
+      "....DDMMMMHO....",
+      "....BDMMMMHO....",
+      "....DDMMMMHO....",
+      "....DDHHHHHO....",
+      "....DDDDDDDO....",
+      "....DLKLKLKO....",
+      "....DHHHHHHO....",
+      "....DDDDDDHO....",
+      "....DDMMMMHO....",
+      "....DDMMMBHO....",
+      "....BDMMMbHO....",
+      "....DDMMMMHO....",
+      "....DDHHHHHO....",
+      "....OOOOOOOO...."
+    ]
+  }
+}

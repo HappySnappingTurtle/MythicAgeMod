@@ -67,8 +67,9 @@ class RecolorTest(unittest.TestCase):
         a = spec("a.json", "tin_ingot", "minecraft:item/iron_ingot", ["#000010", "#ffffff"])
         b = spec("b.json", "bronze_ingot", "minecraft:item/iron_ingot", ["#301000", "#ffe0a0"])
         out = recolor.build([a, b], self.vanilla)
-        self.assertEqual(1, len(out.atlas["sources"]))
-        src = out.atlas["sources"][0]
+        self.assertEqual(1, len(out.atlases["blocks"]["sources"]))
+        self.assertEqual([], out.atlases["signs"]["sources"])
+        src = out.atlases["blocks"]["sources"][0]
         self.assertEqual("paletted_permutations", src["type"])
         self.assertEqual({"mythic_age_bronze_ingot", "mythic_age_tin_ingot"}, set(src["permutations"]))
         self.assertEqual("minecraft:item/iron_ingot_mythic_age_tin_ingot", a.sprite)
@@ -94,8 +95,9 @@ class RecolorTest(unittest.TestCase):
                                                     "base": "minecraft:item/iron_ingot",
                                                     "ramp": ["#000010", "#ffffff"]}), encoding="utf-8")
         out = self.root / "out/textures"
-        atlas = self.root / "out/blocks.json"
-        rc = texgen.main(["--spec-dir", str(specs), "--out", str(out), "--atlas", str(atlas),
+        atlas_dir = self.root / "out/atlases"
+        atlas = atlas_dir / "blocks.json"
+        rc = texgen.main(["--spec-dir", str(specs), "--out", str(out), "--atlas-dir", str(atlas_dir),
                           "--vanilla", str(self.root)])
         self.assertEqual(0, rc)
         self.assertTrue((out / "palettes/tin_ingot.png").exists())
@@ -103,9 +105,10 @@ class RecolorTest(unittest.TestCase):
         self.assertEqual(1, len(json.loads(atlas.read_text(encoding="utf-8"))["sources"]))
         # 删除规格后再运行：多余的调色板被清理
         (specs / "tin.json").unlink()
-        texgen.main(["--spec-dir", str(specs), "--out", str(out), "--atlas", str(atlas), "--vanilla", str(self.root)])
+        texgen.main(["--spec-dir", str(specs), "--out", str(out), "--atlas-dir", str(atlas_dir),
+                     "--vanilla", str(self.root)])
         self.assertFalse((out / "palettes/tin_ingot.png").exists())
-        self.assertEqual([], json.loads(atlas.read_text(encoding="utf-8"))["sources"])
+        self.assertFalse(atlas.exists(), "没有换色时删除图集文件")
 
 
 if __name__ == "__main__":

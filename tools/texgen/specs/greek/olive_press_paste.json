@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "block/olive_press_paste",
+  "size": 16,
+  "palette": {
+    "a": "#3b3a1c",
+    "b": "#4e4b22",
+    "c": "#615c2a",
+    "d": "#787033",
+    "e": "#9a8f3c",
+    "f": "#c0b452"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "cbdddeddcbbdacaa",
+      "cecdeccbbcaacacc",
+      "ddecdabacccafeec",
+      "eaacdbefebcbdccb",
+      "addcdfcdebdbdebb",
+      "ddeeddcdeccdcbcc",
+      "ddcccedfcccdaddc",
+      "edecbdebddbdebdb",
+      "fbccacceddbcbcbb",
+      "adecdcfdecbbddce",
+      "bbcbabadcbccaecd",
+      "ccdaccabcbcbbbda",
+      "aefdcbefcbdacabb",
+      "ddbfaddaabfbcbea",
+      "bdabbccabacfbadb",
+      "cdcebdbfadbccebe"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "template": "recolor",
+  "id": "olive_sign_entity",
+  "base": "minecraft:entity/signs/oak",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "atlas": "signs",
+  "name": "olive",
+  "note": "橄榄木告示牌实体贴图（原版橡木造型换色）"
+}

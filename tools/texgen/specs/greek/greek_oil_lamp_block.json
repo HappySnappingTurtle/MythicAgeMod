@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/greek_oil_lamp",
+  "size": 16,
+  "palette": {
+    "o": "#3d160a",
+    "d": "#7f3519",
+    "m": "#a9492a",
+    "l": "#c8643b",
+    "h": "#e8936a",
+    "g": "#8c8a2c",
+    "G": "#b0aa3c",
+    "k": "#1f1a17"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hlllllmm.lll..lm",
+      "lggGGgmd.lml..md",
+      "lgGggggd.lml....",
+      "lgggggmd........",
+      "lmgggmmd........",
+      "mmmmmmdd........",
+      "lmlmlmlmdlmd....",
+      "mdmdmdmddmdd....",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................"
+    ]
+  }
+}

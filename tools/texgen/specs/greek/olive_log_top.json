@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "olive_log_top",
+  "base": "minecraft:block/acacia_log_top",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "note": "橄榄原木顶面"
+}

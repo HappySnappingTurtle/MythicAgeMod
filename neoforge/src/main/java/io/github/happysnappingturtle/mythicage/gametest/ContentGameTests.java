@@ -69,8 +69,9 @@ public final class ContentGameTests {
         ServerLevel level = helper.getLevel();
         helper.assertTrue(!Content.entries().isEmpty(), "Content 不应为空");
         for (ContentEntry e : Content.entries()) {
-            helper.assertTrue(e.item().isBound(), e.id() + " 物品未注册");
-            String key = e.block().map(b -> b.get().getDescriptionId()).orElse(e.item().get().getDescriptionId());
+            helper.assertTrue(e.item().map(i -> i.isBound()).orElse(e.isBlock()), e.id() + " 物品未注册");
+            String key = e.block().map(b -> b.get().getDescriptionId())
+                    .orElseGet(() -> e.item().orElseThrow().get().getDescriptionId());
             helper.assertTrue(Language.getInstance().has(key), e.id() + " 缺少英文名称 " + key);
             helper.assertTrue(!e.name().zh().isBlank() && !e.name().ja().isBlank(), e.id() + " 三语名称不完整");
             if (e.block().isPresent() && !(e.loot().orElseThrow() instanceof LootSpec.None)) {
@@ -380,7 +381,7 @@ public final class ContentGameTests {
                                boolean automation) {
         WorldRulesConfig next = new WorldRulesConfig(base.beneficialConversions(), base.mobBlockDamage(),
                 base.blockEntityStall(), base.godPowers(),
-                new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(enabled, automation)));
+                new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(enabled, automation)), base.growth());
         var outcome = holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
         if (outcome.status() != ConfigHolder.Status.APPLIED) {
             throw new IllegalStateException("热更失败：" + outcome);

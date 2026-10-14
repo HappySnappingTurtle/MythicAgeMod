@@ -18,6 +18,23 @@ public sealed interface LootSpec {
     record Slab() implements LootSpec {
     }
 
+    /** 门：只在下半掉落。 */
+    record Door() implements LootSpec {
+    }
+
+    /** 掉落另一种物品（墙上告示牌掉告示牌物品等）。 */
+    record Other(Supplier<? extends ItemLike> item) implements LootSpec {
+    }
+
+    /** 盆栽：掉花盆与植物。 */
+    record Potted(Supplier<? extends ItemLike> plant) implements LootSpec {
+    }
+
+    /** 自定义：由 datagen 中的函数生成战利品表（树叶、作物等）。 */
+    record Custom(java.util.function.Function<io.github.happysnappingturtle.mythicage.datagen.ModBlockLoot,
+            net.minecraft.world.level.storage.loot.LootTable.Builder> table) implements LootSpec {
+    }
+
     /** 不掉落（必须显式声明）。 */
     record None() implements LootSpec {
     }
@@ -32,6 +49,23 @@ public sealed interface LootSpec {
 
     static LootSpec slab() {
         return new Slab();
+    }
+
+    static LootSpec door() {
+        return new Door();
+    }
+
+    static LootSpec other(Supplier<? extends ItemLike> item) {
+        return new Other(item);
+    }
+
+    static LootSpec potted(Supplier<? extends ItemLike> plant) {
+        return new Potted(plant);
+    }
+
+    static LootSpec custom(java.util.function.Function<io.github.happysnappingturtle.mythicage.datagen.ModBlockLoot,
+            net.minecraft.world.level.storage.loot.LootTable.Builder> table) {
+        return new Custom(table);
     }
 
     static LootSpec none() {

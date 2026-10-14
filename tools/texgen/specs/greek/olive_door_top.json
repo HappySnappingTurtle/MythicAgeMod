@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/olive_door_top",
+  "size": 16,
+  "palette": {
+    "O": "#5e4529",
+    "D": "#82633c",
+    "M": "#a8845a",
+    "L": "#bf9c68",
+    "H": "#d6b783",
+    "B": "#4a3a24",
+    "b": "#b08d57",
+    "K": "#6b4f30"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "DHHHHHHHHHHHHHHO",
+      "DLMMMMMDLMMMMMDO",
+      "DLMDDDHDLDDDHMDO",
+      "DLMDDMHDLDDMHMDO",
+      "BLMDMLHDLDMLHMDO",
+      "BLMDMMHDLDMMHMDO",
+      "DLMDMMHDLDMMHMDO",
+      "DLMDDLHDLDDLHMDO",
+      "DLMDMMHDLDMMHMDO",
+      "DLMDHHHDLDHHHMDO",
+      "DLDDDDDDDDDDDDDO",
+      "DLKKKLKDLLKKKLDO",
+      "DLKLKLKDLLKLKLDO",
+      "DLKLKKKDLKKLKKDO",
+      "DLHHHHHHHHHHHHDO",
+      "DLMMMMMDLMMMMMDO"
+    ]
+  }
+}

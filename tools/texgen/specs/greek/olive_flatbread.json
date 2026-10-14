@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/olive_flatbread",
+  "size": 16,
+  "palette": {
+    "o": "#5a3a14",
+    "d": "#b07a34",
+    "m": "#d9a85a",
+    "l": "#efcb84",
+    "h": "#fbe6b4",
+    "g": "#5e6b2a",
+    "k": "#2a2018"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      ".....oooooo.....",
+      "...oollhllmoo...",
+      "..olhhlgllllmo..",
+      ".olhllllldllmdo.",
+      ".olllkllglllmdo.",
+      ".olglllllllgmdo.",
+      ".olllldllllmmdo.",
+      "..omlllglklmdo..",
+      "...oommmmmmdoo..",
+      ".....oooooo.....",
+      "................",
+      "................",
+      "................"
+    ]
+  }
+}

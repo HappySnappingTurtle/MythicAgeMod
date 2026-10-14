@@ -1,0 +1,39 @@
+{
+  "template": "pixels",
+  "out": "item/grape_platter",
+  "size": 16,
+  "palette": {
+    "o": "#3a2414",
+    "d": "#6e4a2a",
+    "m": "#946638",
+    "l": "#b9864f",
+    "h": "#d6a66c",
+    "p": "#2e1a42",
+    "P": "#53357a",
+    "q": "#8c6db0",
+    "g": "#5c8c36",
+    "G": "#8ab856",
+    "s": "#5a4428"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "........s.GG....",
+      "......pps.Gg....",
+      ".....qPPpPp.....",
+      "....pqPPqPPp....",
+      "...ooPqPPpPpoo..",
+      "..ohhlpPqPplhho.",
+      ".ohlmmdpPpdmmlho",
+      ".olmmdddddddmmlo",
+      ".olmmmmmmmmmmmlo",
+      "..olllmmmmmlldo.",
+      "...oodddddddoo..",
+      ".....oooooo.....",
+      "................"
+    ]
+  }
+}

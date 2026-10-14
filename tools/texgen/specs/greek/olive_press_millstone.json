@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "block/olive_press_millstone",
+  "size": 16,
+  "palette": {
+    "o": "#7d776c",
+    "d": "#9c968a",
+    "m": "#bdb8ac",
+    "l": "#d8d3c6",
+    "h": "#ece8de",
+    "x": "#5a554c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "....oooooooo....",
+      "..oohhllllmmoo..",
+      ".ohhllmmmmmmddo.",
+      ".ohlmmdmmmdmmdo.",
+      "ohlmmmmdmdmmmddo",
+      "ohlmmmmmdmmmmmdo",
+      "olmdmmmxxxmmdmdo",
+      "olmmdddxxxdddmdo",
+      "olmmmmmxxxmmmmdo",
+      "olmmmmdmdmdmmmdo",
+      "odmmmdmmdmmdmmdo",
+      "odmmdmmmdmmmdmdo",
+      ".odmmmmmdmmmmdo.",
+      ".oddmmmmmmmmddo.",
+      "..ooddddddddoo..",
+      "....oooooooo...."
+    ]
+  }
+}

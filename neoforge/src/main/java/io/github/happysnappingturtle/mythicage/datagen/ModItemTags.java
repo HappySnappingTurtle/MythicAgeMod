@@ -23,7 +23,10 @@ public final class ModItemTags extends ItemTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         for (ContentEntry e : Content.entries()) {
-            Item item = e.item().get();
+            if (e.item().isEmpty()) {
+                continue;
+            }
+            Item item = e.item().get().get();
             for (TagKey<Item> tag : e.itemTags()) {
                 tag(tag).add(item);
             }

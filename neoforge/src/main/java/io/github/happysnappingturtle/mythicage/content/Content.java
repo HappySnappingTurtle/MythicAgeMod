@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -91,6 +92,9 @@ public final class Content {
         private final List<TagKey<Item>> itemTags = new ArrayList<>();
         private Lang3 name;
         private ResourceLocation texture;
+        private ResourceLocation itemTexture;
+        private BiFunction<B, Item.Properties, ? extends Item> itemFactory = BlockItem::new;
+        private boolean hasItem = true;
 
         private BlockBuilder(String id, Civilization civ, Function<BlockBehaviour.Properties, B> factory) {
             this.id = id;
@@ -116,6 +120,24 @@ public final class Content {
 
         public BlockBuilder<B> model(BlockModelSpec model) {
             this.model = model;
+            return this;
+        }
+
+        /** 方块物品使用自定义物品类（门、告示牌等），默认 {@link BlockItem}。 */
+        public BlockBuilder<B> item(BiFunction<B, Item.Properties, ? extends Item> factory) {
+            this.itemFactory = factory;
+            return this;
+        }
+
+        /** 不注册方块物品（墙上告示牌、盆栽等由其他物品放置的方块）。 */
+        public BlockBuilder<B> noItem() {
+            this.hasItem = false;
+            return this;
+        }
+
+        /** 方块物品用平面图标（例如门、树苗）。 */
+        public BlockBuilder<B> itemTexture(ResourceLocation itemTexture) {
+            this.itemTexture = itemTexture;
             return this;
         }
 
@@ -153,6 +175,9 @@ public final class Content {
             if (texture != null && !(model instanceof BlockModelSpec.CubeAll)) {
                 throw new IllegalStateException(id + "：texture(...) 只对 cubeAll 模型有效");
             }
+            if (!hasItem && (!itemTags.isEmpty() || itemTexture != null)) {
+                throw new IllegalStateException(id + "：noItem() 的方块不能声明物品标签或物品图标");
+            }
             // 形状类模型自动带上原版的形状标签
             switch (model) {
                 case BlockModelSpec.Slab s -> addShapeTags(BlockTags.SLABS, ItemTags.SLABS);
@@ -165,11 +190,17 @@ public final class Content {
                     : model instanceof BlockModelSpec.Slab ? LootSpec.slab() : LootSpec.self();
             Supplier<BlockBehaviour.Properties> props = properties;
             DeferredBlock<B> block = ModRegistries.BLOCKS.register(id, () -> factory.apply(props.get()));
-            DeferredItem<BlockItem> item = ModRegistries.ITEMS.register(id,
-                    () -> new BlockItem(block.get(), itemProperties.apply(new Item.Properties())));
-            ENTRIES.add(new ContentEntry(id, civ, Optional.of(block), item, Optional.of(model), ItemModelSpec.BLOCK,
+            Optional<DeferredItem<? extends Item>> item = Optional.empty();
+            if (hasItem) {
+                BiFunction<B, Item.Properties, ? extends Item> factory = itemFactory;
+                UnaryOperator<Item.Properties> itemProps = itemProperties;
+                item = Optional.of(ModRegistries.ITEMS.register(id,
+                        () -> factory.apply(block.get(), itemProps.apply(new Item.Properties()))));
+            }
+            ItemModelSpec itemModel = itemTexture != null ? ItemModelSpec.GENERATED : ItemModelSpec.BLOCK;
+            ENTRIES.add(new ContentEntry(id, civ, Optional.of(block), item, Optional.of(model), itemModel,
                     Optional.of(resolvedLoot), List.copyOf(blockTags), List.copyOf(itemTags), name,
-                    Optional.ofNullable(texture)));
+                    Optional.ofNullable(texture), Optional.ofNullable(itemTexture)));
             return block;
         }
 
@@ -233,8 +264,8 @@ public final class Content {
             }
             UnaryOperator<Item.Properties> props = properties;
             DeferredItem<I> item = ModRegistries.ITEMS.register(id, () -> factory.apply(props.apply(new Item.Properties())));
-            ENTRIES.add(new ContentEntry(id, civ, Optional.empty(), item, Optional.empty(), model, Optional.empty(),
-                    List.of(), List.copyOf(tags), name, Optional.ofNullable(texture)));
+            ENTRIES.add(new ContentEntry(id, civ, Optional.empty(), Optional.of(item), Optional.empty(), model,
+                    Optional.empty(), List.of(), List.copyOf(tags), name, Optional.ofNullable(texture), Optional.empty()));
             return item;
         }
     }

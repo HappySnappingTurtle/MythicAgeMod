@@ -1,0 +1,24 @@
+{
+  "sources": [
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:entity/signs/hanging/oak"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_entity_signs_hanging_oak",
+      "permutations": {
+        "mythic_age_olive": "mythic_age:palettes/olive_hanging_sign_entity"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:entity/signs/oak"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_entity_signs_oak",
+      "permutations": {
+        "mythic_age_olive": "mythic_age:palettes/olive_sign_entity"
+      }
+    }
+  ]
+}

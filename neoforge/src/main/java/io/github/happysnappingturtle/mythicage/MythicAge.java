@@ -4,7 +4,9 @@ import com.mojang.logging.LogUtils;
 import io.github.happysnappingturtle.mythicage.config.ConfigCommand;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.content.ModCreativeTabs;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
+import io.github.happysnappingturtle.mythicage.content.greek.agri.GreekAgricultureEvents;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
 import io.github.happysnappingturtle.mythicage.player.ModAttachments;
@@ -35,6 +37,8 @@ public final class MythicAge {
         LOGGER.info("Mythic Age loading ({} {})", MythicAgeIds.MOD_ID, container.getModInfo().getVersion());
         // 内容声明（T6）：先触发各内容类的类加载，再把 DeferredRegister 挂到 mod 总线
         GreekMaterials.init();
+        GreekAgriculture.init();
+        GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
         ModRegistries.register(modBus);

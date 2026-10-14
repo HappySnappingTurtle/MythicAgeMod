@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "olive_log",
+  "base": "minecraft:block/spruce_log",
+  "ramp": [
+    "#3a3b2a",
+    "#545640",
+    "#6e7056",
+    "#8a8c6e",
+    "#a8aa88"
+  ],
+  "note": "橄榄原木侧面：云杉原木的纵向沟纹，换成橄榄树带绿调的灰褐老树皮"
+}

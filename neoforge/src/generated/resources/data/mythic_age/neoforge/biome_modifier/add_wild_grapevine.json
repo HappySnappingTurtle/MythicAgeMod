@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:has_feature/wild_grapevine",
+  "features": "mythic_age:patch_wild_grapevine",
+  "step": "vegetal_decoration"
+}

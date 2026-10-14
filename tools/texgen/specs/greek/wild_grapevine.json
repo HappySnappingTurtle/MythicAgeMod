@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "block/wild_grapevine",
+  "size": 16,
+  "palette": {
+    "s": "#5a4428",
+    "g": "#3d6427",
+    "G": "#5c8c36",
+    "Y": "#8ab856",
+    "p": "#2e1a42",
+    "P": "#53357a",
+    "q": "#8c6db0"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "......YG........",
+      "...YG.Gg..YG....",
+      "...Ggs.s..Gg.YG.",
+      "..YGs.YG.s...Gg.",
+      ".YGgs.Ggs..YGs..",
+      "..s...s.qPP.Ggs.",
+      ".YG..s..PPp..s..",
+      ".Gg.YG..Pp..YG..",
+      "..s.Gg.s.p..Gg..",
+      ".qPPs..sYG...s..",
+      ".PPp...sGg..s...",
+      "..Pp.s.s...s....",
+      "..p...ss..ss....",
+      ".......sss......",
+      "........s......."
+    ]
+  }
+}

@@ -20,6 +20,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture;
+import io.github.happysnappingturtle.mythicage.recipe.PressingRecipe;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -52,6 +55,71 @@ public final class GreekRecipes {
 
         pottery(out);
         marble(out);
+        agriculture(out);
+    }
+
+    /** 橄榄木（核心件）、告示牌、船、压榨器、油灯、葡萄架、压榨配方（T6b）。木材族其余形态见 codex 交接单。 */
+    private static void agriculture(RecipeOutput out) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, GreekAgriculture.OLIVE_PLANKS, 4)
+                .requires(GreekAgriculture.OLIVE_LOGS_ITEM).group("planks")
+                .unlockedBy("has_log", InventoryChangeTrigger.TriggerInstance.hasItems(
+                        ItemPredicate.Builder.item().of(GreekAgriculture.OLIVE_LOGS_ITEM)))
+                .save(out, id("olive_planks"));
+        woodFromLogs(out, GreekAgriculture.OLIVE_WOOD, GreekAgriculture.OLIVE_LOG);
+        woodFromLogs(out, GreekAgriculture.STRIPPED_OLIVE_WOOD, GreekAgriculture.STRIPPED_OLIVE_LOG);
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekAgriculture.OLIVE_SIGN, 3)
+                .pattern("###").pattern("###").pattern(" X ")
+                .define('#', GreekAgriculture.OLIVE_PLANKS).define('X', Items.STICK).group("wooden_sign")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_sign"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekAgriculture.OLIVE_HANGING_SIGN, 6)
+                .pattern("X X").pattern("###").pattern("###")
+                .define('#', GreekAgriculture.STRIPPED_OLIVE_LOG).define('X', Items.CHAIN).group("hanging_sign")
+                .unlockedBy("has_stripped_logs", has(GreekAgriculture.STRIPPED_OLIVE_LOG))
+                .save(out, id("olive_hanging_sign"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, GreekAgriculture.OLIVE_BOAT)
+                .pattern("# #").pattern("###").define('#', GreekAgriculture.OLIVE_PLANKS).group("boat")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_boat"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TRANSPORTATION, GreekAgriculture.OLIVE_CHEST_BOAT)
+                .requires(net.minecraft.world.level.block.Blocks.CHEST).requires(GreekAgriculture.OLIVE_BOAT).group("chest_boat")
+                .unlockedBy("has_boat", has(GreekAgriculture.OLIVE_BOAT))
+                .save(out, id("olive_chest_boat"));
+
+        // 08 号 json：olive_press（大理石 3 + 橄榄原木 1 + 木棍 2）
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekAgriculture.OLIVE_PRESS)
+                .pattern("SLS").pattern("MMM")
+                .define('S', Items.STICK).define('L', GreekAgriculture.OLIVE_LOG).define('M', MARBLE)
+                .unlockedBy("has_olive_log", has(GreekAgriculture.OLIVE_LOG))
+                .save(out, id("olive_press"));
+        // greek_oil_lamp：陶制构件 + 橄榄油 + 线 → 2
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, GreekAgriculture.GREEK_OIL_LAMP, 2)
+                .requires(CERAMIC_COMPONENT).requires(GreekAgriculture.OLIVE_OIL).requires(Items.STRING)
+                .unlockedBy("has_olive_oil", has(GreekAgriculture.OLIVE_OIL))
+                .save(out, id("greek_oil_lamp"));
+        // libation_oil：水瓶 ×2 + 橄榄油 → 奠酒 ×2
+        Ingredient water = DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS,
+                new PotionContents(Potions.WATER), Items.POTION);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, LIBATION, 2)
+                .requires(GreekAgriculture.OLIVE_OIL).requires(water).requires(water)
+                .unlockedBy("has_olive_oil", has(GreekAgriculture.OLIVE_OIL))
+                .save(out, id("libation_from_olive_oil"));
+        // 葡萄架：木棍 ×6 → 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekAgriculture.GRAPE_TRELLIS, 3)
+                .pattern("S S").pattern("S S").pattern("S S").define('S', Items.STICK)
+                .unlockedBy("has_grape_cutting", has(GreekAgriculture.GRAPE_CUTTING))
+                .save(out, id("grape_trellis"));
+        // olive_oil：压榨器，橄榄 ×4 + 陶制构件 → 橄榄油，40 刻
+        out.accept(id("olive_oil_from_pressing"), new PressingRecipe(Ingredient.of(GreekAgriculture.OLIVE.get()), 4,
+                Ingredient.of(CERAMIC_COMPONENT.get()), new ItemStack(GreekAgriculture.OLIVE_OIL.get()), 40), null);
+    }
+
+    /** 原木 ×4（2×2）→ 木头 ×3。 */
+    private static void woodFromLogs(RecipeOutput out, ItemLike wood, ItemLike log) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood, 3)
+                .pattern("##").pattern("##").define('#', log).group("bark")
+                .unlockedBy("has_log", has(log))
+                .save(out, id(name(wood)));
     }
 
     /** 陶器与器物（08 号 json：raw_roof_tile、ceramic_firing、libation、wooden_platter）。 */

@@ -24,7 +24,8 @@ class WorldRulesSchemaTest {
     @Test
     void tc_t3_41_onlyTerrainEditsChanges() {
         ConfigLoadResult<WorldRulesConfig> r = ConfigLoader.load(S, "{\"godPowers\":{\"terrainEdits\":true}}", null);
-        assertEquals(new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(true), S.defaults().recipes()),
+        assertEquals(new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(true), S.defaults().recipes(),
+                S.defaults().growth()),
                 r.value());
         assertTrue(r.issues().isEmpty());
     }
@@ -61,5 +62,20 @@ class WorldRulesSchemaTest {
         ConfigLoadResult<WorldRulesConfig> r = ConfigLoader.load(S, "{\"recipes\":{\"ageGated\":3}}", null);
         assertEquals(S.defaults().recipes(), r.value().recipes());
         assertFalse(r.issues().isEmpty());
+    }
+
+    @Test
+    void tc_t6b_64_growthDefaultsAndOverrides() {
+        WorldRulesConfig.Growth g = S.defaults().growth();
+        assertEquals(24000, g.oliveFruitTicks());
+        assertEquals(12000, g.grapeStageTicks());
+        assertEquals(0.5, g.boneMeal().grapeChance());
+        assertFalse(g.boneMeal().oliveLeaves());
+        ConfigLoadResult<WorldRulesConfig> r = ConfigLoader.load(S,
+                "{\"growth\":{\"grapeStageTicks\":6000,\"boneMeal\":{\"oliveLeaves\":true,\"grapeChance\":2}}}", null);
+        assertEquals(6000, r.value().growth().grapeStageTicks());
+        assertTrue(r.value().growth().boneMeal().oliveLeaves());
+        assertEquals(0.5, r.value().growth().boneMeal().grapeChance(), "越界值回退为默认");
+        assertEquals(1, r.issues().size());
     }
 }

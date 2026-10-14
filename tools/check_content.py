@@ -38,6 +38,7 @@ TAG_ALIASES = {
     "#c:dusts/glowstone": "minecraft:glowstone_dust",
     "#c:dyes/red": "minecraft:red_dye",
     "#c:cobblestones": "minecraft:cobblestone",
+    "#c:foods/cooked_fish": "design:cooked_fish",
 }
 # 设计 json 中的「设计别名」输入
 WATER_BOTTLE = "design:water_bottle"
@@ -140,6 +141,9 @@ def normalize_recipe(data: dict, tags) -> dict | None:
                     counts[ch] = counts.get(ch, 0) + 1
         for ch, n in counts.items():
             add(ingredient_key(data["key"][ch], tags), n)
+    elif rtype == f"{MOD}:pressing":
+        add(ingredient_key(data["ingredient"], tags), data["count"])
+        add(ingredient_key(data["container"], tags))
     elif rtype in ("minecraft:smelting", "minecraft:blasting", "minecraft:smoking", "minecraft:campfire_cooking",
                    "minecraft:stonecutting"):
         add(ingredient_key(data["ingredient"], tags))
@@ -210,8 +214,13 @@ MIN_DELTA_E = 15.0
 
 
 def load_atlas(paths: Paths) -> dict:
-    f = paths.main / "assets/minecraft/atlases/blocks.json"
-    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"sources": []}
+    """合并本模组提供的全部图集文件（blocks、signs）。"""
+    sources = []
+    folder = paths.main / "assets/minecraft/atlases"
+    if folder.exists():
+        for f in sorted(folder.glob("*.json")):
+            sources += json.loads(f.read_text(encoding="utf-8")).get("sources", [])
+    return {"sources": sources}
 
 
 def recolor_sprites(atlas: dict) -> set[str]:
@@ -356,8 +365,8 @@ def check_textures(paths: Paths, report: Report) -> None:
         return
     for f in sorted(folder.rglob("*.png")):
         rel = f.relative_to(folder)
-        if rel.parts[0] in ("palettes", "entity"):
-            continue  # 调色板是 N×1；实体贴图的尺寸由模型 UV 决定
+        if rel.parts[0] in ("palettes", "entity", "gui"):
+            continue  # 调色板是 N×1；实体与界面贴图的尺寸由模型 UV / 界面布局决定
         with Image.open(f) as img:
             w, h = img.size
         animated = Path(str(f) + ".mcmeta").exists()

@@ -1,0 +1,38 @@
+{
+  "template": "pixels",
+  "out": "item/greek_oil_lamp",
+  "size": 16,
+  "palette": {
+    "o": "#3d160a",
+    "d": "#7f3519",
+    "m": "#a9492a",
+    "l": "#c8643b",
+    "h": "#e8936a",
+    "F": "#d8641c",
+    "y": "#ffcc4a",
+    "Y": "#fff2b8",
+    "k": "#2a1a10",
+    "g": "#8c8a2c"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      ".............F..",
+      "............FyF.",
+      "............FYF.",
+      ".............y..",
+      ".ooo....oooo.k..",
+      "o...ooohllmmoko.",
+      "o.oohlggggmmmdo.",
+      ".ohllmggggmmddo.",
+      "..ohlmmmmmmddo..",
+      "...odmmmmddoo...",
+      "....oooooooo....",
+      "................",
+      "................"
+    ]
+  }
+}

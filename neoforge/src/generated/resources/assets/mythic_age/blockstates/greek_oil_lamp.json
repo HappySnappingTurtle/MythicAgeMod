@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "mythic_age:block/greek_oil_lamp",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "mythic_age:block/greek_oil_lamp"
+    },
+    "facing=south": {
+      "model": "mythic_age:block/greek_oil_lamp",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mythic_age:block/greek_oil_lamp",
+      "y": 270
+    }
+  }
+}

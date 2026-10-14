@@ -1,0 +1,40 @@
+{
+  "template": "pixels",
+  "out": "block/grape_trellis",
+  "size": 16,
+  "palette": {
+    "L": "#a07a4a",
+    "D": "#6e5032",
+    "O": "#4a3420",
+    "s": "#5a4428",
+    "g": "#3d6427",
+    "G": "#5c8c36",
+    "Y": "#8ab856",
+    "w": "#f1efe2",
+    "y": "#e2c449",
+    "p": "#2e1a42",
+    "P": "#53357a",
+    "q": "#8c6db0"
+  },
+  "params": {
+    "kind": "block_cutout",
+    "rows": [
+      ".LD..........LD.",
+      ".LD..........LD.",
+      "LLLLLLLLLLLLLLLL",
+      "DDDDDDDDDDDDDDDD",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      "LLLLLLLLLLLLLLLL",
+      "DDDDDDDDDDDDDDDD",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD."
+    ]
+  }
+}

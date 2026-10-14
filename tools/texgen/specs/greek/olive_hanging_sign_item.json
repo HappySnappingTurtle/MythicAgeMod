@@ -1,0 +1,15 @@
+{
+  "template": "recolor",
+  "id": "olive_hanging_sign_item",
+  "base": "minecraft:item/oak_hanging_sign",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "atlas": "blocks",
+  "name": "olive_hanging_sign",
+  "note": "橄榄木悬挂告示牌物品图标"
+}

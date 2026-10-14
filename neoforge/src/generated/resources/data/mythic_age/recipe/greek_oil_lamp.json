@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:ceramic_component"
+    },
+    {
+      "item": "mythic_age:olive_oil"
+    },
+    {
+      "item": "minecraft:string"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "mythic_age:greek_oil_lamp"
+  }
+}

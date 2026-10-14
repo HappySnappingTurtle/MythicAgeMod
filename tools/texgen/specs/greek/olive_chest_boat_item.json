@@ -1,0 +1,15 @@
+{
+  "template": "recolor",
+  "id": "olive_chest_boat_item",
+  "base": "minecraft:item/oak_chest_boat",
+  "ramp": [
+    "#615a2c",
+    "#837b40",
+    "#a49c56",
+    "#c1b972",
+    "#dbd394"
+  ],
+  "atlas": "blocks",
+  "name": "olive_chest_boat",
+  "note": "橄榄木运输船物品图标"
+}

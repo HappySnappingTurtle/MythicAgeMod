@@ -3,11 +3,61 @@
     {
       "type": "paletted_permutations",
       "textures": [
+        "minecraft:block/acacia_log_top"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_acacia_log_top",
+      "permutations": {
+        "mythic_age_olive_log_top": "mythic_age:palettes/olive_log_top"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
         "minecraft:block/iron_ore"
       ],
       "palette_key": "mythic_age:palettes/key/minecraft_block_iron_ore__keep_minecraft_block_stone",
       "permutations": {
         "mythic_age_tin_ore": "mythic_age:palettes/tin_ore"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/jungle_planks"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_jungle_planks",
+      "permutations": {
+        "mythic_age_olive_planks": "mythic_age:palettes/olive_planks"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/spruce_log"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_spruce_log",
+      "permutations": {
+        "mythic_age_olive_log": "mythic_age:palettes/olive_log"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/stripped_acacia_log"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_stripped_acacia_log",
+      "permutations": {
+        "mythic_age_stripped_olive_log": "mythic_age:palettes/stripped_olive_log"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/stripped_acacia_log_top"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_stripped_acacia_log_top",
+      "permutations": {
+        "mythic_age_stripped_olive_log_top": "mythic_age:palettes/stripped_olive_log_top"
       }
     },
     {
@@ -19,6 +69,46 @@
       "permutations": {
         "mythic_age_bronze_ingot": "mythic_age:palettes/bronze_ingot",
         "mythic_age_tin_ingot": "mythic_age:palettes/tin_ingot"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/oak_boat"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_oak_boat",
+      "permutations": {
+        "mythic_age_olive_boat": "mythic_age:palettes/olive_boat_item"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/oak_chest_boat"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_oak_chest_boat",
+      "permutations": {
+        "mythic_age_olive_chest_boat": "mythic_age:palettes/olive_chest_boat_item"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/oak_hanging_sign"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_oak_hanging_sign",
+      "permutations": {
+        "mythic_age_olive_hanging_sign": "mythic_age:palettes/olive_hanging_sign_item"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/oak_sign"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_oak_sign",
+      "permutations": {
+        "mythic_age_olive_sign": "mythic_age:palettes/olive_sign_item"
       }
     },
     {

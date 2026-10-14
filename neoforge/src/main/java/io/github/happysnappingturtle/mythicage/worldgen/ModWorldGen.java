@@ -1,7 +1,18 @@
 package io.github.happysnappingturtle.mythicage.worldgen;
 
 import io.github.happysnappingturtle.mythicage.content.ModTags;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
+import net.minecraft.core.BlockPos;
+import net.minecraft.data.worldgen.features.FeatureUtils;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
+import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
+import net.minecraft.world.level.levelgen.placement.SurfaceWaterDepthFilter;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import net.minecraft.core.HolderGetter;
@@ -40,6 +51,11 @@ import java.util.function.Supplier;
  * </ul>
  */
 public final class ModWorldGen {
+    /** 生成范围的群系标签（可被数据包覆盖）。 */
+    public static final net.minecraft.tags.TagKey<Biome> OLIVE_COMMON_BIOMES = ModTags.biome("has_feature/olive_tree_common");
+    public static final net.minecraft.tags.TagKey<Biome> OLIVE_SPARSE_BIOMES = ModTags.biome("has_feature/olive_tree_sparse");
+    public static final net.minecraft.tags.TagKey<Biome> GRAPEVINE_BIOMES = ModTags.biome("has_feature/wild_grapevine");
+
     public static final int TIN_COUNT = 5;
     public static final int TIN_SIZE = 7;
     public static final int TIN_MIN_Y = 0;
@@ -55,6 +71,21 @@ public final class ModWorldGen {
     public static final ResourceKey<PlacedFeature> MARBLE_PLACED = key(Registries.PLACED_FEATURE, "ore_marble");
     public static final ResourceKey<BiomeModifier> ADD_TIN_ORE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_ore_tin");
     public static final ResourceKey<BiomeModifier> ADD_MARBLE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_ore_marble");
+
+    /** 橄榄树：平原、草甸等每 2 个区块约 1 棵；风袭丘陵每 4 个区块约 1 棵（T6b 设计文档 §3.3）。 */
+    public static final int OLIVE_COMMON_RARITY = 2;
+    public static final int OLIVE_SPARSE_RARITY = 4;
+    /** 野葡萄藤：每 8 个区块约 1 片，每片 3–6 株（尝试 12 次）。 */
+    public static final int GRAPEVINE_RARITY = 8;
+
+    public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_GRAPEVINE_CONFIGURED =
+            key(Registries.CONFIGURED_FEATURE, "patch_wild_grapevine");
+    public static final ResourceKey<PlacedFeature> OLIVE_TREE_COMMON = key(Registries.PLACED_FEATURE, "olive_tree_common");
+    public static final ResourceKey<PlacedFeature> OLIVE_TREE_SPARSE = key(Registries.PLACED_FEATURE, "olive_tree_sparse");
+    public static final ResourceKey<PlacedFeature> WILD_GRAPEVINE_PLACED = key(Registries.PLACED_FEATURE, "patch_wild_grapevine");
+    public static final ResourceKey<BiomeModifier> ADD_OLIVE_COMMON = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_olive_tree_common");
+    public static final ResourceKey<BiomeModifier> ADD_OLIVE_SPARSE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_olive_tree_sparse");
+    public static final ResourceKey<BiomeModifier> ADD_WILD_GRAPEVINE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_wild_grapevine");
 
     private ModWorldGen() {
     }
@@ -73,6 +104,11 @@ public final class ModWorldGen {
     private static void configured(BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
         ctx.register(TIN_ORE_CONFIGURED, stoneOre(GreekMaterials.TIN_ORE, TIN_SIZE));
         ctx.register(MARBLE_CONFIGURED, stoneOre(GreekMaterials.MARBLE, MARBLE_SIZE));
+        ctx.register(GreekAgriculture.OLIVE_TREE_CONFIGURED, GreekAgriculture.oliveTreeConfigured());
+        ctx.register(WILD_GRAPEVINE_CONFIGURED, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
+                FeatureUtils.simplePatchConfiguration(Feature.SIMPLE_BLOCK,
+                        new SimpleBlockConfiguration(BlockStateProvider.simple(GreekAgriculture.WILD_GRAPEVINE.get())),
+                        List.of(Blocks.GRASS_BLOCK), 12)));
     }
 
     private static ConfiguredFeature<?, ?> stoneOre(Supplier<? extends Block> block, int size) {
@@ -90,6 +126,20 @@ public final class ModWorldGen {
                 CountPlacement.of(MARBLE_COUNT), InSquarePlacement.spread(),
                 HeightRangePlacement.uniform(VerticalAnchor.absolute(MARBLE_MIN_Y), VerticalAnchor.absolute(MARBLE_MAX_Y)),
                 BiomeFilter.biome())));
+        ctx.register(OLIVE_TREE_COMMON, oliveTree(cf, OLIVE_COMMON_RARITY));
+        ctx.register(OLIVE_TREE_SPARSE, oliveTree(cf, OLIVE_SPARSE_RARITY));
+        ctx.register(WILD_GRAPEVINE_PLACED, new PlacedFeature(cf.getOrThrow(WILD_GRAPEVINE_CONFIGURED), List.of(
+                RarityFilter.onAverageOnceEvery(GRAPEVINE_RARITY), InSquarePlacement.spread(),
+                PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
+    }
+
+    private static PlacedFeature oliveTree(HolderGetter<ConfiguredFeature<?, ?>> cf, int rarity) {
+        return new PlacedFeature(cf.getOrThrow(GreekAgriculture.OLIVE_TREE_CONFIGURED), List.of(
+                RarityFilter.onAverageOnceEvery(rarity), InSquarePlacement.spread(),
+                SurfaceWaterDepthFilter.forMaxDepth(0), PlacementUtils.HEIGHTMAP_OCEAN_FLOOR,
+                BlockPredicateFilter.forPredicate(BlockPredicate.wouldSurvive(
+                        GreekAgriculture.OLIVE_SAPLING.get().defaultBlockState(), BlockPos.ZERO)),
+                BiomeFilter.biome()));
     }
 
     private static void biomeModifiers(BootstrapContext<BiomeModifier> ctx) {
@@ -100,5 +150,11 @@ public final class ModWorldGen {
                 HolderSet.direct(placed.getOrThrow(TIN_ORE_PLACED)), GenerationStep.Decoration.UNDERGROUND_ORES));
         ctx.register(ADD_MARBLE, new BiomeModifiers.AddFeaturesBiomeModifier(greek,
                 HolderSet.direct(placed.getOrThrow(MARBLE_PLACED)), GenerationStep.Decoration.UNDERGROUND_ORES));
+        ctx.register(ADD_OLIVE_COMMON, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(OLIVE_COMMON_BIOMES),
+                HolderSet.direct(placed.getOrThrow(OLIVE_TREE_COMMON)), GenerationStep.Decoration.VEGETAL_DECORATION));
+        ctx.register(ADD_OLIVE_SPARSE, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(OLIVE_SPARSE_BIOMES),
+                HolderSet.direct(placed.getOrThrow(OLIVE_TREE_SPARSE)), GenerationStep.Decoration.VEGETAL_DECORATION));
+        ctx.register(ADD_WILD_GRAPEVINE, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(GRAPEVINE_BIOMES),
+                HolderSet.direct(placed.getOrThrow(WILD_GRAPEVINE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
     }
 }

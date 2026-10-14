@@ -1,8 +1,8 @@
 """原版造型换色（T6 设计文档 §3.2）。
 
 不复制原版贴图：只读取原版贴图里用到的几种颜色，按亮度排成「调色板键」，再配上我们自己的色阶，
-写出两张 N×1 的调色板 PNG，并在 assets/minecraft/atlases/blocks.json 中登记一个
-paletted_permutations 图集来源。游戏在加载资源时用玩家本机的原版贴图实时换色。
+写出两张 N×1 的调色板 PNG，并在 assets/minecraft/atlases/<图集>.json 中登记一个
+paletted_permutations 图集来源（默认 blocks；告示牌用 signs）。游戏在加载资源时用玩家本机的原版贴图实时换色。
 
 生成的贴图名（模型里引用的名字）是 `<原版贴图>_mythic_age_<id>`，
 例如 `minecraft:item/iron_ingot_mythic_age_tin_ingot`；Java 侧用 `Recolor.sprite(base, id)` 得到同样的名字。
@@ -14,6 +14,8 @@ paletted_permutations 图集来源。游戏在加载资源时用玩家本机的�
     "base": "minecraft:item/iron_ingot",     原版贴图
     "keep": "minecraft:block/stone",         可选：这张贴图里出现的颜色保持不变（用于矿石保留石头底）
     "ramp": ["#4f5762", "#76808c", "#dfe5ea"] 由暗到亮的锚点颜色，按需要插值成 N 种
+    "atlas": "blocks"                        可选：blocks（默认）或 signs
+    "name": "olive"                          可选：贴图名后缀，默认等于 id
   }
 """
 from __future__ import annotations
@@ -45,10 +47,17 @@ class RecolorSpec:
     base: str
     keep: str | None
     ramp: list[tuple[int, int, int]]
+    atlas: str = "blocks"
+    name: str | None = None
+
+    @property
+    def suffix(self) -> str:
+        """贴图名后缀：默认等于 id；不同底图需要同一个后缀时（如告示牌与悬挂告示牌都要 olive）用 name 指定。"""
+        return self.name or self.id
 
     @property
     def permutation(self) -> str:
-        return PREFIX + self.id
+        return PREFIX + self.suffix
 
     @property
     def sprite(self) -> str:
@@ -87,8 +96,14 @@ def load_recolor_spec(path: Path, data: dict) -> RecolorSpec:
     ramp = data["ramp"]
     if not isinstance(ramp, list) or len(ramp) < 2:
         raise RecolorError(f"{path}：ramp 至少需要 2 个锚点颜色")
+    atlas = data.get("atlas", "blocks")
+    if atlas not in ("blocks", "signs"):
+        raise RecolorError(f"{path}：atlas 只能是 blocks 或 signs，实际 {atlas!r}")
+    name = data.get("name")
+    if name is not None and (not isinstance(name, str) or not re.fullmatch(r"[a-z0-9_]+", name)):
+        raise RecolorError(f"{path}：name 只能包含小写字母、数字和下划线，实际 {name!r}")
     return RecolorSpec(path, rid, data["base"], data.get("keep"),
-                       [parse_hex(c, f"{path} ramp[{i}]") for i, c in enumerate(ramp)])
+                       [parse_hex(c, f"{path} ramp[{i}]") for i, c in enumerate(ramp)], atlas, name)
 
 
 class VanillaAssets:
@@ -164,34 +179,40 @@ def strip(colors) -> Image.Image:
 class RecolorOutput:
     keys: dict[str, Image.Image]          # 键名 → 调色板键
     palettes: dict[str, Image.Image]      # id → 我们的色阶
-    atlas: dict                           # blocks.json 内容
+    atlases: dict                         # 图集名 → 图集 JSON 内容（blocks、signs）
     previews: dict[str, Image.Image]      # sprite → 换色后的效果（本地预览用，不写入资源）
 
 
 def build(specs: list[RecolorSpec], vanilla: VanillaAssets) -> RecolorOutput:
     ids = {}
+    sprites = {}
     for s in specs:
+        if s.sprite in sprites:
+            raise RecolorError(f"换色贴图名重复：{s.sprite}（{sprites[s.sprite]} 与 {s.path}）")
+        sprites[s.sprite] = s.path
         if s.id in ids:
             raise RecolorError(f"换色 id 重复：{s.id}（{ids[s.id]} 与 {s.path}）")
         ids[s.id] = s.path
     keys: dict[str, Image.Image] = {}
     palettes: dict[str, Image.Image] = {}
     previews: dict[str, Image.Image] = {}
-    groups: dict[tuple[str, str], dict[str, str]] = {}
+    groups: dict[tuple[str, str, str], dict[str, str]] = {}
     for s in sorted(specs, key=lambda x: x.id):
         kc = key_colors(s, vanilla)
         target = interpolate(s.ramp, len(kc))
         keys[s.key_name] = strip(kc)
         palettes[s.id] = strip(target)
-        groups.setdefault((s.base, s.key_name), {})[s.permutation] = f"mythic_age:{PALETTE_DIR}/{s.id}"
+        groups.setdefault((s.atlas, s.base, s.key_name), {})[s.permutation] = f"mythic_age:{PALETTE_DIR}/{s.id}"
         previews[s.sprite] = apply(vanilla.texture(s.base), dict(zip(kc, target)))
-    sources = [{
-        "type": "paletted_permutations",
-        "textures": [base],
-        "palette_key": f"mythic_age:{PALETTE_DIR}/key/{key}",
-        "permutations": dict(sorted(perms.items())),
-    } for (base, key), perms in sorted(groups.items())]
-    return RecolorOutput(keys, palettes, {"sources": sources}, previews)
+    atlases: dict[str, dict] = {"blocks": {"sources": []}, "signs": {"sources": []}}
+    for (atlas, base, key), perms in sorted(groups.items()):
+        atlases[atlas]["sources"].append({
+            "type": "paletted_permutations",
+            "textures": [base],
+            "palette_key": f"mythic_age:{PALETTE_DIR}/key/{key}",
+            "permutations": dict(sorted(perms.items())),
+        })
+    return RecolorOutput(keys, palettes, atlases, previews)
 
 
 def apply(img: Image.Image, mapping: dict) -> Image.Image:

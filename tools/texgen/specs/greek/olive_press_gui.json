@@ -1,0 +1,41 @@
+{
+  "template": "gui_container",
+  "out": "gui/olive_press",
+  "palette": {
+    "outline": "#2b2418",
+    "light": "#f6f2ea",
+    "dark": "#a89f8c",
+    "panel": "#e8e2d5",
+    "frame": "#a49c56",
+    "slot": "#b9b09c",
+    "highlight": "#f6f2ea",
+    "arrow_empty": "#c8bfac",
+    "arrow_full": "#8c8a2c"
+  },
+  "params": {
+    "width": 176,
+    "height": 166,
+    "slots": [
+      [
+        44,
+        26
+      ],
+      [
+        44,
+        48
+      ],
+      [
+        116,
+        37
+      ]
+    ],
+    "arrow": [
+      79,
+      37
+    ],
+    "arrowFilled": [
+      176,
+      0
+    ]
+  }
+}

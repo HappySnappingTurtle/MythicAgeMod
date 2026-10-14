@@ -1,0 +1,15 @@
+{
+  "type": "mythic_age:pressing",
+  "container": {
+    "item": "mythic_age:ceramic_component"
+  },
+  "count": 4,
+  "ingredient": {
+    "item": "mythic_age:olive"
+  },
+  "result": {
+    "count": 1,
+    "id": "mythic_age:olive_oil"
+  },
+  "time": 40
+}

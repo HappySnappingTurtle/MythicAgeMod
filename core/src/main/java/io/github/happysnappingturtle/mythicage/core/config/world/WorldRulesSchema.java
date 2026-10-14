@@ -12,7 +12,8 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
 
     private static final WorldRulesConfig DEFAULTS =
             new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
-                    new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)));
+                    new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)),
+                    new WorldRulesConfig.Growth(24000, 12000, new WorldRulesConfig.BoneMeal(0.5, false)));
 
     private WorldRulesSchema() {
     }
@@ -40,7 +41,18 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 root.bool("blockEntityStall", base.blockEntityStall()),
                 new WorldRulesConfig.GodPowers(
                         root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
-                readRecipes(root.object("recipes"), base.recipes()));
+                readRecipes(root.object("recipes"), base.recipes()),
+                readGrowth(root.object("growth"), base.growth()));
+    }
+
+    private static WorldRulesConfig.Growth readGrowth(ObjectReader growth, WorldRulesConfig.Growth base) {
+        ObjectReader bone = growth.object("boneMeal");
+        return new WorldRulesConfig.Growth(
+                growth.longIn("oliveFruitTicks", base.oliveFruitTicks(), 1200, 24000L * 30),
+                growth.longIn("grapeStageTicks", base.grapeStageTicks(), 1200, 24000L * 30),
+                new WorldRulesConfig.BoneMeal(
+                        bone.doubleIn("grapeChance", base.boneMeal().grapeChance(), 0, 1),
+                        bone.bool("oliveLeaves", base.boneMeal().oliveLeaves())));
     }
 
     private static WorldRulesConfig.Recipes readRecipes(ObjectReader recipes, WorldRulesConfig.Recipes base) {
@@ -65,6 +77,14 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         JsonObject recipes = new JsonObject();
         recipes.add("ageGated", gated);
         root.add("recipes", recipes);
+        JsonObject growth = new JsonObject();
+        growth.addProperty("oliveFruitTicks", value.growth().oliveFruitTicks());
+        growth.addProperty("grapeStageTicks", value.growth().grapeStageTicks());
+        JsonObject bone = new JsonObject();
+        bone.addProperty("grapeChance", value.growth().boneMeal().grapeChance());
+        bone.addProperty("oliveLeaves", value.growth().boneMeal().oliveLeaves());
+        growth.add("boneMeal", bone);
+        root.add("growth", growth);
         return root;
     }
 }

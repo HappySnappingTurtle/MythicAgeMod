@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "gui/hanging_signs/oak_mythic_age_olive",
+  "namespace": "minecraft",
+  "size": 16,
+  "palette": {
+    "o": "#4a4320",
+    "d": "#837b40",
+    "m": "#a49c56",
+    "l": "#c1b972",
+    "h": "#dbd394"
+  },
+  "params": {
+    "kind": "gui",
+    "rows": [
+      "oooooooooooooooo",
+      "ohhhhhhhhhhhhhho",
+      "olllllmlllllllmo",
+      "olmllllllllmlllo",
+      "oddddddddddddddo",
+      "ohhhhhhhhhhhhhho",
+      "olllmlllllllmllo",
+      "ollllllmlllllllo",
+      "oddddddddddddddo",
+      "ohhhhhhhhhhhhhho",
+      "olmllllllmllllmo",
+      "ollllllllllllllo",
+      "oddddddddddddddo",
+      "ohhhhhhhhhhhhhho",
+      "olllllmllllllllo",
+      "oooooooooooooooo"
+    ]
+  }
+}
