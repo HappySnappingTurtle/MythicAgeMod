@@ -1,6 +1,14 @@
 {
-  "template": "ingot",
-  "out": "item/bronze_ingot",
-  "seed": 3105,
-  "palette": {"outline": "#3d2a16", "dark": "#7d5a2f", "mid": "#a37a44", "light": "#c49a5e", "highlight": "#e2c48f"}
+  "template": "recolor",
+  "id": "bronze_ingot",
+  "base": "minecraft:item/iron_ingot",
+  "ramp": [
+    "#2b1708",
+    "#5e3a17",
+    "#8e5d28",
+    "#b8843f",
+    "#d6a95e",
+    "#f0d494"
+  ],
+  "note": "青铜锭：铁锭造型，低饱和暖铜（不与山铜同色）"
 }

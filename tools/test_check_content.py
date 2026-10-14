@@ -39,7 +39,7 @@ def fixture(root: Path, *, bronze_count=4, drop_ja_key=None, missing_texture=Fal
         write(gen / f"assets/mythic_age/models/item/{it}.json",
               {"parent": "item/generated", "textures": {"layer0": f"mythic_age:item/{it}"}})
         if not (missing_texture and it == "libation"):
-            size = (24, 24) if bad_size and it == "raw_tin" else (32, 32)
+            size = (24, 24) if bad_size and it == "raw_tin" else (16, 16)
             p = main / f"assets/mythic_age/textures/item/{it}.png"
             p.parent.mkdir(parents=True, exist_ok=True)
             Image.new("RGBA", size).save(p)
@@ -105,6 +105,40 @@ class CheckContentTest(unittest.TestCase):
             r = cc.run(Path(d), Path(d) / "no_such.json")
             self.assertEqual([], r.errors)
             self.assertTrue(any("跳过" in n for n in r.notes))
+
+    def recolor_fixture(self, root: Path, perm_colors, extra_model_ref=None):
+        main = root / "neoforge/src/main/resources"
+        key = [(10, 10, 10), (120, 120, 120), (240, 240, 240)]
+        for name, colors in (("key/k", key), ("tin", perm_colors)):
+            p = main / f"assets/mythic_age/textures/palettes/{name}.png"
+            p.parent.mkdir(parents=True, exist_ok=True)
+            img = Image.new("RGBA", (len(colors), 1))
+            img.putdata([c + (255,) for c in colors])
+            img.save(p)
+        write(main / "assets/minecraft/atlases/blocks.json", {"sources": [{
+            "type": "paletted_permutations", "textures": ["minecraft:item/iron_ingot"],
+            "palette_key": "mythic_age:palettes/key/k",
+            "permutations": {"mythic_age_tin": "mythic_age:palettes/tin"}}]})
+        ref = extra_model_ref or "minecraft:item/iron_ingot_mythic_age_tin"
+        write(root / "neoforge/src/generated/resources/assets/mythic_age/models/item/tin_ingot.json",
+              {"parent": "item/generated", "textures": {"layer0": ref}})
+
+    def test_recolor_ok_and_unregistered_sprite(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            design = fixture(root)
+            self.recolor_fixture(root, [(40, 20, 80), (90, 140, 200), (200, 230, 255)])
+            self.assertEqual([], cc.run(root, design).errors)
+            self.recolor_fixture(root, [(40, 20, 80), (90, 140, 200), (200, 230, 255)],
+                                 extra_model_ref="minecraft:item/iron_ingot_mythic_age_bronze")
+            self.assertTrue(any("没有在图集中登记" in e for e in cc.run(root, design).errors))
+
+    def test_recolor_too_close_to_vanilla(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            design = fixture(root)
+            self.recolor_fixture(root, [(12, 12, 12), (122, 120, 121), (238, 240, 240)])
+            self.assertTrue(any("太接近" in e for e in cc.run(root, design).errors))
 
     def test_repository_passes(self):
         r = cc.run(cc.DEFAULT_ROOT, None)

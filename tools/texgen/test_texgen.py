@@ -20,6 +20,7 @@ PALETTES = {
     "stone": {"dark": "#ddd6c7", "mid": "#e8e2d5", "light": "#f2eee5", "vein": "#c9c1b0"},
     "polished": {"dark": "#cfc8b8", "mid": "#e8e2d5", "light": "#f2eee5", "highlight": "#fbf9f4"},
     "bricks": {"mortar": "#bdb5a4", "dark": "#ddd6c7", "mid": "#e8e2d5", "light": "#f5f1e9"},
+    "voronoi_masonry": {"joint": "#c4bba8", "dark": "#e0d9ca", "mid": "#ebe5d8", "light": "#f0ebe1", "highlight": "#f6f2ea"},
     "bottle": {"outline": "#3a1f14", "dark": "#7d3a20", "mid": "#a9532e", "light": "#c9764a", "band": "#2b2b2b", "stopper": "#8a6a3a"},
     "tile": {"outline": "#3a1f14", "dark": "#8a8278", "mid": "#a59d92", "light": "#bdb5aa"},
     "plate": {"outline": "#3a2614", "dark": "#7a5532", "mid": "#9c7044", "light": "#bd8e5c"},
@@ -34,6 +35,12 @@ def make_spec(template: str, seed: int = 1, **extra) -> texgen.Spec:
     return texgen.load_spec(Path(f.name))
 
 
+def make_spec_raw(data: dict) -> texgen.Spec:
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as f:
+        json.dump(data, f)
+    return texgen.load_spec(Path(f.name))
+
+
 def pixels(img):
     flat = getattr(img, "get_flattened_data", None)
     return list(flat() if flat else img.getdata())
@@ -42,7 +49,7 @@ def pixels(img):
 class TexgenTest(unittest.TestCase):
 
     def test_tc_t6_01_deterministic(self):
-        for template in texgen.TEMPLATES:
+        for template in (t for t in texgen.TEMPLATES if t != "pixels"):
             a = texgen.render(make_spec(template, 7))
             b = texgen.render(make_spec(template, 7))
             self.assertEqual(a.tobytes(), b.tobytes(), template)
@@ -124,11 +131,34 @@ class TexgenTest(unittest.TestCase):
                 texgen.write_png(b, target, False)
             self.assertEqual("overwritten", texgen.write_png(b, target, True))
 
+    def test_pixels_template(self):
+        rows = ["." * 16] * 16
+        rows = rows[:5] + ["....aab.........".ljust(16, ".")] + rows[6:]
+        spec = make_spec_raw({"template": "pixels", "out": "t/p", "size": 16,
+                              "palette": {"a": "#112233", "b": "#445566"}, "params": {"rows": rows}})
+        img = texgen.render(spec)
+        self.assertEqual((16, 16), img.size)
+        self.assertEqual((0x11, 0x22, 0x33, 255), img.getpixel((4, 5)))
+        self.assertEqual((0x44, 0x55, 0x66, 255), img.getpixel((6, 5)))
+        self.assertEqual(0, img.getpixel((0, 0))[3])
+
+    def test_pixels_rejects_bad_rows(self):
+        base = {"template": "pixels", "out": "t/p", "size": 16, "palette": {"a": "#112233"}}
+        for rows, needle in ((["." * 16] * 15, "共 16 行"), (["." * 15] + ["." * 16] * 15, "16 个字符"),
+                             (["z" + "." * 15] + ["." * 16] * 15, "不在调色板")):
+            with self.assertRaises(texgen.SpecError) as ctx:
+                make_spec_raw(dict(base, params={"rows": rows}))
+            self.assertIn(needle, str(ctx.exception))
+        with self.assertRaises(texgen.SpecError):
+            make_spec_raw(dict(base, palette={"ab": "#112233"}, params={"rows": ["." * 16] * 16}))
+
     def test_repository_specs_are_valid(self):
         specs = sorted(texgen.SPEC_DIR.rglob("*.json"))
         self.assertTrue(specs)
         outs = set()
         for p in specs:
+            if texgen.is_recolor(p):
+                continue
             s = texgen.load_spec(p)
             self.assertNotIn(s.out, outs, f"重复的输出路径 {s.out}")
             outs.add(s.out)

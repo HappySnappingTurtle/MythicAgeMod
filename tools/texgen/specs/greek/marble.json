@@ -2,16 +2,17 @@
   "template": "stone",
   "out": "block/marble",
   "seed": 3201,
+  "size": 16,
   "palette": {
-    "dark": "#ddd6c7",
-    "mid": "#e8e2d5",
-    "light": "#f2eee5",
-    "vein": "#d2cbbb"
+    "dark": "#e0d9ca",
+    "mid": "#ebe5d8",
+    "light": "#f6f2ea",
+    "vein": "#d2cab8"
   },
   "params": {
     "thresholds": [
-      0.36,
-      0.64
+      0.4,
+      0.66
     ],
     "veins": 1
   }

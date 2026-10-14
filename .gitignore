@@ -30,3 +30,6 @@ __pycache__/
 
 # 代理工具的会话记忆（文档类）
 .codex-continuity/
+
+# datagen 的增量缓存（每次运行都会变）
+neoforge/src/generated/resources/.cache/

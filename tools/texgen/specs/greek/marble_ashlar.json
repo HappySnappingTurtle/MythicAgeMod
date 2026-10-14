@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/marble_ashlar",
+  "size": 16,
+  "palette": {
+    "j": "#c4bba8",
+    "n": "#e0d9ca",
+    "m": "#ebe5d8",
+    "h": "#f6f2ea"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhjhhhhh",
+      "mmmmmmmmmmjhmmmm",
+      "mmmmnmmmmmjhmmmm",
+      "mmmmmmmmmmjhmmnm",
+      "mmmmmmmmmmjhmmmm",
+      "mmmmmmmnmmjhmmmm",
+      "nnnnnnnnnnjnnnnn",
+      "jjjjjjjjjjjjjjjj",
+      "hhjhhhhhhhhhhhhh",
+      "mmjhmmmmmmmmmmmm",
+      "mmjhmmmmmnmmmmmm",
+      "mmjhmmmmmmmmmmmm",
+      "mnjhmmmmmmmmmnmm",
+      "mmjhmmmmmmmmmmmm",
+      "nnjnnnnnnnnnnnnn",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

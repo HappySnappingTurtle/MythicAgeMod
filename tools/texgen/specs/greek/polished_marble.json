@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/polished_marble",
+  "size": 16,
+  "palette": {
+    "k": "#d8d0bf",
+    "m": "#ebe5d8",
+    "h": "#f3efe6",
+    "v": "#d2cab8"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "mmmmmmmmmmmmmmmk",
+      "mmmmmmmmmmmmmmmk",
+      "mmhhhmmmmmmmmmmk",
+      "mmhhmmmmmmmmmmmk",
+      "mmhmmmmmmmmmmmmk",
+      "mmmmmmmmmmmmmvmk",
+      "mmmmmmmmmmmmmvmk",
+      "mmmmmmmmmmmmvmmk",
+      "mmmmmmmmmmmmmmmk",
+      "mmmmmmmmmmmvmmmk",
+      "mmmmmmmmmvvmmmmk",
+      "mmmmmmmmvmmmmmmk",
+      "mmmmmmvvmmmmmmmk",
+      "mmmmmvmmmmmmmmmk",
+      "mmmmmmmmmmmmmmmk",
+      "kkkkkkkkkkkkkkkk"
+    ]
+  }
+}

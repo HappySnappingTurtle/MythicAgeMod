@@ -1,7 +1,0 @@
-// 1.21.1	2026-10-13T23:35:17.927067	Registries
-2a31b33cc06baefed120feaf68fb83e2f96752ed data/mythic_age/neoforge/biome_modifier/add_ore_marble.json
-cea50987f80e47db533414f4a26b1f2a20d8ce3f data/mythic_age/neoforge/biome_modifier/add_ore_tin.json
-d435f882576729132dfdf3c56c71df6936f9edd8 data/mythic_age/worldgen/configured_feature/ore_marble.json
-42dc928fb9c6b0193756381c48132711d05bb7b3 data/mythic_age/worldgen/configured_feature/ore_tin.json
-bc22ab474c74e34790c11859090edd3e95dbf8ab data/mythic_age/worldgen/placed_feature/ore_marble.json
-592d4ea521bf16a75a7d0a83eb5e6969a3ce5c08 data/mythic_age/worldgen/placed_feature/ore_tin.json

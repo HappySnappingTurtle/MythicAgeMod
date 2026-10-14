@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mythic_age:block/marble_ashlar_slab"
+    },
+    "type=double": {
+      "model": "mythic_age:block/marble_ashlar"
+    },
+    "type=top": {
+      "model": "mythic_age:block/marble_ashlar_slab_top"
+    }
+  }
+}

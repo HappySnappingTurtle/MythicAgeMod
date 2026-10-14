@@ -5,7 +5,9 @@
   1. 已实现条目的配方与 08 号设计 json（recipe_contract_examples）一致：类型、输入、数量、产物、时代解锁；
   2. 模型引用的本模组贴图都存在；
   3. zh_cn / en_us / ja_jp 三个语言文件的键完全一致，且每个物品模型都有名称；
-  4. 贴图是 16×16 或 32×32 的正方形（带 .mcmeta 的动画贴图允许高度为宽度的整数倍）。
+  4. 物品与方块贴图是 16×16（带 .mcmeta 的动画贴图允许高度为宽度的整数倍；实体贴图另行规定）；
+  5. 原版造型换色：模型引用的换色贴图都在 assets/minecraft/atlases/blocks.json 中登记；
+     调色板键与色阶长度一致；换色结果与原版底图、以及同一底图的其他换色之间色差（CIE76 ΔE）≥ 15。
 
 用法：
   python3 tools/check_content.py [--root 仓库根目录] [--design 设计 json 路径]
@@ -180,7 +182,8 @@ def check_recipes(paths: Paths, design_file: Path, report: Report) -> None:
     pending = []
     for d in design.get("recipe_contract_examples", []):
         outs = d.get("outputs", {})
-        if not outs or not all(o in items for o in outs):
+        own_inputs = [i for i in d.get("inputs", {}) if i.startswith(MOD + ":")]
+        if not outs or not all(o in items for o in outs) or not all(i in items for i in own_inputs):
             pending.append(d["id"])
             continue
         types = TYPE_MAP.get(d["type"], {d["type"]})
@@ -200,6 +203,95 @@ def check_recipes(paths: Paths, design_file: Path, report: Report) -> None:
 
 # ---------------------------------------------------------------- 模型、语言、贴图
 
+RECOLOR_MARK = "_mythic_age_"
+# 平均色差阈值：实测锡（蓝灰白镴色）与原版铁锭的 ΔE 约 16 时，两者并排已一眼可辨；
+# 低于 15 时开始容易混淆（2026-10-14 预览对比）。
+MIN_DELTA_E = 15.0
+
+
+def load_atlas(paths: Paths) -> dict:
+    f = paths.main / "assets/minecraft/atlases/blocks.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"sources": []}
+
+
+def recolor_sprites(atlas: dict) -> set[str]:
+    out = set()
+    for src in atlas.get("sources", []):
+        if src.get("type") == "paletted_permutations":
+            for base in src["textures"]:
+                for perm in src["permutations"]:
+                    out.add(f"{base}_{perm}")
+    return out
+
+
+def palette_file(paths: Paths, rl: str) -> Path:
+    ns, path = rl.split(":", 1)
+    return paths.main / "assets" / ns / "textures" / (path + ".png")
+
+
+def read_strip(f: Path) -> list[tuple[int, int, int]]:
+    with Image.open(f) as img:
+        img = img.convert("RGBA")
+        flat = getattr(img, "get_flattened_data", None)
+        return [p[:3] for p in (flat() if flat else img.getdata())]
+
+
+def to_lab(c):
+    def lin(v):
+        v /= 255
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    r, g, b = (lin(v) for v in c)
+    x = (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047
+    y = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    z = (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883
+
+    def f(t):
+        return t ** (1 / 3) if t > 0.008856 else 7.787 * t + 16 / 116
+    fx, fy, fz = f(x), f(y), f(z)
+    return 116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)
+
+
+def delta_e(a: list, b: list) -> float:
+    """两条等长色阶逐项色差的平均值（CIE76）。"""
+    total = 0.0
+    for c1, c2 in zip(a, b):
+        l1, l2 = to_lab(c1), to_lab(c2)
+        total += sum((l1[i] - l2[i]) ** 2 for i in range(3)) ** 0.5
+    return total / max(1, len(a))
+
+
+def check_recolor(paths: Paths, report: Report) -> None:
+    atlas = load_atlas(paths)
+    for src in atlas.get("sources", []):
+        if src.get("type") != "paletted_permutations":
+            continue
+        key_f = palette_file(paths, src["palette_key"])
+        if not key_f.exists():
+            report.error(f"调色板键不存在：{src['palette_key']}")
+            continue
+        key = read_strip(key_f)
+        perms = {}
+        for name, rl in src["permutations"].items():
+            f = palette_file(paths, rl)
+            if not f.exists():
+                report.error(f"换色色阶不存在：{rl}")
+                continue
+            colors = read_strip(f)
+            if len(colors) != len(key):
+                report.error(f"换色 {name} 的色阶长度 {len(colors)} 与调色板键 {len(key)} 不一致")
+                continue
+            perms[name] = colors
+            d = delta_e(key, colors)
+            if d < MIN_DELTA_E:
+                report.error(f"换色 {name} 与原版底图 {src['textures'][0]} 太接近（ΔE {d:.1f} < {MIN_DELTA_E}）")
+        names = sorted(perms)
+        for i in range(len(names)):
+            for j in range(i + 1, len(names)):
+                d = delta_e(perms[names[i]], perms[names[j]])
+                if d < MIN_DELTA_E:
+                    report.error(f"换色 {names[i]} 与 {names[j]} 太接近（ΔE {d:.1f} < {MIN_DELTA_E}）")
+
+
 def texture_file(paths: Paths, ref: str) -> Path | None:
     ns, _, path = ref.partition(":") if ":" in ref else ("minecraft", "", ref)
     if ns != MOD:
@@ -208,6 +300,7 @@ def texture_file(paths: Paths, ref: str) -> Path | None:
 
 
 def check_models(paths: Paths, report: Report) -> None:
+    sprites = recolor_sprites(load_atlas(paths))
     for assets in paths.assets():
         folder = assets / "models"
         if not folder.exists():
@@ -216,6 +309,10 @@ def check_models(paths: Paths, report: Report) -> None:
             textures = json.loads(f.read_text(encoding="utf-8")).get("textures", {})
             for key, ref in textures.items():
                 if not isinstance(ref, str) or ref.startswith("#"):
+                    continue
+                if RECOLOR_MARK in ref:
+                    if ref not in sprites:
+                        report.error(f"模型 {f.relative_to(paths.root)} 引用的换色贴图 {ref} 没有在图集中登记")
                     continue
                 tf = texture_file(paths, ref)
                 if tf is not None and not tf.exists():
@@ -258,12 +355,15 @@ def check_textures(paths: Paths, report: Report) -> None:
     if not folder.exists():
         return
     for f in sorted(folder.rglob("*.png")):
+        rel = f.relative_to(folder)
+        if rel.parts[0] in ("palettes", "entity"):
+            continue  # 调色板是 N×1；实体贴图的尺寸由模型 UV 决定
         with Image.open(f) as img:
             w, h = img.size
-        animated = f.with_suffix(".png.mcmeta").exists()
-        ok = w in (16, 32) and (h == w or (animated and h % w == 0))
+        animated = Path(str(f) + ".mcmeta").exists()
+        ok = w == 16 and (h == w or (animated and h % w == 0))
         if not ok:
-            report.error(f"贴图 {f.relative_to(paths.root)} 尺寸为 {w}×{h}，应为 16×16 或 32×32")
+            report.error(f"贴图 {f.relative_to(paths.root)} 尺寸为 {w}×{h}，物品与方块应为 16×16")
 
 
 def run(root: Path, design: Path | None) -> Report:
@@ -273,6 +373,7 @@ def run(root: Path, design: Path | None) -> Report:
     check_models(paths, report)
     check_lang(paths, report)
     check_textures(paths, report)
+    check_recolor(paths, report)
     return report
 
 

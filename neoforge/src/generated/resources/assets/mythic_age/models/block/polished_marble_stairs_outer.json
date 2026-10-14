@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "mythic_age:block/polished_marble",
+    "side": "mythic_age:block/polished_marble",
+    "top": "mythic_age:block/polished_marble"
+  }
+}

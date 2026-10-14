@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "mythic_age:block/smooth_marble",
+    "side": "mythic_age:block/blue_meander_marble"
+  }
+}

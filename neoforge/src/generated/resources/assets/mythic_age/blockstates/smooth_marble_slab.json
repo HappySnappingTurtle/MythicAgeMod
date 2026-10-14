@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mythic_age:block/smooth_marble_slab"
+    },
+    "type=double": {
+      "model": "mythic_age:block/smooth_marble_slab_double"
+    },
+    "type=top": {
+      "model": "mythic_age:block/smooth_marble_slab_top"
+    }
+  }
+}

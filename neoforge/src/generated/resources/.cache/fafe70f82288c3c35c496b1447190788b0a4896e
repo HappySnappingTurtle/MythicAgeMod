@@ -1,8 +1,0 @@
-// 1.21.1	2026-10-13T23:35:17.926468	Tags for minecraft:block mod id mythic_age
-2e7bb4813b1e961fa0480b1c63f553fc213b7573 data/c/tags/block/ore_rates/singular.json
-2e7bb4813b1e961fa0480b1c63f553fc213b7573 data/c/tags/block/ores.json
-2e7bb4813b1e961fa0480b1c63f553fc213b7573 data/c/tags/block/ores/tin.json
-2e7bb4813b1e961fa0480b1c63f553fc213b7573 data/c/tags/block/ores_in_ground/stone.json
-e739ef4fd2e3adf6eefd4056dc4ba009580b9bf5 data/minecraft/tags/block/mineable/pickaxe.json
-2e7bb4813b1e961fa0480b1c63f553fc213b7573 data/minecraft/tags/block/needs_iron_tool.json
-06207e864a07be9db3d13df2649e5ee9d99691ec data/mythic_age/tags/block/marble.json

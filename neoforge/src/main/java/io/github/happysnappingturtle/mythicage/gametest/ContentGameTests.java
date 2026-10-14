@@ -179,6 +179,109 @@ public final class ContentGameTests {
         helper.succeed();
     }
 
+    /** TC-T6-26（续）：只走熔炉的配方——陶坯构件烧成陶制构件、大理石烧成平滑大理石；高炉不接受。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void furnace_only_recipes(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var rm = level.getServer().getRecipeManager();
+        record Case(net.minecraft.world.item.Item in, net.minecraft.world.item.Item out) {
+        }
+        for (Case c : List.of(new Case(GreekMaterials.RAW_ROOF_TILE.get(), GreekMaterials.CERAMIC_COMPONENT.get()),
+                new Case(GreekMaterials.MARBLE.get().asItem(), GreekMaterials.SMOOTH_MARBLE.get().asItem()))) {
+            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(c.in()));
+            var r = rm.getRecipeFor(RecipeType.SMELTING, input, level);
+            helper.assertTrue(r.isPresent() && r.get().value().getResultItem(level.registryAccess()).is(c.out()),
+                    c.in() + " 在熔炉中应得到 " + c.out());
+            helper.assertTrue(rm.getRecipeFor(RecipeType.BLASTING, input, level).isEmpty(), c.in() + " 不应能用高炉");
+        }
+        helper.succeed();
+    }
+
+    private static ItemStack craft(GameTestHelper helper, int w, int h, List<ItemStack> items) {
+        ServerLevel level = helper.getLevel();
+        CraftingInput input = CraftingInput.of(w, h, items);
+        return level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level)
+                .map(r -> r.value().assemble(input, level.registryAccess())).orElse(ItemStack.EMPTY);
+    }
+
+    private static ItemStack potion(net.minecraft.core.Holder<net.minecraft.world.item.alchemy.Potion> potion) {
+        return net.minecraft.world.item.alchemy.PotionContents.createItemStack(Items.POTION, potion);
+    }
+
+    /** TC-T6-28：苹果 + 2 个水瓶 → 奠酒 ×2；换成粗制的药水不匹配。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void libation_recipe(GameTestHelper helper) {
+        var water = net.minecraft.world.item.alchemy.Potions.WATER;
+        var awkward = net.minecraft.world.item.alchemy.Potions.AWKWARD;
+        ItemStack ok = craft(helper, 3, 1, List.of(new ItemStack(Items.APPLE), potion(water), potion(water)));
+        helper.assertTrue(ok.is(GreekMaterials.LIBATION.get()) && ok.getCount() == 2, "应得到奠酒 ×2，实际 " + ok);
+        ItemStack bad = craft(helper, 3, 1, List.of(new ItemStack(Items.APPLE), potion(awkward), potion(awkward)));
+        helper.assertTrue(bad.isEmpty(), "粗制的药水不应能做奠酒，实际 " + bad);
+        helper.succeed();
+    }
+
+    /** TC-T6-29：两种不同木头的台阶 → 木盘 ×2。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void platter_recipe(GameTestHelper helper) {
+        ItemStack r = craft(helper, 2, 1, List.of(new ItemStack(Items.OAK_SLAB), new ItemStack(Items.SPRUCE_SLAB)));
+        helper.assertTrue(r.is(GreekMaterials.WOODEN_PLATTER.get()) && r.getCount() == 2, "应得到木盘 ×2，实际 " + r);
+        helper.succeed();
+    }
+
+    /** TC-T6-30：切石机能从大理石原石与平滑大理石切出对应的形状，产量符合原版惯例。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void marble_stonecutting(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var rm = level.getServer().getRecipeManager();
+        record Case(net.minecraft.world.level.ItemLike in, net.minecraft.world.level.ItemLike out, int count) {
+        }
+        List<Case> cases = List.of(
+                new Case(GreekMaterials.MARBLE.get(), GreekMaterials.MARBLE_SLAB.get(), 2),
+                new Case(GreekMaterials.MARBLE.get(), GreekMaterials.MARBLE_STAIRS.get(), 1),
+                new Case(GreekMaterials.MARBLE.get(), GreekMaterials.MARBLE_WALL.get(), 1),
+                new Case(GreekMaterials.MARBLE.get(), GreekMaterials.POLYGONAL_MARBLE.get(), 1),
+                new Case(GreekMaterials.SMOOTH_MARBLE.get(), GreekMaterials.SMOOTH_MARBLE_SLAB.get(), 2),
+                new Case(GreekMaterials.SMOOTH_MARBLE.get(), GreekMaterials.MARBLE_ASHLAR.get(), 1),
+                new Case(GreekMaterials.SMOOTH_MARBLE.get(), GreekMaterials.POLISHED_MARBLE.get(), 1),
+                new Case(GreekMaterials.MARBLE_ASHLAR.get(), GreekMaterials.MARBLE_ASHLAR_WALL.get(), 1));
+        for (Case c : cases) {
+            var results = rm.getRecipesFor(RecipeType.STONECUTTING, new SingleRecipeInput(new ItemStack(c.in())), level)
+                    .stream().map(r -> r.value().getResultItem(level.registryAccess())).toList();
+            boolean found = results.stream().anyMatch(st -> st.is(c.out().asItem()) && st.getCount() == c.count());
+            helper.assertTrue(found, c.in() + " 应能切出 " + c.count() + " 个 " + c.out() + "，实际 " + results);
+        }
+        helper.assertTrue(rm.getRecipesFor(RecipeType.STONECUTTING,
+                        new SingleRecipeInput(new ItemStack(GreekMaterials.MARBLE.get())), level).stream()
+                        .noneMatch(r -> r.value().getResultItem(level.registryAccess()).is(GreekMaterials.SMOOTH_MARBLE.get().asItem())),
+                "原石不能直接切出平滑大理石（必须烧制）");
+        helper.succeed();
+    }
+
+    /** TC-T6-31（续）：大理石族标签与原版形状标签。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void marble_family_tags(GameTestHelper helper) {
+        for (ContentEntry e : Content.entries()) {
+            if (e.block().isPresent() && e.id().contains("marble")) {
+                helper.assertTrue(e.block().get().get().defaultBlockState().is(GreekMaterials.MARBLE_FAMILY),
+                        e.id() + " 应在 mythic_age:marble_family");
+            }
+        }
+        helper.assertTrue(GreekMaterials.MARBLE_WALL.get().defaultBlockState().is(BlockTags.WALLS), "大理石墙应在 walls");
+        helper.assertTrue(GreekMaterials.MARBLE_ASHLAR_SLAB.get().defaultBlockState().is(BlockTags.SLABS), "方石台阶应在 slabs");
+        helper.assertTrue(GreekMaterials.POLISHED_MARBLE_STAIRS.get().defaultBlockState().is(BlockTags.STAIRS), "磨光楼梯应在 stairs");
+        helper.succeed();
+    }
+
+    /** TC-T6-32：双层台阶掉 2 个。 */
+    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    public static void double_slab_drops_two(GameTestHelper helper) {
+        BlockState doubleSlab = GreekMaterials.SMOOTH_MARBLE_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE, net.minecraft.world.level.block.state.properties.SlabType.DOUBLE);
+        List<ItemStack> got = drops(helper.getLevel(), doubleSlab, new ItemStack(Items.IRON_PICKAXE));
+        helper.assertTrue(count(got, GreekMaterials.SMOOTH_MARBLE_SLAB.get().asItem()) == 2, "双层台阶应掉 2 个，实际 " + got);
+        helper.succeed();
+    }
+
     // ---------------------------------------------------------------- 时代受限配方
 
     private static FakePlayer player(GameTestHelper helper, String name, Age greekAge) {

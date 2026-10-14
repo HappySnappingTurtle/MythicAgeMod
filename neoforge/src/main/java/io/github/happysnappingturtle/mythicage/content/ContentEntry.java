@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.content;
 
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -18,11 +19,13 @@ import java.util.Optional;
  * @param model     方块条目的模型种类
  * @param itemModel 物品模型种类
  * @param loot      方块条目的战利品种类
+ * @param texture   贴图覆盖：方块为六面贴图，物品为图标；为空时用 {@code mythic_age:block|item/<id>}
  */
 public record ContentEntry(String id, Civilization civ, Optional<DeferredBlock<? extends Block>> block,
                            DeferredItem<? extends Item> item, Optional<BlockModelSpec> model,
                            ItemModelSpec itemModel, Optional<LootSpec> loot, List<TagKey<Block>> blockTags,
-                           List<TagKey<Item>> itemTags, Lang3 name) {
+                           List<TagKey<Item>> itemTags, Lang3 name,
+                           Optional<ResourceLocation> texture) {
     public boolean isBlock() {
         return block.isPresent();
     }

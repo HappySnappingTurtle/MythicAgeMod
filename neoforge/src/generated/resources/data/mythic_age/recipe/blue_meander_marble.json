@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": {
+      "item": "mythic_age:marble_ashlar"
+    },
+    "P": {
+      "item": "minecraft:lapis_lazuli"
+    }
+  },
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "result": {
+    "count": 8,
+    "id": "mythic_age:blue_meander_marble"
+  }
+}

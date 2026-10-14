@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/libation",
+  "size": 16,
+  "palette": {
+    "o": "#2c120a",
+    "d": "#7f3519",
+    "m": "#a9492a",
+    "l": "#c8643b",
+    "h": "#e8936a",
+    "k": "#1f1a17",
+    "g": "#d9b26a"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "......ooo.......",
+      ".....ohlmo......",
+      "......omo...oo..",
+      "......olo..o.o..",
+      ".....ollmo.o.o..",
+      "....ohllmmoo.o..",
+      "...ohlllmmmdoo..",
+      "...okkgkkgkkko..",
+      "..ohlllmmmmddo..",
+      "..ohllmmmmmddo..",
+      "..olllmmmmdddo..",
+      "...olmmmmmddo...",
+      "....oommmddo....",
+      "......oooo......",
+      "................"
+    ]
+  }
+}

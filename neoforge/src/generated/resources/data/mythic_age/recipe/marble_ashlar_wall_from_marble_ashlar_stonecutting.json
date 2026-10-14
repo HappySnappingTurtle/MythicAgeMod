@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "mythic_age:marble_ashlar"
+  },
+  "result": {
+    "count": 1,
+    "id": "mythic_age:marble_ashlar_wall"
+  }
+}

@@ -1,8 +1,40 @@
 {
-  "template": "granular",
+  "template": "pixels",
   "out": "item/bronze_mix",
-  "seed": 3104,
-  "palette": {"outline": "#3a2416", "a_dark": "#8a4f2c", "a_mid": "#b46a3c", "a_light": "#d9905c",
-              "b_dark": "#737b85", "b_mid": "#9da5ae", "b_light": "#c7cdd3"},
-  "params": {"ratio": 0.25}
+  "size": 16,
+  "palette": {
+    "o": "#3b1d0d",
+    "1": "#7a3f1f",
+    "2": "#a55a30",
+    "3": "#cf8650",
+    "4": "#eab17c",
+    "k": "#5e2c10",
+    "c": "#b8622f",
+    "C": "#f0a46c",
+    "O": "#25292e",
+    "d": "#5f6872",
+    "t": "#9ea7b1",
+    "T": "#e3e8ec"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      ".......oo.......",
+      "......o43o......",
+      ".....o4332o.....",
+      "....o433322o....",
+      "...o43342221o...",
+      "..o4334232411o..",
+      ".oooo33222OOOO..",
+      "oCCcko322OTTtdO.",
+      "oCcckko22OTttddO",
+      "occkkko11OttdddO",
+      ".ooooo.oo.OOOOO.",
+      "................"
+    ]
+  }
 }

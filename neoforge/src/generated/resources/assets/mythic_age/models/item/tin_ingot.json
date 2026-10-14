@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "mythic_age:item/tin_ingot"
+    "layer0": "minecraft:item/iron_ingot_mythic_age_tin_ingot"
   }
 }

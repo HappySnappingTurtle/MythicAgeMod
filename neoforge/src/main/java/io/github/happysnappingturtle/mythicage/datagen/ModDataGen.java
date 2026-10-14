@@ -1,11 +1,14 @@
 package io.github.happysnappingturtle.mythicage.datagen;
 
+import io.github.happysnappingturtle.mythicage.content.Recolor;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.worldgen.ModWorldGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -30,6 +33,10 @@ public final class ModDataGen {
         PackOutput out = gen.getPackOutput();
         ExistingFileHelper files = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
+        // 换色贴图在游戏加载资源时生成，磁盘上没有文件：告诉模型检查器它们存在
+        for (ResourceLocation sprite : Recolor.sprites()) {
+            files.trackGenerated(sprite, PackType.CLIENT_RESOURCES, ".png", "textures");
+        }
 
         DatapackBuiltinEntriesProvider worldgen = new DatapackBuiltinEntriesProvider(out, lookup,
                 ModWorldGen.builder(), Set.of(MythicAgeIds.MOD_ID));

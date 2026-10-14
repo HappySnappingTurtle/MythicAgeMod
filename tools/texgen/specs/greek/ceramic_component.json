@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/ceramic_component",
+  "size": 16,
+  "palette": {
+    "o": "#3d160a",
+    "d": "#7f3519",
+    "m": "#a9492a",
+    "l": "#c8643b",
+    "h": "#e8936a",
+    "x": "#5a2410",
+    "y": "#6e2c14"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "........oooooo..",
+      "......oohhhhhhoo",
+      "....oohhhhlllllo",
+      "...ohhhllllmmmo.",
+      "..ohhlllmmmmddo.",
+      ".ohllmmooooomdo.",
+      ".ohlmoxxxxxxomdo",
+      "ohlmoxyyyyyyxodo",
+      "olmmoxy.....oddo",
+      "oooooo......oooo",
+      "................",
+      "................"
+    ]
+  }
+}

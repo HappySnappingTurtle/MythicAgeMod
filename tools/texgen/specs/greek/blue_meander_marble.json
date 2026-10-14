@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/blue_meander_marble",
+  "size": 16,
+  "palette": {
+    "j": "#c4bba8",
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "B": "#2f6e9e"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "jjjjjjjjjjjjjjjj",
+      "hhhhhhhhhhhhhhhh",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "BBBBBBmmBBBBBBmm",
+      "BmmmmBmmBmmmmBmm",
+      "BmBBmBmmBmBBmBmm",
+      "BmmBmBmmBmmBmBmm",
+      "BBBBmBmmBBBBmBmm",
+      "mmmmmBmmmmmmmBmm",
+      "BBBBBBBBBBBBBBBB",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "hhhhhhhhhhhhhhhh",
+      "nnnnnnnnnnnnnnnn",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

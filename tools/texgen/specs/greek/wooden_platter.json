@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "item/wooden_platter",
+  "size": 16,
+  "palette": {
+    "o": "#3a2414",
+    "d": "#6e4a2a",
+    "m": "#946638",
+    "l": "#b9864f",
+    "h": "#d6a66c"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      ".....oooooo.....",
+      "...oohhllllloo..",
+      "..ohlmmmmmmmlho.",
+      ".ohlmdddddddmlho",
+      ".olmdmmmmmmmdmlo",
+      ".olmmdddddddmmlo",
+      "..olllmmmmmllldo",
+      "...oodddddddoo..",
+      ".....oooooo.....",
+      "................",
+      "................"
+    ]
+  }
+}

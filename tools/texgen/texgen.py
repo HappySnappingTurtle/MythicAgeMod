@@ -11,6 +11,8 @@
   python3 tools/texgen/texgen.py --preview DIR   另外输出放大 8 倍的预览图与总览图
   python3 tools/texgen/texgen.py --list-templates
 
+另有「原版造型换色」规格（template 为 recolor），见 recolor.py：不生成像素画，而是生成调色板与图集登记。
+
 规格格式：
   {
     "template": "ingot",               模板名，见 TEMPLATES
@@ -33,9 +35,12 @@ from pathlib import Path
 
 from PIL import Image
 
+import recolor
+
 ROOT = Path(__file__).resolve().parents[2]
 SPEC_DIR = Path(__file__).resolve().parent / "specs"
 DEFAULT_OUT = ROOT / "neoforge/src/main/resources/assets/mythic_age/textures"
+DEFAULT_ATLAS = ROOT / "neoforge/src/main/resources" / "assets/minecraft/atlases/blocks.json"
 
 RGBA = tuple[int, int, int, int]
 CLEAR: RGBA = (0, 0, 0, 0)
@@ -427,6 +432,41 @@ def t_bricks(spec: Spec) -> Canvas:
     return canvas
 
 
+def t_voronoi_masonry(spec: Spec) -> Canvas:
+    """多边形砌石：环面上的 Voronoi 分块（四边可平铺），石块之间是 1 像素的缝；
+    每块石头的明暗略有不同，左上边缘受光、右下边缘背光。"""
+    s, rng = spec.size, random.Random(spec.seed)
+    n = spec.param("stones", 6)
+    seeds = [(rng.uniform(0, s), rng.uniform(0, s)) for _ in range(n)]
+    tones = [rng.choice(("mid", "mid", "light", "dark")) for _ in range(n)]
+
+    def nearest(x, y):
+        best = None
+        for i, (sx, sy) in enumerate(seeds):
+            dx = min(abs(x + 0.5 - sx), s - abs(x + 0.5 - sx))
+            dy = min(abs(y + 0.5 - sy), s - abs(y + 0.5 - sy))
+            d = dx * dx + dy * dy
+            if best is None or d < best[0]:
+                best = (d, i)
+        return best[1]
+
+    owner = [[nearest(x, y) for x in range(s)] for y in range(s)]
+    canvas = Canvas(s, wrap=True)
+    for y in range(s):
+        for x in range(s):
+            o = owner[y][x]
+            right, down = owner[y][(x + 1) % s], owner[(y + 1) % s][x]
+            left, up = owner[y][(x - 1) % s], owner[(y - 1) % s][x]
+            if right != o or down != o:
+                c = spec.color("joint")
+            elif left != o or up != o:
+                c = spec.color("highlight")
+            else:
+                c = spec.color(tones[o])
+            canvas.set(x, y, c)
+    return canvas
+
+
 def t_bottle(spec: Spec) -> Canvas:
     """细颈陶瓶：圆腹、细颈、瓶口与塞子；腹部一道纹饰带（band）。"""
     s = spec.size
@@ -498,7 +538,18 @@ def t_plate(spec: Spec) -> Canvas:
     return canvas
 
 
+def t_pixels(spec: Spec) -> Canvas:
+    """手绘像素：rows 为 size 行字符串，每个字符是调色板里的一个键，「.」为透明。"""
+    canvas = Canvas(spec.size)
+    for y, row in enumerate(spec.params["rows"]):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                canvas.set(x, y, spec.color(ch))
+    return canvas
+
+
 TEMPLATES = {
+    "pixels": t_pixels,
     "ore_overlay": t_ore_overlay,
     "ingot": t_ingot,
     "raw_chunk": t_raw_chunk,
@@ -507,11 +558,13 @@ TEMPLATES = {
     "polished": t_polished,
     "bricks": t_bricks,
     "bottle": t_bottle,
+    "voronoi_masonry": t_voronoi_masonry,
     "tile": t_tile,
     "plate": t_plate,
 }
 
 REQUIRED_COLORS = {
+    "pixels": [],
     "ore_overlay": ["light", "mid", "dark", "shadow", "highlight"],
     "ingot": ["outline", "dark", "mid", "light", "highlight"],
     "raw_chunk": ["outline", "dark", "mid", "light"],
@@ -520,14 +573,15 @@ REQUIRED_COLORS = {
     "polished": ["dark", "mid", "light", "highlight"],
     "bricks": ["mortar", "dark", "mid", "light"],
     "bottle": ["outline", "dark", "mid", "light", "band", "stopper"],
+    "voronoi_masonry": ["joint", "dark", "mid", "light", "highlight"],
     "tile": ["outline", "dark", "mid", "light"],
     "plate": ["outline", "dark", "mid", "light"],
 }
 
-# 物品类模板：四边必须留透明边
+# 物品类模板：四边必须留透明边（pixels 由规格的 params.kind 决定，见 check_content）
 ITEM_TEMPLATES = {"ingot", "raw_chunk", "granular", "bottle", "tile", "plate"}
 # 方块面模板：必须四边可平铺
-TILING_TEMPLATES = {"stone", "bricks"}
+TILING_TEMPLATES = {"stone", "bricks", "voronoi_masonry"}
 
 
 # ---------------------------------------------------------------- 读取与输出
@@ -537,6 +591,8 @@ def load_spec(path: Path) -> Spec:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         raise SpecError(f"{path}：无法读取 JSON：{e}") from e
+    if data.get("template") == "pixels":
+        data.setdefault("seed", 0)
     for key in ("template", "out", "seed", "palette"):
         if key not in data:
             raise SpecError(f"{path}：缺少字段 {key}")
@@ -560,7 +616,24 @@ def load_spec(path: Path) -> Spec:
     params = data.get("params", {})
     if not isinstance(params, dict):
         raise SpecError(f"{path}：params 应为对象")
+    if template == "pixels":
+        check_pixels(path, palette, params, size)
     return Spec(path, template, out, data["seed"], size, palette, params)
+
+
+def check_pixels(path: Path, palette: dict, params: dict, size: int) -> None:
+    rows = params.get("rows")
+    if not isinstance(rows, list) or len(rows) != size:
+        raise SpecError(f"{path}：pixels 模板需要 params.rows，共 {size} 行")
+    for k in palette:
+        if len(k) != 1 or k == ".":
+            raise SpecError(f"{path}：pixels 的调色板键必须是单个字符且不能是「.」，实际 {k!r}")
+    for y, row in enumerate(rows):
+        if not isinstance(row, str) or len(row) != size:
+            raise SpecError(f"{path}：rows[{y}] 应为 {size} 个字符")
+        for x, ch in enumerate(row):
+            if ch != "." and ch not in palette:
+                raise SpecError(f"{path}：rows[{y}][{x}] 的字符 {ch!r} 不在调色板中")
 
 
 def render(spec: Spec) -> Image.Image:
@@ -603,9 +676,9 @@ def save_preview(images: list[tuple[str, Image.Image]], out_dir: Path, scale: in
         sheet.save(out_dir / "_sheet.png")
 
 
-def collect_specs(args: list[str]) -> list[Path]:
+def collect_specs(args: list[str], spec_dir: Path = SPEC_DIR) -> list[Path]:
     if not args:
-        return sorted(SPEC_DIR.rglob("*.json"))
+        return sorted(spec_dir.rglob("*.json"))
     paths = []
     for a in args:
         p = Path(a)
@@ -615,10 +688,54 @@ def collect_specs(args: list[str]) -> list[Path]:
     return paths
 
 
+def is_recolor(path: Path) -> bool:
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("template") == "recolor"
+    except (OSError, json.JSONDecodeError, AttributeError):
+        return False
+
+
+def write_recolor(out_root: Path, atlas_file: Path, spec_dir: Path, vanilla) -> dict:
+    """换色输出总是由规格目录中的全部 recolor 规格重建（图集文件只能有一份）。"""
+    specs = []
+    for p in sorted(spec_dir.rglob("*.json")):
+        if is_recolor(p):
+            try:
+                specs.append(recolor.load_recolor_spec(p, json.loads(p.read_text(encoding="utf-8"))))
+            except recolor.RecolorError as e:
+                raise SpecError(str(e)) from e
+    try:
+        result = recolor.build(specs, vanilla)
+    except recolor.RecolorError as e:
+        raise SpecError(str(e)) from e
+    palette_dir = out_root / recolor.PALETTE_DIR
+    wanted = {palette_dir / f"{i}.png": img for i, img in result.palettes.items()}
+    wanted.update({palette_dir / "key" / f"{k}.png": img for k, img in result.keys.items()})
+    if palette_dir.exists():
+        for old in palette_dir.rglob("*.png"):
+            if old not in wanted:
+                old.unlink()
+                print(f"removed     {old.relative_to(out_root)}")
+    for target, img in sorted(wanted.items()):
+        status = write_png(img, target, force=True)
+        if status != "unchanged":
+            print(f"{status:11s} {target.relative_to(out_root)}")
+    text = recolor.atlas_text(result.atlas)
+    if specs or atlas_file.exists():
+        if not atlas_file.exists() or atlas_file.read_text(encoding="utf-8") != text:
+            atlas_file.parent.mkdir(parents=True, exist_ok=True)
+            atlas_file.write_text(text, encoding="utf-8")
+            print(f"updated     {atlas_file.name}（{len(specs)} 个换色）")
+    return result.previews
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Mythic Age 程序化像素贴图生成器")
-    ap.add_argument("specs", nargs="*")
+    ap.add_argument("specs", nargs="*", help="只生成这些像素规格；换色规格总是全部重建")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    ap.add_argument("--atlas", type=Path, default=DEFAULT_ATLAS)
+    ap.add_argument("--spec-dir", type=Path, default=SPEC_DIR)
+    ap.add_argument("--vanilla", type=Path, help="原版资源目录（默认读取 MDG 下载的资源 jar）")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--preview", type=Path)
     ap.add_argument("--list-templates", action="store_true")
@@ -626,10 +743,13 @@ def main(argv: list[str] | None = None) -> int:
     if a.list_templates:
         for name in sorted(TEMPLATES):
             print(f"{name}: {', '.join(REQUIRED_COLORS[name])}")
+        print("recolor: 见 tools/texgen/recolor.py 文件头")
         return 0
     try:
-        specs = [load_spec(p) for p in collect_specs(a.specs)]
+        paths = [p for p in collect_specs(a.specs, a.spec_dir) if not is_recolor(p)]
+        specs = [load_spec(p) for p in paths]
         rendered = [(s, render(s)) for s in specs]
+        previews = write_recolor(a.out, a.atlas, a.spec_dir, recolor.VanillaAssets(a.vanilla))
         for s, img in rendered:
             status = write_png(img, a.out / (s.out + ".png"), a.force)
             print(f"{status:11s} {s.out}.png  ({s.template}, seed {s.seed})")
@@ -637,7 +757,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"错误：{e}", file=sys.stderr)
         return 2
     if a.preview:
-        save_preview([(s.out, img) for s, img in rendered], a.preview)
+        save_preview([(s.out, img) for s, img in rendered] + sorted(previews.items()), a.preview)
     return 0
 
 

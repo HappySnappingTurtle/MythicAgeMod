@@ -1,9 +1,6 @@
 {
-  "parent": "mythic_age:block/template_ore_overlay",
-  "render_type": "minecraft:cutout",
+  "parent": "minecraft:block/cube_all",
   "textures": {
-    "base": "minecraft:block/stone",
-    "overlay": "mythic_age:block/tin_ore_overlay",
-    "particle": "minecraft:block/stone"
+    "all": "minecraft:block/iron_ore_mythic_age_tin_ore"
   }
 }

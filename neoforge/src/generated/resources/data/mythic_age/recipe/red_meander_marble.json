@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": {
+      "item": "mythic_age:marble_ashlar"
+    },
+    "P": {
+      "item": "mythic_age:ceramic_component"
+    }
+  },
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "result": {
+    "count": 8,
+    "id": "mythic_age:red_meander_marble"
+  }
+}

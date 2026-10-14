@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "mythic_age:item/raw_tin"
+    "layer0": "minecraft:item/raw_iron_mythic_age_raw_tin"
   }
 }

@@ -1,6 +1,22 @@
 {
   "values": [
     "mythic_age:tin_ore",
-    "mythic_age:marble"
+    "mythic_age:marble",
+    "mythic_age:marble_slab",
+    "mythic_age:marble_stairs",
+    "mythic_age:marble_wall",
+    "mythic_age:smooth_marble",
+    "mythic_age:smooth_marble_slab",
+    "mythic_age:marble_ashlar",
+    "mythic_age:marble_ashlar_slab",
+    "mythic_age:marble_ashlar_stairs",
+    "mythic_age:marble_ashlar_wall",
+    "mythic_age:polygonal_marble",
+    "mythic_age:polygonal_marble_wall",
+    "mythic_age:polished_marble",
+    "mythic_age:polished_marble_slab",
+    "mythic_age:polished_marble_stairs",
+    "mythic_age:blue_meander_marble",
+    "mythic_age:red_meander_marble"
   ]
 }

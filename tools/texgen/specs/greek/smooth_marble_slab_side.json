@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/smooth_marble_slab_side",
+  "size": 16,
+  "palette": {
+    "j": "#c4bba8",
+    "n": "#e0d9ca",
+    "m": "#ebe5d8",
+    "h": "#f6f2ea"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhhhhhhj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmmmmmmmnmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmnnmmmmmmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "jjjjjjjjjjjjjjjj",
+      "hhhhhhhhhhhhhhhj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmnmmmmmmmmmmmj",
+      "hmmmmmmmmmmnmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmmmmnmmmmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

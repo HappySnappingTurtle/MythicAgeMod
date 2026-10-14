@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/raw_roof_tile",
+  "size": 16,
+  "palette": {
+    "o": "#3e3a35",
+    "d": "#7a746c",
+    "m": "#9b958c",
+    "l": "#bab4ab",
+    "h": "#d6d1c9",
+    "x": "#57524c",
+    "y": "#6c665f"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "........oooooo..",
+      "......oohhhhhhoo",
+      "....oohhhhlllllo",
+      "...ohhhllllmmmo.",
+      "..ohhlllmmmmddo.",
+      ".ohllmmooooomdo.",
+      ".ohlmoxxxxxxomdo",
+      "ohlmoxyyyyyyxodo",
+      "olmmoxy.....oddo",
+      "oooooo......oooo",
+      "................",
+      "................"
+    ]
+  }
+}

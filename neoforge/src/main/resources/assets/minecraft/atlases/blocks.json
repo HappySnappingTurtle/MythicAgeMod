@@ -1,0 +1,35 @@
+{
+  "sources": [
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/iron_ore"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_iron_ore__keep_minecraft_block_stone",
+      "permutations": {
+        "mythic_age_tin_ore": "mythic_age:palettes/tin_ore"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/iron_ingot"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_iron_ingot",
+      "permutations": {
+        "mythic_age_bronze_ingot": "mythic_age:palettes/bronze_ingot",
+        "mythic_age_tin_ingot": "mythic_age:palettes/tin_ingot"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:item/raw_iron"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_item_raw_iron",
+      "permutations": {
+        "mythic_age_raw_tin": "mythic_age:palettes/raw_tin"
+      }
+    }
+  ]
+}

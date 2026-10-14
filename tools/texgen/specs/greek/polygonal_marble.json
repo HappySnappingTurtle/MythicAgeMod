@@ -1,0 +1,16 @@
+{
+  "template": "voronoi_masonry",
+  "out": "block/polygonal_marble",
+  "seed": 3207,
+  "size": 16,
+  "palette": {
+    "joint": "#c4bba8",
+    "dark": "#e0d9ca",
+    "mid": "#ebe5d8",
+    "light": "#f0ebe1",
+    "highlight": "#f6f2ea"
+  },
+  "params": {
+    "stones": 3
+  }
+}

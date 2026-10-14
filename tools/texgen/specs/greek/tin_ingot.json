@@ -1,7 +1,14 @@
 {
-  "template": "ingot",
-  "out": "item/tin_ingot",
-  "seed": 3103,
-  "palette": {"outline": "#3b4049", "dark": "#7a828c", "mid": "#a6aeb7", "light": "#cdd3d9", "highlight": "#eef2f5", "accent": "#8892a2"},
-  "params": {"accentSpots": 4}
+  "template": "recolor",
+  "id": "tin_ingot",
+  "base": "minecraft:item/iron_ingot",
+  "ramp": [
+    "#24323f",
+    "#3a5163",
+    "#527088",
+    "#6f8fa8",
+    "#93b2c8",
+    "#bcd4e4"
+  ],
+  "note": "锡锭：铁锭造型，冷银偏蓝，比铁暗"
 }

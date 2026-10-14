@@ -2,6 +2,7 @@ package io.github.happysnappingturtle.mythicage.content;
 
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -28,7 +29,7 @@ import java.util.function.UnaryOperator;
  * <pre>
  * public static final DeferredBlock&lt;Block&gt; TIN_ORE = Content.block("tin_ore", GREEK)
  *         .properties(() -&gt; BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_ORE))
- *         .model(BlockModelSpec.oreOverlay(STONE_TEXTURE))
+ *         .texture(Recolor.sprite("minecraft:block/iron_ore", "tin_ore"))
  *         .loot(LootSpec.ore(RAW_TIN))
  *         .tags(...).itemTags(...)
  *         .lang("锡石矿", "Tin Ore", "錫石鉱石")
@@ -89,6 +90,7 @@ public final class Content {
         private final List<TagKey<Block>> blockTags = new ArrayList<>();
         private final List<TagKey<Item>> itemTags = new ArrayList<>();
         private Lang3 name;
+        private ResourceLocation texture;
 
         private BlockBuilder(String id, Civilization civ, Function<BlockBehaviour.Properties, B> factory) {
             this.id = id;
@@ -103,6 +105,12 @@ public final class Content {
 
         public BlockBuilder<B> itemProperties(UnaryOperator<Item.Properties> itemProperties) {
             this.itemProperties = itemProperties;
+            return this;
+        }
+
+        /** 六面贴图（只对 cubeAll 有效），例如 {@code Recolor.sprite("minecraft:block/calcite", "marble")}。 */
+        public BlockBuilder<B> texture(ResourceLocation texture) {
+            this.texture = texture;
             return this;
         }
 
@@ -142,6 +150,9 @@ public final class Content {
             if (name == null) {
                 throw new IllegalStateException(id + "：缺少三语名称 lang(...)");
             }
+            if (texture != null && !(model instanceof BlockModelSpec.CubeAll)) {
+                throw new IllegalStateException(id + "：texture(...) 只对 cubeAll 模型有效");
+            }
             // 形状类模型自动带上原版的形状标签
             switch (model) {
                 case BlockModelSpec.Slab s -> addShapeTags(BlockTags.SLABS, ItemTags.SLABS);
@@ -157,7 +168,8 @@ public final class Content {
             DeferredItem<BlockItem> item = ModRegistries.ITEMS.register(id,
                     () -> new BlockItem(block.get(), itemProperties.apply(new Item.Properties())));
             ENTRIES.add(new ContentEntry(id, civ, Optional.of(block), item, Optional.of(model), ItemModelSpec.BLOCK,
-                    Optional.of(resolvedLoot), List.copyOf(blockTags), List.copyOf(itemTags), name));
+                    Optional.of(resolvedLoot), List.copyOf(blockTags), List.copyOf(itemTags), name,
+                    Optional.ofNullable(texture)));
             return block;
         }
 
@@ -179,6 +191,7 @@ public final class Content {
         private ItemModelSpec model = ItemModelSpec.GENERATED;
         private final List<TagKey<Item>> tags = new ArrayList<>();
         private Lang3 name;
+        private ResourceLocation texture;
 
         private ItemBuilder(String id, Civilization civ, Function<Item.Properties, I> factory) {
             this.id = id;
@@ -188,6 +201,12 @@ public final class Content {
 
         public ItemBuilder<I> properties(UnaryOperator<Item.Properties> properties) {
             this.properties = properties;
+            return this;
+        }
+
+        /** 图标贴图，例如 {@code Recolor.sprite("minecraft:item/iron_ingot", "tin_ingot")}。 */
+        public ItemBuilder<I> texture(ResourceLocation texture) {
+            this.texture = texture;
             return this;
         }
 
@@ -215,7 +234,7 @@ public final class Content {
             UnaryOperator<Item.Properties> props = properties;
             DeferredItem<I> item = ModRegistries.ITEMS.register(id, () -> factory.apply(props.apply(new Item.Properties())));
             ENTRIES.add(new ContentEntry(id, civ, Optional.empty(), item, Optional.empty(), model, Optional.empty(),
-                    List.of(), List.copyOf(tags), name));
+                    List.of(), List.copyOf(tags), name, Optional.ofNullable(texture)));
             return item;
         }
     }

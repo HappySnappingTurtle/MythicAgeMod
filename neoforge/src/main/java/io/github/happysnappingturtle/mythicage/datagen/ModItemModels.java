@@ -18,18 +18,15 @@ public final class ModItemModels extends ItemModelProvider {
     protected void registerModels() {
         for (ContentEntry e : Content.entries()) {
             switch (e.itemModel()) {
-                case GENERATED -> basicItem(e.item().get());
+                case GENERATED -> withExistingParent(e.id(), mcLoc("item/generated"))
+                        .texture("layer0", e.texture().orElse(modLoc("item/" + e.id())));
                 case HANDHELD -> withExistingParent(e.id(), mcLoc("item/handheld"))
-                        .texture("layer0", modLoc("item/" + e.id()));
+                        .texture("layer0", e.texture().orElse(modLoc("item/" + e.id())));
                 case BLOCK -> {
-                    boolean wall = e.model().orElse(null) instanceof BlockModelSpec.Wall;
-                    boolean manual = e.model().orElse(null) instanceof BlockModelSpec.Manual;
-                    if (!manual) {
-                        var model = withExistingParent(e.id(), modLoc("block/" + e.id() + (wall ? "_inventory" : "")));
-                        // 物品模型不会继承父模型的 render_type：叠层矿石要显式声明，否则透明像素在物品栏里显示成黑色
-                        if (e.model().orElse(null) instanceof BlockModelSpec.OreOverlay) {
-                            model.renderType("cutout");
-                        }
+                    BlockModelSpec model = e.model().orElse(null);
+                    if (!(model instanceof BlockModelSpec.Manual)) {
+                        boolean wall = model instanceof BlockModelSpec.Wall;
+                        withExistingParent(e.id(), modLoc("block/" + e.id() + (wall ? "_inventory" : "")));
                     }
                 }
                 case MANUAL -> {
