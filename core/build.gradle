@@ -1,0 +1,48 @@
+plugins {
+    id 'java-library'
+}
+
+// devtools：工程卫生工具（字节码依赖扫描、源码卫生），只给测试和构建检查使用，不进 mod jar。
+sourceSets {
+    devtools {
+        java.srcDir 'src/devtools/java'
+    }
+    test {
+        compileClasspath += devtools.output
+        runtimeClasspath += devtools.output
+    }
+}
+
+dependencies {
+    // 与 Minecraft 1.21.1 运行时自带的 Gson 版本一致；不打进 mod jar。
+    implementation "com.google.code.gson:gson:${gson_version}"
+    devtoolsImplementation "com.google.code.gson:gson:${gson_version}"
+    testImplementation platform("org.junit:junit-bom:${junit_version}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// 源码卫生：生产代码不得使用 System.out / System.err / printStackTrace（统一用 LOGGER）。
+// 只扫描 main 源集；测试代码里的这些字样是测试输入，不在检查范围内。
+def hygieneRoots = [rootProject.file('core/src/main/java'), rootProject.file('neoforge/src/main/java')]
+def checkSourceHygiene = tasks.register('checkSourceHygiene', JavaExec) {
+    group = 'verification'
+    description = '检查生产代码中是否出现 System.out、System.err 或 printStackTrace。'
+    classpath = sourceSets.devtools.runtimeClasspath
+    mainClass = 'io.github.happysnappingturtle.mythicage.devtools.SourceHygieneCli'
+    args hygieneRoots.collect { it.absolutePath }
+    hygieneRoots.each { if (it.exists()) inputs.dir(it) }
+    // 没有输出文件：每次 check 都重新扫描（扫描很快）
+    outputs.upToDateWhen { false }
+}
+tasks.named('check') {
+    dependsOn checkSourceHygiene
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    dependsOn tasks.named('classes')
+    // 架构测试扫描 core 主源集的编译产物；版本锁定测试读取根目录配置与设计文档。
+    systemProperty 'mythicage.coreClassesDirs', sourceSets.main.output.classesDirs.asPath
+    systemProperty 'mythicage.rootDir', rootProject.projectDir.absolutePath
+}

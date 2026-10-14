@@ -1,0 +1,22 @@
+{
+  "commands.mythic_age.config.result": "%s：%s（版本 %s，%s 个问题）%s",
+  "commands.mythic_age.config.show": "%s（版本 %s）：\n%s",
+  "commands.mythic_age.config.unknown": "未知配置「%s」。可选：all、runtime、world_rules、conduct",
+  "mythic_age.civ.greek": "希腊",
+  "mythic_age.civ.egyptian": "埃及",
+  "mythic_age.civ.norse": "北欧",
+  "mythic_age.civ.chinese": "中华",
+  "mythic_age.civ.atlantean": "亚特兰蒂斯",
+  "mythic_age.age.none": "未接触",
+  "mythic_age.age.archaic": "远古",
+  "mythic_age.age.classical": "古典",
+  "mythic_age.age.heroic": "英雄",
+  "mythic_age.age.mythic": "神话",
+  "mythic_age.hud.favor": "%s恩宠 %s/%s",
+  "commands.mythic_age.unknown_civ": "未知文明：%s",
+  "commands.mythic_age.unknown_age": "未知时代：%s",
+  "commands.mythic_age.favor.get": "%s %s：%s/%s（%s）",
+  "commands.mythic_age.favor.add": "%s %s +%s → %s（%s）",
+  "commands.mythic_age.favor.set": "%s %s = %s",
+  "commands.mythic_age.age.set": "%s %s → %s"
+}

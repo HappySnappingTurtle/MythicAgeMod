@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "mythic_age:block/temple_egyptian_stairs",
-    "top": "mythic_age:block/temple_egyptian_stairs",
-    "side": "mythic_age:block/temple_egyptian_stairs"
-  }
-}

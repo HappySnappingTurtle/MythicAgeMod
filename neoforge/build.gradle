@@ -1,0 +1,223 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+evaluationDependsOn(':core')
+
+base {
+    archivesName = mod_id
+}
+
+// T2b 实机遥控口：agent 源集只在 -Pagent=remote 时并入 mod 并启用，永远不进发布 jar。
+def agentEnabled = project.findProperty('agent') == 'remote'
+sourceSets {
+    agent {
+        java.srcDir 'src/agent/java'
+    }
+}
+configurations {
+    agentImplementation.extendsFrom implementation
+    agentCompileOnly.extendsFrom compileOnly
+    agentRuntimeOnly.extendsFrom runtimeOnly
+}
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            if (agentEnabled) {
+                sourceSet = sourceSets.agent
+                systemProperty 'mythicage.agent', 'remote'
+                ['World', 'Fresh', 'Lang', 'Realtime', 'Structures', 'IdleMinutes'].each { key ->
+                    def value = project.findProperty("remote${key}")
+                    if (value != null) {
+                        systemProperty "mythicage.remote.${key.uncapitalize()}", value.toString()
+                    }
+                }
+            }
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        // 运行全部 GameTest 后退出；有失败时以非 0 退出码结束。
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+            gameDirectory = project.file("runs/${it.name}")
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(project(':core').sourceSets.main)
+            if (agentEnabled) {
+                sourceSet(sourceSets.agent)
+                sourceSet(project(':core').sourceSets.devtools)
+            }
+        }
+    }
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+}
+
+configurations {
+    // 只在开发环境运行时可用的依赖（如 JEI），不写进发布元数据
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+repositories {
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex 'software\\.bernie.*'
+            includeGroup 'com.eliotlash.mclib'
+        }
+    }
+    maven {
+        name = 'Curios'
+        url = 'https://maven.theillusivec4.top/'
+        content { includeGroup 'top.theillusivec4.curios' }
+    }
+    maven {
+        name = 'BlameJared'
+        url = 'https://maven.blamejared.com/'
+        content {
+            includeGroup 'vazkii.patchouli'
+            includeGroup 'mezz.jei'
+        }
+    }
+}
+
+dependencies {
+    implementation project(':core')
+
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+    compileOnly "vazkii.patchouli:Patchouli:${patchouli_version}:api"
+    runtimeOnly "vazkii.patchouli:Patchouli:${patchouli_version}"
+
+    localRuntime "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+
+    agentImplementation sourceSets.main.output
+    agentImplementation project(':core').sourceSets.devtools.output
+}
+
+neoForge.addModdingDependenciesTo(sourceSets.agent)
+configurations.agentRuntimeOnly.extendsFrom(configurations.localRuntime)
+
+// 由 gradle.properties 展开 neoforge.mods.toml，版本只在一处定义。
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            geckolib_version_range : "[${geckolib_version},)",
+            curios_version_range   : "[${curios_version},)",
+            patchouli_version_range: "[${patchouli_version},)",
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+// core 不是独立库：把它的类直接打进 mod jar。
+tasks.named('jar', Jar) {
+    from(project(':core').sourceSets.main.output)
+}
+
+// TC-T2-05：检查发布 jar 的内容。
+def verifyModJar = tasks.register('verifyModJar') {
+    group = 'verification'
+    description = '检查 mod jar 包含 core、元数据正确且不含开发期依赖。'
+    def jarFile = tasks.named('jar', Jar).flatMap { it.archiveFile }
+    inputs.file(jarFile)
+    doLast {
+        def zip = new java.util.zip.ZipFile(jarFile.get().asFile)
+        try {
+            def coreClass = 'io/github/happysnappingturtle/mythicage/core/MythicAgeIds.class'
+            if (zip.getEntry(coreClass) == null) throw new GradleException("jar 中缺少 core 类 ${coreClass}")
+            if (zip.entries().toList().any { it.name.startsWith('mezz/jei/') }) throw new GradleException('jar 中不应包含 JEI')
+            if (zip.entries().toList().any { it.name.startsWith('io/github/happysnappingturtle/mythicage/agent/') }) {
+                throw new GradleException('jar 中不应包含遥控口（agent 源集）的类')
+            }
+            if (zip.entries().toList().any { it.name.startsWith('io/github/happysnappingturtle/mythicage/devtools/') }) {
+                throw new GradleException('jar 中不应包含 devtools 工具类')
+            }
+            def toml = zip.getInputStream(zip.getEntry('META-INF/neoforge.mods.toml')).getText('UTF-8')
+            ["modId=\"${mod_id}\"", "version=\"${mod_version}\"", 'modId="geckolib"', 'modId="curios"', 'modId="patchouli"'].each {
+                if (!toml.contains(it)) throw new GradleException("neoforge.mods.toml 缺少 ${it}")
+            }
+            if (toml.contains('modId="jei"')) throw new GradleException('neoforge.mods.toml 不应声明 JEI')
+            def classBytes = zip.getInputStream(zip.getEntry('io/github/happysnappingturtle/mythicage/MythicAge.class')).bytes
+            int major = ((classBytes[6] & 0xFF) << 8) | (classBytes[7] & 0xFF)
+            if (major != 65) throw new GradleException("MythicAge.class 的 class 主版本应为 65（Java 21），实际 ${major}")
+        } finally {
+            zip.close()
+        }
+    }
+}
+// T2b：遥控口代码不得使用网络、外部进程或桌面截图（只拦 Runtime 类本身，不误伤 RuntimeException）。
+def checkAgentSandbox = tasks.register('checkAgentSandbox', JavaExec) {
+    group = 'verification'
+    description = '检查 agent 源集没有引用网络、外部进程或桌面截图相关的类。'
+    dependsOn tasks.named('agentClasses')
+    classpath = project(':core').sourceSets.devtools.runtimeClasspath
+    mainClass = 'io.github.happysnappingturtle.mythicage.devtools.ForbiddenReferenceCli'
+    def dir = sourceSets.agent.java.destinationDirectory
+    args = [dir.get().asFile.absolutePath, 'java/net/', 'java/awt/', 'javax/imageio/',
+            'java/lang/ProcessBuilder', 'java/lang/Runtime', 'java/lang/ProcessHandle']
+    inputs.dir(dir)
+    outputs.upToDateWhen { false }
+}
+
+tasks.named('check') {
+    dependsOn verifyModJar
+    dependsOn checkAgentSandbox
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

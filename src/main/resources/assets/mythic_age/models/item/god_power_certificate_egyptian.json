@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "mythic_age:item/god_power_certificate_egyptian"
-  }
-} 

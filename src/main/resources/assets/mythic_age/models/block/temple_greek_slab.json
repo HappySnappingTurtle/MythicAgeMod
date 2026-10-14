@@ -1,8 +1,0 @@
-{
-  "parent": "block/slab",
-  "textures": {
-    "bottom": "mythic_age:block/temple_greek_bricks",
-    "top": "mythic_age:block/temple_greek_bricks",
-    "side": "mythic_age:block/temple_greek_bricks"
-  }
-} 

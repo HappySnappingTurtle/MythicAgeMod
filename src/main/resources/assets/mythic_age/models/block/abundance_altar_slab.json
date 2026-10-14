@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "mythic_age:block/abundance_altar_slab",
-    "top": "mythic_age:block/abundance_altar_slab",
-    "side": "mythic_age:block/abundance_altar_slab"
-  }
-} 

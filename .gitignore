@@ -1,8 +1,18 @@
+# Gradle / IDE
 .gradle/
-.idea/
 build/
-run/
 out/
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+bin/
+
+# NeoForge 运行目录
+neoforge/runs/
+runs/
+run/
 
 *.class
 *.log
@@ -10,10 +20,13 @@ out/
 *.tmp
 .DS_Store
 
-# Generated visual review artifacts that are not part of the Blockbench-only gate
-docs/preview_assets/greek_creatures/*/minecraft/
-docs/preview_assets/greek_creatures/*/blockbench/three_quarter.png
-docs/preview_assets/entity_validation/minecraft/
+# 文档类内容不入版本控制（用户要求，2026-10-13）：设计文档、开发文档、截图、会话归档
+docs/
 
-# 预览/验收图（136MB，可由 tools 重新生成，不入版本控制）
-docs/preview_assets/
+# 文档类：任务清单也属于文档
+TODOList.md
+__pycache__/
+*.pyc
+
+# 代理工具的会话记忆（文档类）
+.codex-continuity/

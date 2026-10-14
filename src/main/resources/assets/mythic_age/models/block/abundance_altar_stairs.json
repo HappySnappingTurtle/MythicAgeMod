@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "mythic_age:block/abundance_altar_wall",
-    "top": "mythic_age:block/abundance_altar_wall",
-    "side": "mythic_age:block/abundance_altar_wall"
-  }
-}

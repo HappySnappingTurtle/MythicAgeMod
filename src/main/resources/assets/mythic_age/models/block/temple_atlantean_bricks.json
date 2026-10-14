@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "mythic_age:block/temple_atlantean_bricks"
-  }
-} 

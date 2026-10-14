@@ -1,61 +1,28 @@
 plugins {
-    id 'fabric-loom' version '1.3.8'
-    id 'maven-publish'
+    id 'base'
 }
 
-version = project.mod_version
-group = project.maven_group
+subprojects {
+    apply plugin: 'java'
 
-base {
-    archivesName = project.archives_base_name
-}
+    group = mod_group_id
+    version = mod_version
 
-repositories {
-    maven { url "https://maven.fabricmc.net/" }
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    // Add other dependencies here
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
-    it.options.release = 17
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 21
     }
-}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
     repositories {
-        // Add publishing repositories here
+        mavenCentral()
     }
+}
+
+// 源码卫生检查定义在 core 子工程中（它拥有 devtools 源集），根工程的 check 也触发它。
+tasks.named('check') {
+    dependsOn ':core:checkSourceHygiene'
 }
