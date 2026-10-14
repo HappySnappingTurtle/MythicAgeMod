@@ -5,6 +5,13 @@
       "bonus_rolls": 0.0,
       "conditions": [
         {
+          "block": "mythic_age:grape_trellis",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "part": "bottom"
+          }
+        },
+        {
           "condition": "minecraft:survives_explosion"
         }
       ],
@@ -19,6 +26,13 @@
     {
       "bonus_rolls": 0.0,
       "conditions": [
+        {
+          "block": "mythic_age:grape_trellis",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "part": "bottom"
+          }
+        },
         {
           "condition": "minecraft:inverted",
           "term": {
@@ -41,6 +55,13 @@
     {
       "bonus_rolls": 0.0,
       "conditions": [
+        {
+          "block": "mythic_age:grape_trellis",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "part": "bottom"
+          }
+        },
         {
           "block": "mythic_age:grape_trellis",
           "condition": "minecraft:block_state_property",

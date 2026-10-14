@@ -23,14 +23,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -243,51 +248,161 @@ public final class AgricultureGameTests {
 
     // ---------------------------------------------------------------- 葡萄
 
-    /** TC-T6b-31 至 TC-T6b-34、TC-T6b-36：种植、生长、采摘、破坏掉落。 */
-    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    /** 在 rel 处放一架完整的三格葡萄架（下方铺 soil），三格的 stage 都为 stage。 */
+    private static void trellis(GameTestHelper helper, BlockPos rel, Block soil, int stage) {
+        helper.setBlock(rel.below(), soil);
+        BlockState s = GreekAgriculture.GRAPE_TRELLIS.get().defaultBlockState().setValue(GrapeTrellisBlock.STAGE, stage);
+        for (GrapeTrellisBlock.Part part : GrapeTrellisBlock.Part.values()) {
+            helper.setBlock(rel.above(part.offset), s.setValue(GrapeTrellisBlock.PART, part));
+        }
+    }
+
+    /** 三格都是葡萄架，且 stage 相同。 */
+    private static void assertTrellisStage(GameTestHelper helper, BlockPos bottom, int stage, String message) {
+        for (GrapeTrellisBlock.Part part : GrapeTrellisBlock.Part.values()) {
+            BlockState s = helper.getBlockState(bottom.above(part.offset));
+            helper.assertTrue(s.is(GreekAgriculture.GRAPE_TRELLIS.get()) && s.getValue(GrapeTrellisBlock.PART) == part
+                    && s.getValue(GrapeTrellisBlock.STAGE) == stage, message + "（" + part.getSerializedName() + "）");
+        }
+    }
+
+    private static void assertTrellisGone(GameTestHelper helper, BlockPos bottom, String message) {
+        for (int i = 0; i < 3; i++) {
+            helper.assertTrue(!helper.getBlockState(bottom.above(i)).is(GreekAgriculture.GRAPE_TRELLIS.get()), message);
+        }
+    }
+
+    /** 以玩家（空手）的方式破坏 rel 处的方块，走完整的 playerWillDestroy / playerDestroy 流程。 */
+    private static void breakAsPlayer(GameTestHelper helper, FakePlayer pl, BlockPos rel) {
+        pl.gameMode.destroyBlock(helper.absolutePos(rel));
+    }
+
+    /** TC-T6b-37：用物品放置得到三格；上方第二格或第三格被挡住时放不下，不消耗物品。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
+    public static void grape_trellis_placement(GameTestHelper helper) {
+        FakePlayer pl = player(helper);
+        int[] blockedAt = {0, 2, 3};
+        for (int k = 0; k < blockedAt.length; k++) {
+            BlockPos ground = new BlockPos(1 + 3 * k, 0, 1);
+            helper.setBlock(ground, Blocks.DIRT);
+            if (blockedAt[k] > 0) {
+                helper.setBlock(ground.above(blockedAt[k]), Blocks.STONE);
+            }
+            ItemStack stack = new ItemStack(GreekAgriculture.GRAPE_TRELLIS.get(), 2);
+            BlockPos abs = helper.absolutePos(ground);
+            BlockPlaceContext ctx = new BlockPlaceContext(pl, InteractionHand.MAIN_HAND, stack,
+                    new BlockHitResult(Vec3.atCenterOf(abs).add(0, 0.5, 0), Direction.UP, abs, false));
+            InteractionResult result = ((BlockItem) stack.getItem()).place(ctx);
+            if (blockedAt[k] == 0) {
+                helper.assertTrue(result.consumesAction() && stack.getCount() == 1, "应放下并消耗 1 个");
+                assertTrellisStage(helper, ground.above(), 0, "应放出三格");
+                Direction.Axis axis = helper.getBlockState(ground.above()).getValue(GrapeTrellisBlock.AXIS);
+                for (int i = 2; i <= 3; i++) {
+                    helper.assertTrue(helper.getBlockState(ground.above(i)).getValue(GrapeTrellisBlock.AXIS) == axis,
+                            "三格的 axis 应一致");
+                }
+            } else {
+                helper.assertTrue(!result.consumesAction() && stack.getCount() == 2, "被挡住时不应放下");
+                assertTrellisGone(helper, ground.above(), "被挡住时不应有葡萄架");
+            }
+        }
+        helper.succeed();
+    }
+
+    /** TC-T6b-31、33、34、36：对中格种下、底格生长、对顶格采摘，破坏顶格时只掉一份。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
     public static void grape_trellis_cycle(GameTestHelper helper) {
-        BlockPos p = new BlockPos(1, 1, 1);
-        helper.setBlock(new BlockPos(1, 0, 1), Blocks.DIRT);
-        helper.setBlock(p, GreekAgriculture.GRAPE_TRELLIS.get());
+        BlockPos p = new BlockPos(5, 1, 5);
+        trellis(helper, p, Blocks.DIRT, 0);
         FakePlayer pl = player(helper);
         ItemStack cuttings = new ItemStack(GreekAgriculture.GRAPE_CUTTING.get(), 3);
         pl.setItemInHand(InteractionHand.MAIN_HAND, cuttings);
-        helper.getBlockState(p).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND, hit(helper, p));
-        helper.assertTrue(helper.getBlockState(p).getValue(GrapeTrellisBlock.STAGE) == 1, "应种下");
+        helper.getBlockState(p.above()).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND,
+                hit(helper, p.above()));
+        assertTrellisStage(helper, p, 1, "对中格种下后三格应为 1");
         helper.assertTrue(cuttings.getCount() == 2, "插条应 −1");
 
         RandomSource random = RandomSource.create(5);
         for (int stage = 2; stage <= 4; stage++) {
-            helper.assertTrue(tickUntilChange(helper, p, random, 3000).getValue(GrapeTrellisBlock.STAGE) == stage,
-                    "应推进到 " + stage);
+            tickUntilChange(helper, p, random, 3000);
+            assertTrellisStage(helper, p, stage, "应推进到 " + stage);
         }
-        helper.assertTrue(tickUntilChange(helper, p, random, 500).getValue(GrapeTrellisBlock.STAGE) == 4, "成熟后不再变化");
+        tickUntilChange(helper, p, random, 500);
+        assertTrellisStage(helper, p, 4, "成熟后不再变化");
 
-        helper.getBlockState(p).useWithoutItem(helper.getLevel(), pl, hit(helper, p));
-        int grapes = dropped(helper, p, GreekAgriculture.GRAPE.get());
+        helper.getBlockState(p.above(2)).useWithoutItem(helper.getLevel(), pl, hit(helper, p.above(2)));
+        int grapes = dropped(helper, p.above(2), GreekAgriculture.GRAPE.get());
         helper.assertTrue(grapes >= 2 && grapes <= 3, "采摘应掉 2–3 串，实际 " + grapes);
-        helper.assertTrue(helper.getBlockState(p).getValue(GrapeTrellisBlock.STAGE) == 2, "采摘后回到抽藤阶段");
-        clearDrops(helper, p);
+        assertTrellisStage(helper, p, 2, "采摘后回到抽藤阶段");
+        clearDrops(helper, p.above());
 
         helper.setBlock(p, helper.getBlockState(p).setValue(GrapeTrellisBlock.STAGE, 4));
-        helper.getLevel().destroyBlock(helper.absolutePos(p), true);
-        helper.assertTrue(dropped(helper, p, GreekAgriculture.GRAPE_TRELLIS.get().asItem()) == 1, "破坏应掉架子");
-        helper.assertTrue(dropped(helper, p, GreekAgriculture.GRAPE_CUTTING.get()) == 1, "破坏应掉 1 根插条");
-        helper.assertTrue(dropped(helper, p, GreekAgriculture.GRAPE.get()) >= 2, "成熟时破坏另掉葡萄");
+        assertTrellisStage(helper, p, 4, "改底格后上两格应同步");
+        breakAsPlayer(helper, pl, p.above(2));
+        assertTrellisGone(helper, p, "破坏顶格后整架应消失");
+        helper.assertTrue(dropped(helper, p.above(), GreekAgriculture.GRAPE_TRELLIS.get().asItem()) == 1, "应只掉 1 个架子");
+        helper.assertTrue(dropped(helper, p.above(), GreekAgriculture.GRAPE_CUTTING.get()) == 1, "应掉 1 根插条");
+        helper.assertTrue(dropped(helper, p.above(), GreekAgriculture.GRAPE.get()) >= 2, "成熟时破坏另掉葡萄");
         helper.succeed();
     }
 
-    /** TC-T6b-32：架子放在石头上时种不下插条。 */
-    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    /** TC-T6b-32：架子放在石头上时，对任意一格都种不下插条。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
     public static void grape_needs_soil(GameTestHelper helper) {
-        BlockPos p = new BlockPos(1, 1, 1);
-        helper.setBlock(new BlockPos(1, 0, 1), Blocks.STONE);
-        helper.setBlock(p, GreekAgriculture.GRAPE_TRELLIS.get());
+        BlockPos p = new BlockPos(5, 1, 5);
+        trellis(helper, p, Blocks.STONE, 0);
         FakePlayer pl = player(helper);
         ItemStack cuttings = new ItemStack(GreekAgriculture.GRAPE_CUTTING.get(), 3);
-        helper.getBlockState(p).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND, hit(helper, p));
-        helper.assertTrue(helper.getBlockState(p).getValue(GrapeTrellisBlock.STAGE) == 0, "石头上不应能种");
+        for (int i = 0; i < 3; i++) {
+            helper.getBlockState(p.above(i)).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND,
+                    hit(helper, p.above(i)));
+        }
+        assertTrellisStage(helper, p, 0, "石头上不应能种");
         helper.assertTrue(cuttings.getCount() == 3, "不应消耗插条");
+        helper.succeed();
+    }
+
+    /** TC-T6b-38、39、41：破坏底格或中格只掉一份；创造模式不掉落；下方的土被换掉后整架掉落。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
+    public static void grape_trellis_breaking(GameTestHelper helper) {
+        FakePlayer pl = player(helper);
+        Item trellisItem = GreekAgriculture.GRAPE_TRELLIS.get().asItem();
+        for (int i = 0; i < 2; i++) {
+            BlockPos p = new BlockPos(1 + 4 * i, 1, 1);
+            trellis(helper, p, Blocks.DIRT, 0);
+            breakAsPlayer(helper, pl, p.above(i));
+            assertTrellisGone(helper, p, "破坏任意一格后整架应消失");
+            helper.assertTrue(dropped(helper, p.above(), trellisItem) == 1, "应只掉 1 个架子");
+            clearDrops(helper, p.above());
+        }
+
+        BlockPos c = new BlockPos(1, 1, 7);
+        trellis(helper, c, Blocks.DIRT, 4);
+        FakePlayer creative = player(helper);
+        creative.setGameMode(GameType.CREATIVE);
+        breakAsPlayer(helper, creative, c.above(2));
+        assertTrellisGone(helper, c, "创造模式破坏顶格后整架应消失");
+        helper.assertTrue(dropped(helper, c.above(), trellisItem) == 0
+                && dropped(helper, c.above(), GreekAgriculture.GRAPE.get()) == 0, "创造模式不应掉落");
+
+        BlockPos s = new BlockPos(8, 1, 7);
+        trellis(helper, s, Blocks.DIRT, 1);
+        helper.setBlock(s.below(), Blocks.STONE);
+        assertTrellisGone(helper, s, "土被换成石头后整架应掉落");
+        helper.assertTrue(dropped(helper, s.above(), trellisItem) == 1
+                && dropped(helper, s.above(), GreekAgriculture.GRAPE_CUTTING.get()) == 1, "应掉架子与插条");
+        helper.succeed();
+    }
+
+    /** TC-T6b-40：中格、顶格接收随机刻时不推进。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
+    public static void grape_only_bottom_ticks(GameTestHelper helper) {
+        BlockPos p = new BlockPos(5, 1, 5);
+        trellis(helper, p, Blocks.DIRT, 1);
+        RandomSource random = RandomSource.create(3);
+        tickUntilChange(helper, p.above(), random, 3000);
+        tickUntilChange(helper, p.above(2), random, 3000);
+        assertTrellisStage(helper, p, 1, "只有底格生长");
         helper.succeed();
     }
 
@@ -444,11 +559,10 @@ public final class AgricultureGameTests {
         helper.succeed();
     }
 
-    /** TC-T6b-61：骨粉对葡萄架约 50% 几率推进 1 阶，从不一次推进 2 阶；成熟后不接受。 */
-    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
+    /** TC-T6b-61：骨粉对葡萄架约 50% 几率推进 1 阶，从不一次推进 2 阶；施在中格也作用到整架；成熟后不接受。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
     public static void bone_meal_on_trellis(GameTestHelper helper) {
-        BlockPos p = new BlockPos(1, 1, 1);
-        helper.setBlock(new BlockPos(1, 0, 1), Blocks.DIRT);
+        BlockPos p = new BlockPos(5, 1, 5);
         GrapeTrellisBlock block = GreekAgriculture.GRAPE_TRELLIS.get();
         RandomSource random = RandomSource.create(11);
         int success = 0;
@@ -459,27 +573,28 @@ public final class AgricultureGameTests {
             }
         }
         helper.assertTrue(success >= 450 && success <= 550, "骨粉成功率应约 50%，实际 " + success / 10.0 + "%");
-        helper.setBlock(p, block.defaultBlockState().setValue(GrapeTrellisBlock.STAGE, 1));
-        block.performBonemeal(helper.getLevel(), random, helper.absolutePos(p), helper.getBlockState(p));
-        helper.assertTrue(helper.getBlockState(p).getValue(GrapeTrellisBlock.STAGE) == 2, "每次只推进 1 阶");
-        helper.setBlock(p, block.defaultBlockState().setValue(GrapeTrellisBlock.STAGE, 4));
-        helper.assertTrue(!block.isValidBonemealTarget(helper.getLevel(), helper.absolutePos(p), helper.getBlockState(p)),
-                "成熟后不接受骨粉");
+        trellis(helper, p, Blocks.DIRT, 1);
+        block.performBonemeal(helper.getLevel(), random, helper.absolutePos(p.above()), helper.getBlockState(p.above()));
+        assertTrellisStage(helper, p, 2, "施在中格：每次只推进 1 阶，三格同步");
+        helper.setBlock(p, helper.getBlockState(p).setValue(GrapeTrellisBlock.STAGE, 4));
+        for (int i = 0; i < 3; i++) {
+            helper.assertTrue(!block.isValidBonemealTarget(helper.getLevel(), helper.absolutePos(p.above(i)),
+                    helper.getBlockState(p.above(i))), "成熟后任何一格都不接受骨粉");
+        }
         helper.succeed();
     }
 
     /** TC-T6b-62：其他模组拦截 CropGrowEvent.Pre 时，随机刻与骨粉都不推进。 */
-    @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = CONFIG_BATCH)
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = CONFIG_BATCH)
     public static void crop_grow_event_respected(GameTestHelper helper) {
-        BlockPos p = new BlockPos(1, 1, 1);
-        helper.setBlock(new BlockPos(1, 0, 1), Blocks.DIRT);
+        BlockPos p = new BlockPos(5, 1, 5);
         GrapeTrellisBlock block = GreekAgriculture.GRAPE_TRELLIS.get();
-        helper.setBlock(p, block.defaultBlockState().setValue(GrapeTrellisBlock.STAGE, 1));
+        trellis(helper, p, Blocks.DIRT, 1);
         blockGrowth = true;
         try {
             tickUntilChange(helper, p, RandomSource.create(1), 3000);
             block.performBonemeal(helper.getLevel(), RandomSource.create(1), helper.absolutePos(p), helper.getBlockState(p));
-            helper.assertTrue(helper.getBlockState(p).getValue(GrapeTrellisBlock.STAGE) == 1, "被拦截时不应推进");
+            assertTrellisStage(helper, p, 1, "被拦截时不应推进");
         } finally {
             blockGrowth = false;
         }

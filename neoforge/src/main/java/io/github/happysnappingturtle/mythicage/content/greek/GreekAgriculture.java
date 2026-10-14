@@ -45,6 +45,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -231,11 +232,12 @@ public final class GreekAgriculture {
                     GrapeTrellisBlock::new)
             .properties(() -> BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(0.6f)
                     .sound(net.minecraft.world.level.block.SoundType.WOOD).noOcclusion().randomTicks()
-                    .ignitedByLava())
+                    .ignitedByLava().pushReaction(PushReaction.DESTROY))
             .model(new BlockModelSpec.Trellis())
-            .itemTexture(mod("block/grape_trellis"))
-            .loot(LootSpec.custom(l -> l.trellis(GreekAgriculture.GRAPE_TRELLIS.get(), GrapeTrellisBlock.STAGE,
-                    GrapeTrellisBlock.MATURE, GreekAgriculture.GRAPE_CUTTING.get(), GreekAgriculture.GRAPE.get(), 2, 3)))
+            .itemTexture(mod("item/grape_trellis"))
+            .loot(LootSpec.custom(l -> l.trellis(GreekAgriculture.GRAPE_TRELLIS.get(), GrapeTrellisBlock.PART,
+                    GrapeTrellisBlock.Part.BOTTOM, GrapeTrellisBlock.STAGE, GrapeTrellisBlock.MATURE,
+                    GreekAgriculture.GRAPE_CUTTING.get(), GreekAgriculture.GRAPE.get(), 2, 3)))
             .tags(BlockTags.MINEABLE_WITH_AXE)
             .lang("葡萄架", "Grape Trellis", "ブドウ棚")
             .register();

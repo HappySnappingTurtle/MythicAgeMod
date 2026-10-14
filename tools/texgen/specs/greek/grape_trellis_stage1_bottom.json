@@ -1,0 +1,40 @@
+{
+  "template": "pixels",
+  "out": "block/grape_trellis_stage1_bottom",
+  "size": 16,
+  "palette": {
+    "L": "#a07a4a",
+    "D": "#6e5032",
+    "O": "#4a3420",
+    "s": "#5a4428",
+    "g": "#3d6427",
+    "G": "#5c8c36",
+    "Y": "#8ab856",
+    "w": "#f1efe2",
+    "y": "#e2c449",
+    "p": "#2e1a42",
+    "P": "#53357a",
+    "q": "#8c6db0"
+  },
+  "params": {
+    "kind": "block_cutout",
+    "rows": [
+      ".LD.....sGY..LD.",
+      ".LD.....sgG..LD.",
+      "LLLLLLLsLLLLLLLL",
+      "DDDDssDsDDssDDDD",
+      ".LDYGYG.s....LD.",
+      ".LDGgGg.s....LD.",
+      ".LD....s.....LD.",
+      ".LD....s.....LD.",
+      ".LD.....sGY..LD.",
+      ".LD.....sgG..LD.",
+      "LLLLLLLsLLLLLLLL",
+      "DDDDDDDsDDDDDDDD",
+      ".LD..YG.s....LD.",
+      ".LD..Gg.s....LD.",
+      ".LD....s.....LD.",
+      ".LD....s.....LD."
+    ]
+  }
+}

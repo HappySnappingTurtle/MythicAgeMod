@@ -1,6 +1,6 @@
 {
   "template": "pixels",
-  "out": "block/grape_trellis_stage0",
+  "out": "block/grape_trellis_stage2_bottom",
   "size": 16,
   "palette": {
     "L": "#a07a4a",
@@ -19,21 +19,21 @@
   "params": {
     "kind": "block_cutout",
     "rows": [
-      ".LD..........LD.",
-      ".LD..........LD.",
-      "LLLLLLLLLLLLLLLL",
-      "DDDDDDDDDDDDDDDD",
-      ".LD..........LD.",
-      ".LD..........LD.",
-      ".LD..........LD.",
-      ".LD..........LD.",
-      ".LD..........LD.",
-      ".LD..........LD.",
-      "LLLLLLLLLLLLLLLL",
-      "DDDDDDDDDYGDDDDD",
-      ".LD..YG.sGg..LD.",
+      ".LDwyG..sYG..LD.",
+      ".LD.....sGww.LD.",
+      "LLLLLLLsLLwyLLLL",
+      "DDDDDsDsDDsDDDDD",
+      ".LD..YG.s....LD.",
       ".LD..Gg.s....LD.",
-      ".LD....s.....LD.",
+      ".LD.ww.s.GY..LD.",
+      ".LD.wy.s.gG..LD.",
+      ".LD.GY..s....LD.",
+      ".LD.gG..s....LD.",
+      "LLLLLLLsLLLLLLLL",
+      "DDDDDsDsDDsDDDDD",
+      ".LD.....s.YG.LD.",
+      ".LD..YG.s.Gg.LD.",
+      ".LD..Ggs.....LD.",
       ".LD....s.....LD."
     ]
   }

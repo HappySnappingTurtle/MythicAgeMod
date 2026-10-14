@@ -1,0 +1,40 @@
+{
+  "template": "pixels",
+  "out": "item/grape_trellis",
+  "size": 16,
+  "palette": {
+    "L": "#a07a4a",
+    "D": "#6e5032",
+    "O": "#4a3420",
+    "s": "#5a4428",
+    "g": "#3d6427",
+    "G": "#5c8c36",
+    "Y": "#8ab856",
+    "w": "#f1efe2",
+    "y": "#e2c449",
+    "p": "#2e1a42",
+    "P": "#53357a",
+    "q": "#8c6db0"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "...L.YG..G...L..",
+      "..LLsGgYGgs.LL..",
+      "..DDDsDDDsDDDD..",
+      "...DYG.s.qPPD...",
+      "...DGg.s.PPpD...",
+      "...D..s..LPpD...",
+      "..LLLLsLLLLLLL..",
+      "..DDDDsDDYGDDD..",
+      "...D.YGs.GgqPP..",
+      "...D.Gg.s..PPp..",
+      "...D....s...Pp..",
+      "..LLLLLLsLLLLL..",
+      "..DDDDDsDDDDDD..",
+      "...D...s....D...",
+      "................"
+    ]
+  }
+}
