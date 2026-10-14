@@ -5,6 +5,14 @@
     "mythic_age:stripped_olive_log",
     "mythic_age:stripped_olive_wood",
     "mythic_age:olive_planks",
-    "mythic_age:grape_trellis"
+    "mythic_age:grape_trellis",
+    "mythic_age:olive_slab",
+    "mythic_age:olive_stairs",
+    "mythic_age:olive_fence",
+    "mythic_age:olive_fence_gate",
+    "mythic_age:olive_door",
+    "mythic_age:olive_trapdoor",
+    "mythic_age:olive_button",
+    "mythic_age:olive_pressure_plate"
   ]
 }

@@ -1,6 +1,8 @@
 package io.github.happysnappingturtle.mythicage.datagen.greek;
 
 import io.github.happysnappingturtle.mythicage.content.ModTags;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
@@ -56,9 +58,72 @@ public final class GreekRecipes {
         pottery(out);
         marble(out);
         agriculture(out);
+        woodShapes(out);
+        foods(out);
     }
 
-    /** 橄榄木（核心件）、告示牌、船、压榨器、油灯、葡萄架、压榨配方（T6b）。木材族其余形态见 codex 交接单。 */
+    /** 橄榄木族其余八种形态：图案、产量与配方组均沿用原版橡木。 */
+    private static void woodShapes(RecipeOutput out) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekWood.OLIVE_SLAB, 6)
+                .pattern("###").define('#', GreekAgriculture.OLIVE_PLANKS).group("wooden_slab")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_slab"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekWood.OLIVE_STAIRS, 4)
+                .pattern("#  ").pattern("## ").pattern("###")
+                .define('#', GreekAgriculture.OLIVE_PLANKS).group("wooden_stairs")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_stairs"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekWood.OLIVE_FENCE, 3)
+                .pattern("W#W").pattern("W#W")
+                .define('W', GreekAgriculture.OLIVE_PLANKS).define('#', Items.STICK).group("wooden_fence")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_fence"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, GreekWood.OLIVE_FENCE_GATE)
+                .pattern("#W#").pattern("#W#")
+                .define('W', GreekAgriculture.OLIVE_PLANKS).define('#', Items.STICK).group("wooden_fence_gate")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_fence_gate"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, GreekWood.OLIVE_DOOR, 3)
+                .pattern("##").pattern("##").pattern("##")
+                .define('#', GreekAgriculture.OLIVE_PLANKS).group("wooden_door")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_door"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, GreekWood.OLIVE_TRAPDOOR, 2)
+                .pattern("###").pattern("###")
+                .define('#', GreekAgriculture.OLIVE_PLANKS).group("wooden_trapdoor")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_trapdoor"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, GreekWood.OLIVE_BUTTON)
+                .requires(GreekAgriculture.OLIVE_PLANKS).group("wooden_button")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_button"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, GreekWood.OLIVE_PRESSURE_PLATE)
+                .pattern("##").define('#', GreekAgriculture.OLIVE_PLANKS).group("wooden_pressure_plate")
+                .unlockedBy("has_planks", has(GreekAgriculture.OLIVE_PLANKS))
+                .save(out, id("olive_pressure_plate"));
+    }
+
+    /** 四种希腊食物（08 号）：蜜酪的桶与玻璃瓶由原版合成剩余物规则返还。 */
+    private static void foods(RecipeOutput out) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, GreekFoods.OLIVE_FLATBREAD)
+                .requires(Items.WHEAT, 3).requires(GreekAgriculture.OLIVE)
+                .unlockedBy("has_olive", has(GreekAgriculture.OLIVE))
+                .save(out, id("olive_flatbread"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, GreekFoods.HONEY_CURD)
+                .requires(Items.MILK_BUCKET).requires(Items.HONEY_BOTTLE).requires(Items.BOWL)
+                .unlockedBy("has_honey_bottle", has(Items.HONEY_BOTTLE))
+                .save(out, id("honey_curd"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, GreekFoods.GRAPE_PLATTER)
+                .requires(GreekAgriculture.GRAPE, 3).requires(WOODEN_PLATTER)
+                .unlockedBy("has_grape", has(GreekAgriculture.GRAPE))
+                .save(out, id("grape_platter"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, GreekFoods.GREEK_TRAVEL_MEAL)
+                .requires(GreekFoods.OLIVE_FLATBREAD).requires(ModTags.cItem("foods/cooked_fish"))
+                .unlockedBy("has_olive_flatbread", has(GreekFoods.OLIVE_FLATBREAD))
+                .save(out, id("greek_travel_meal"));
+    }
+
+    /** 橄榄木（核心件）、告示牌、船、压榨器、油灯、葡萄架、压榨配方（T6b）。木材族其余形态见 woodShapes。 */
     private static void agriculture(RecipeOutput out) {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, GreekAgriculture.OLIVE_PLANKS, 4)
                 .requires(GreekAgriculture.OLIVE_LOGS_ITEM).group("planks")

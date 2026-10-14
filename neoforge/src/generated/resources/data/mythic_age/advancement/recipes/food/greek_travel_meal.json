@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_olive_flatbread": {
+      "conditions": {
+        "items": [
+          {
+            "items": "mythic_age:olive_flatbread"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "mythic_age:greek_travel_meal"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_olive_flatbread"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "mythic_age:greek_travel_meal"
+    ]
+  }
+}

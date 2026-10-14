@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "mythic_age:olive"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:olive_flatbread"
+  }
+}

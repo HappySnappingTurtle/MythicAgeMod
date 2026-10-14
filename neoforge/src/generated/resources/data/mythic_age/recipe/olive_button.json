@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "wooden_button",
+  "ingredients": [
+    {
+      "item": "mythic_age:olive_planks"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:olive_button"
+  }
+}

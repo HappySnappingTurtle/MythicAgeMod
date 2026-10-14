@@ -108,6 +108,8 @@ def ingredient_key(ing, tags: dict[str, set[str]]) -> str:
         tag = "#" + ing["tag"]
         if tag in TAG_ALIASES:
             return TAG_ALIASES[tag]
+        if tag.startswith("#minecraft:"):
+            return tag  # 原版标签在原版数据里还有其他成员，本仓库只看得到我们追加的部分，不能折叠
         members = tags.get(tag, set())
         own = sorted(m for m in members if m.startswith(MOD + ":"))
         return own[0] if len(own) == 1 else tag

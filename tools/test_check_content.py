@@ -106,6 +106,12 @@ class CheckContentTest(unittest.TestCase):
             self.assertEqual([], r.errors)
             self.assertTrue(any("跳过" in n for n in r.notes))
 
+    def test_vanilla_tag_not_folded(self):
+        """往原版标签里追加一个本模组成员（如 #minecraft:wooden_slabs 加橄榄木台阶）后，不应把标签折叠成该成员。"""
+        tags = {"#minecraft:wooden_slabs": {"mythic_age:olive_slab"}, "#c:ingots/tin": {"mythic_age:tin_ingot"}}
+        self.assertEqual("#minecraft:wooden_slabs", cc.ingredient_key({"tag": "minecraft:wooden_slabs"}, tags))
+        self.assertEqual("mythic_age:tin_ingot", cc.ingredient_key({"tag": "c:ingots/tin"}, tags))
+
     def recolor_fixture(self, root: Path, perm_colors, extra_model_ref=None):
         main = root / "neoforge/src/main/resources"
         key = [(10, 10, 10), (120, 120, 120), (240, 240, 240)]

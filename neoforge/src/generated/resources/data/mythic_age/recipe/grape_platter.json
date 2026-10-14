@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:wooden_platter"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:grape_platter"
+  }
+}

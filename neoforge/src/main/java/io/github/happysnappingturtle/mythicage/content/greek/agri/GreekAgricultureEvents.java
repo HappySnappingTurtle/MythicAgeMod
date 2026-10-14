@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.content.greek.agri;
 
 import io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
@@ -38,6 +39,10 @@ public final class GreekAgricultureEvents {
                 fire.setFlammable(log, 5, 5);
             }
             fire.setFlammable(GreekAgriculture.OLIVE_PLANKS.get(), 5, 20);
+            fire.setFlammable(GreekWood.OLIVE_SLAB.get(), 5, 20);
+            fire.setFlammable(GreekWood.OLIVE_STAIRS.get(), 5, 20);
+            fire.setFlammable(GreekWood.OLIVE_FENCE.get(), 5, 20);
+            fire.setFlammable(GreekWood.OLIVE_FENCE_GATE.get(), 5, 20);
             fire.setFlammable(GreekAgriculture.OLIVE_LEAVES.get(), 30, 60);
             fire.setFlammable(GreekAgriculture.GRAPE_TRELLIS.get(), 5, 20);
             fire.setFlammable(GreekAgriculture.WILD_GRAPEVINE.get(), 60, 100);
