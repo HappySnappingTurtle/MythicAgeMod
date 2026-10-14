@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "mythic_age:block/grape_trellis"
+    "layer0": "mythic_age:item/grape_trellis"
   }
 }

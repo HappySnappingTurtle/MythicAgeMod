@@ -1,38 +1,108 @@
 {
   "variants": {
-    "axis=x,stage=0": {
-      "model": "mythic_age:block/grape_trellis"
+    "axis=x,part=bottom,stage=0": {
+      "model": "mythic_age:block/grape_trellis_bottom"
     },
-    "axis=x,stage=1": {
-      "model": "mythic_age:block/grape_trellis_1"
+    "axis=x,part=bottom,stage=1": {
+      "model": "mythic_age:block/grape_trellis_bottom_1"
     },
-    "axis=x,stage=2": {
-      "model": "mythic_age:block/grape_trellis_2"
+    "axis=x,part=bottom,stage=2": {
+      "model": "mythic_age:block/grape_trellis_bottom_2"
     },
-    "axis=x,stage=3": {
-      "model": "mythic_age:block/grape_trellis_3"
+    "axis=x,part=bottom,stage=3": {
+      "model": "mythic_age:block/grape_trellis_bottom_3"
     },
-    "axis=x,stage=4": {
-      "model": "mythic_age:block/grape_trellis_4"
+    "axis=x,part=bottom,stage=4": {
+      "model": "mythic_age:block/grape_trellis_bottom_4"
     },
-    "axis=z,stage=0": {
-      "model": "mythic_age:block/grape_trellis",
+    "axis=x,part=middle,stage=0": {
+      "model": "mythic_age:block/grape_trellis_middle"
+    },
+    "axis=x,part=middle,stage=1": {
+      "model": "mythic_age:block/grape_trellis_middle_1"
+    },
+    "axis=x,part=middle,stage=2": {
+      "model": "mythic_age:block/grape_trellis_middle_2"
+    },
+    "axis=x,part=middle,stage=3": {
+      "model": "mythic_age:block/grape_trellis_middle_3"
+    },
+    "axis=x,part=middle,stage=4": {
+      "model": "mythic_age:block/grape_trellis_middle_4"
+    },
+    "axis=x,part=top,stage=0": {
+      "model": "mythic_age:block/grape_trellis_top"
+    },
+    "axis=x,part=top,stage=1": {
+      "model": "mythic_age:block/grape_trellis_top_1"
+    },
+    "axis=x,part=top,stage=2": {
+      "model": "mythic_age:block/grape_trellis_top_2"
+    },
+    "axis=x,part=top,stage=3": {
+      "model": "mythic_age:block/grape_trellis_top_3"
+    },
+    "axis=x,part=top,stage=4": {
+      "model": "mythic_age:block/grape_trellis_top_4"
+    },
+    "axis=z,part=bottom,stage=0": {
+      "model": "mythic_age:block/grape_trellis_bottom",
       "y": 90
     },
-    "axis=z,stage=1": {
-      "model": "mythic_age:block/grape_trellis_1",
+    "axis=z,part=bottom,stage=1": {
+      "model": "mythic_age:block/grape_trellis_bottom_1",
       "y": 90
     },
-    "axis=z,stage=2": {
-      "model": "mythic_age:block/grape_trellis_2",
+    "axis=z,part=bottom,stage=2": {
+      "model": "mythic_age:block/grape_trellis_bottom_2",
       "y": 90
     },
-    "axis=z,stage=3": {
-      "model": "mythic_age:block/grape_trellis_3",
+    "axis=z,part=bottom,stage=3": {
+      "model": "mythic_age:block/grape_trellis_bottom_3",
       "y": 90
     },
-    "axis=z,stage=4": {
-      "model": "mythic_age:block/grape_trellis_4",
+    "axis=z,part=bottom,stage=4": {
+      "model": "mythic_age:block/grape_trellis_bottom_4",
+      "y": 90
+    },
+    "axis=z,part=middle,stage=0": {
+      "model": "mythic_age:block/grape_trellis_middle",
+      "y": 90
+    },
+    "axis=z,part=middle,stage=1": {
+      "model": "mythic_age:block/grape_trellis_middle_1",
+      "y": 90
+    },
+    "axis=z,part=middle,stage=2": {
+      "model": "mythic_age:block/grape_trellis_middle_2",
+      "y": 90
+    },
+    "axis=z,part=middle,stage=3": {
+      "model": "mythic_age:block/grape_trellis_middle_3",
+      "y": 90
+    },
+    "axis=z,part=middle,stage=4": {
+      "model": "mythic_age:block/grape_trellis_middle_4",
+      "y": 90
+    },
+    "axis=z,part=top,stage=0": {
+      "model": "mythic_age:block/grape_trellis_top",
+      "y": 90
+    },
+    "axis=z,part=top,stage=1": {
+      "model": "mythic_age:block/grape_trellis_top_1",
+      "y": 90
+    },
+    "axis=z,part=top,stage=2": {
+      "model": "mythic_age:block/grape_trellis_top_2",
+      "y": 90
+    },
+    "axis=z,part=top,stage=3": {
+      "model": "mythic_age:block/grape_trellis_top_3",
+      "y": 90
+    },
+    "axis=z,part=top,stage=4": {
+      "model": "mythic_age:block/grape_trellis_top_4",
       "y": 90
     }
   }

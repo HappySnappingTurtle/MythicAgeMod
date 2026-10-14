@@ -93,7 +93,7 @@ public sealed interface BlockModelSpec {
     record GeneratedBy(String ownerId) implements BlockModelSpec {
     }
 
-    /** 葡萄架：每个 stage 一个模型（模板 template_trellis + block/<id>[_stage<n>]），按 axis 旋转。 */
+    /** 葡萄架（三格）：每个 part × stage 一个模型（模板 template_trellis + block/<id>[_stage<n>]_<part>），按 axis 旋转。 */
     record Trellis() implements BlockModelSpec {
     }
 

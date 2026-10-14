@@ -87,18 +87,28 @@ public final class ModBlockStates extends BlockStateProvider {
         }
     }
 
-    /** 葡萄架：stage 0 为空架子（block/<id>），1–4 为 block/<id>_stage0..3；横向轴为 Z 时旋转 90°。 */
+    /**
+     * 葡萄架（三格）：每个 part × stage 一个模型。stage 0 为空架子（block/<id>_<part>），
+     * 1–4 为 block/<id>_stage0..3_<part>；横向轴为 Z 时旋转 90°。
+     */
     private void trellis(ContentEntry e, Block block) {
         var stage = io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeTrellisBlock.STAGE;
         var axis = io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeTrellisBlock.AXIS;
-        ModelFile[] models = new ModelFile[5];
-        for (int i = 0; i <= 4; i++) {
-            String tex = i == 0 ? e.id() : e.id() + "_stage" + (i - 1);
-            models[i] = models().withExistingParent(i == 0 ? e.id() : e.id() + "_" + i, modLoc("block/template_trellis"))
-                    .texture("all", modLoc("block/" + tex)).renderType("cutout");
+        var part = io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeTrellisBlock.PART;
+        var models = new java.util.EnumMap<io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeTrellisBlock.Part,
+                ModelFile[]>(io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeTrellisBlock.Part.class);
+        for (var p : part.getPossibleValues()) {
+            String suffix = "_" + p.getSerializedName();
+            ModelFile[] byStage = new ModelFile[5];
+            for (int i = 0; i <= 4; i++) {
+                String tex = (i == 0 ? e.id() : e.id() + "_stage" + (i - 1)) + suffix;
+                byStage[i] = models().withExistingParent(e.id() + suffix + (i == 0 ? "" : "_" + i),
+                        modLoc("block/template_trellis")).texture("all", modLoc("block/" + tex)).renderType("cutout");
+            }
+            models.put(p, byStage);
         }
         getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
-                .modelFile(models[state.getValue(stage)])
+                .modelFile(models.get(state.getValue(part))[state.getValue(stage)])
                 .rotationY(state.getValue(axis) == net.minecraft.core.Direction.Axis.Z ? 90 : 0).build());
     }
 

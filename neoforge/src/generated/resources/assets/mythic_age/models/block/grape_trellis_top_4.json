@@ -2,6 +2,6 @@
   "parent": "mythic_age:block/template_trellis",
   "render_type": "minecraft:cutout",
   "textures": {
-    "all": "mythic_age:block/grape_trellis"
+    "all": "mythic_age:block/grape_trellis_stage3_top"
   }
 }

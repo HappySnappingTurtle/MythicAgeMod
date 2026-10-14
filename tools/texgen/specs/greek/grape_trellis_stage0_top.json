@@ -1,6 +1,6 @@
 {
   "template": "pixels",
-  "out": "block/grape_trellis",
+  "out": "block/grape_trellis_stage0_top",
   "size": 16,
   "palette": {
     "L": "#a07a4a",

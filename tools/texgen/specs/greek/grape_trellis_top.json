@@ -1,6 +1,6 @@
 {
   "template": "pixels",
-  "out": "block/grape_trellis_stage1",
+  "out": "block/grape_trellis_top",
   "size": 16,
   "palette": {
     "L": "#a07a4a",
@@ -26,15 +26,15 @@
       ".LD..........LD.",
       ".LD..........LD.",
       ".LD..........LD.",
-      ".LD....s.YG..LD.",
-      ".LD..YG.sGg..LD.",
-      ".LD..Gg.s....LD.",
-      "LLLLLLLsLLLLLLLL",
-      "DDDDDDDsDYGDDDDD",
-      ".LD..YG.sGg..LD.",
-      ".LD..Gg.s....LD.",
-      ".LD....s.....LD.",
-      ".LD....s.....LD."
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      "LLLLLLLLLLLLLLLL",
+      "DDDDDDDDDDDDDDDD",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD.",
+      ".LD..........LD."
     ]
   }
 }

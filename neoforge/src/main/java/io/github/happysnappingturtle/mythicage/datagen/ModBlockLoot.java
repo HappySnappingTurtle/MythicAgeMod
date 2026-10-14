@@ -5,11 +5,13 @@ import io.github.happysnappingturtle.mythicage.content.ContentEntry;
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
@@ -67,22 +69,28 @@ public final class ModBlockLoot extends BlockLootSubProvider {
     }
 
     /**
-     * 作物架：总是掉架子本身；已种下（property ≠ 0）时掉 1 根插条；成熟（property = mature）时另掉 min–max 个果实。
+     * 作物架（多格时只由 part = bottom 的一格掉落）：总是掉架子本身；已种下（stage ≠ 0）时掉 1 根插条；
+     * 成熟（stage = mature）时另掉 min–max 个果实。
      */
-    public LootTable.Builder trellis(Block block, IntegerProperty property, int mature, ItemLike cutting, ItemLike fruit,
-                                     float min, float max) {
+    public LootTable.Builder trellis(Block block, Property<?> part, StringRepresentable bottom, IntegerProperty stage,
+                                     int mature, ItemLike cutting, ItemLike fruit, float min, float max) {
+        var isBottom = state(block, StatePropertiesPredicate.Builder.properties()
+                .hasProperty(part, bottom.getSerializedName()));
         return LootTable.lootTable()
                 .withPool(applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                        .add(LootItem.lootTableItem(block))))
+                        .add(LootItem.lootTableItem(block)).when(isBottom)))
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                         .add(LootItem.lootTableItem(cutting))
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
-                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(property, 0))
-                                .invert()))
+                        .when(isBottom)
+                        .when(state(block, StatePropertiesPredicate.Builder.properties().hasProperty(stage, 0)).invert()))
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                         .add(LootItem.lootTableItem(fruit).apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max))))
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
-                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(property, mature))));
+                        .when(isBottom)
+                        .when(state(block, StatePropertiesPredicate.Builder.properties().hasProperty(stage, mature))));
+    }
+
+    private static LootItemBlockStatePropertyCondition.Builder state(Block block, StatePropertiesPredicate.Builder props) {
+        return LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(props);
     }
 
     /** 灌木：剪刀得到本体；否则掉插条（a 个）与果实（b 个）。 */
