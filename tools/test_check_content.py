@@ -1,0 +1,115 @@
+"""check_content 的单元测试（T6 测试用例文档 §2，TC-T6-10 至 TC-T6-15）。
+
+运行：python3 -m unittest tools/test_check_content.py
+"""
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import check_content as cc  # noqa: E402
+
+DESIGN = {
+    "recipe_contract_examples": [
+        {"id": "tin_smelting", "type": "smelting", "inputs": {"mythic_age:raw_tin": 1},
+         "outputs": {"mythic_age:tin_ingot": 1}},
+        {"id": "bronze_mix", "type": "crafting", "inputs": {"minecraft:copper_ingot": 3, "mythic_age:tin_ingot": 1},
+         "outputs": {"mythic_age:bronze_mix": 4}, "unlock": "greek_classical"},
+        {"id": "libation", "type": "crafting", "inputs": {"minecraft:apple": 1, "design:water_bottle": 2},
+         "outputs": {"mythic_age:libation": 2}},
+        {"id": "not_yet", "type": "crafting", "inputs": {"minecraft:stick": 1}, "outputs": {"mythic_age:nope": 1}},
+    ]
+}
+
+
+def write(path: Path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+
+def fixture(root: Path, *, bronze_count=4, drop_ja_key=None, missing_texture=False, bad_size=False):
+    gen = root / "neoforge/src/generated/resources"
+    main = root / "neoforge/src/main/resources"
+    items = ["raw_tin", "tin_ingot", "bronze_mix", "libation"]
+    for it in items:
+        write(gen / f"assets/mythic_age/models/item/{it}.json",
+              {"parent": "item/generated", "textures": {"layer0": f"mythic_age:item/{it}"}})
+        if not (missing_texture and it == "libation"):
+            size = (24, 24) if bad_size and it == "raw_tin" else (32, 32)
+            p = main / f"assets/mythic_age/textures/item/{it}.png"
+            p.parent.mkdir(parents=True, exist_ok=True)
+            Image.new("RGBA", size).save(p)
+    for loc in cc.LOCALES:
+        lang = {f"item.mythic_age.{it}": f"{it}-{loc}" for it in items}
+        if loc == "ja_jp" and drop_ja_key:
+            lang.pop(drop_ja_key)
+        write(gen / f"assets/mythic_age/lang/{loc}.json", lang)
+    write(gen / "data/c/tags/item/ingots/tin.json", {"values": ["mythic_age:tin_ingot"]})
+    write(gen / "data/mythic_age/recipe/tin_ingot_from_smelting.json",
+          {"type": "minecraft:smelting", "ingredient": {"item": "mythic_age:raw_tin"},
+           "result": {"id": "mythic_age:tin_ingot"}, "cookingtime": 200, "experience": 0.7})
+    write(gen / "data/mythic_age/recipe/bronze_mix.json",
+          {"type": "mythic_age:age_gated", "civilization": "greek", "age": "classical",
+           "recipe": {"type": "minecraft:crafting_shapeless",
+                      "ingredients": [{"tag": "c:ingots/copper"}] * 3 + [{"tag": "c:ingots/tin"}],
+                      "result": {"id": "mythic_age:bronze_mix", "count": bronze_count}}})
+    water = {"type": "neoforge:components", "items": "minecraft:potion",
+             "components": {"minecraft:potion_contents": {"potion": "minecraft:water"}}}
+    write(gen / "data/mythic_age/recipe/libation.json",
+          {"type": "minecraft:crafting_shapeless", "ingredients": [{"item": "minecraft:apple"}, water, water],
+           "result": {"id": "mythic_age:libation", "count": 2}})
+    design = root / "design.json"
+    write(design, DESIGN)
+    return design
+
+
+class CheckContentTest(unittest.TestCase):
+
+    def run_fixture(self, **kw):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            design = fixture(root, **kw)
+            return cc.run(root, design)
+
+    def test_tc_t6_10_consistent_fixture_passes(self):
+        r = self.run_fixture()
+        self.assertEqual([], r.errors)
+        self.assertTrue(any("尚未实现" in n for n in r.notes))
+
+    def test_tc_t6_11_wrong_count_is_reported(self):
+        r = self.run_fixture(bronze_count=3)
+        self.assertTrue(any("bronze_mix" in e and "不一致" in e for e in r.errors), r.errors)
+        with tempfile.TemporaryDirectory() as d:
+            design = fixture(Path(d), bronze_count=3)
+            self.assertEqual(1, cc.main(["--root", d, "--design", str(design)]))
+
+    def test_tc_t6_12_missing_texture(self):
+        r = self.run_fixture(missing_texture=True)
+        self.assertTrue(any("libation" in e and "不存在" in e for e in r.errors), r.errors)
+
+    def test_tc_t6_13_missing_japanese(self):
+        r = self.run_fixture(drop_ja_key="item.mythic_age.tin_ingot")
+        self.assertTrue(any("ja_jp 缺少键 item.mythic_age.tin_ingot" in e for e in r.errors), r.errors)
+
+    def test_tc_t6_14_bad_texture_size(self):
+        r = self.run_fixture(bad_size=True)
+        self.assertTrue(any("raw_tin.png" in e and "24×24" in e for e in r.errors), r.errors)
+
+    def test_tc_t6_15_missing_design_is_skipped(self):
+        with tempfile.TemporaryDirectory() as d:
+            fixture(Path(d))
+            r = cc.run(Path(d), Path(d) / "no_such.json")
+            self.assertEqual([], r.errors)
+            self.assertTrue(any("跳过" in n for n in r.notes))
+
+    def test_repository_passes(self):
+        r = cc.run(cc.DEFAULT_ROOT, None)
+        self.assertEqual([], r.errors)
+
+
+if __name__ == "__main__":
+    unittest.main()

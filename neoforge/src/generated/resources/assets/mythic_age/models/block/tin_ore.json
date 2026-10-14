@@ -1,0 +1,9 @@
+{
+  "parent": "mythic_age:block/template_ore_overlay",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "base": "minecraft:block/stone",
+    "overlay": "mythic_age:block/tin_ore_overlay",
+    "particle": "minecraft:block/stone"
+  }
+}

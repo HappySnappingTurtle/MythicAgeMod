@@ -1,0 +1,18 @@
+{
+  "template": "stone",
+  "out": "block/marble",
+  "seed": 3201,
+  "palette": {
+    "dark": "#ddd6c7",
+    "mid": "#e8e2d5",
+    "light": "#f2eee5",
+    "vein": "#d2cbbb"
+  },
+  "params": {
+    "thresholds": [
+      0.36,
+      0.64
+    ],
+    "veins": 1
+  }
+}

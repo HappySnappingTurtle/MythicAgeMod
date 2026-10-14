@@ -1,0 +1,4 @@
+{
+  "parent": "mythic_age:block/tin_ore",
+  "render_type": "minecraft:cutout"
+}

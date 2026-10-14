@@ -1,0 +1,7 @@
+{
+  "template": "ingot",
+  "out": "item/tin_ingot",
+  "seed": 3103,
+  "palette": {"outline": "#3b4049", "dark": "#7a828c", "mid": "#a6aeb7", "light": "#cdd3d9", "highlight": "#eef2f5", "accent": "#8892a2"},
+  "params": {"accentSpots": 4}
+}

@@ -11,7 +11,8 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
     public static final WorldRulesSchema INSTANCE = new WorldRulesSchema();
 
     private static final WorldRulesConfig DEFAULTS =
-            new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false));
+            new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
+                    new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)));
 
     private WorldRulesSchema() {
     }
@@ -38,7 +39,15 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 root.bool("mobBlockDamage", base.mobBlockDamage()),
                 root.bool("blockEntityStall", base.blockEntityStall()),
                 new WorldRulesConfig.GodPowers(
-                        root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())));
+                        root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
+                readRecipes(root.object("recipes"), base.recipes()));
+    }
+
+    private static WorldRulesConfig.Recipes readRecipes(ObjectReader recipes, WorldRulesConfig.Recipes base) {
+        ObjectReader gated = recipes.object("ageGated");
+        return new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(
+                gated.bool("enabled", base.ageGated().enabled()),
+                gated.bool("allowAutomation", base.ageGated().allowAutomation())));
     }
 
     @Override
@@ -50,6 +59,12 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         JsonObject godPowers = new JsonObject();
         godPowers.addProperty("terrainEdits", value.godPowers().terrainEdits());
         root.add("godPowers", godPowers);
+        JsonObject gated = new JsonObject();
+        gated.addProperty("enabled", value.recipes().ageGated().enabled());
+        gated.addProperty("allowAutomation", value.recipes().ageGated().allowAutomation());
+        JsonObject recipes = new JsonObject();
+        recipes.add("ageGated", gated);
+        root.add("recipes", recipes);
         return root;
     }
 }

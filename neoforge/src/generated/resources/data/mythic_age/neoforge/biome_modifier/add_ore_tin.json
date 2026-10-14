@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:region/greek",
+  "features": "mythic_age:ore_tin",
+  "step": "underground_ores"
+}

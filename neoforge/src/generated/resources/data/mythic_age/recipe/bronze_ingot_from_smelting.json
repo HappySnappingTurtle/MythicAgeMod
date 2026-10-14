@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "mythic_age:bronze_mix"
+  },
+  "result": {
+    "count": 1,
+    "id": "mythic_age:bronze_ingot"
+  }
+}

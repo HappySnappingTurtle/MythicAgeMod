@@ -1,0 +1,7 @@
+{
+  "template": "raw_chunk",
+  "out": "item/raw_tin",
+  "seed": 3102,
+  "palette": {"outline": "#34383e", "dark": "#6f7781", "mid": "#99a2ac", "light": "#c3cad1", "accent": "#e4e9ed"},
+  "params": {"lumps": 4, "accentSpots": 7}
+}

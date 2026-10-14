@@ -1,0 +1,6 @@
+{
+  "template": "ingot",
+  "out": "item/bronze_ingot",
+  "seed": 3105,
+  "palette": {"outline": "#3d2a16", "dark": "#7d5a2f", "mid": "#a37a44", "light": "#c49a5e", "highlight": "#e2c48f"}
+}

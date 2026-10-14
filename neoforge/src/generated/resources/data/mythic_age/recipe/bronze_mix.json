@@ -1,0 +1,27 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+      {
+        "tag": "c:ingots/copper"
+      },
+      {
+        "tag": "c:ingots/copper"
+      },
+      {
+        "tag": "c:ingots/copper"
+      },
+      {
+        "tag": "c:ingots/tin"
+      }
+    ],
+    "result": {
+      "count": 4,
+      "id": "mythic_age:bronze_mix"
+    }
+  }
+}

@@ -3,11 +3,16 @@ package io.github.happysnappingturtle.mythicage;
 import com.mojang.logging.LogUtils;
 import io.github.happysnappingturtle.mythicage.config.ConfigCommand;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
+import io.github.happysnappingturtle.mythicage.content.ModCreativeTabs;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
+import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
 import io.github.happysnappingturtle.mythicage.player.ModAttachments;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.player.MythDataCommand;
 import io.github.happysnappingturtle.mythicage.player.MythNetwork;
+import io.github.happysnappingturtle.mythicage.recipe.ModRecipes;
+import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
@@ -28,6 +33,12 @@ public final class MythicAge {
 
     public MythicAge(IEventBus modBus, ModContainer container) {
         LOGGER.info("Mythic Age loading ({} {})", MythicAgeIds.MOD_ID, container.getModInfo().getVersion());
+        // 内容声明（T6）：先触发各内容类的类加载，再把 DeferredRegister 挂到 mod 总线
+        GreekMaterials.init();
+        ModCreativeTabs.init();
+        ModRecipes.init();
+        ModRegistries.register(modBus);
+        modBus.addListener(ModDataGen::gather);
         ModAttachments.register(modBus);
         modBus.addListener(MythNetwork::onRegisterPayloads);
 
@@ -48,5 +59,6 @@ public final class MythicAge {
         game.addListener(RuntimeCommand::onRegisterCommands);
         PlayerActivity.register(game);
         TestProducers.register();
+        game.addListener(ModRecipes::onServerTickPre);
     }
 }

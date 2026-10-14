@@ -1,0 +1,8 @@
+{
+  "template": "granular",
+  "out": "item/bronze_mix",
+  "seed": 3104,
+  "palette": {"outline": "#3a2416", "a_dark": "#8a4f2c", "a_mid": "#b46a3c", "a_light": "#d9905c",
+              "b_dark": "#737b85", "b_mid": "#9da5ae", "b_light": "#c7cdd3"},
+  "params": {"ratio": 0.25}
+}
