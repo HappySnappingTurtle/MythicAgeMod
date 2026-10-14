@@ -69,13 +69,13 @@ public final class MythDataCommand {
                                                         .executes(MythDataCommand::setAge)))))));
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, String> civArgument() {
+    public static RequiredArgumentBuilder<CommandSourceStack, String> civArgument() {
         return Commands.argument("civ", StringArgumentType.word())
                 .suggests((c, b) -> SharedSuggestionProvider.suggest(
                         Arrays.stream(Civilization.values()).map(Civilization::id), b));
     }
 
-    private static Civilization civ(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    public static Civilization civ(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String id = StringArgumentType.getString(ctx, "civ");
         return Civilization.byId(id).orElseThrow(() -> UNKNOWN_CIV.create(id));
     }

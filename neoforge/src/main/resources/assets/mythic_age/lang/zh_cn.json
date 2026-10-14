@@ -18,5 +18,13 @@
   "commands.mythic_age.favor.get": "%s %s：%s/%s（%s）",
   "commands.mythic_age.favor.add": "%s %s +%s → %s（%s）",
   "commands.mythic_age.favor.set": "%s %s = %s",
-  "commands.mythic_age.age.set": "%s %s → %s"
+  "commands.mythic_age.age.set": "%s %s → %s",
+  "commands.mythic_age.runtime.unknown": "未知台账：%s",
+  "commands.mythic_age.runtime.added": "已创建台账 %s",
+  "commands.mythic_age.runtime.count": "共 %s 本台账，当前 tick=%s",
+  "commands.mythic_age.runtime.real": "%s 真实运行 = %s",
+  "commands.mythic_age.runtime.invalidated": "%s 已失效",
+  "commands.mythic_age.runtime.removed": "%s 已删除",
+  "commands.mythic_age.runtime.settled": "已结算 %s 本台账",
+  "commands.mythic_age.runtime.status": "%s：活跃=%s，未操作 %s/%s tick，当前 tick=%s，台账 %s 本"
 }

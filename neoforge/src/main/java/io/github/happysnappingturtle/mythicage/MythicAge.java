@@ -8,6 +8,10 @@ import io.github.happysnappingturtle.mythicage.player.ModAttachments;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.player.MythDataCommand;
 import io.github.happysnappingturtle.mythicage.player.MythNetwork;
+import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
+import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
+import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
+import io.github.happysnappingturtle.mythicage.runtime.TestProducers;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -36,5 +40,13 @@ public final class MythicAge {
         game.addListener(MythData::onLoggedIn);
         game.addListener(MythData::onRespawn);
         game.addListener(MythData::onChangedDimension);
+
+        // 运行时钟（T5）：钩子在普通优先级注册到 ModConfigs 刚创建的 holder 上
+        game.addListener(RuntimeDriver::onServerAboutToStart);
+        game.addListener(RuntimeDriver::onServerStopped);
+        game.addListener(RuntimeDriver::onServerTickPost);
+        game.addListener(RuntimeCommand::onRegisterCommands);
+        PlayerActivity.register(game);
+        TestProducers.register();
     }
 }

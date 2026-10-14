@@ -165,4 +165,17 @@ class TransactionTest {
         assertEquals(120, d.civ(GREEK).favor());
         assertEquals(0, d.civ(Civilization.NORSE).favor(), "其他文明不受影响");
     }
+
+    @Test
+    void internalRequestWritesNoReceiptAndNeverDuplicates() {
+        PlayerMythData d = withFavor(10);
+        long v = d.dataVersion();
+        var first = Transactions.execute(d, Transactions.Request.internal(TxSteps.addFavor(GREEK, 5, 0)));
+        var second = Transactions.execute(d, Transactions.Request.internal(TxSteps.addFavor(GREEK, 5, 0)));
+        assertEquals(Transactions.Status.COMMITTED, first.status());
+        assertEquals(Transactions.Status.COMMITTED, second.status());
+        assertEquals(20, d.civ(GREEK).favor());
+        assertEquals(v + 2, d.dataVersion());
+        assertFalse(d.receipts().contains(ReceiptBook.Scope.REQUEST, ""));
+    }
 }

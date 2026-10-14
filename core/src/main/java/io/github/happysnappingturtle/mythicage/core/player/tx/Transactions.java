@@ -14,10 +14,12 @@ import java.util.Optional;
 public final class Transactions {
     public enum Status { COMMITTED, DUPLICATE, REJECTED }
 
+    /**
+     * @param scope 收据范围；为 {@code null} 表示内部请求，不查也不写收据
+     */
     public record Request(String requestId, ReceiptBook.Scope scope, List<TxStep> steps) {
         public Request {
             Objects.requireNonNull(requestId);
-            Objects.requireNonNull(scope);
             steps = List.copyOf(steps);
         }
 
@@ -29,6 +31,18 @@ public final class Transactions {
         /** 唯一奖励（首杀、任务、晋升奖励）。 */
         public static Request unique(String rewardId, TxStep... steps) {
             return new Request(rewardId, ReceiptBook.Scope.UNIQUE, List.of(steps));
+        }
+
+        /**
+         * 服务端内部结算（T5 台账入账）：不查也不写收据。去重由调用方保证
+         * （例如台账的 {@code lastSettledTick}），避免挤占 REQUEST 收据。
+         */
+        public static Request internal(TxStep... steps) {
+            return new Request("", null, List.of(steps));
+        }
+
+        public boolean isInternal() {
+            return scope == null;
         }
     }
 
@@ -45,7 +59,7 @@ public final class Transactions {
      * @throws RuntimeException apply 阶段抛出的异常原样向上抛出；此时不写收据、不递增版本，以便修复后重试
      */
     public static Result execute(PlayerMythData data, Request request) {
-        if (data.receipts().contains(request.scope(), request.requestId())) {
+        if (!request.isInternal() && data.receipts().contains(request.scope(), request.requestId())) {
             return new Result(Status.DUPLICATE, "重复请求：" + request.requestId(), data.dataVersion());
         }
         for (TxStep step : request.steps()) {
@@ -57,7 +71,9 @@ public final class Transactions {
         for (TxStep step : request.steps()) {
             step.apply(data);
         }
-        data.receipts().record(request.scope(), request.requestId());
+        if (!request.isInternal()) {
+            data.receipts().record(request.scope(), request.requestId());
+        }
         data.markChanged();
         return new Result(Status.COMMITTED, "", data.dataVersion());
     }
