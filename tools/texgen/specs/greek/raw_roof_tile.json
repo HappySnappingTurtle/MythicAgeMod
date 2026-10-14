@@ -8,8 +8,7 @@
     "m": "#9b958c",
     "l": "#bab4ab",
     "h": "#d6d1c9",
-    "x": "#57524c",
-    "y": "#6c665f"
+    "x": "#57524c"
   },
   "params": {
     "kind": "item",
@@ -18,17 +17,17 @@
       "................",
       "................",
       "................",
-      "........oooooo..",
-      "......oohhhhhhoo",
-      "....oohhhhlllllo",
-      "...ohhhllllmmmo.",
-      "..ohhlllmmmmddo.",
-      ".ohllmmooooomdo.",
-      ".ohlmoxxxxxxomdo",
-      "ohlmoxyyyyyyxodo",
-      "olmmoxy.....oddo",
-      "oooooo......oooo",
-      "................",
+      "...oooooooooo...",
+      "..ohhhhhhhhhlo..",
+      "..oddmmmmmmddo..",
+      ".ooooooooooooo..",
+      ".ohhhhhhhhhhlo..",
+      ".oddmmmmmmmddo..",
+      "oooooooooooooo..",
+      "ohhhhhhhhhhhlo..",
+      "oddmmmmmmmmddo..",
+      "oxxxxxxxxxxxxo..",
+      "oooooooooooooo..",
       "................"
     ]
   }
