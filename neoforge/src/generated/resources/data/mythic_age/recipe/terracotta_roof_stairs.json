@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "terracotta_roof",
+  "key": {
+    "T": {
+      "item": "mythic_age:terracotta_roof_tiles"
+    }
+  },
+  "pattern": [
+    "T  ",
+    "TT ",
+    "TTT"
+  ],
+  "result": {
+    "count": 4,
+    "id": "mythic_age:terracotta_roof_stairs"
+  }
+}

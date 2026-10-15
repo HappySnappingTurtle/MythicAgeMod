@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.datagen.greek;
 
 import io.github.happysnappingturtle.mythicage.content.ModTags;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekArchitecture;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
@@ -62,6 +63,68 @@ public final class GreekRecipes {
         woodShapes(out);
         foods(out);
         temple(out);
+        architecture(out);
+    }
+
+    /** 希腊建筑套件（T8b）：六种切石构件、两种时代受限柱头，以及赤陶屋顶与马赛克。 */
+    private static void architecture(RecipeOutput out) {
+        // 平滑大理石 1 → 柱身、柱础、额枋、檐口、三陇板饰带、多立克柱头各 1（六条远古切石配方）。
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.MARBLE_COLUMN, 1);
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.MARBLE_COLUMN_BASE, 1);
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.MARBLE_ARCHITRAVE, 1);
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.MARBLE_CORNICE, 1);
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.TRIGLYPH_FRIEZE, 1);
+        stonecut(out, SMOOTH_MARBLE, GreekArchitecture.DORIC_CAPITAL, 1);
+
+        // 平滑大理石 2 + 大理石方石 1 → 爱奥尼柱头 1（希腊古典时代）。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.IONIC_CAPITAL)
+                .pattern("S S").pattern(" A ").define('S', SMOOTH_MARBLE).define('A', MARBLE_ASHLAR)
+                .unlockedBy("has_smooth_marble", has(SMOOTH_MARBLE))
+                .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL), id("ionic_capital"));
+
+        // 平滑大理石 2 + 金粒 1 + 大理石方石 1 → 科林斯柱头 1（希腊英雄时代）。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.CORINTHIAN_CAPITAL)
+                .pattern("SNS").pattern(" A ")
+                .define('S', SMOOTH_MARBLE).define('N', Tags.Items.NUGGETS_GOLD).define('A', MARBLE_ASHLAR)
+                .unlockedBy("has_smooth_marble", has(SMOOTH_MARBLE))
+                .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.HEROIC), id("corinthian_capital"));
+
+        // 陶制构件 2×2 → 赤陶瓦 4。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.TERRACOTTA_ROOF_TILES, 4)
+                .pattern("CC").pattern("CC").define('C', CERAMIC_COMPONENT)
+                .unlockedBy("has_ceramic_component", has(CERAMIC_COMPONENT))
+                .save(out, id("terracotta_roof_tiles"));
+
+        // 赤陶瓦 6（原版楼梯图案）→ 坡面 4；与平面共用 terracotta_roof 配方组。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.TERRACOTTA_ROOF_STAIRS, 4)
+                .pattern("T  ").pattern("TT ").pattern("TTT").define('T', GreekArchitecture.TERRACOTTA_ROOF_TILES)
+                .group("terracotta_roof")
+                .unlockedBy("has_roof_tiles", has(GreekArchitecture.TERRACOTTA_ROOF_TILES))
+                .save(out, id("terracotta_roof_stairs"));
+
+        // 赤陶瓦 3（一行）→ 平面 6。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.TERRACOTTA_ROOF_SLAB, 6)
+                .pattern("TTT").define('T', GreekArchitecture.TERRACOTTA_ROOF_TILES).group("terracotta_roof")
+                .unlockedBy("has_roof_tiles", has(GreekArchitecture.TERRACOTTA_ROOF_TILES))
+                .save(out, id("terracotta_roof_slab"));
+
+        // 赤陶瓦 3（拱形）→ 屋脊瓦 2。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.TERRACOTTA_RIDGE, 2)
+                .pattern(" T ").pattern("T T").define('T', GreekArchitecture.TERRACOTTA_ROOF_TILES)
+                .unlockedBy("has_roof_tiles", has(GreekArchitecture.TERRACOTTA_ROOF_TILES))
+                .save(out, id("terracotta_ridge"));
+
+        // 陶制构件 2 + 黑色染料 1 → 瓦当 4（无序）。
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, GreekArchitecture.TERRACOTTA_ANTEFIX, 4)
+                .requires(CERAMIC_COMPONENT, 2).requires(Tags.Items.DYES_BLACK)
+                .unlockedBy("has_ceramic_component", has(CERAMIC_COMPONENT))
+                .save(out, id("terracotta_antefix"));
+
+        // 闪长岩 2 + 黑石 2（交错 2×2）→ 卵石马赛克 4。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.PEBBLE_MOSAIC, 4)
+                .pattern("DB").pattern("BD").define('D', Items.DIORITE).define('B', Items.BLACKSTONE)
+                .unlockedBy("has_diorite", has(Items.DIORITE))
+                .save(out, id("pebble_mosaic"));
     }
 
     /** 神庙构件（T8a）：柱与基础圣火盆远古可做，神像与三角楣石要求希腊古典时代。 */

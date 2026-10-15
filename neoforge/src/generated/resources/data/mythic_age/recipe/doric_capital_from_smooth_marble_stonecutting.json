@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "mythic_age:smooth_marble"
+  },
+  "result": {
+    "count": 1,
+    "id": "mythic_age:doric_capital"
+  }
+}

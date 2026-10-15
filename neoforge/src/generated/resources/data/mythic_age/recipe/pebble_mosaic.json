@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": {
+      "item": "minecraft:blackstone"
+    },
+    "D": {
+      "item": "minecraft:diorite"
+    }
+  },
+  "pattern": [
+    "DB",
+    "BD"
+  ],
+  "result": {
+    "count": 4,
+    "id": "mythic_age:pebble_mosaic"
+  }
+}
