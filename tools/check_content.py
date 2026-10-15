@@ -385,7 +385,19 @@ def run(root: Path, design: Path | None) -> Report:
     check_lang(paths, report)
     check_textures(paths, report)
     check_recolor(paths, report)
+    check_rigs(root, report)
     return report
+
+
+def check_rigs(root: Path, report: Report) -> None:
+    """实体资源（T7）：骨骼、定位点、UV、动画与导出哈希，见 tools/blockbench/check_rig.py。"""
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "blockbench"))
+    import check_rig  # noqa: E402
+    if not (root / check_rig.RIGS[0]["params"]).exists():
+        report.note("没有实体参数文件，跳过实体资源校验")
+        return
+    for e in check_rig.run(root):
+        report.error(e)
 
 
 def main(argv=None) -> int:

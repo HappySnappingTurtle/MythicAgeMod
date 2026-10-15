@@ -11,12 +11,15 @@ import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.content.greek.agri.GreekAgricultureEvents;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
+import io.github.happysnappingturtle.mythicage.entity.EntityDevCommand;
+import io.github.happysnappingturtle.mythicage.entity.ModEntities;
 import io.github.happysnappingturtle.mythicage.player.ModAttachments;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.player.MythDataCommand;
 import io.github.happysnappingturtle.mythicage.player.MythNetwork;
 import io.github.happysnappingturtle.mythicage.recipe.ModRecipes;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
+import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
 import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
@@ -45,6 +48,7 @@ public final class MythicAge {
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
+        ModEntities.init(modBus);
         ModRegistries.register(modBus);
         modBus.addListener(ModDataGen::gather);
         ModAttachments.register(modBus);
@@ -68,5 +72,9 @@ public final class MythicAge {
         PlayerActivity.register(game);
         TestProducers.register();
         game.addListener(ModRecipes::onServerTickPre);
+
+        // 实体与美术管线（T7）
+        game.addListener(RigRegistry::onAddReloadListeners);
+        game.addListener(EntityDevCommand::onRegisterCommands);
     }
 }

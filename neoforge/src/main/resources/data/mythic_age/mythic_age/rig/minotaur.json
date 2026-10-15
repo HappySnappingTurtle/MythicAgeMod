@@ -1,0 +1,35 @@
+{
+  "model": "mythic_age:minotaur",
+  "collision": {
+    "width": 1.1,
+    "height": 2.5
+  },
+  "locators": {
+    "axe_grip_l": [
+      10,
+      12,
+      1.5
+    ],
+    "stone_grip_r": [
+      -10,
+      12,
+      1.5
+    ],
+    "snort": [
+      0,
+      34.2,
+      11.5
+    ],
+    "horn_contact_visual": [
+      0,
+      38.5,
+      7.5
+    ]
+  },
+  "variants": {
+    "boss": {
+      "scale": 1.4,
+      "texture": "mythic_age:textures/entity/minotaur/minotaur_boss.png"
+    }
+  }
+}

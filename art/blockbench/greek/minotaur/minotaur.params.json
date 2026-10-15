@@ -1,0 +1,2748 @@
+{
+ "id": "MD-GR-MIN-01",
+ "name": "弥诺陶洛斯共享形体",
+ "height_limit_u": 44,
+ "atlas": 512,
+ "texels_per_unit": 2,
+ "collision_proposal_blocks": [
+  1.1,
+  2.5,
+  1.1
+ ],
+ "boss_scale": 1.4,
+ "coordinate_system": "X anatomical left; Y up; Z forward; all centers/pivots in MODEL rest coordinates, not parent-local; 16 design units per block",
+ "bones": [
+  {
+   "id": "root",
+   "parent": null,
+   "pivot_model_units": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "pelvis",
+   "parent": "root",
+   "pivot_model_units": [
+    0,
+    18,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    18,
+    0
+   ]
+  },
+  {
+   "id": "torso",
+   "parent": "pelvis",
+   "pivot_model_units": [
+    0,
+    22,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    4,
+    0
+   ]
+  },
+  {
+   "id": "neck",
+   "parent": "torso",
+   "pivot_model_units": [
+    0,
+    29,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    7,
+    0
+   ]
+  },
+  {
+   "id": "head",
+   "parent": "neck",
+   "pivot_model_units": [
+    0,
+    32,
+    1
+   ],
+   "pivot_parent_local_units": [
+    0,
+    3,
+    1
+   ]
+  },
+  {
+   "id": "jaw",
+   "parent": "head",
+   "pivot_model_units": [
+    0,
+    32.5,
+    5.5
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0.5,
+    4.5
+   ]
+  },
+  {
+   "id": "tail_root",
+   "parent": "pelvis",
+   "pivot_model_units": [
+    0,
+    18,
+    -4
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0,
+    -4
+   ]
+  },
+  {
+   "id": "tail_tip",
+   "parent": "tail_root",
+   "pivot_model_units": [
+    0,
+    12,
+    -4.8
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -6,
+    -0.8
+   ]
+  },
+  {
+   "id": "loincloth",
+   "parent": "pelvis",
+   "pivot_model_units": [
+    0,
+    20,
+    4.5
+   ],
+   "pivot_parent_local_units": [
+    0,
+    2,
+    4.5
+   ]
+  },
+  {
+   "id": "upper_arm_r",
+   "parent": "torso",
+   "pivot_model_units": [
+    -10,
+    29,
+    0
+   ],
+   "pivot_parent_local_units": [
+    -10,
+    7,
+    0
+   ]
+  },
+  {
+   "id": "forearm_r",
+   "parent": "upper_arm_r",
+   "pivot_model_units": [
+    -10,
+    21,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -8,
+    0
+   ]
+  },
+  {
+   "id": "hand_r",
+   "parent": "forearm_r",
+   "pivot_model_units": [
+    -10,
+    14,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -7,
+    0
+   ]
+  },
+  {
+   "id": "thigh_r",
+   "parent": "pelvis",
+   "pivot_model_units": [
+    -4.5,
+    18,
+    0
+   ],
+   "pivot_parent_local_units": [
+    -4.5,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "shin_r",
+   "parent": "thigh_r",
+   "pivot_model_units": [
+    -4.5,
+    10,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -8,
+    0
+   ]
+  },
+  {
+   "id": "hoof_r",
+   "parent": "shin_r",
+   "pivot_model_units": [
+    -4.5,
+    3,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -7,
+    0
+   ]
+  },
+  {
+   "id": "upper_arm_l",
+   "parent": "torso",
+   "pivot_model_units": [
+    10,
+    29,
+    0
+   ],
+   "pivot_parent_local_units": [
+    10,
+    7,
+    0
+   ]
+  },
+  {
+   "id": "forearm_l",
+   "parent": "upper_arm_l",
+   "pivot_model_units": [
+    10,
+    21,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -8,
+    0
+   ]
+  },
+  {
+   "id": "hand_l",
+   "parent": "forearm_l",
+   "pivot_model_units": [
+    10,
+    14,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -7,
+    0
+   ]
+  },
+  {
+   "id": "thigh_l",
+   "parent": "pelvis",
+   "pivot_model_units": [
+    4.5,
+    18,
+    0
+   ],
+   "pivot_parent_local_units": [
+    4.5,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "shin_l",
+   "parent": "thigh_l",
+   "pivot_model_units": [
+    4.5,
+    10,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -8,
+    0
+   ]
+  },
+  {
+   "id": "hoof_l",
+   "parent": "shin_l",
+   "pivot_model_units": [
+    4.5,
+    3,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -7,
+    0
+   ]
+  }
+ ],
+ "parts": [
+  {
+   "id": "pelvis",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    19.5,
+    0
+   ],
+   "size_model_units": [
+    11.8,
+    5,
+    8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "pelvis",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "pelvis_side",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    19.5,
+    0
+   ],
+   "size_model_units": [
+    13,
+    5,
+    6.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "pelvis_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kilt",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    17,
+    0
+   ],
+   "size_model_units": [
+    13.6,
+    4,
+    8.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#5A3B26",
+   "uv_group": "kilt",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "belt",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    21,
+    0
+   ],
+   "size_model_units": [
+    14,
+    2,
+    9
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8C7A45",
+   "uv_group": "belt",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "belt_buckle",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    21,
+    4.8
+   ],
+   "size_model_units": [
+    3,
+    2.6,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "belt_buckle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "loincloth",
+   "bone": "loincloth",
+   "center_model_units": [
+    0,
+    15,
+    4.65
+   ],
+   "size_model_units": [
+    6,
+    10,
+    0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A95135",
+   "uv_group": "loincloth",
+   "uv_share": null,
+   "surface_kind": "single_plane",
+   "plane_normal_model_axes": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "loincloth_back",
+   "bone": "pelvis",
+   "center_model_units": [
+    0,
+    16,
+    -4.65
+   ],
+   "size_model_units": [
+    5,
+    8,
+    0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A95135",
+   "uv_group": "loincloth_back",
+   "uv_share": null,
+   "surface_kind": "single_plane",
+   "plane_normal_model_axes": [
+    0,
+    0,
+    -1
+   ]
+  },
+  {
+   "id": "abdomen",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    24,
+    0.3
+   ],
+   "size_model_units": [
+    11.4,
+    4,
+    8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "abdomen",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "abdomen_side",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    24,
+    0.3
+   ],
+   "size_model_units": [
+    13,
+    4,
+    6.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "abdomen_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "chest",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    28,
+    0.5
+   ],
+   "size_model_units": [
+    15.0,
+    6,
+    10
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "chest",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "chest_side",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    28,
+    0.5
+   ],
+   "size_model_units": [
+    17,
+    6,
+    8.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "chest_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "pecs",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27.75,
+    6
+   ],
+   "size_model_units": [
+    13,
+    3.5,
+    1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "pecs",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "trapezius",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    31.5,
+    -0.5
+   ],
+   "size_model_units": [
+    11,
+    2,
+    7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "trapezius",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "strap_front_a",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27.5,
+    6.75
+   ],
+   "size_model_units": [
+    1.6,
+    11,
+    0.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    38
+   ],
+   "color": "#8C7A45",
+   "uv_group": "strap",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "strap_front_b",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27.5,
+    6.75
+   ],
+   "size_model_units": [
+    1.6,
+    11,
+    0.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -38
+   ],
+   "color": "#8C7A45",
+   "uv_group": "strap",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "strap_back_a",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27.5,
+    -4.75
+   ],
+   "size_model_units": [
+    1.6,
+    11,
+    0.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    38
+   ],
+   "color": "#8C7A45",
+   "uv_group": "strap",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "strap_back_b",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27.5,
+    -4.75
+   ],
+   "size_model_units": [
+    1.6,
+    11,
+    0.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -38
+   ],
+   "color": "#8C7A45",
+   "uv_group": "strap",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "medallion_front",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27,
+    7.2
+   ],
+   "size_model_units": [
+    4,
+    4,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "medallion",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "medallion_back",
+   "bone": "torso",
+   "center_model_units": [
+    0,
+    27,
+    -5.1
+   ],
+   "size_model_units": [
+    4,
+    4,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "medallion",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "neck",
+   "bone": "neck",
+   "center_model_units": [
+    0,
+    31.25,
+    1
+   ],
+   "size_model_units": [
+    8,
+    4.5,
+    7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "neck",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_upper",
+   "bone": "neck",
+   "center_model_units": [
+    0,
+    36,
+    -2.9
+   ],
+   "size_model_units": [
+    10.4,
+    8.4,
+    2.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_upper",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_lower",
+   "bone": "neck",
+   "center_model_units": [
+    0,
+    29.6,
+    -4.9
+   ],
+   "size_model_units": [
+    8,
+    5.2,
+    1.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_lower",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_strand_c",
+   "bone": "neck",
+   "center_model_units": [
+    0,
+    25.8,
+    -5.0
+   ],
+   "size_model_units": [
+    2.6,
+    3.4,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_strand",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_strand_l",
+   "bone": "neck",
+   "center_model_units": [
+    2.6,
+    26.6,
+    -4.95
+   ],
+   "size_model_units": [
+    2.2,
+    2.4,
+    1.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_strand_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_strand_r",
+   "bone": "neck",
+   "center_model_units": [
+    -2.4,
+    26.2,
+    -4.95
+   ],
+   "size_model_units": [
+    2.2,
+    2.4,
+    1.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_strand_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cranium",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    36,
+    2
+   ],
+   "size_model_units": [
+    8.6,
+    8,
+    8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "cranium",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cranium_side",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    36,
+    2
+   ],
+   "size_model_units": [
+    10,
+    8,
+    6.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "cranium_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "brow",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    39,
+    6.5
+   ],
+   "size_model_units": [
+    10,
+    1.6,
+    1.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "brow",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "muzzle",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    33.75,
+    8
+   ],
+   "size_model_units": [
+    6.8,
+    3,
+    4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#CAB38C",
+   "uv_group": "muzzle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "muzzle_side",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    33.75,
+    8
+   ],
+   "size_model_units": [
+    8,
+    3,
+    2.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#CAB38C",
+   "uv_group": "muzzle_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "nose",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    33.9,
+    10.5
+   ],
+   "size_model_units": [
+    7,
+    2.6,
+    1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#CAB38C",
+   "uv_group": "nose",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "jaw",
+   "bone": "jaw",
+   "center_model_units": [
+    0,
+    31.75,
+    7.75
+   ],
+   "size_model_units": [
+    7,
+    1.5,
+    4.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#CAB38C",
+   "uv_group": "jaw",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mane_crown",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    40.5,
+    1.5
+   ],
+   "size_model_units": [
+    8,
+    1.5,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "mane_crown",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ruff_l",
+   "bone": "neck",
+   "center_model_units": [
+    4.6,
+    31.5,
+    0
+   ],
+   "size_model_units": [
+    1.8,
+    4.5,
+    5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "ruff",
+   "uv_share": "ruff",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ruff_r",
+   "bone": "neck",
+   "center_model_units": [
+    -4.6,
+    31.5,
+    0
+   ],
+   "size_model_units": [
+    1.8,
+    4.5,
+    5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "ruff",
+   "uv_share": "ruff",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "jowl_l",
+   "bone": "head",
+   "center_model_units": [
+    5.2,
+    33.6,
+    3.6
+   ],
+   "size_model_units": [
+    1.2,
+    3,
+    4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "jowl",
+   "uv_share": "jowl",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "jowl_r",
+   "bone": "head",
+   "center_model_units": [
+    -5.2,
+    33.6,
+    3.6
+   ],
+   "size_model_units": [
+    1.2,
+    3,
+    4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "jowl",
+   "uv_share": "jowl",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "forelock",
+   "bone": "head",
+   "center_model_units": [
+    0,
+    39.9,
+    5.6
+   ],
+   "size_model_units": [
+    4,
+    2,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "forelock",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ear_l",
+   "bone": "head",
+   "center_model_units": [
+    6.6,
+    36.3,
+    1.5
+   ],
+   "size_model_units": [
+    3.8,
+    2,
+    3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -22
+   ],
+   "color": "#865632",
+   "uv_group": "ear",
+   "uv_share": "ear",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ear_r",
+   "bone": "head",
+   "center_model_units": [
+    -6.6,
+    36.3,
+    1.5
+   ],
+   "size_model_units": [
+    3.8,
+    2,
+    3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    22
+   ],
+   "color": "#865632",
+   "uv_group": "ear",
+   "uv_share": "ear",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_base_l",
+   "bone": "head",
+   "center_model_units": [
+    6.38,
+    39.68,
+    1.5
+   ],
+   "size_model_units": [
+    3.2,
+    4,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -70
+   ],
+   "color": "#CAB38C",
+   "uv_group": "horn_base",
+   "uv_share": "horn_base",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_base_r",
+   "bone": "head",
+   "center_model_units": [
+    -6.38,
+    39.68,
+    1.5
+   ],
+   "size_model_units": [
+    3.2,
+    4,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    70
+   ],
+   "color": "#CAB38C",
+   "uv_group": "horn_base",
+   "uv_share": "horn_base",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_mid_l",
+   "bone": "head",
+   "center_model_units": [
+    8.96,
+    41.35,
+    1.5
+   ],
+   "size_model_units": [
+    2.6,
+    3,
+    2.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -40
+   ],
+   "color": "#CAB38C",
+   "uv_group": "horn_mid",
+   "uv_share": "horn_mid",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_mid_r",
+   "bone": "head",
+   "center_model_units": [
+    -8.96,
+    41.35,
+    1.5
+   ],
+   "size_model_units": [
+    2.6,
+    3,
+    2.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    40
+   ],
+   "color": "#CAB38C",
+   "uv_group": "horn_mid",
+   "uv_share": "horn_mid",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_tip_l",
+   "bone": "head",
+   "center_model_units": [
+    9.71,
+    43.1,
+    1.5
+   ],
+   "size_model_units": [
+    2,
+    1.6,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    5
+   ],
+   "color": "#3A2E26",
+   "uv_group": "horn_tip",
+   "uv_share": "horn_tip",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "horn_tip_r",
+   "bone": "head",
+   "center_model_units": [
+    -9.71,
+    43.1,
+    1.5
+   ],
+   "size_model_units": [
+    2,
+    1.6,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    -5
+   ],
+   "color": "#3A2E26",
+   "uv_group": "horn_tip",
+   "uv_share": "horn_tip",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "deltoid_l",
+   "bone": "upper_arm_l",
+   "center_model_units": [
+    10.4,
+    28.3,
+    0
+   ],
+   "size_model_units": [
+    5.199999999999999,
+    5,
+    7.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "deltoid",
+   "uv_share": "deltoid",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "deltoid_r",
+   "bone": "upper_arm_r",
+   "center_model_units": [
+    -10.4,
+    28.3,
+    0
+   ],
+   "size_model_units": [
+    5.199999999999999,
+    5,
+    7.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "deltoid",
+   "uv_share": "deltoid",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "deltoid_side_l",
+   "bone": "upper_arm_l",
+   "center_model_units": [
+    10.4,
+    28.3,
+    0
+   ],
+   "size_model_units": [
+    6.8,
+    5,
+    5.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "deltoid_side",
+   "uv_share": "deltoid_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "deltoid_side_r",
+   "bone": "upper_arm_r",
+   "center_model_units": [
+    -10.4,
+    28.3,
+    0
+   ],
+   "size_model_units": [
+    6.8,
+    5,
+    5.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "deltoid_side",
+   "uv_share": "deltoid_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "upper_arm_l",
+   "bone": "upper_arm_l",
+   "center_model_units": [
+    10.2,
+    24,
+    0
+   ],
+   "size_model_units": [
+    4.8,
+    7,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "upper_arm",
+   "uv_share": "upper_arm",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "upper_arm_r",
+   "bone": "upper_arm_r",
+   "center_model_units": [
+    -10.2,
+    24,
+    0
+   ],
+   "size_model_units": [
+    4.8,
+    7,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "upper_arm",
+   "uv_share": "upper_arm",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "upper_arm_side_l",
+   "bone": "upper_arm_l",
+   "center_model_units": [
+    10.2,
+    24,
+    0
+   ],
+   "size_model_units": [
+    6,
+    7,
+    4.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "upper_arm_side",
+   "uv_share": "upper_arm_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "upper_arm_side_r",
+   "bone": "upper_arm_r",
+   "center_model_units": [
+    -10.2,
+    24,
+    0
+   ],
+   "size_model_units": [
+    6,
+    7,
+    4.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "upper_arm_side",
+   "uv_share": "upper_arm_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "forearm_l",
+   "bone": "forearm_l",
+   "center_model_units": [
+    10.1,
+    17.5,
+    0.2
+   ],
+   "size_model_units": [
+    4.3999999999999995,
+    7,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "forearm",
+   "uv_share": "forearm",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "forearm_r",
+   "bone": "forearm_r",
+   "center_model_units": [
+    -10.1,
+    17.5,
+    0.2
+   ],
+   "size_model_units": [
+    4.3999999999999995,
+    7,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "forearm",
+   "uv_share": "forearm",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "forearm_side_l",
+   "bone": "forearm_l",
+   "center_model_units": [
+    10.1,
+    17.5,
+    0.2
+   ],
+   "size_model_units": [
+    5.6,
+    7,
+    4.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "forearm_side",
+   "uv_share": "forearm_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "forearm_side_r",
+   "bone": "forearm_r",
+   "center_model_units": [
+    -10.1,
+    17.5,
+    0.2
+   ],
+   "size_model_units": [
+    5.6,
+    7,
+    4.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "forearm_side",
+   "uv_share": "forearm_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "bracer_l",
+   "bone": "forearm_l",
+   "center_model_units": [
+    10.1,
+    16,
+    0.2
+   ],
+   "size_model_units": [
+    6.6,
+    3.5,
+    7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8C7A45",
+   "uv_group": "bracer",
+   "uv_share": "bracer",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "bracer_r",
+   "bone": "forearm_r",
+   "center_model_units": [
+    -10.1,
+    16,
+    0.2
+   ],
+   "size_model_units": [
+    6.6,
+    3.5,
+    7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8C7A45",
+   "uv_group": "bracer",
+   "uv_share": "bracer",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hand_l",
+   "bone": "hand_l",
+   "center_model_units": [
+    10.1,
+    12,
+    0.3
+   ],
+   "size_model_units": [
+    6,
+    4.6,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "hand_grip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hand_r",
+   "bone": "hand_r",
+   "center_model_units": [
+    -10.1,
+    12,
+    0.3
+   ],
+   "size_model_units": [
+    6,
+    4.6,
+    6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "hand_fist",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thumb_l",
+   "bone": "hand_l",
+   "center_model_units": [
+    7.6,
+    12.6,
+    2.2
+   ],
+   "size_model_units": [
+    1.4,
+    2.4,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thumb",
+   "uv_share": "thumb",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thumb_r",
+   "bone": "hand_r",
+   "center_model_units": [
+    -7.6,
+    12.6,
+    2.2
+   ],
+   "size_model_units": [
+    1.4,
+    2.4,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thumb",
+   "uv_share": "thumb",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thigh_l",
+   "bone": "thigh_l",
+   "center_model_units": [
+    4.7,
+    13.5,
+    0.3
+   ],
+   "size_model_units": [
+    5.4,
+    9,
+    7.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thigh",
+   "uv_share": "thigh",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thigh_r",
+   "bone": "thigh_r",
+   "center_model_units": [
+    -4.7,
+    13.5,
+    0.3
+   ],
+   "size_model_units": [
+    5.4,
+    9,
+    7.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thigh",
+   "uv_share": "thigh",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thigh_side_l",
+   "bone": "thigh_l",
+   "center_model_units": [
+    4.7,
+    13.5,
+    0.3
+   ],
+   "size_model_units": [
+    7,
+    9,
+    5.9
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thigh_side",
+   "uv_share": "thigh_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "thigh_side_r",
+   "bone": "thigh_r",
+   "center_model_units": [
+    -4.7,
+    13.5,
+    0.3
+   ],
+   "size_model_units": [
+    7,
+    9,
+    5.9
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "thigh_side",
+   "uv_share": "thigh_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shin_l",
+   "bone": "shin_l",
+   "center_model_units": [
+    4.6,
+    6.5,
+    0
+   ],
+   "size_model_units": [
+    3.8,
+    7,
+    5.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "shin",
+   "uv_share": "shin",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shin_r",
+   "bone": "shin_r",
+   "center_model_units": [
+    -4.6,
+    6.5,
+    0
+   ],
+   "size_model_units": [
+    3.8,
+    7,
+    5.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "shin",
+   "uv_share": "shin",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shin_side_l",
+   "bone": "shin_l",
+   "center_model_units": [
+    4.6,
+    6.5,
+    0
+   ],
+   "size_model_units": [
+    5,
+    7,
+    4.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "shin_side",
+   "uv_share": "shin_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shin_side_r",
+   "bone": "shin_r",
+   "center_model_units": [
+    -4.6,
+    6.5,
+    0
+   ],
+   "size_model_units": [
+    5,
+    7,
+    4.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "shin_side",
+   "uv_share": "shin_side",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "calf_l",
+   "bone": "shin_l",
+   "center_model_units": [
+    4.6,
+    7.6,
+    -3.1
+   ],
+   "size_model_units": [
+    4,
+    4,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "calf",
+   "uv_share": "calf",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "calf_r",
+   "bone": "shin_r",
+   "center_model_units": [
+    -4.6,
+    7.6,
+    -3.1
+   ],
+   "size_model_units": [
+    4,
+    4,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "calf",
+   "uv_share": "calf",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fetlock_l",
+   "bone": "shin_l",
+   "center_model_units": [
+    4.6,
+    3.7,
+    0.2
+   ],
+   "size_model_units": [
+    5.8,
+    1.6,
+    6.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "fetlock",
+   "uv_share": "fetlock",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fetlock_r",
+   "bone": "shin_r",
+   "center_model_units": [
+    -4.6,
+    3.7,
+    0.2
+   ],
+   "size_model_units": [
+    5.8,
+    1.6,
+    6.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "fetlock",
+   "uv_share": "fetlock",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hoof_outer_l",
+   "bone": "hoof_l",
+   "center_model_units": [
+    6.1,
+    1.5,
+    1.2
+   ],
+   "size_model_units": [
+    2.8,
+    3,
+    6.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "hoof_toe",
+   "uv_share": "hoof_toe",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hoof_outer_r",
+   "bone": "hoof_r",
+   "center_model_units": [
+    -6.1,
+    1.5,
+    1.2
+   ],
+   "size_model_units": [
+    2.8,
+    3,
+    6.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "hoof_toe",
+   "uv_share": "hoof_toe",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hoof_inner_l",
+   "bone": "hoof_l",
+   "center_model_units": [
+    3.1,
+    1.5,
+    1.2
+   ],
+   "size_model_units": [
+    2.8,
+    3,
+    6.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "hoof_toe",
+   "uv_share": "hoof_toe",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hoof_inner_r",
+   "bone": "hoof_r",
+   "center_model_units": [
+    -3.1,
+    1.5,
+    1.2
+   ],
+   "size_model_units": [
+    2.8,
+    3,
+    6.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "hoof_toe",
+   "uv_share": "hoof_toe",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "dewclaw_l",
+   "bone": "hoof_l",
+   "center_model_units": [
+    4.6,
+    2.5,
+    -2.6
+   ],
+   "size_model_units": [
+    3,
+    2,
+    1.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "dewclaw",
+   "uv_share": "dewclaw",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "dewclaw_r",
+   "bone": "hoof_r",
+   "center_model_units": [
+    -4.6,
+    2.5,
+    -2.6
+   ],
+   "size_model_units": [
+    3,
+    2,
+    1.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#42382E",
+   "uv_group": "dewclaw",
+   "uv_share": "dewclaw",
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "tail_base",
+   "bone": "tail_root",
+   "center_model_units": [
+    0,
+    15,
+    -4.8
+   ],
+   "size_model_units": [
+    1.6,
+    6,
+    1.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "tail_base",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "tail_mid",
+   "bone": "tail_tip",
+   "center_model_units": [
+    0,
+    10,
+    -4.8
+   ],
+   "size_model_units": [
+    1.3,
+    4,
+    1.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#865632",
+   "uv_group": "tail_mid",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "tail_tuft",
+   "bone": "tail_tip",
+   "center_model_units": [
+    0,
+    7,
+    -4.8
+   ],
+   "size_model_units": [
+    2.6,
+    4,
+    2.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#47362D",
+   "uv_group": "tail_tuft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  }
+ ],
+ "attachments": [
+  {
+   "id": "axe_grip_l",
+   "bone": "hand_l",
+   "position_model_units": [
+    10,
+    12,
+    1.5
+   ],
+   "position_bone_local_units": [
+    0,
+    -2,
+    1.5
+   ]
+  },
+  {
+   "id": "stone_grip_r",
+   "bone": "hand_r",
+   "position_model_units": [
+    -10,
+    12,
+    1.5
+   ],
+   "position_bone_local_units": [
+    0,
+    -2,
+    1.5
+   ]
+  },
+  {
+   "id": "snort",
+   "bone": "head",
+   "position_model_units": [
+    0,
+    34.2,
+    11.5
+   ],
+   "position_bone_local_units": [
+    0,
+    2.2,
+    10.5
+   ]
+  },
+  {
+   "id": "horn_contact_visual",
+   "bone": "head",
+   "position_model_units": [
+    0,
+    38.5,
+    7.5
+   ],
+   "position_bone_local_units": [
+    0,
+    6.5,
+    6.5
+   ]
+  }
+ ],
+ "paint_features": [
+  {
+   "id": "eye_l",
+   "on": "cranium.front",
+   "center_model_units": [
+    2.7,
+    37.25,
+    6.01
+   ],
+   "size_model_units": [
+    2,
+    1.5,
+    0
+   ],
+   "color": "#EEE6D3"
+  },
+  {
+   "id": "pupil_l",
+   "on": "cranium.front",
+   "center_model_units": [
+    2.5,
+    37.3,
+    6.02
+   ],
+   "size_model_units": [
+    0.8,
+    1,
+    0
+   ],
+   "color": "#2C221C"
+  },
+  {
+   "id": "eye_r",
+   "on": "cranium.front",
+   "center_model_units": [
+    -2.7,
+    37.25,
+    6.01
+   ],
+   "size_model_units": [
+    2,
+    1.5,
+    0
+   ],
+   "color": "#EEE6D3"
+  },
+  {
+   "id": "pupil_r",
+   "on": "cranium.front",
+   "center_model_units": [
+    -2.5,
+    37.3,
+    6.02
+   ],
+   "size_model_units": [
+    0.8,
+    1,
+    0
+   ],
+   "color": "#2C221C"
+  },
+  {
+   "id": "nostril_l",
+   "on": "nose.front",
+   "center_model_units": [
+    2,
+    34.0,
+    11.01
+   ],
+   "size_model_units": [
+    1.2,
+    1,
+    0
+   ],
+   "color": "#34251D"
+  },
+  {
+   "id": "nostril_r",
+   "on": "nose.front",
+   "center_model_units": [
+    -2,
+    34.0,
+    11.01
+   ],
+   "size_model_units": [
+    1.2,
+    1,
+    0
+   ],
+   "color": "#34251D"
+  },
+  {
+   "id": "mouth_seam",
+   "on": "jaw.front",
+   "center_model_units": [
+    0,
+    32.4,
+    10.01
+   ],
+   "size_model_units": [
+    6,
+    0.4,
+    0
+   ],
+   "color": "#4C3426"
+  }
+ ],
+ "source": "docs/重构/设计/逐项设计/希腊首批/MD-GR-MIN-01_部件骨骼UV.json（2026-10-13 设计冻结 v1.0），T7 起以本文件为准",
+ "extra_bones": [
+  {
+   "id": "axe",
+   "parent": "hand_l",
+   "pivot_model_units": [
+    10,
+    12,
+    1.5
+   ]
+  },
+  {
+   "id": "stone_r",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -10,
+    12,
+    1.5
+   ],
+   "hidden_by_default": true
+  }
+ ],
+ "extra_parts": [
+  {
+   "id": "axe_haft",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    4.5
+   ],
+   "size_model_units": [
+    1.5,
+    1.5,
+    34
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#5A3A22",
+   "uv_group": "axe_haft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_pommel",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    -12.5
+   ],
+   "size_model_units": [
+    2.2,
+    2.2,
+    2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "axe_metal",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_band_low",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    -6.5
+   ],
+   "size_model_units": [
+    2,
+    2,
+    1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "axe_band",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_band_mid",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    7.5
+   ],
+   "size_model_units": [
+    2,
+    2,
+    1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "axe_band",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_socket",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    17.0
+   ],
+   "size_model_units": [
+    2.6,
+    2.6,
+    7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "axe_metal",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_cap",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    12,
+    21.5
+   ],
+   "size_model_units": [
+    1.8,
+    1.8,
+    1.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A13B",
+   "uv_group": "axe_metal",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_blade_up",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    15.55,
+    17.0
+   ],
+   "size_model_units": [
+    0.8,
+    4.5,
+    8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#D8B24A",
+   "uv_group": "axe_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_blade_up_edge",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    18.2,
+    17.0
+   ],
+   "size_model_units": [
+    0.8,
+    1.2,
+    11
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#D8B24A",
+   "uv_group": "axe_blade_edge",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_blade_down",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    8.45,
+    17.0
+   ],
+   "size_model_units": [
+    0.8,
+    4.5,
+    8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#D8B24A",
+   "uv_group": "axe_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_blade_down_edge",
+   "bone": "axe",
+   "center_model_units": [
+    10,
+    5.8,
+    17.0
+   ],
+   "size_model_units": [
+    0.8,
+    1.2,
+    11
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#D8B24A",
+   "uv_group": "axe_blade_edge",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "stone",
+   "bone": "stone_r",
+   "center_model_units": [
+    -10,
+    12,
+    2.5
+   ],
+   "size_model_units": [
+    3.5,
+    3,
+    3.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8C8478",
+   "uv_group": "stone",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  }
+ ],
+ "revisions": [
+  "T7-R1（2026-10-14 白模）：鼻吻 y 31.5–35、下颌移到鼻吻下方（y 30–31.5），眼睛（y 35–36.5）不再被鼻吻遮挡；头部整体前移 1.5u。",
+  "T7-R2（2026-10-14 白模）：胸腔厚度 8→10u、中心前移 0.5u，侧视不再像薄板；胸章随之前移。 后鬃改为 9×9×3、中心 z −3，填住头后与颈后的缝。",
+  "T7-R3：UV 由构建脚本按部件尺寸自动排布（MA.packUvNets），原设计稿的 uv_nets 已移除。",
+  "T7-R4：斧握点到顶端 20u、到底端 14u（柄长 34u 不变）；双刃总宽 13.5u，沿斧柄长 8–10u。",
+  "T7-R5（2026-10-14 白模 v2，用户要求精修）：部件表改由 tools/blockbench/params/minotaur_parts.py 生成；增加眉骨、顶毛、三段牛角、三角肌、胸肌、斜方肌、X 形束带与前后铜章、宽护腕、拳与拇指、深色裹裙、带扣、后片、悬蹄、加长尾与毛簇、月牙形三层斧刃与金箍。骨骼与挂点名称不变；尾尖枢轴下移，头部枢轴上移 1u（头不再压在胸前），牛角按 44u 上限重算。v2.1（同日，用户「继续优化」）：手臂加粗，前臂、拳更大；大腿加粗，加小腿肚与蹄上毛；耳加厚下垂；颈两侧毛领、颊侧下颌肉；后鬃改为后脑一片 + 上背一片 + 三缕长短不一的发梢。v2.2（同日，用户要求「更多边、更自然、红眼」）：躯干、头、鼻吻、四肢主体改为倒角体块（一窄一宽交叉）；五官与细节画在贴图上，眼睛为红色并有自发光遮罩；图集 256→512（密度仍为 2 像素/单位）；眉骨与眼上移 1u、鼻吻压低 0.5u，平视时红眼不被鼻吻挡住；眼改为无眼框的怒视眼型（用户：原来像戴眼镜）；斧柄只沿左拳握孔方向（卡片 Z）穿过，姿势由手腕与前臂摆出（用户：原来像插进手里），左右手贴图分开。"
+ ],
+ "animations": {
+  "idle": {
+   "loop": "loop",
+   "length": 3.0
+  },
+  "walk": {
+   "loop": "loop",
+   "length": 1.0
+  },
+  "charge_windup": {
+   "loop": "hold_on_last_frame",
+   "length": 1.0
+  },
+  "charge_run": {
+   "loop": "loop",
+   "length": 0.5
+  },
+  "charge_recover": {
+   "loop": "once",
+   "length": 0.8
+  }
+ }
+}

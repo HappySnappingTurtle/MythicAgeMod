@@ -24,6 +24,8 @@ public final class ModRegistries {
             DeferredRegister.create(Registries.MENU, MythicAgeIds.MOD_ID);
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.Feature<?>> FEATURES =
             DeferredRegister.create(Registries.FEATURE, MythicAgeIds.MOD_ID);
+    public static final DeferredRegister<net.minecraft.world.entity.EntityType<?>> ENTITY_TYPES =
+            DeferredRegister.create(Registries.ENTITY_TYPE, MythicAgeIds.MOD_ID);
 
     private ModRegistries() {
     }
@@ -37,5 +39,6 @@ public final class ModRegistries {
         BLOCK_ENTITY_TYPES.register(modBus);
         MENU_TYPES.register(modBus);
         FEATURES.register(modBus);
+        ENTITY_TYPES.register(modBus);
     }
 }

@@ -41,6 +41,12 @@ public final class LangKeys {
         add("commands.mythic_age.runtime.settled", "已结算 %s 本台账", "Settled %s ledger(s)", "台帳 %s 件を精算しました");
         add("commands.mythic_age.runtime.status", "%s：活跃=%s，未操作 %s/%s tick，当前 tick=%s，台账 %s 本", "%s: active=%s, idle %s/%s ticks, now=%s, ledgers=%s", "%s：アクティブ=%s、無操作 %s/%s tick、現在 tick=%s、台帳 %s 件");
         add("itemGroup.mythic_age.greek", "神话时代·希腊", "Mythic Age: Greek", "ミシックエイジ・ギリシャ");
+        add("entity.mythic_age.minotaur", "弥诺陶洛斯", "Minotaur", "ミノタウロス");
+        add("commands.mythic_age.dev.no_entity", "没有可操作的实体（只支持本模组的动画实体）", "No supported entity selected", "対象となるエンティティがありません");
+        add("commands.mythic_age.dev.anim", "已将 %s 个实体的动画设为 %s", "Set animation of %s entit(ies) to %s", "%s 体のアニメーションを %s に設定しました");
+        add("commands.mythic_age.dev.charge", "%s 个实体开始冲锋（%s 格）", "%s entit(ies) charging (%s blocks)", "%s 体が突進を開始（%s ブロック）");
+        add("commands.mythic_age.dev.variant", "已将 %s 个实体的变体设为「%s」（缩放 %s）", "Set variant of %s entit(ies) to '%s' (scale %s)", "%s 体の変種を「%s」に設定しました（倍率 %s）");
+        add("commands.mythic_age.dev.unknown_state", "未知动画状态：%s", "Unknown animation state: %s", "不明なアニメーション状態：%s");
         add("mythic_age.recipe.age_locked", "%s 需要%s%s时代", "%s requires %s %s Age", "%sには%s・%s時代が必要です");
     }
 
