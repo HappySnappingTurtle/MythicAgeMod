@@ -1,0 +1,450 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "base": "mythic_age:block/marble_ashlar",
+    "robe": "mythic_age:block/greek_statue_robe",
+    "skin": "mythic_age:block/smooth_marble",
+    "face": "mythic_age:block/greek_statue_face",
+    "shield": "mythic_age:block/greek_statue_shield",
+    "bronze": "mythic_age:block/greek_statue_bronze"
+  },
+  "elements": [
+    {
+      "__comment": "上身（披肩褶皱）",
+      "from": [
+        4.5,
+        0,
+        5.5
+      ],
+      "to": [
+        11.5,
+        6,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#robe"
+        },
+        "south": {
+          "texture": "#robe"
+        },
+        "east": {
+          "texture": "#robe"
+        },
+        "west": {
+          "texture": "#robe"
+        },
+        "down": {
+          "texture": "#robe"
+        }
+      }
+    },
+    {
+      "__comment": "肩",
+      "from": [
+        4,
+        5,
+        5
+      ],
+      "to": [
+        12,
+        7,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "up": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "颈",
+      "from": [
+        7,
+        7,
+        6.5
+      ],
+      "to": [
+        9,
+        8,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "头",
+      "from": [
+        6,
+        8,
+        6
+      ],
+      "to": [
+        10,
+        12,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#face"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "up": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "头盔",
+      "from": [
+        5.5,
+        11,
+        5.5
+      ],
+      "to": [
+        10.5,
+        13,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "up": {
+          "texture": "#bronze"
+        },
+        "down": {
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "__comment": "盔冠",
+      "from": [
+        7.5,
+        13,
+        5
+      ],
+      "to": [
+        8.5,
+        15.5,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "up": {
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "__comment": "护颈",
+      "from": [
+        5.5,
+        10,
+        9.5
+      ],
+      "to": [
+        10.5,
+        12,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "__comment": "左臂",
+      "from": [
+        2.5,
+        0,
+        6.5
+      ],
+      "to": [
+        4.5,
+        6,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "圆盾（上半）",
+      "from": [
+        1.5,
+        0,
+        3
+      ],
+      "to": [
+        2.5,
+        4,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            12,
+            8,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            12,
+            8,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#shield",
+          "uv": [
+            3,
+            12,
+            13,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#shield",
+          "uv": [
+            3,
+            12,
+            13,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            2,
+            8,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            2,
+            8,
+            12
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "右臂（上举）",
+      "from": [
+        11.5,
+        3,
+        6.5
+      ],
+      "to": [
+        13.5,
+        9,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "up": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "右拳",
+      "from": [
+        12.5,
+        7,
+        7
+      ],
+      "to": [
+        14.5,
+        9,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "up": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "矛杆（上段）",
+      "from": [
+        13,
+        0,
+        7.5
+      ],
+      "to": [
+        14,
+        13,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "down": {
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "__comment": "矛头",
+      "from": [
+        12.75,
+        13,
+        7.25
+      ],
+      "to": [
+        14.25,
+        16,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "up": {
+          "texture": "#bronze"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

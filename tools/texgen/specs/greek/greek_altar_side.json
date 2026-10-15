@@ -1,0 +1,37 @@
+{
+  "template": "pixels",
+  "out": "block/greek_altar_side",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b",
+    "r": "#a9492a",
+    "R": "#c8643b",
+    "g": "#7d8a4a",
+    "G": "#9fae62"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhhhhhhh",
+      "mmmmmmmmmmmmmmmm",
+      "nnnnnnnnnnnnnnnn",
+      "jjjjjjjjjjjjjjjj",
+      "kkkkkkkkkkkkkkkk",
+      "mRRRRRRRRRRRRRRm",
+      "mRrrrRrrrRrrrRRm",
+      "mRrRrRrRrRrRrRRm",
+      "mRRRrRRRrRRRrRRm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmGmmmmmmmmGmmm",
+      "mmgmGmmhhmmGmgmm",
+      "mmmmmgGnnGgmmmmm",
+      "jmmmmmmmmmmmmmmj",
+      "kkkkkkkkkkkkkkkk",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

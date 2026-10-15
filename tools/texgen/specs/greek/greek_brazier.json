@@ -1,0 +1,37 @@
+{
+  "template": "pixels",
+  "out": "block/greek_brazier",
+  "size": 16,
+  "palette": {
+    "s": "#8f8f8f",
+    "S": "#a8a8a8",
+    "d": "#6b6b6b",
+    "D": "#555555",
+    "w": "#6b4a2b",
+    "W": "#8a6238",
+    "c": "#2a2522",
+    "C": "#3d3530",
+    "x": "#1a1715"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SSSSSSSSSSSSSSSS",
+      "SsSssSsssSssSsSs",
+      "sssdsssssdssssds",
+      "ssssssdssssssdss",
+      "dsssdssssssdssss",
+      "DDDDDDDDDDDDDDDD",
+      "sSssssSsssSssSss",
+      "dddddddddddddddd",
+      "WwcCccCcCcccCccC",
+      "WwCcCccCcccCcCcc",
+      "WwccCcCccCcccCcC",
+      "WwCcccCcCcCccCcc",
+      "WwcCcCccccCcCccC",
+      "WwccCccCcCccCcxc",
+      "WwCcxcCcccCcccCc",
+      "WwcCccCcxCcCcCcc"
+    ]
+  }
+}

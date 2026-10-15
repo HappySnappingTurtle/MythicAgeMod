@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/greek_altar_top",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b",
+    "A": "#4a403a",
+    "a": "#2f2925",
+    "e": "#d8641c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhhhhhhh",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmjjjjjjjjjjmmj",
+      "hmmjAAaAAAaAjmmj",
+      "hmmjAaAAeAAAjmmj",
+      "hmmjAAAaAAaAjmmj",
+      "hmmjAeAAAAAAjmmj",
+      "hmmjAAAAaAeAjmmj",
+      "hmmjaAAAAAAAjmmj",
+      "hmmjAAeAAaAAjmmj",
+      "hmmjAAAAAAAajmmj",
+      "hmmhhhhhhhhhhmmj",
+      "hmmmmmmmmmmmmmmj",
+      "hmmmmmmmmmmmmmmj",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

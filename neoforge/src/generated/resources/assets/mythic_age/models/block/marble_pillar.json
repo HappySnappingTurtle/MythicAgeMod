@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "mythic_age:block/marble_pillar_top",
+    "side": "mythic_age:block/marble_pillar"
+  }
+}

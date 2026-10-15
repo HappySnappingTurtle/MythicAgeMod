@@ -13,7 +13,8 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
     private static final WorldRulesConfig DEFAULTS =
             new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
                     new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)),
-                    new WorldRulesConfig.Growth(24000, 12000, new WorldRulesConfig.BoneMeal(0.5, false)));
+                    new WorldRulesConfig.Growth(24000, 12000, new WorldRulesConfig.BoneMeal(0.5, false)),
+                    WorldRulesConfig.Temples.DEFAULTS);
 
     private WorldRulesSchema() {
     }
@@ -42,7 +43,21 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 new WorldRulesConfig.GodPowers(
                         root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
                 readRecipes(root.object("recipes"), base.recipes()),
-                readGrowth(root.object("growth"), base.growth()));
+                readGrowth(root.object("growth"), base.growth()),
+                readTemples(root.object("temples"), base.temples()));
+    }
+
+    private static WorldRulesConfig.Temples readTemples(ObjectReader t, WorldRulesConfig.Temples base) {
+        ObjectReader limits = t.object("altarLimitByAge");
+        return new WorldRulesConfig.Temples(
+                limits.intIn("archaic", base.altarLimitArchaic(), 0, 16),
+                limits.intIn("classical", base.altarLimitClassical(), 0, 16),
+                limits.intIn("heroic", base.altarLimitHeroic(), 0, 16),
+                limits.intIn("mythic", base.altarLimitMythic(), 0, 16),
+                t.intIn("altarSpacing", base.altarSpacing(), 1, 64),
+                t.bool("protectAltar", base.protectAltar()),
+                t.intIn("scanCellsPerTick", base.scanCellsPerTick(), 256, 65536),
+                t.intIn("rescanIntervalTicks", base.rescanIntervalTicks(), 1200, 72000));
     }
 
     private static WorldRulesConfig.Growth readGrowth(ObjectReader growth, WorldRulesConfig.Growth base) {
@@ -85,6 +100,19 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         bone.addProperty("oliveLeaves", value.growth().boneMeal().oliveLeaves());
         growth.add("boneMeal", bone);
         root.add("growth", growth);
+        WorldRulesConfig.Temples t = value.temples();
+        JsonObject temples = new JsonObject();
+        JsonObject limits = new JsonObject();
+        limits.addProperty("archaic", t.altarLimitArchaic());
+        limits.addProperty("classical", t.altarLimitClassical());
+        limits.addProperty("heroic", t.altarLimitHeroic());
+        limits.addProperty("mythic", t.altarLimitMythic());
+        temples.add("altarLimitByAge", limits);
+        temples.addProperty("altarSpacing", t.altarSpacing());
+        temples.addProperty("protectAltar", t.protectAltar());
+        temples.addProperty("scanCellsPerTick", t.scanCellsPerTick());
+        temples.addProperty("rescanIntervalTicks", t.rescanIntervalTicks());
+        root.add("temples", temples);
         return root;
     }
 }

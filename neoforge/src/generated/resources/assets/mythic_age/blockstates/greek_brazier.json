@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "mythic_age:block/greek_brazier"
+    },
+    "lit=true": {
+      "model": "mythic_age:block/greek_brazier_lit"
+    }
+  }
+}

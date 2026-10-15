@@ -1,0 +1,25 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shaped",
+    "category": "building",
+    "key": {
+      "A": {
+        "item": "mythic_age:marble_ashlar"
+      },
+      "C": {
+        "item": "mythic_age:ceramic_component"
+      }
+    },
+    "pattern": [
+      "AAA",
+      " C "
+    ],
+    "result": {
+      "count": 2,
+      "id": "mythic_age:greek_pediment"
+    }
+  }
+}

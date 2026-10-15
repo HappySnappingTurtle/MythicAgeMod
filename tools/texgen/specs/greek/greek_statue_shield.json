@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/greek_statue_shield",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b",
+    "b": "#b08d3e",
+    "B": "#d2ad55",
+    "o": "#7a5f26"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "....oooooooo....",
+      "..ooBBBBBBBBoo..",
+      ".oBBbbbbbbbbBBo.",
+      ".oBbbbbbbbbbbBo.",
+      "oBbbbbmmmmbbbbBo",
+      "oBbbbmhmmhmbbbBo",
+      "oBbbmhjmmjhmbbBo",
+      "oBbbmmmnnmmmbbBo",
+      "oBbbmmjnnjmmbbBo",
+      "oBbbmjmjjmjmbbBo",
+      "oBbbbmmmmmmbbbBo",
+      "oBbbbbmmmmbbbbBo",
+      ".oBbbbbbbbbbbBo.",
+      ".oBBbbbbbbbbBBo.",
+      "..ooBBBBBBBBoo..",
+      "....oooooooo...."
+    ]
+  }
+}

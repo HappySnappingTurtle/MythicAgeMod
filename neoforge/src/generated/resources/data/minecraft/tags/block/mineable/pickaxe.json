@@ -19,6 +19,11 @@
     "mythic_age:blue_meander_marble",
     "mythic_age:red_meander_marble",
     "mythic_age:olive_press",
-    "mythic_age:greek_oil_lamp"
+    "mythic_age:greek_oil_lamp",
+    "mythic_age:greek_altar",
+    "mythic_age:greek_brazier",
+    "mythic_age:greek_statue",
+    "mythic_age:greek_pediment",
+    "mythic_age:marble_pillar"
   ]
 }

@@ -381,7 +381,8 @@ public final class ContentGameTests {
                                boolean automation) {
         WorldRulesConfig next = new WorldRulesConfig(base.beneficialConversions(), base.mobBlockDamage(),
                 base.blockEntityStall(), base.godPowers(),
-                new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(enabled, automation)), base.growth());
+                new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(enabled, automation)), base.growth(),
+                base.temples());
         var outcome = holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
         if (outcome.status() != ConfigHolder.Status.APPLIED) {
             throw new IllegalStateException("热更失败：" + outcome);

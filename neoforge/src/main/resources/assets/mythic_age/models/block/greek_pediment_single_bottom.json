@@ -1,0 +1,433 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "front": "mythic_age:block/greek_pediment",
+    "side": "mythic_age:block/smooth_marble",
+    "cornice": "mythic_age:block/greek_pediment_cornice"
+  },
+  "elements": [
+    {
+      "__comment": "三角填充",
+      "from": [
+        0,
+        0,
+        1
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        2,
+        1
+      ],
+      "to": [
+        14,
+        4,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        4,
+        1
+      ],
+      "to": [
+        12,
+        6,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        6,
+        1
+      ],
+      "to": [
+        10,
+        8,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "斜檐",
+      "from": [
+        -1.657,
+        3,
+        0
+      ],
+      "to": [
+        9.657,
+        5,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "south": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "east": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "west": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "up": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "down": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        }
+      },
+      "rotation": {
+        "angle": 45,
+        "axis": "z",
+        "origin": [
+          4,
+          4,
+          8
+        ]
+      }
+    },
+    {
+      "from": [
+        6.343,
+        3,
+        0
+      ],
+      "to": [
+        17.657,
+        5,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "south": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "east": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "west": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "up": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "down": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        }
+      },
+      "rotation": {
+        "angle": -45,
+        "axis": "z",
+        "origin": [
+          12,
+          4,
+          8
+        ]
+      }
+    },
+    {
+      "__comment": "顶端饰",
+      "from": [
+        7,
+        7,
+        0
+      ],
+      "to": [
+        9,
+        10,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        },
+        "south": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        },
+        "east": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        },
+        "west": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        },
+        "up": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        },
+        "down": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            0,
+            2,
+            3
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "底部齿饰横檐",
+      "from": [
+        0,
+        0,
+        -1
+      ],
+      "to": [
+        16,
+        2,
+        1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ]
+        },
+        "east": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "west": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "up": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "down": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}

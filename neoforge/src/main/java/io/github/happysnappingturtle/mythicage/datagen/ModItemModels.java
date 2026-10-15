@@ -32,6 +32,7 @@ public final class ModItemModels extends ItemModelProvider {
                         case BlockModelSpec.Button b -> e.id() + "_inventory";
                         case BlockModelSpec.Trapdoor t -> e.id() + "_bottom";
                         case BlockModelSpec.Leaves l -> e.id();
+                        case BlockModelSpec.StateModels sm -> e.id() + sm.itemSuffix();
                         default -> e.id();
                     };
                     withExistingParent(e.id(), modLoc("block/" + parent));

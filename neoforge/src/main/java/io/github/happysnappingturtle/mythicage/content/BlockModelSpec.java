@@ -113,6 +113,14 @@ public sealed interface BlockModelSpec {
     record Manual() implements BlockModelSpec {
     }
 
+    /**
+     * 按方块状态选手写模型：{@code block/<id><suffix(state)>}。horizontal 为 true 时按 facing 旋转
+     * （模型按朝北绘制）。方块物品继承 {@code block/<id><itemSuffix>}。
+     */
+    record StateModels(java.util.function.Function<net.minecraft.world.level.block.state.BlockState, String> suffix,
+                       boolean horizontal, String itemSuffix) implements BlockModelSpec {
+    }
+
     static BlockModelSpec cubeAll() {
         return new CubeAll();
     }

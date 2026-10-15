@@ -3,6 +3,7 @@ package io.github.happysnappingturtle.mythicage.datagen.greek;
 import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
@@ -60,6 +61,33 @@ public final class GreekRecipes {
         agriculture(out);
         woodShapes(out);
         foods(out);
+        temple(out);
+    }
+
+    /** 神庙构件（T8a）：柱与基础圣火盆远古可做，神像与三角楣石要求希腊古典时代。 */
+    private static void temple(RecipeOutput out) {
+        // 大理石 1 → 大理石柱 1（切石机）；解锁条件由 stonecut 使用 has(MARBLE)。
+        stonecut(out, MARBLE, GreekTemple.MARBLE_PILLAR, 1);
+
+        // 圆石台阶 3 + 煤或木炭 1 + 木棍 2 → 基础圣火盆 1。
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, GreekTemple.GREEK_BRAZIER)
+                .pattern("SCS").pattern(" S ").pattern("I I")
+                .define('S', Items.COBBLESTONE_SLAB).define('C', ItemTags.COALS).define('I', Items.STICK)
+                .unlockedBy("has_cobblestone_slab", has(Items.COBBLESTONE_SLAB))
+                .save(out, id("greek_brazier"));
+
+        // 大理石 5 + 平滑大理石 2 + 金锭 1 → 神像 1（无序，希腊古典时代）。
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, GreekTemple.GREEK_STATUE)
+                .requires(MARBLE, 5).requires(SMOOTH_MARBLE, 2).requires(Tags.Items.INGOTS_GOLD)
+                .unlockedBy("has_marble", has(MARBLE))
+                .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL), id("greek_statue"));
+
+        // 大理石方石 3 + 陶制构件 1 → 三角楣石 2（有序，希腊古典时代）。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekTemple.GREEK_PEDIMENT, 2)
+                .pattern("AAA").pattern(" C ")
+                .define('A', MARBLE_ASHLAR).define('C', CERAMIC_COMPONENT)
+                .unlockedBy("has_marble_ashlar", has(MARBLE_ASHLAR))
+                .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL), id("greek_pediment"));
     }
 
     /** 橄榄木族其余八种形态：图案、产量与配方组均沿用原版橡木。 */

@@ -9,6 +9,7 @@ import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.content.greek.agri.GreekAgricultureEvents;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
 import io.github.happysnappingturtle.mythicage.entity.EntityDevCommand;
@@ -20,6 +21,8 @@ import io.github.happysnappingturtle.mythicage.player.MythNetwork;
 import io.github.happysnappingturtle.mythicage.recipe.ModRecipes;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
+import io.github.happysnappingturtle.mythicage.temple.TempleRulesLoader;
+import io.github.happysnappingturtle.mythicage.temple.TempleService;
 import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
@@ -45,6 +48,7 @@ public final class MythicAge {
         GreekAgriculture.init();
         GreekWood.init();
         GreekFoods.init();
+        GreekTemple.init();
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
@@ -76,5 +80,13 @@ public final class MythicAge {
         // 实体与美术管线（T7）
         game.addListener(RigRegistry::onAddReloadListeners);
         game.addListener(EntityDevCommand::onRegisterCommands);
+
+        // 希腊神坛与神庙判定（T8a）
+        game.addListener(TempleRulesLoader::onAddReloadListeners);
+        game.addListener(TempleService::onServerStarted);
+        game.addListener(TempleService::onServerStopped);
+        game.addListener(TempleService::onServerTickPost);
+        game.addListener(TempleService::onNeighborNotify);
+        game.addListener(TempleService::onBreak);
     }
 }

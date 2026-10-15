@@ -1,0 +1,113 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "front": "mythic_age:block/greek_pediment",
+    "side": "mythic_age:block/smooth_marble",
+    "cornice": "mythic_age:block/greek_pediment_cornice"
+  },
+  "elements": [
+    {
+      "__comment": "山花面",
+      "from": [
+        0,
+        0,
+        1
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "底部齿饰横檐",
+      "from": [
+        0,
+        0,
+        -1
+      ],
+      "to": [
+        16,
+        2,
+        1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ]
+        },
+        "east": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "west": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "up": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        },
+        "down": {
+          "texture": "#cornice",
+          "uv": [
+            0,
+            4,
+            2,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}

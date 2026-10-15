@@ -8,6 +8,8 @@ public final class GameTestTemplates {
     public static final String EMPTY_3X3 = "empty_3x3";
     /** 11×11×11 的空气模板，用于需要较大空间的测试（如树木生长）。 */
     public static final String EMPTY_11X11 = "empty_11x11";
+    /** 17×16×20 的空气模板，容纳 15×15×18 的神庙扫描体（T8a 修订 01）。 */
+    public static final String EMPTY_17X16X20 = "empty_17x16x20";
 
     private GameTestTemplates() {
     }

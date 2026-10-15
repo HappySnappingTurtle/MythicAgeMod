@@ -78,4 +78,21 @@ class WorldRulesSchemaTest {
         assertEquals(0.5, r.value().growth().boneMeal().grapeChance(), "越界值回退为默认");
         assertEquals(1, r.issues().size());
     }
+
+    @Test
+    void tc_t8a_templesDefaultsAndOverrides() {
+        WorldRulesConfig.Temples t = S.defaults().temples();
+        assertEquals(1, t.altarLimit("archaic"));
+        assertEquals(2, t.altarLimit("classical"));
+        assertEquals(3, t.altarLimit("mythic"));
+        assertEquals(0, t.altarLimit("none"));
+        assertEquals(15, t.altarSpacing());
+        assertEquals(2048, t.scanCellsPerTick());
+        ConfigLoadResult<WorldRulesConfig> r = ConfigLoader.load(S,
+                "{\"temples\":{\"altarLimitByAge\":{\"archaic\":2},\"scanCellsPerTick\":10,\"protectAltar\":false}}", null);
+        assertEquals(2, r.value().temples().altarLimit("archaic"));
+        assertFalse(r.value().temples().protectAltar());
+        assertEquals(2048, r.value().temples().scanCellsPerTick(), "越界值回退为默认");
+        assertEquals(1, r.issues().size());
+    }
 }

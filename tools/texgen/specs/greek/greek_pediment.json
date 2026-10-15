@@ -1,0 +1,37 @@
+{
+  "template": "pixels",
+  "out": "block/greek_pediment",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b",
+    "u": "#3f6aa8",
+    "U": "#35598f",
+    "r": "#a9492a",
+    "R": "#c8643b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "uuuuuuuuuuuuuuuu",
+      "uuuuuuuhhuuuuuuu",
+      "uuuuuuhmmjuuuuuu",
+      "uuuuuuhmmjuuuuuu",
+      "uuuuuuunjuuuuuuu",
+      "uuuuuhhmmmjuuuuu",
+      "uuuuhmhmmnmjuuuu",
+      "uuuuhmumnmujuuuu",
+      "uuuuuuhmnmjuuuuu",
+      "uuuuuuhmnmjuuuuu",
+      "uuuuuhmmnmmjuuuu",
+      "uuuuuhmnmnmjuuuu",
+      "uuuuhmmnmnmmjuuu",
+      "uuuuhmnmmmnmjuuu",
+      "UUUUjjjjjjjjjUUU",
+      "UUUUUUUUUUUUUUUU"
+    ]
+  }
+}

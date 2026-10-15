@@ -613,7 +613,7 @@ public final class AgricultureGameTests {
             WorldRulesConfig next = new WorldRulesConfig(original.beneficialConversions(), original.mobBlockDamage(),
                     original.blockEntityStall(), original.godPowers(), original.recipes(),
                     new WorldRulesConfig.Growth(g.oliveFruitTicks(), g.grapeStageTicks(),
-                            new WorldRulesConfig.BoneMeal(g.boneMeal().grapeChance(), true)));
+                            new WorldRulesConfig.BoneMeal(g.boneMeal().grapeChance(), true)), original.temples());
             holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
             ItemStack meal = new ItemStack(Items.BONE_MEAL, 5);
             helper.assertTrue(BoneMealItem.applyBonemeal(meal, helper.getLevel(), helper.absolutePos(p), null),

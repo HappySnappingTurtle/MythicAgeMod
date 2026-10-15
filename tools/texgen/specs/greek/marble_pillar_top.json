@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/marble_pillar_top",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "jjjjjjjjjjjjjjjj",
+      "jjjjjhjhjhjjjjjj",
+      "jjjhnmmmmmmnhjjj",
+      "jjhmmmmmmmmmmhjj",
+      "jhmmmmnnnnmmmmhj",
+      "jnmmmnmmmmnmmmnj",
+      "jhmmnmmhhmmnmmhj",
+      "jnmmnmhmmhmnmmnj",
+      "jhmmnmhmmhmnmmhj",
+      "jnmmnmmhhmmnmmnj",
+      "jhmmmnmmmmnmmmhj",
+      "jjmmmmnnnnmmmmjj",
+      "jjhmmmmmmmmmmhjj",
+      "jjjhnmmmmmmnhjjj",
+      "jjjjjhjhjhjjjjjj",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

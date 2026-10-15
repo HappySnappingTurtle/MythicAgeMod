@@ -83,6 +83,16 @@ public final class ModBlockStates extends BlockStateProvider {
                         horizontalBlock(block, models().getExistingFile(modLoc("block/" + e.id())));
                 case BlockModelSpec.Manual m -> {
                 }
+                case BlockModelSpec.StateModels sm -> {
+                    java.util.function.Function<net.minecraft.world.level.block.state.BlockState, ModelFile> model =
+                            st -> models().getExistingFile(modLoc("block/" + e.id() + sm.suffix().apply(st)));
+                    if (sm.horizontal()) {
+                        horizontalBlock(block, model);
+                    } else {
+                        getVariantBuilder(block).forAllStates(st -> net.neoforged.neoforge.client.model.generators
+                                .ConfiguredModel.builder().modelFile(model.apply(st)).build());
+                    }
+                }
             }
         }
     }
