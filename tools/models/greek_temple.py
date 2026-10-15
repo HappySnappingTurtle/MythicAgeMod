@@ -449,32 +449,34 @@ DENTIL = {"north": [0, 4, 16, 9], "south": [0, 9, 16, 14], "east": [0, 4, 1, 9],
 
 
 def pediment(shape: str, bottom: bool) -> list:
-    """正面朝北。LEFT 端高在 x=0、RIGHT 端高在 x=16，斜边 45°；逐行收 1 格叠放时斜檐连成直线。"""
+    """缓坡 1:2（T8a 修订 02）。正面朝北；left 系列外侧在 x=16、坡向 x=0 升高，right 系列相反。
+    斜面用 2 像素一级的阶梯填充（方块模型只能转 22.5° 的倍数，做不出 1:2 的光滑斜面），
+    顶上一条 1.5 像素的斜檐线脚，正面突出 1 像素。"""
+    def height(xc: float) -> float:
+        return {
+            "left": (16 - xc) / 2, "left_high": 8 + (16 - xc) / 2,
+            "right": xc / 2, "right_high": 8 + xc / 2,
+            "single": 4 - abs(xc - 8) / 2, "middle": 16,
+        }[shape]
+
     faces = {"north": "front", "south": "side", "east": "side", "west": "side", "up": "side", "down": "side"}
     els = []
     if shape == "middle":
         els.append(box((0, 0, 1), (16, 16, 16), faces, comment="山花面"))
     else:
-        # 斜坡内的三角形填充：2 像素一级
-        for k in range(8 if shape != "single" else 4):
-            y0, y1 = k * 2, k * 2 + 2
-            if shape == "left":
-                x0, x1 = 0, 16 - y0
-            elif shape == "right":
-                x0, x1 = y0, 16
-            else:
-                x0, x1 = y0, 16 - y0
-            els.append(box((x0, y0, 1), (x1, y1, 16), faces, comment="三角填充" if k == 0 else None))
-        # 45° 斜檐（突出正面 1 像素）
-        half = 11.314
-        rakes = {"left": [(-45, 8, 8, half)], "right": [(45, 8, 8, half)],
-                 "single": [(45, 4, 4, half / 2), (-45, 12, 4, half / 2)]}[shape]
-        for n, (angle, cx, cy, h) in enumerate(rakes):
-            els.append({**box((cx - h, cy - 1, 0), (cx + h, cy + 1, 16), "cornice", uv=RAKE,
-                              comment="斜檐" if n == 0 else None),
-                        "rotation": {"angle": angle, "axis": "z", "origin": [cx, cy, 8]}})
+        for k in range(8):
+            x0, x1 = k * 2, k * 2 + 2
+            h = round(height(x0 + 1) * 2) / 2
+            if h <= 0:
+                continue
+            els.append(box((x0, 0, 1), (x1, h, 16), faces, comment="斜面填充" if k == 0 else None))
+            top = min(h + 1.5, 16)
+            if top > h:
+                els.append(box((x0, h, 0), (x1, top, 16), "cornice",
+                               uv={n: [x0, 0, x1, top - h] for n in ("north", "south", "east", "west", "up", "down")},
+                               comment="斜檐线脚" if k == 0 else None))
         if shape == "single":
-            els.append(box((7, 7, 0), (9, 10, 3), "cornice", comment="顶端饰",
+            els.append(box((7, 4, 0), (9, 7, 3), "cornice", comment="顶端饰",
                            uv={k: [0, 0, 2, 3] for k in ("north", "south", "east", "west", "up", "down")}))
     if bottom:
         els.append(box((0, 0, -1), (16, 2, 1), "cornice", uv={k: [0, 4, 16, 6] if k in ("north", "south") else
@@ -483,7 +485,7 @@ def pediment(shape: str, bottom: bool) -> list:
     return els
 
 
-for shape in ("single", "left", "middle", "right"):
+for shape in ("single", "left", "left_high", "middle", "right_high", "right"):
     for bottom in (False, True):
         model(f"greek_pediment_{shape}" + ("_bottom" if bottom else ""), PED_TEX, pediment(shape, bottom))
 

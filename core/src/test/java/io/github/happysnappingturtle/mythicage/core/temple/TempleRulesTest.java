@@ -49,10 +49,10 @@ class TempleRulesTest {
         assertEquals(4, r.tiers().size());
         assertEquals(49, r.roof().need(81));
         assertEquals(6, r.roof().need(4), "面积不足 3×3 时按 9 计算需要数");
-        assertEquals(4050, r.scan().volume());
+        assertEquals(7650, r.scan().volume());
         assertEquals(15, r.scan().sizeX());
         assertEquals(15, r.scan().sizeY());
-        assertEquals(18, r.scan().sizeZ());
+        assertEquals(34, r.scan().sizeZ());
         assertEquals(new TempleRules.Requirement(4, true, true, false, 1, 0, 0, 0), r.tier(1).require());
         assertTrue(r.tier(2).require().crepidoma());
         assertEquals(Age.CLASSICAL, r.tier(2).age());
@@ -73,7 +73,7 @@ class TempleRulesTest {
         assertPath(base.formatted(t0 + ",{\"level\":1,\"name\":\"b\",\"age\":\"archaic\",\"prayerSlots\":4,\"coefficient\":1.5}"),
                 "tiers[1].require");
         assertPath(base.formatted(t0).replace("\"minPercent\":60", "\"minPercent\":101"), "roof.minPercent");
-        assertPath(base.formatted(t0).replace("\"front\":16", "\"front\":30"), "scan");
+        assertPath(base.formatted(t0).replace("\"front\":16", "\"front\":32").replace("\"halfWidth\":7", "\"halfWidth\":9"), "scan");
         assertPath(base.formatted(""), "tiers");
         assertPath("{oops", "(根)");
     }

@@ -1,0 +1,64 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "flute": "mythic_age:block/marble_column",
+    "end": "mythic_age:block/marble_pillar_top",
+    "smooth": "mythic_age:block/smooth_marble",
+    "molding": "mythic_age:block/marble_molding"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        4
+      ],
+      "to": [
+        14,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        2
+      ],
+      "to": [
+        12,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        }
+      }
+    }
+  ]
+}

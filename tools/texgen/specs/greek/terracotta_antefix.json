@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/terracotta_antefix",
+  "size": 16,
+  "palette": {
+    "R": "#e0875a",
+    "r": "#b5532e",
+    "s": "#7f3519",
+    "b": "#2b1a12"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "...r.r....r.r...",
+      "..rbrbr..rbrbr..",
+      ".rbrbrbrrbrbrbr.",
+      ".rbbbbbrrbbbbbr.",
+      ".rrbbbrrrrbbbrr.",
+      "..rrbrr..rrbrr..",
+      "..rRRRr..rRRRr..",
+      "..rrrrr..rrrrr..",
+      "..sssss..sssss.."
+    ]
+  }
+}

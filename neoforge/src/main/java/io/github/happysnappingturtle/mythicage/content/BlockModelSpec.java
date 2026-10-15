@@ -27,6 +27,10 @@ public sealed interface BlockModelSpec {
     record Stairs(Supplier<? extends Block> base) implements BlockModelSpec {
     }
 
+    /** 楼梯形状、自有贴图（檐口、赤陶瓦坡面）：侧面、底面、顶面各一张。 */
+    record StairsTextured(ResourceLocation side, ResourceLocation bottom, ResourceLocation top) implements BlockModelSpec {
+    }
+
     /** 墙，贴图取自 base 方块。 */
     record Wall(Supplier<? extends Block> base) implements BlockModelSpec {
     }

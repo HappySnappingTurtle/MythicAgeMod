@@ -235,4 +235,42 @@ class TempleGeometryTest {
             assertEquals(List.of(a.get(i)[0], a.get(i)[1], a.get(i)[2]), List.of(b.get(i)[0], b.get(i)[1], b.get(i)[2]));
         }
     }
+
+    /** 修订 02：2 格高台基 = 整格一级 + 外圈半格踏步，逐级可走（每步脚底高差 ≤ 1）。 */
+    @Test
+    void halfStepRingMakesPlatformReachable() {
+        Grid3 top2 = geo.newGrid();
+        Grid3 pass2 = geo.newGrid();
+        Grid3 half2 = geo.newGrid();
+        // 地面脚底 2 → 外圈半砖 2.5 → 内圈整格 + 半砖 3.5 → 柱座两整格 4
+        for (int z = 0; z < 18; z++) {
+            for (int x = 0; x < 15; x++) {
+                boolean platform = x >= 4 && x <= 10 && z >= 6 && z <= 12;
+                boolean inner = !platform && x >= 3 && x <= 11 && z >= 5 && z <= 13;
+                boolean outer = !platform && !inner && x >= 2 && x <= 12 && z >= 4 && z <= 14;
+                top2.set(x, 1, z, true);
+                int air = 2;
+                if (platform) {
+                    top2.set(x, 2, z, true);
+                    top2.set(x, 3, z, true);
+                    air = 4;
+                } else if (inner) {
+                    top2.set(x, 2, z, true);
+                    half2.set(x, 3, z, true);
+                    air = 4;
+                } else if (outer) {
+                    half2.set(x, 2, z, true);
+                    air = 3;
+                }
+                for (int y = air; y < 15; y++) {
+                    pass2.set(x, y, z, true);
+                }
+            }
+        }
+        var box2 = TempleGeometry.columnBox(corners(4));
+        assertFalse(geo.platformReachable(geo.reachable(geo.standable(top2, pass2)), box2),
+                "不认半格踏步时走不上去");
+        assertTrue(geo.platformReachable(geo.reachable(geo.standable(top2, pass2, half2), half2), box2),
+                "整格 + 半格踏步逐级上去");
+    }
 }

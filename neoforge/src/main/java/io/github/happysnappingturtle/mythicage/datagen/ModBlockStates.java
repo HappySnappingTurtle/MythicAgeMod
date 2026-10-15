@@ -45,6 +45,7 @@ public final class ModBlockStates extends BlockStateProvider {
                 case BlockModelSpec.Slab s -> slab(e, (SlabBlock) block, s);
                 case BlockModelSpec.Column c -> simpleBlock(block, models().cubeColumn(e.id(), texture(e), c.end()));
                 case BlockModelSpec.Stairs s -> stairsBlock((StairBlock) block, textureOf(s.base().get()));
+                case BlockModelSpec.StairsTextured s -> stairsBlock((StairBlock) block, s.side(), s.bottom(), s.top());
                 case BlockModelSpec.Wall w -> {
                     wallBlock((WallBlock) block, textureOf(w.base().get()));
                     models().wallInventory(e.id() + "_inventory", textureOf(w.base().get()));

@@ -1,0 +1,171 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "flute": "mythic_age:block/marble_column",
+    "end": "mythic_age:block/marble_pillar_top",
+    "smooth": "mythic_age:block/smooth_marble",
+    "molding": "mythic_age:block/marble_molding"
+  },
+  "elements": [
+    {
+      "__comment": "主体",
+      "from": [
+        0,
+        0,
+        3
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "south": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "下带",
+      "from": [
+        0,
+        0,
+        2
+      ],
+      "to": [
+        16,
+        5,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "中带",
+      "from": [
+        0,
+        5,
+        1
+      ],
+      "to": [
+        16,
+        10,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "上带",
+      "from": [
+        0,
+        10,
+        0.5
+      ],
+      "to": [
+        16,
+        14,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "束带",
+      "from": [
+        0,
+        14,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        },
+        "east": {
+          "texture": "#molding",
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ]
+        },
+        "west": {
+          "texture": "#molding",
+          "uv": [
+            0,
+            0,
+            3,
+            2
+          ]
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    }
+  ]
+}

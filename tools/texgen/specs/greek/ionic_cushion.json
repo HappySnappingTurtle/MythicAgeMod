@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/ionic_cushion",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhhhhhhh",
+      "nmhhmnnjjnnmhhmn",
+      "nmhhmnnjjnnmhhmn",
+      "jmhhmjnjjnjmhhmj",
+      "jnmmnjnjjnjnmmnj",
+      "jjjjjjjjjjjjjjjj",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm"
+    ]
+  }
+}

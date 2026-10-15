@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mythic_age:block/terracotta_roof_slab"
+    },
+    "type=double": {
+      "model": "mythic_age:block/terracotta_roof_slab_double"
+    },
+    "type=top": {
+      "model": "mythic_age:block/terracotta_roof_slab_top"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "mythic_age:block/ionic_capital_x"
+    },
+    "axis=z": {
+      "model": "mythic_age:block/ionic_capital_z"
+    }
+  }
+}

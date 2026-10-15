@@ -33,6 +33,8 @@ final class TempleScan {
     private final Grid3 full;
     private final Grid3 sturdyTop;
     private final Grid3 passable;
+    /** 半格踏步：下半台阶、下半楼梯（修订 02）。 */
+    private final Grid3 halfStep;
     private int litBraziers;
     private int statues;
     private int pediments;
@@ -52,6 +54,7 @@ final class TempleScan {
         this.full = geo.newGrid();
         this.sturdyTop = geo.newGrid();
         this.passable = geo.newGrid();
+        this.halfStep = geo.newGrid();
     }
 
     int volume() {
@@ -100,6 +103,7 @@ final class TempleScan {
         full.clear();
         sturdyTop.clear();
         passable.clear();
+        halfStep.clear();
         litBraziers = 0;
         statues = 0;
         pediments = 0;
@@ -145,6 +149,9 @@ final class TempleScan {
         sturdyTop.setIndex(i, top);
         full.setIndex(i, s.isCollisionShapeFullBlock(level, p));
         passable.setIndex(i, s.getCollisionShape(level, p).isEmpty() && s.getFluidState().isEmpty());
+        if (isHalfStep(s)) {
+            halfStep.setIndex(i, true);
+        }
         if (s.is(GreekTemple.BRAZIERS)) {
             boolean lit = !s.hasProperty(BlockStateProperties.LIT) || s.getValue(BlockStateProperties.LIT);
             if (lit) {
@@ -160,6 +167,14 @@ final class TempleScan {
         if (s.is(GreekTemple.TEMPLE_PEDIMENTS)) {
             pediments++;
         }
+    }
+
+    private static boolean isHalfStep(BlockState s) {
+        if (s.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+            return s.getValue(BlockStateProperties.SLAB_TYPE) == net.minecraft.world.level.block.state.properties.SlabType.BOTTOM;
+        }
+        return s.getBlock() instanceof net.minecraft.world.level.block.StairBlock
+                && s.getValue(BlockStateProperties.HALF) == net.minecraft.world.level.block.state.properties.Half.BOTTOM;
     }
 
     boolean unloaded() {
@@ -185,8 +200,8 @@ final class TempleScan {
         ColumnCounter.Result columns = ColumnCounter.count(column, rules.columnMinHeight());
         TempleGeometry.ColumnBox box = TempleGeometry.columnBox(columns);
         TempleGeometry.Roof roof = geo.roof(cover, column, box, rules.roof());
-        Grid3 reachable = geo.reachable(geo.standable(sturdyTop, passable));
-        int marble = geo.reachableFloor(floor, reachable);
+        Grid3 reachable = geo.reachable(geo.standable(sturdyTop, passable, halfStep), halfStep);
+        int marble = geo.reachableFloor(floor, reachable, halfStep);
         TempleSurvey survey = new TempleSurvey(columns.count(), geo.raisedColumns(columns), roof.covered(), roof.area(),
                 geo.openAltar(cover), geo.platformReachable(reachable, box), litBraziers, statues, pediments, marble);
         List<int[]> slots = geo.prayerSlots(reachable, prayerSlotLimitMax);

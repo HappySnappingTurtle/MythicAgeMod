@@ -37,6 +37,8 @@ TAG_ALIASES = {
     "#c:gems/amethyst": "minecraft:amethyst_shard",
     "#c:dusts/glowstone": "minecraft:glowstone_dust",
     "#c:dyes/red": "minecraft:red_dye",
+    "#c:dyes/black": "minecraft:black_dye",
+    "#c:nuggets/gold": "minecraft:gold_nugget",
     "#c:cobblestones": "minecraft:cobblestone",
     "#c:foods/cooked_fish": "design:cooked_fish",
 }
@@ -52,6 +54,7 @@ TYPE_MAP = {
 # 设计中的 unlock 值 → (文明, 时代)；archaic 表示「远古即可，不加限制」
 UNLOCKS = {
     "greek_classical": ("greek", "classical"),
+    "greek_heroic": ("greek", "heroic"),
     "norse_classical": ("norse", "classical"),
     "archaic": None,
 }

@@ -1,0 +1,279 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "flute": "mythic_age:block/marble_column",
+    "end": "mythic_age:block/marble_pillar_top",
+    "smooth": "mythic_age:block/smooth_marble",
+    "molding": "mythic_age:block/marble_molding"
+  },
+  "elements": [
+    {
+      "__comment": "方底板",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "下圆环",
+      "from": [
+        1,
+        3,
+        3.5
+      ],
+      "to": [
+        15,
+        6,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        3,
+        1
+      ],
+      "to": [
+        12.5,
+        6,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        2.5,
+        6,
+        4.5
+      ],
+      "to": [
+        13.5,
+        7,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        6,
+        2.5
+      ],
+      "to": [
+        11.5,
+        7,
+        13.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "上圆环",
+      "from": [
+        1.5,
+        7,
+        4.0
+      ],
+      "to": [
+        14.5,
+        9,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        7,
+        1.5
+      ],
+      "to": [
+        12.0,
+        9,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        9,
+        4
+      ],
+      "to": [
+        14,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        9,
+        2
+      ],
+      "to": [
+        12,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        }
+      }
+    }
+  ]
+}

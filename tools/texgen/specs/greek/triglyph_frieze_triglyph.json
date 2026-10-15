@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/triglyph_frieze_triglyph",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "d": "#8f8676"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhhhhhhhhhhhhh",
+      "jjjjjjjjjjjjjjjj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jhmnddhmmnddhmnj",
+      "jjjjjjjjjjjjjjjj",
+      "hhhhhhhhhhhhhhhh",
+      "nnnnnnnnnnnnnnnn",
+      "mhjmhjmhjmhjmhjm",
+      "mmmmmmmmmmmmmmmm"
+    ]
+  }
+}

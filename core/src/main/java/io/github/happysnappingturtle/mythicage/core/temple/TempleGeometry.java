@@ -165,11 +165,17 @@ public final class TempleGeometry {
 
     /** 能走到的大理石地面：floor 中上方一格是可达站立格的格子（台基顶面算，屋顶不算）。 */
     public int reachableFloor(Grid3 floor, Grid3 reachable) {
+        return reachableFloor(floor, reachable, newGrid());
+    }
+
+    /** 同上；修订 02：可走的大理石半格踏步（站位在自身格）也算地面。 */
+    public int reachableFloor(Grid3 floor, Grid3 reachable, Grid3 halfStep) {
         int n = 0;
         for (int y = 0; y < scan.sizeY() - 1; y++) {
             for (int z = 0; z < scan.sizeZ(); z++) {
                 for (int x = 0; x < scan.sizeX(); x++) {
-                    if (floor.get(x, y, z) && reachable.get(x, y + 1, z)) {
+                    boolean walked = reachable.get(x, y + 1, z) || halfStep.get(x, y, z) && reachable.get(x, y, z);
+                    if (floor.get(x, y, z) && walked) {
                         n++;
                     }
                 }
@@ -185,17 +191,32 @@ public final class TempleGeometry {
      * 最底层没有「脚下」、最顶层没有「头顶」，都不可站立。
      */
     public Grid3 standable(Grid3 sturdyTop, Grid3 passable) {
+        return standable(sturdyTop, passable, newGrid());
+    }
+
+    /**
+     * 可站立格（修订 02）：除整格站位外，halfStep 格（下半台阶、下半楼梯）本身也是站位，
+     * 脚底高度为该格 + 0.5，要求上方两格可通过。
+     */
+    public Grid3 standable(Grid3 sturdyTop, Grid3 passable, Grid3 halfStep) {
         Grid3 out = newGrid();
-        for (int y = 1; y < scan.sizeY() - 1; y++) {
+        for (int y = 0; y < scan.sizeY() - 1; y++) {
             for (int z = 0; z < scan.sizeZ(); z++) {
                 for (int x = 0; x < scan.sizeX(); x++) {
-                    if (sturdyTop.get(x, y - 1, z) && passable.get(x, y, z) && passable.get(x, y + 1, z)) {
+                    boolean full = y >= 1 && sturdyTop.get(x, y - 1, z) && passable.get(x, y, z) && passable.get(x, y + 1, z);
+                    boolean half = halfStep.get(x, y, z) && passable.get(x, y + 1, z)
+                            && (y + 2 >= scan.sizeY() || passable.get(x, y + 2, z));
+                    if (full || half) {
                         out.set(x, y, z, true);
                     }
                 }
             }
         }
         return out;
+    }
+
+    private static double foot(Grid3 halfStep, int x, int y, int z) {
+        return halfStep.get(x, y, z) ? y + 0.5 : y;
     }
 
     private int dist(int x, int z) {
@@ -207,9 +228,15 @@ public final class TempleGeometry {
     }
 
     /**
-     * 从扫描体水平边缘上的可站立格出发，在可站立格上做 BFS：四个水平方向，高差不超过 1。返回可达格。
+     * 从扫描体水平边缘上的可站立格出发，在可站立格上做 BFS：四个水平方向，相邻两格脚底高差 ≤ 1（修订 02：
+     * 半格踏步的脚底比格子高 0.5）。返回可达格。
      */
     public Grid3 reachable(Grid3 standable) {
+        return reachable(standable, newGrid());
+    }
+
+    /** 同 {@link #reachable(Grid3)}，halfStep 中的格子脚底高 0.5。 */
+    public Grid3 reachable(Grid3 standable, Grid3 halfStep) {
         Grid3 seen = newGrid();
         ArrayDeque<int[]> queue = new ArrayDeque<>();
         for (int y = 0; y < scan.sizeY(); y++) {
@@ -225,12 +252,13 @@ public final class TempleGeometry {
         int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         while (!queue.isEmpty()) {
             int[] c = queue.poll();
+            double f = foot(halfStep, c[0], c[1], c[2]);
             for (int[] d : dirs) {
                 for (int dy = -1; dy <= 1; dy++) {
                     int nx = c[0] + d[0];
                     int ny = c[1] + dy;
                     int nz = c[2] + d[1];
-                    if (standable.get(nx, ny, nz) && !seen.get(nx, ny, nz)) {
+                    if (standable.get(nx, ny, nz) && !seen.get(nx, ny, nz) && Math.abs(foot(halfStep, nx, ny, nz) - f) <= 1.0) {
                         seen.set(nx, ny, nz, true);
                         queue.add(new int[]{nx, ny, nz});
                     }

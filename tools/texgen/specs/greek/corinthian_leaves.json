@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/corinthian_leaves",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "k": "#a99f8b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "jjjjjjjjjjjkjjjj",
+      "jjkjjjjjkjjjjjkj",
+      "jkjjjjkjjjjjjjkj",
+      "jjkhhjkkjjkhhjjj",
+      "jjhjkhkjjjhjkhjj",
+      "jjhjhjjjjjhjhjjj",
+      "nnjhnnjhnnjhnnjh",
+      "nnjhnnkhnnkhnnkh",
+      "nmhmnmhmnmhmnmnm",
+      "nmhmnmhmnmhmnmnm",
+      "nmhmnmhmnmhmnmnm",
+      "jhnnjhnnjhnnkhnn",
+      "jhnnjhnnjhnnkhnn",
+      "nmnmhmnmhmnmhmnm",
+      "nmnmhmnmhmnmhmnm",
+      "nmnmhmnmhmnmhmnm"
+    ]
+  }
+}

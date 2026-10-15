@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "quadrant=0": {
+      "model": "mythic_age:block/pebble_mosaic_q0"
+    },
+    "quadrant=1": {
+      "model": "mythic_age:block/pebble_mosaic_q1"
+    },
+    "quadrant=2": {
+      "model": "mythic_age:block/pebble_mosaic_q2"
+    },
+    "quadrant=3": {
+      "model": "mythic_age:block/pebble_mosaic_q3"
+    }
+  }
+}

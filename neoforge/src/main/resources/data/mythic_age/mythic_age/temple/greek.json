@@ -1,5 +1,5 @@
 {
-  "scan": {"halfWidth": 7, "back": 1, "front": 16, "below": 2, "above": 12},
+  "scan": {"halfWidth": 7, "back": 1, "front": 32, "below": 2, "above": 12},
   "roof": {"minPercent": 60, "minSide": 3},
   "columnMinHeight": 3,
   "tiers": [

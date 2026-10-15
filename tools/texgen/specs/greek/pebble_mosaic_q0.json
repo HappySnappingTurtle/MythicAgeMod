@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/pebble_mosaic_q0",
+  "size": 16,
+  "palette": {
+    "K": "#2b2826",
+    "k": "#3a3633",
+    "W": "#e8e4da",
+    "w": "#d4cec2",
+    "g": "#9a948a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "KWKkkkKkKgkKkKKk",
+      "wWwWwWwgwWgwWWWw",
+      "KwKKKkKKKKKKKkkg",
+      "kWkwWWWkwwWWWWWK",
+      "KWkwkWWKWKKkKKWk",
+      "KwkWwgwkWkwWwKWK",
+      "kWKWKKWkwkWkkKWW",
+      "kwkWWWWkKKgKWgwk",
+      "KWKKKkggKkwWkgKK",
+      "KWKWWwWKKwKgKkKw",
+      "KWKwKKKkWKKwKKkW",
+      "kwgwKWkgWKwWWKkW",
+      "KwkWKWgwKKkWgWkg",
+      "KWKWgWWWKkKKwwKK",
+      "KwKwKKkWkKKKKkWK",
+      "KWKWWWWkKWWWWKgw"
+    ]
+  }
+}

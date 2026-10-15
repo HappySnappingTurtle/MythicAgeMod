@@ -5,6 +5,7 @@ import io.github.happysnappingturtle.mythicage.config.ConfigCommand;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.content.ModCreativeTabs;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekArchitecture;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
@@ -49,6 +50,7 @@ public final class MythicAge {
         GreekWood.init();
         GreekFoods.init();
         GreekTemple.init();
+        GreekArchitecture.init();
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();

@@ -16,12 +16,15 @@ import java.util.Optional;
  * 要认定 k 级，必须满足第 1…k 级的全部要求（逐级累加）；认定等级再受主人时代封顶。
  */
 public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> tiers) {
+    /** 单次扫描红线（修订 02 §5）：扫描分刻进行，8192 格在默认每刻 2048 格下 4 刻完成。 */
+    public static final int MAX_SCAN_VOLUME = 8192;
+
     public TempleRules {
         tiers = List.copyOf(tiers);
     }
 
     /**
-     * 扫描体（修订 01 §2.1）：以神坛为参照，局部 +z 为神坛朝向（指向神庙）。
+     * 扫描体（修订 01 §2.1，修订 02 §5 加长到前方 32）：以神坛为参照，局部 +z 为神坛朝向（指向神庙）。
      * x ∈ [−halfWidth, halfWidth]，y ∈ [−below, above]，z ∈ [−back, front]。
      */
     public record Scan(int halfWidth, int back, int front, int below, int above) {
@@ -146,8 +149,8 @@ public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> 
         Scan scan = new Scan(intIn(scanO, "halfWidth", "scan.halfWidth", 1, 16), intIn(scanO, "back", "scan.back", 0, 16),
                 intIn(scanO, "front", "scan.front", 1, 32), intIn(scanO, "below", "scan.below", 0, 16),
                 intIn(scanO, "above", "scan.above", 1, 24));
-        if (scan.volume() > 4096) {
-            throw new TempleRulesException("scan: 扫描体 " + scan.volume() + " 格超过单次扫描红线 4096");
+        if (scan.volume() > MAX_SCAN_VOLUME) {
+            throw new TempleRulesException("scan: 扫描体 " + scan.volume() + " 格超过单次扫描红线 " + MAX_SCAN_VOLUME);
         }
         JsonObject roofO = object(root.get("roof"), "roof");
         Roof roof = new Roof(intIn(roofO, "minPercent", "roof.minPercent", 1, 100),

@@ -4,12 +4,20 @@
       "model": "mythic_age:block/greek_pediment_left",
       "y": 90
     },
+    "bottom=false,facing=east,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high",
+      "y": 90
+    },
     "bottom=false,facing=east,shape=middle": {
       "model": "mythic_age:block/greek_pediment_middle",
       "y": 90
     },
     "bottom=false,facing=east,shape=right": {
       "model": "mythic_age:block/greek_pediment_right",
+      "y": 90
+    },
+    "bottom=false,facing=east,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high",
       "y": 90
     },
     "bottom=false,facing=east,shape=single": {
@@ -19,17 +27,27 @@
     "bottom=false,facing=north,shape=left": {
       "model": "mythic_age:block/greek_pediment_left"
     },
+    "bottom=false,facing=north,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high"
+    },
     "bottom=false,facing=north,shape=middle": {
       "model": "mythic_age:block/greek_pediment_middle"
     },
     "bottom=false,facing=north,shape=right": {
       "model": "mythic_age:block/greek_pediment_right"
     },
+    "bottom=false,facing=north,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high"
+    },
     "bottom=false,facing=north,shape=single": {
       "model": "mythic_age:block/greek_pediment_single"
     },
     "bottom=false,facing=south,shape=left": {
       "model": "mythic_age:block/greek_pediment_left",
+      "y": 180
+    },
+    "bottom=false,facing=south,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high",
       "y": 180
     },
     "bottom=false,facing=south,shape=middle": {
@@ -40,12 +58,20 @@
       "model": "mythic_age:block/greek_pediment_right",
       "y": 180
     },
+    "bottom=false,facing=south,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high",
+      "y": 180
+    },
     "bottom=false,facing=south,shape=single": {
       "model": "mythic_age:block/greek_pediment_single",
       "y": 180
     },
     "bottom=false,facing=west,shape=left": {
       "model": "mythic_age:block/greek_pediment_left",
+      "y": 270
+    },
+    "bottom=false,facing=west,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high",
       "y": 270
     },
     "bottom=false,facing=west,shape=middle": {
@@ -56,12 +82,20 @@
       "model": "mythic_age:block/greek_pediment_right",
       "y": 270
     },
+    "bottom=false,facing=west,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high",
+      "y": 270
+    },
     "bottom=false,facing=west,shape=single": {
       "model": "mythic_age:block/greek_pediment_single",
       "y": 270
     },
     "bottom=true,facing=east,shape=left": {
       "model": "mythic_age:block/greek_pediment_left_bottom",
+      "y": 90
+    },
+    "bottom=true,facing=east,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high_bottom",
       "y": 90
     },
     "bottom=true,facing=east,shape=middle": {
@@ -72,6 +106,10 @@
       "model": "mythic_age:block/greek_pediment_right_bottom",
       "y": 90
     },
+    "bottom=true,facing=east,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high_bottom",
+      "y": 90
+    },
     "bottom=true,facing=east,shape=single": {
       "model": "mythic_age:block/greek_pediment_single_bottom",
       "y": 90
@@ -79,17 +117,27 @@
     "bottom=true,facing=north,shape=left": {
       "model": "mythic_age:block/greek_pediment_left_bottom"
     },
+    "bottom=true,facing=north,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high_bottom"
+    },
     "bottom=true,facing=north,shape=middle": {
       "model": "mythic_age:block/greek_pediment_middle_bottom"
     },
     "bottom=true,facing=north,shape=right": {
       "model": "mythic_age:block/greek_pediment_right_bottom"
     },
+    "bottom=true,facing=north,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high_bottom"
+    },
     "bottom=true,facing=north,shape=single": {
       "model": "mythic_age:block/greek_pediment_single_bottom"
     },
     "bottom=true,facing=south,shape=left": {
       "model": "mythic_age:block/greek_pediment_left_bottom",
+      "y": 180
+    },
+    "bottom=true,facing=south,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high_bottom",
       "y": 180
     },
     "bottom=true,facing=south,shape=middle": {
@@ -100,6 +148,10 @@
       "model": "mythic_age:block/greek_pediment_right_bottom",
       "y": 180
     },
+    "bottom=true,facing=south,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high_bottom",
+      "y": 180
+    },
     "bottom=true,facing=south,shape=single": {
       "model": "mythic_age:block/greek_pediment_single_bottom",
       "y": 180
@@ -108,12 +160,20 @@
       "model": "mythic_age:block/greek_pediment_left_bottom",
       "y": 270
     },
+    "bottom=true,facing=west,shape=left_high": {
+      "model": "mythic_age:block/greek_pediment_left_high_bottom",
+      "y": 270
+    },
     "bottom=true,facing=west,shape=middle": {
       "model": "mythic_age:block/greek_pediment_middle_bottom",
       "y": 270
     },
     "bottom=true,facing=west,shape=right": {
       "model": "mythic_age:block/greek_pediment_right_bottom",
+      "y": 270
+    },
+    "bottom=true,facing=west,shape=right_high": {
+      "model": "mythic_age:block/greek_pediment_right_high_bottom",
       "y": 270
     },
     "bottom=true,facing=west,shape=single": {

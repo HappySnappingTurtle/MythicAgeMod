@@ -1,0 +1,103 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/terracotta_roof_tiles",
+    "tiles": "mythic_age:block/terracotta_roof_tiles",
+    "cap": "mythic_age:block/terracotta_ridge_cap",
+    "under": "mythic_age:block/terracotta_roof_under"
+  },
+  "elements": [
+    {
+      "__comment": "瓦面",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#under"
+        },
+        "south": {
+          "texture": "#under"
+        },
+        "east": {
+          "texture": "#under"
+        },
+        "west": {
+          "texture": "#under"
+        },
+        "up": {
+          "texture": "#tiles"
+        },
+        "down": {
+          "texture": "#under"
+        }
+      }
+    },
+    {
+      "__comment": "脊瓦",
+      "from": [
+        3,
+        8,
+        0
+      ],
+      "to": [
+        13,
+        11,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cap"
+        },
+        "south": {
+          "texture": "#cap"
+        },
+        "east": {
+          "texture": "#cap"
+        },
+        "west": {
+          "texture": "#cap"
+        },
+        "up": {
+          "texture": "#cap"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        11,
+        0
+      ],
+      "to": [
+        11,
+        13,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cap"
+        },
+        "south": {
+          "texture": "#cap"
+        },
+        "east": {
+          "texture": "#cap"
+        },
+        "west": {
+          "texture": "#cap"
+        },
+        "up": {
+          "texture": "#cap"
+        }
+      }
+    }
+  ]
+}

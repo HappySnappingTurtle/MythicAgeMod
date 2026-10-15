@@ -1,0 +1,286 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "flute": "mythic_age:block/marble_column",
+    "end": "mythic_age:block/marble_pillar_top",
+    "smooth": "mythic_age:block/smooth_marble",
+    "molding": "mythic_age:block/marble_molding"
+  },
+  "elements": [
+    {
+      "from": [
+        2.5,
+        0,
+        4.5
+      ],
+      "to": [
+        13.5,
+        7,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        },
+        "down": {
+          "texture": "#end"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        0,
+        2.5
+      ],
+      "to": [
+        11.5,
+        7,
+        13.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        },
+        "down": {
+          "texture": "#end"
+        }
+      }
+    },
+    {
+      "__comment": "颈环",
+      "from": [
+        2.25,
+        7,
+        4.25
+      ],
+      "to": [
+        13.75,
+        8,
+        11.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        4.25,
+        7,
+        2.25
+      ],
+      "to": [
+        11.75,
+        8,
+        13.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "__comment": "圆垫下层",
+      "from": [
+        1.5,
+        8,
+        4.0
+      ],
+      "to": [
+        14.5,
+        10,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        8,
+        1.5
+      ],
+      "to": [
+        12.0,
+        10,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "__comment": "圆垫上层",
+      "from": [
+        0.5,
+        10,
+        3.5
+      ],
+      "to": [
+        15.5,
+        12,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        10,
+        0.5
+      ],
+      "to": [
+        12.5,
+        12,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#molding"
+        },
+        "south": {
+          "texture": "#molding"
+        },
+        "east": {
+          "texture": "#molding"
+        },
+        "west": {
+          "texture": "#molding"
+        },
+        "up": {
+          "texture": "#molding"
+        },
+        "down": {
+          "texture": "#molding"
+        }
+      }
+    },
+    {
+      "__comment": "方顶板",
+      "from": [
+        0,
+        12,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#smooth"
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    }
+  ]
+}

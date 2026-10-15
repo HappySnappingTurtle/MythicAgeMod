@@ -1,0 +1,405 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "flute": "mythic_age:block/marble_column",
+    "end": "mythic_age:block/marble_pillar_top",
+    "smooth": "mythic_age:block/smooth_marble",
+    "molding": "mythic_age:block/marble_molding",
+    "echinus": "mythic_age:block/ionic_echinus",
+    "volute": "mythic_age:block/ionic_volute",
+    "cushion": "mythic_age:block/ionic_cushion",
+    "spiral": "mythic_age:block/ionic_spiral"
+  },
+  "elements": [
+    {
+      "from": [
+        4.5,
+        0,
+        2.5
+      ],
+      "to": [
+        11.5,
+        6,
+        13.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "north": {
+          "texture": "#flute"
+        },
+        "down": {
+          "texture": "#end"
+        }
+      }
+    },
+    {
+      "from": [
+        2.5,
+        0,
+        4.5
+      ],
+      "to": [
+        13.5,
+        6,
+        11.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#flute"
+        },
+        "west": {
+          "texture": "#flute"
+        },
+        "south": {
+          "texture": "#flute"
+        },
+        "north": {
+          "texture": "#flute"
+        },
+        "down": {
+          "texture": "#end"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        6,
+        1.5
+      ],
+      "to": [
+        12.5,
+        9,
+        14.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "west": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "north": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        1.5,
+        6,
+        3.5
+      ],
+      "to": [
+        14.5,
+        9,
+        12.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "west": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "north": {
+          "texture": "#echinus",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "涡卷带（两侧各挑出 1 像素）",
+      "from": [
+        3,
+        8,
+        -1
+      ],
+      "to": [
+        13,
+        14,
+        17
+      ],
+      "faces": {
+        "east": {
+          "texture": "#volute",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "west": {
+          "texture": "#volute",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#cushion",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "north": {
+          "texture": "#cushion",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ]
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "方顶板",
+      "from": [
+        1,
+        14,
+        1
+      ],
+      "to": [
+        15,
+        16,
+        15
+      ],
+      "faces": {
+        "east": {
+          "texture": "#smooth"
+        },
+        "west": {
+          "texture": "#smooth"
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "north": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "__comment": "螺旋盘",
+      "from": [
+        13,
+        8,
+        -1.5
+      ],
+      "to": [
+        14,
+        14,
+        4.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#spiral",
+          "uv": [
+            0,
+            0,
+            6,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "north": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        8,
+        -1.5
+      ],
+      "to": [
+        3,
+        14,
+        4.5
+      ],
+      "faces": {
+        "west": {
+          "texture": "#spiral",
+          "uv": [
+            0,
+            0,
+            6,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "north": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "from": [
+        13,
+        8,
+        11.5
+      ],
+      "to": [
+        14,
+        14,
+        17.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#spiral",
+          "uv": [
+            0,
+            0,
+            6,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "north": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        8,
+        11.5
+      ],
+      "to": [
+        3,
+        14,
+        17.5
+      ],
+      "faces": {
+        "west": {
+          "texture": "#spiral",
+          "uv": [
+            0,
+            0,
+            6,
+            6
+          ]
+        },
+        "south": {
+          "texture": "#smooth"
+        },
+        "north": {
+          "texture": "#smooth"
+        },
+        "up": {
+          "texture": "#smooth"
+        },
+        "down": {
+          "texture": "#smooth"
+        }
+      }
+    }
+  ]
+}

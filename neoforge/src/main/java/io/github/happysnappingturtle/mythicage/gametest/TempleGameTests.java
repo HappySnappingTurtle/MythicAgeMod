@@ -55,7 +55,7 @@ import java.util.function.Consumer;
 @PrefixGameTestTemplate(false)
 public final class TempleGameTests {
     private static final String BATCH = "temple";
-    private static final String T = GameTestTemplates.EMPTY_17X16X20;
+    private static final String T = GameTestTemplates.EMPTY_17X16X36;
     private static final BlockPos ALTAR = new BlockPos(8, 3, 2);
     private static final int GROUND = 3;
 
@@ -370,6 +370,53 @@ public final class TempleGameTests {
     @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
     public static void tall_platform_needs_stairs(GameTestHelper h) {
         expectLevel(h, new Build(8, 60, 2, 1, 2, 40, Age.CLASSICAL, 3, false), 1);
+    }
+
+    /** 修订 02：2 格高台基，四周用半砖逐级（地面 → 半砖 → 整格 + 半砖 → 柱座），不设正门台阶也能认定中神庙。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void half_slab_steps_all_round(GameTestHelper h) {
+        Build b = new Build(8, 60, 2, 1, 2, 40, Age.CLASSICAL, 2, false);
+        build(h, b);
+        BlockState slab = GreekMaterials.SMOOTH_MARBLE_SLAB.get().defaultBlockState();
+        // 台基 x 2–14、z 4–16：把最外一圈改成「整格 + 半砖」，再在外面加一圈贴地半砖
+        for (int x = 1; x <= 15; x++) {
+            for (int z = 3; z <= 17; z++) {
+                boolean edge = x == 2 || x == 14 || z == 4 || z == 16;
+                boolean outside = x == 1 || x == 15 || z == 3 || z == 17;
+                if (edge && x >= 2 && x <= 14 && z >= 4 && z <= 16) {
+                    h.setBlock(x, GROUND + 1, z, slab);
+                } else if (outside && !(x == 8 && z <= 3)) {
+                    h.setBlock(x, GROUND, z, slab);
+                }
+            }
+        }
+        whenScanned(h, be -> {
+            int level = be.verdict(TempleService.rules()).grantedLevel();
+            h.assertTrue(be.survey().platformReachable() && level == 2,
+                    "半砖逐级应可走上台基并认定中神庙，实际 " + level + " " + be.survey());
+        });
+    }
+
+    /** 修订 02 §5：神像在神坛前方 28 格（长内殿后墙处）仍在扫描体内，计入后认定中神庙。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void statue_at_back_of_long_cella(GameTestHelper h) {
+        statueAtDepth(h, 28, 1, 2);
+    }
+
+    /** 修订 02 §5：扫描体前沿是神坛前方 32 格；33 格处的神像不计，停在小神庙。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void statue_beyond_scan_front_not_counted(GameTestHelper h) {
+        statueAtDepth(h, 33, 0, 1);
+    }
+
+    private static void statueAtDepth(GameTestHelper h, int depth, int statues, int level) {
+        build(h, new Build(8, 60, 2, 0, 2, 40, Age.CLASSICAL));
+        statue(h, new BlockPos(8, GROUND + 1, ALTAR.getZ() + depth));
+        whenScanned(h, be -> {
+            int got = be.verdict(TempleService.rules()).grantedLevel();
+            h.assertTrue(be.survey().statues() == statues && got == level,
+                    "前方 " + depth + " 格的神像：应计 " + statues + " 尊、认定 " + level + " 级，实际 " + got + " " + be.survey());
+        });
     }
 
     @GameTest(template = T, batch = BATCH, timeoutTicks = 200)

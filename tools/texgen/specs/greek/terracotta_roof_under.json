@@ -1,0 +1,30 @@
+{
+  "template": "pixels",
+  "out": "block/terracotta_roof_under",
+  "size": 16,
+  "palette": {
+    "s": "#7f3519",
+    "o": "#9a4426"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "sosssssossoooooo",
+      "osssosssosssosoo",
+      "sosossssssssssso",
+      "sosssoossossssss",
+      "ssososossssossss",
+      "ssssssssssosssss",
+      "ssssosssosssosos",
+      "oosssossssssosoo",
+      "sosossossosoosoo",
+      "sosososssssssooo",
+      "osoossosssssssos",
+      "oossssossossssos",
+      "ssossssoosssssos",
+      "sssosossssssooos",
+      "sssossssosssssss",
+      "ssssossosssssoss"
+    ]
+  }
+}

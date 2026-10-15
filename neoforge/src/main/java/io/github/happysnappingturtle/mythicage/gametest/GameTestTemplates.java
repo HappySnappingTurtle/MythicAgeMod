@@ -10,6 +10,8 @@ public final class GameTestTemplates {
     public static final String EMPTY_11X11 = "empty_11x11";
     /** 17×16×20 的空气模板，容纳 15×15×18 的神庙扫描体（T8a 修订 01）。 */
     public static final String EMPTY_17X16X20 = "empty_17x16x20";
+    /** 17×16×36 的空气模板，容纳 15×15×34 的神庙扫描体（T8a 修订 02 §5）。 */
+    public static final String EMPTY_17X16X36 = "empty_17x16x36";
 
     private GameTestTemplates() {
     }

@@ -182,6 +182,7 @@ public final class Content {
             switch (model) {
                 case BlockModelSpec.Slab s -> addShapeTags(BlockTags.SLABS, ItemTags.SLABS);
                 case BlockModelSpec.Stairs s -> addShapeTags(BlockTags.STAIRS, ItemTags.STAIRS);
+                case BlockModelSpec.StairsTextured s -> addShapeTags(BlockTags.STAIRS, ItemTags.STAIRS);
                 case BlockModelSpec.Wall w -> addShapeTags(BlockTags.WALLS, ItemTags.WALLS);
                 default -> {
                 }

@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/ionic_spiral",
+  "size": 16,
+  "palette": {
+    "h": "#f6f2ea",
+    "m": "#ebe5d8",
+    "n": "#e0d9ca",
+    "j": "#c4bba8",
+    "d": "#8f8676"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "njjjjnmmmmmmmmmm",
+      "jhhhmjmmmmmmmmmm",
+      "jhjjmjmmmmmmmmmm",
+      "jhjdmjmmmmmmmmmm",
+      "jmmmnjmmmmmmmmmm",
+      "njjjjnmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmm"
+    ]
+  }
+}

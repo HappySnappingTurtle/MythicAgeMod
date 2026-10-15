@@ -24,6 +24,20 @@
     "mythic_age:greek_brazier",
     "mythic_age:greek_statue",
     "mythic_age:greek_pediment",
-    "mythic_age:marble_pillar"
+    "mythic_age:marble_pillar",
+    "mythic_age:marble_column_base",
+    "mythic_age:marble_column",
+    "mythic_age:doric_capital",
+    "mythic_age:ionic_capital",
+    "mythic_age:corinthian_capital",
+    "mythic_age:marble_architrave",
+    "mythic_age:triglyph_frieze",
+    "mythic_age:marble_cornice",
+    "mythic_age:terracotta_roof_tiles",
+    "mythic_age:terracotta_roof_stairs",
+    "mythic_age:terracotta_roof_slab",
+    "mythic_age:terracotta_ridge",
+    "mythic_age:terracotta_antefix",
+    "mythic_age:pebble_mosaic"
   ]
 }

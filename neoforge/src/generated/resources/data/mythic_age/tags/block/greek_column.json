@@ -1,6 +1,11 @@
 {
   "values": [
     "mythic_age:marble_pillar",
+    "mythic_age:marble_column_base",
+    "mythic_age:marble_column",
+    "mythic_age:doric_capital",
+    "mythic_age:ionic_capital",
+    "mythic_age:corinthian_capital",
     "minecraft:quartz_pillar"
   ]
 }
