@@ -73,6 +73,7 @@ public final class PlayerMythData {
     private int conductScore;
     private final Deque<ConductEntry> recentConduct = new ArrayDeque<>();
     private final ReceiptBook receipts = new ReceiptBook();
+    private final DailyLedger tradeDaily = new DailyLedger();
     private long dataVersion;
 
     public PlayerMythData() {
@@ -134,6 +135,11 @@ public final class PlayerMythData {
         return receipts;
     }
 
+    /** 每日限购台账（T9）。 */
+    public DailyLedger tradeDaily() {
+        return tradeDaily;
+    }
+
     public long dataVersion() {
         return dataVersion;
     }
@@ -166,6 +172,7 @@ public final class PlayerMythData {
                 c.receipts.record(scope, id);
             }
         }
+        c.tradeDaily.entriesFrom(tradeDaily);
         c.dataVersion = dataVersion;
         return c;
     }
@@ -181,6 +188,7 @@ public final class PlayerMythData {
                 && conductScore == d.conductScore
                 && List.copyOf(recentConduct).equals(List.copyOf(d.recentConduct))
                 && receipts.equals(d.receipts)
+                && tradeDaily.equals(d.tradeDaily)
                 && dataVersion == d.dataVersion;
     }
 

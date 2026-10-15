@@ -9,14 +9,24 @@ package io.github.happysnappingturtle.mythicage.core.config.world;
  * @param recipes               配方规则（T6）
  * @param growth                作物与果树的生长（T6b，含骨粉等催化效果的规则）
  * @param temples               神坛与神庙判定（T8a）
+ * @param guardians             守护者（T9）
  */
 public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
-                               GodPowers godPowers, Recipes recipes, Growth growth, Temples temples) {
+                               GodPowers godPowers, Recipes recipes, Growth growth, Temples temples,
+                               Guardians guardians) {
+
+    /** 兼容旧调用：守护者规则用默认值。 */
+    public WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
+                            GodPowers godPowers, Recipes recipes, Growth growth, Temples temples) {
+        this(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, growth, temples,
+                Guardians.DEFAULTS);
+    }
 
     /** 兼容旧调用：神庙规则用默认值。 */
     public WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
                             GodPowers godPowers, Recipes recipes, Growth growth) {
-        this(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, growth, Temples.DEFAULTS);
+        this(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, growth, Temples.DEFAULTS,
+                Guardians.DEFAULTS);
     }
 
     /** @param terrainEdits 神力的永久地形破坏，默认关闭（红线 1） */
@@ -74,5 +84,16 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
                 default -> 0;
             };
         }
+    }
+
+    /**
+     * 守护者（T9 设计文档 §7）。
+     *
+     * @param spawnInVillages 希腊地域的原版村庄聚会钟旁出现祭司（决策 D1）
+     * @param respawnDays     祭司死亡后在居所复原所需的 MC 日（决策 D4）
+     * @param interactRange   交易界面保持打开的最大距离（格）
+     */
+    public record Guardians(boolean spawnInVillages, int respawnDays, int interactRange) {
+        public static final Guardians DEFAULTS = new Guardians(true, 1, 8);
     }
 }

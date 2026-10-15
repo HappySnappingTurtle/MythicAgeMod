@@ -15,6 +15,9 @@ import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
 import io.github.happysnappingturtle.mythicage.entity.EntityDevCommand;
 import io.github.happysnappingturtle.mythicage.entity.ModEntities;
+import io.github.happysnappingturtle.mythicage.guardian.GreekGuardian;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianCommand;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.player.ModAttachments;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.player.MythDataCommand;
@@ -24,6 +27,8 @@ import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
 import io.github.happysnappingturtle.mythicage.temple.TempleRulesLoader;
 import io.github.happysnappingturtle.mythicage.temple.TempleService;
+import io.github.happysnappingturtle.mythicage.trade.TradeService;
+import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
 import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
@@ -51,6 +56,7 @@ public final class MythicAge {
         GreekFoods.init();
         GreekTemple.init();
         GreekArchitecture.init();
+        GreekGuardian.init();
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
@@ -90,5 +96,12 @@ public final class MythicAge {
         game.addListener(TempleService::onServerTickPost);
         game.addListener(TempleService::onNeighborNotify);
         game.addListener(TempleService::onBreak);
+
+        // 守护者与恩宠兑换（T9）
+        game.addListener(TradeTableLoader::onAddReloadListeners);
+        game.addListener(TradeService::onServerTickPost);
+        game.addListener(GuardianSpawner::onServerTickPost);
+        game.addListener(GuardianSpawner::onEntityJoin);
+        game.addListener(GuardianCommand::onRegisterCommands);
     }
 }

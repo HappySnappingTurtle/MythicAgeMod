@@ -14,7 +14,7 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
             new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
                     new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)),
                     new WorldRulesConfig.Growth(24000, 12000, new WorldRulesConfig.BoneMeal(0.5, false)),
-                    WorldRulesConfig.Temples.DEFAULTS);
+                    WorldRulesConfig.Temples.DEFAULTS, WorldRulesConfig.Guardians.DEFAULTS);
 
     private WorldRulesSchema() {
     }
@@ -44,7 +44,15 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                         root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
                 readRecipes(root.object("recipes"), base.recipes()),
                 readGrowth(root.object("growth"), base.growth()),
-                readTemples(root.object("temples"), base.temples()));
+                readTemples(root.object("temples"), base.temples()),
+                readGuardians(root.object("guardians"), base.guardians()));
+    }
+
+    private static WorldRulesConfig.Guardians readGuardians(ObjectReader g, WorldRulesConfig.Guardians base) {
+        return new WorldRulesConfig.Guardians(
+                g.bool("spawnInVillages", base.spawnInVillages()),
+                g.intIn("respawnDays", base.respawnDays(), 0, 30),
+                g.intIn("interactRange", base.interactRange(), 4, 32));
     }
 
     private static WorldRulesConfig.Temples readTemples(ObjectReader t, WorldRulesConfig.Temples base) {
@@ -113,6 +121,12 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         temples.addProperty("scanCellsPerTick", t.scanCellsPerTick());
         temples.addProperty("rescanIntervalTicks", t.rescanIntervalTicks());
         root.add("temples", temples);
+        WorldRulesConfig.Guardians gd = value.guardians();
+        JsonObject guardians = new JsonObject();
+        guardians.addProperty("spawnInVillages", gd.spawnInVillages());
+        guardians.addProperty("respawnDays", gd.respawnDays());
+        guardians.addProperty("interactRange", gd.interactRange());
+        root.add("guardians", guardians);
         return root;
     }
 }

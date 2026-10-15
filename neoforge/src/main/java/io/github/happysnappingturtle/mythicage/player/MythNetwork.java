@@ -1,10 +1,12 @@
 package io.github.happysnappingturtle.mythicage.player;
 
+import io.github.happysnappingturtle.mythicage.trade.TradePayloads;
+import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "2";
+    private static final String PROTOCOL_VERSION = "3";
 
     private MythNetwork() {
     }
@@ -15,6 +17,17 @@ public final class MythNetwork {
                         (payload, context) -> ClientMythData.accept(payload))
                 .playToClient(io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload.TYPE,
                         io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload.STREAM_CODEC,
-                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openAltar(payload));
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openAltar(payload))
+                // 守护者与神坛兑换（T9）
+                .playToClient(TradePayloads.Open.TYPE, TradePayloads.Open.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openTrade(payload))
+                .playToClient(TradePayloads.Result.TYPE, TradePayloads.Result.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.tradeResult(payload))
+                .playToClient(TradePayloads.Close.TYPE, TradePayloads.Close.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.tradeClose())
+                .playToServer(TradePayloads.Buy.TYPE, TradePayloads.Buy.STREAM_CODEC, TradeService::handleBuy)
+                .playToServer(TradePayloads.Blessing.TYPE, TradePayloads.Blessing.STREAM_CODEC, TradeService::handleBlessing)
+                .playToServer(TradePayloads.Closed.TYPE, TradePayloads.Closed.STREAM_CODEC, TradeService::handleClosed)
+                .playToServer(TradePayloads.OpenAltar.TYPE, TradePayloads.OpenAltar.STREAM_CODEC, TradeService::handleOpenAltar);
     }
 }

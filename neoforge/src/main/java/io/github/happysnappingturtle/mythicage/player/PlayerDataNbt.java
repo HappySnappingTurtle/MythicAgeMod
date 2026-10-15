@@ -56,6 +56,14 @@ public final class PlayerDataNbt {
         receipts.put("unique", strings(data.receipts().list(ReceiptBook.Scope.UNIQUE)));
         receipts.put("request", strings(data.receipts().list(ReceiptBook.Scope.REQUEST)));
         root.put("receipts", receipts);
+        CompoundTag daily = new CompoundTag();
+        data.tradeDaily().view().forEach((key, c) -> {
+            CompoundTag t = new CompoundTag();
+            t.putLong("day", c.day());
+            t.putInt("count", c.count());
+            daily.put(key, t);
+        });
+        root.put("tradeDaily", daily);
         root.putLong("version", data.dataVersion());
         return root;
     }
@@ -109,6 +117,12 @@ public final class PlayerDataNbt {
         }
         for (Tag t : receipts.getList("request", Tag.TAG_STRING)) {
             data.receipts().record(ReceiptBook.Scope.REQUEST, t.getAsString());
+        }
+        CompoundTag daily = root.getCompound("tradeDaily");
+        for (String key : daily.getAllKeys()) {
+            CompoundTag t = daily.getCompound(key);
+            data.tradeDaily().restore(key, new io.github.happysnappingturtle.mythicage.core.player.DailyLedger.DailyCount(
+                    t.getLong("day"), t.getInt("count")));
         }
         data.setDataVersion(root.getLong("version"));
         return data;

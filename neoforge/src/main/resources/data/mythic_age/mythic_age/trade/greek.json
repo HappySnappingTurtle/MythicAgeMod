@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "civilization": "greek",
+  "offers": [
+    {"id": "libation", "category": "supplies",
+     "result": {"item": "mythic_age:libation", "count": 2},
+     "price": {"items": [{"item": "minecraft:emerald", "count": 1}]},
+     "minAge": "archaic", "venues": ["guardian"], "dailyLimit": 8}
+  ]
+}

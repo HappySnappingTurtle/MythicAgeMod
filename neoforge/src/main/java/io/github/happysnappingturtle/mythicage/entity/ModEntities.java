@@ -1,5 +1,6 @@
 package io.github.happysnappingturtle.mythicage.entity;
 
+import io.github.happysnappingturtle.mythicage.guardian.GreekGuardianEntity;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -15,6 +16,14 @@ public final class ModEntities {
                     .eyeHeight(2.2F)
                     .clientTrackingRange(10)
                     .build("mythic_age:minotaur"));
+    /** 希腊守护者（神庙祭司，T9）：人形，碰撞 0.6 × 1.95（VI-GR-PRI-01）。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<GreekGuardianEntity>> GREEK_GUARDIAN =
+            ModRegistries.ENTITY_TYPES.register("greek_guardian",
+                    () -> EntityType.Builder.of(GreekGuardianEntity::new, MobCategory.MISC)
+                            .sized(0.6F, 1.95F)
+                            .eyeHeight(1.62F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:greek_guardian"));
 
     private ModEntities() {
     }
@@ -25,5 +34,6 @@ public final class ModEntities {
 
     private static void onAttributes(EntityAttributeCreationEvent event) {
         event.put(MINOTAUR.get(), MinotaurEntity.createAttributes().build());
+        event.put(GREEK_GUARDIAN.get(), GreekGuardianEntity.createAttributes().build());
     }
 }

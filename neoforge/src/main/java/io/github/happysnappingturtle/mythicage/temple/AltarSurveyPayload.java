@@ -20,13 +20,15 @@ import java.util.List;
  *
  * @param rows     下一级（结构等级 + 1）的每一项要求：当前值 / 需要值；已是最高级时为当前各项统计（need = 0）
  * @param estimate 满员时的预计日产出（估算，不是发放承诺）
+ * @param altarOffers 交易表中有可在神坛兑换的商品，且查看者是主人（T9：显示「兑换」按钮）
  */
 public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerIsOwner, Age ownerAge, boolean hasResult,
                                  boolean unverified, int structuralLevel, int grantedLevel, List<String> tierNames,
                                  double coefficient, int slotsCap, int slotsFound, List<Row> rows, String ageRequired,
                                  double estimate, BlockPos scanMin, BlockPos scanMax, List<BlockPos> uncoveredRoof,
                                  List<BlockPos> countedColumns, List<BlockPos> shortColumns, List<BlockPos> unlitBraziers,
-                                 List<BlockPos> prayerSlots, List<BlockPos> altarCover) implements CustomPacketPayload {
+                                 List<BlockPos> prayerSlots, List<BlockPos> altarCover, boolean altarOffers)
+        implements CustomPacketPayload {
 
     /** 一项条件：have / need；布尔条件（露天祭坛、台基可达）用 0/1 表示。 */
     public record Row(String key, int have, int need) {
@@ -88,7 +90,10 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
                 v.ageRequired().map(Age::id).orElse(""), estimate, min, max,
                 h == null ? List.of() : h.uncoveredRoof(), h == null ? List.of() : h.countedColumns(),
                 h == null ? List.of() : h.shortColumns(), h == null ? List.of() : h.unlitBraziers(),
-                be.prayerSlots(rules), h == null ? List.of() : h.altarCover());
+                be.prayerSlots(rules), h == null ? List.of() : h.altarCover(),
+                isOwner && !io.github.happysnappingturtle.mythicage.trade.TradeTableLoader.table(
+                        io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK)
+                        .offersAt(io.github.happysnappingturtle.mythicage.core.trade.TradeOffer.Venue.ALTAR).isEmpty());
     }
 
     private static void row(List<Row> rows, String key, int have, int need) {
@@ -145,6 +150,7 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
                 writePositions(buf, p.unlitBraziers());
                 writePositions(buf, p.prayerSlots());
                 writePositions(buf, p.altarCover());
+                buf.writeBoolean(p.altarOffers());
             },
             buf -> {
                 BlockPos pos = buf.readBlockPos();
@@ -174,7 +180,8 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
                 BlockPos max = buf.readBlockPos();
                 return new AltarSurveyPayload(pos, owner, isOwner, age, hasResult, unverified, structural, granted, names,
                         coefficient, cap, found, rows, ageRequired, estimate, min, max, readPositions(buf),
-                        readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf));
+                        readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf),
+                        buf.readBoolean());
             });
 
     @Override

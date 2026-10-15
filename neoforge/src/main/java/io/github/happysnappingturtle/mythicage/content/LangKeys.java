@@ -86,6 +86,51 @@ public final class LangKeys {
         add("mythic_age.temple.tier.prostylos", "中神庙", "Prostylos", "前柱式神殿");
         add("mythic_age.temple.tier.peripteros", "大神庙", "Peripteros", "周柱式神殿");
         add("mythic_age.recipe.age_locked", "%s 需要%s%s时代", "%s requires %s %s Age", "%sには%s・%s時代が必要です");
+        // 守护者与兑换（T9）
+        add("entity.mythic_age.greek_guardian", "神庙祭司", "Temple Priest", "神殿の神官");
+        add("mythic_age.guardian.talk.first", "远方来的旅人，奥林匹斯的众神注视着你。接受祝福，带走这座祭坛，在你的居所为众神立起香火。", "Traveller from afar, the gods of Olympus are watching you. Accept their blessing and take this altar; kindle an offering to the gods where you dwell.", "遠方からの旅人よ、オリュンポスの神々があなたを見守っている。祝福を受け、この祭壇を持ち帰り、住まいで神々に灯をともしなさい。");
+        add("mythic_age.guardian.talk.reissue", "你的祭坛遗失了？众神仍记得你。我可以再给你一座，但每天只能一次。", "Your altar is lost? The gods still remember you. I can give you another, but only once a day.", "祭壇をなくしたのか？神々はまだあなたを覚えている。もう一基渡そう。ただし一日に一度だけだ。");
+        add("mythic_age.guardian.talk.greet", "愿众神庇佑你。需要什么，就到兑换页看看。", "May the gods protect you. See the exchange page for what I can offer.", "神々のご加護を。必要なものは交換のページを見てほしい。");
+        add("mythic_age.guardian.accept_blessing", "接受祝福", "Accept the blessing", "祝福を受ける");
+        add("mythic_age.guardian.reissue", "补领祭坛", "Ask for another altar", "祭壇を再び受け取る");
+        add("mythic_age.guardian.to_trade", "去兑换", "Exchange", "交換へ");
+        add("mythic_age.trade.tab.talk", "对话", "Talk", "会話");
+        add("mythic_age.trade.tab.trade", "兑换", "Exchange", "交換");
+        add("mythic_age.trade.altar_title", "奥林匹斯祭坛 · 兑换", "Olympian Altar · Exchange", "オリュンポスの祭壇・交換");
+        add("mythic_age.trade.favor", "希腊恩宠 %s/%s · %s时代", "Greek Favor %s/%s · %s Age", "ギリシャの恩寵 %s/%s・%s時代");
+        add("mythic_age.trade.favor.none", "尚未得到希腊众神的祝福", "Not yet blessed by the Greek gods", "まだギリシャの神々の祝福を受けていません");
+        add("mythic_age.trade.buy", "兑换", "Buy", "交換");
+        add("mythic_age.trade.pending", "祭司正在准备……", "The priest is preparing…", "神官が準備しています……");
+        add("mythic_age.trade.empty", "此处暂时没有可兑换的物品。", "Nothing to exchange here yet.", "ここで交換できるものはまだありません。");
+        add("mythic_age.trade.price.favor", "%s 恩宠", "%s Favor", "%s 恩寵");
+        add("mythic_age.trade.category.god_power", "神力", "God Power", "神力");
+        add("mythic_age.trade.category.summon", "召唤", "Summon", "召喚");
+        add("mythic_age.trade.category.blueprint", "图纸", "Blueprint", "設計図");
+        add("mythic_age.trade.category.supplies", "补给", "Supplies", "補給");
+        add("mythic_age.trade.state.locked", "%s时代解锁", "Unlocks in the %s Age", "%s時代で解放");
+        add("mythic_age.trade.state.sold_out", "今日已售罄", "Sold out today", "本日は売り切れ");
+        add("mythic_age.trade.state.no_favor", "恩宠不足", "Not enough Favor", "恩寵が足りません");
+        add("mythic_age.trade.state.no_items", "物品不足", "Missing items", "品物が足りません");
+        add("mythic_age.trade.state.remaining", "今日剩余 %s", "%s left today", "本日残り %s");
+        add("mythic_age.trade.result.ok", "获得 %s ×%s", "Received %s ×%s", "%s ×%s を受け取りました");
+        add("mythic_age.trade.result.duplicate", "这次请求已经处理过了。", "This request has already been handled.", "この依頼はすでに処理されています。");
+        add("mythic_age.trade.result.npc_gone", "祭司已离开。", "The priest has left.", "神官は立ち去りました。");
+        add("mythic_age.trade.result.unknown_offer", "这件商品已经下架。", "This item is no longer offered.", "この品物はもう扱っていません。");
+        add("mythic_age.trade.result.wrong_venue", "这件商品只能在祭司处兑换。", "This item can only be exchanged with the priest.", "この品物は神官のもとでしか交換できません。");
+        add("mythic_age.trade.result.age_locked", "你的信仰时代还不够。", "Your Age of faith is not high enough.", "信仰の時代がまだ足りません。");
+        add("mythic_age.trade.result.price_changed", "价格已变为 %s，请确认后再兑换。", "The price is now %s; please confirm and try again.", "価格が %s に変わりました。確認してからもう一度交換してください。");
+        add("mythic_age.trade.result.daily_limit", "今天已经达到限购次数，明天再来。", "Daily limit reached; come back tomorrow.", "本日の購入上限に達しました。また明日来てください。");
+        add("mythic_age.trade.result.not_enough_favor", "恩宠不足，还差 %s。", "Not enough Favor: %s short.", "恩寵が足りません（あと %s）。");
+        add("mythic_age.trade.result.not_enough_items", "背包里的物品不够支付。", "You do not carry enough items to pay.", "支払う品物が足りません。");
+        add("mythic_age.trade.result.inventory_full", "背包已满，腾出空间再来。", "Your inventory is full; make room first.", "持ち物がいっぱいです。空きを作ってから来てください。");
+        add("mythic_age.trade.result.already_blessed", "你已经得到过众神的祝福。", "You have already received the gods' blessing.", "すでに神々の祝福を受けています。");
+        add("mythic_age.trade.result.not_blessed", "请先接受祝福。", "Accept the blessing first.", "まず祝福を受けてください。");
+        add("mythic_age.trade.result.has_altar", "你名下已有祭坛，或背包里还有一座。", "You already own an altar or carry one.", "すでに祭壇を持っているか、持ち物に一基あります。");
+        add("mythic_age.trade.result.reissued_today", "今天已经补领过了，明天再来。", "You already received one today; come back tomorrow.", "本日はすでに受け取りました。また明日来てください。");
+        add("commands.mythic_age.guardian.spawned", "已在 %s %s %s 生成神庙祭司", "Temple priest spawned at %s %s %s", "%s %s %s に神殿の神官を生成しました");
+        add("commands.mythic_age.guardian.count", "共 %s 位神庙祭司", "%s temple priest(s)", "神殿の神官 %s 人");
+        add("commands.mythic_age.guardian.alive", "· %s %s (%s, %s, %s) 在世", "· %s %s (%s, %s, %s) alive", "· %s %s (%s, %s, %s) 健在");
+        add("commands.mythic_age.guardian.dead", "· %s %s (%s, %s, %s) 已故，死于第 %s 日", "· %s %s (%s, %s, %s) dead since day %s", "· %s %s (%s, %s, %s) 死亡（%s 日目）");
     }
 
     private LangKeys() {

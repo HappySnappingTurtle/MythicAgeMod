@@ -67,6 +67,39 @@ public final class TxSteps {
         };
     }
 
+    /** 要求某文明的时代恰好是 age（初见只在 NONE 时成立，T9）。 */
+    public static TxStep requireAgeExactly(Civilization civ, Age age) {
+        return new TxStep() {
+            @Override
+            public Optional<String> check(PlayerMythData data) {
+                Age have = data.civ(civ).age();
+                return have == age ? Optional.empty()
+                        : Optional.of(civ.id() + " 时代应为 " + age.id() + "，现为 " + have.id());
+            }
+
+            @Override
+            public void apply(PlayerMythData data) {
+            }
+        };
+    }
+
+    /** 每日限购记一次（T9）；limit 为 0 表示不限，只记账。今日已达上限时拒绝。 */
+    public static TxStep recordDaily(String key, long day, int limit) {
+        return new TxStep() {
+            @Override
+            public Optional<String> check(PlayerMythData data) {
+                int have = data.tradeDaily().count(key, day);
+                return limit <= 0 || have < limit ? Optional.empty()
+                        : Optional.of(key + " 今日已达限购 " + limit);
+            }
+
+            @Override
+            public void apply(PlayerMythData data) {
+                data.tradeDaily().record(key, day);
+            }
+        };
+    }
+
     /** 设定某文明的时代（晋升、首次交谈进入远古）。 */
     public static TxStep setAge(Civilization civ, Age age) {
         return new TxStep() {

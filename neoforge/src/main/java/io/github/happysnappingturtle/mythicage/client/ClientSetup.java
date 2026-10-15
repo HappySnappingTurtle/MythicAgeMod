@@ -32,6 +32,8 @@ public final class ClientSetup {
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
+        // T9a 占位渲染；T9b 换成 GeckoLib 祭司模型
+        event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(), GuardianPlaceholderRenderer::new);
     }
 
     @SubscribeEvent
