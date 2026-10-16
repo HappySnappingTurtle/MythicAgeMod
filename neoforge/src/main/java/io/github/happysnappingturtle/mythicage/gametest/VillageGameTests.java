@@ -10,7 +10,7 @@ import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.player.PlayerMythData;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeReason;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeTable;
-import io.github.happysnappingturtle.mythicage.guardian.GreekGuardianEntity;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianEntity;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
 import io.github.happysnappingturtle.mythicage.player.MythData;
@@ -95,7 +95,7 @@ public final class VillageGameTests {
         } finally {
             VillageResolver.overrideTypeForTest(null);
         }
-        h.assertTrue(h.getLevel().getEntitiesOfClass(GreekGuardianEntity.class,
+        h.assertTrue(h.getLevel().getEntitiesOfClass(GuardianEntity.class,
                 new net.minecraft.world.phys.AABB(bell).inflate(5)).isEmpty(), "埃及村庄不生成希腊祭司");
         h.succeed();
     }
@@ -170,15 +170,15 @@ public final class VillageGameTests {
         return v;
     }
 
-    private static FakePlayer player(GameTestHelper h, GreekGuardianEntity g, String name) {
+    private static FakePlayer player(GameTestHelper h, GuardianEntity g, String name) {
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), name));
         p.moveTo(g.getX() + 2, g.getY(), g.getZ());
         MythData.get(p).civ(Civilization.GREEK).setAge(Age.CLASSICAL);
         return p;
     }
 
-    private static GreekGuardianEntity priest(GameTestHelper h, BlockPos bell) {
-        GreekGuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), bell.offset(2, 0, 0), Optional.of(bell));
+    private static GuardianEntity priest(GameTestHelper h, BlockPos bell) {
+        GuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), bell.offset(2, 0, 0), Optional.of(bell), Civilization.GREEK);
         if (g == null) {
             throw new net.minecraft.gametest.framework.GameTestAssertException("祭司没有生成");
         }
@@ -190,7 +190,7 @@ public final class VillageGameTests {
     public static void talking_to_village_priest_learns_patron(GameTestHelper h) {
         BlockPos bell = bell(h, 5, 5);
         village(h, bell, "hades");
-        GreekGuardianEntity g = priest(h, bell);
+        GuardianEntity g = priest(h, bell);
         h.assertTrue(GuardianSpawner.villageOf(g).map(VillageRegistry.Village::patron).equals(Optional.of("hades")),
                 "祭司属于该村庄");
         FakePlayer p = player(h, g, "ma_learn");
@@ -206,7 +206,7 @@ public final class VillageGameTests {
     @GameTest(template = T, batch = BATCH)
     public static void egg_priest_teaches_nothing(GameTestHelper h) {
         bell(h, 5, 5);
-        GreekGuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(3, 1, 3)), Optional.empty());
+        GuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(3, 1, 3)), Optional.empty(), Civilization.GREEK);
         h.assertTrue(g != null, "生成");
         FakePlayer p = player(h, g, "ma_egg");
         TradeService.openGuardian(p, g);
@@ -233,8 +233,8 @@ public final class VillageGameTests {
             h.setBlock(new BlockPos(9, 1, 9), Blocks.BELL);
             BlockPos hadesBell = h.absolutePos(new BlockPos(9, 1, 9));
             village(h, hadesBell, "hades");
-            GreekGuardianEntity zeusPriest = priest(h, zeusBell);
-            GreekGuardianEntity hadesPriest = priest(h, hadesBell);
+            GuardianEntity zeusPriest = priest(h, zeusBell);
+            GuardianEntity hadesPriest = priest(h, hadesBell);
             FakePlayer p = player(h, zeusPriest, "ma_gods");
             MythData.get(p).civ(Civilization.GREEK).setFavor(100);
             TradeService.openGuardian(p, zeusPriest);

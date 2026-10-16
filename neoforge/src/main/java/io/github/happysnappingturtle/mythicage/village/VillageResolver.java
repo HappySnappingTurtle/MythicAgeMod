@@ -1,13 +1,17 @@
 package io.github.happysnappingturtle.mythicage.village;
 
+import io.github.happysnappingturtle.mythicage.core.config.villages.VillagesConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.BiomeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -16,6 +20,7 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
@@ -67,14 +72,49 @@ public final class VillageResolver {
         return Optional.empty();
     }
 
-    /** 钟周围 32 格（中心 + 8 个方向）有海洋或海滩群系即为沿海。 */
-    public static boolean coastal(ServerLevel level, BlockPos bell) {
-        int[][] dirs = {{0, 0}, {32, 0}, {-32, 0}, {0, 32}, {0, -32}, {23, 23}, {23, -23}, {-23, 23}, {-23, -23}};
-        for (int[] d : dirs) {
-            BlockPos p = bell.offset(d[0], 0, d[1]);
-            var biome = level.getBiome(p);
-            if (biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH)) {
-                return true;
+    @Nullable
+    private static volatile BiFunction<ServerLevel, BlockPos, Set<String>> biomeOverride;
+
+    /** 只供 GameTest：替换「钟周围有哪些群系」的判定（返回群系 id 与标签，标签带 #）；传 null 恢复。 */
+    public static void overrideBiomesForTest(@Nullable BiFunction<ServerLevel, BlockPos, Set<String>> f) {
+        biomeOverride = f;
+    }
+
+    /**
+     * 群系加成命中的主神 → 倍率（T10b 设计文档 §7）：在钟周围 radius 格（中心 + 8 个方向）采样，
+     * 任一点的群系 id 或标签在加成表里即命中。
+     */
+    public static Map<String, Double> matchedBonuses(ServerLevel level, BlockPos bell,
+                                                     Map<String, VillagesConfig.BiomeBonus> bonuses) {
+        Map<String, Double> out = new LinkedHashMap<>();
+        bonuses.forEach((patron, b) -> {
+            if (matches(level, bell, b)) {
+                out.put(patron, b.multiplier());
+            }
+        });
+        return out;
+    }
+
+    private static boolean matches(ServerLevel level, BlockPos bell, VillagesConfig.BiomeBonus b) {
+        BiFunction<ServerLevel, BlockPos, Set<String>> o = biomeOverride;
+        if (o != null) {
+            Set<String> here = o.apply(level, bell);
+            return b.biomes().stream().anyMatch(here::contains);
+        }
+        int r = b.radius();
+        int d = (int) Math.round(r * 0.7071);
+        int[][] dirs = {{0, 0}, {r, 0}, {-r, 0}, {0, r}, {0, -r}, {d, d}, {d, -d}, {-d, d}, {-d, -d}};
+        for (int[] off : dirs) {
+            Holder<Biome> biome = level.getBiome(bell.offset(off[0], 0, off[1]));
+            for (String id : b.biomes()) {
+                if (id.startsWith("#")) {
+                    ResourceLocation rl = ResourceLocation.tryParse(id.substring(1));
+                    if (rl != null && biome.is(TagKey.create(Registries.BIOME, rl))) {
+                        return true;
+                    }
+                } else if (biome.unwrapKey().map(k -> k.location().toString().equals(id)).orElse(false)) {
+                    return true;
+                }
             }
         }
         return false;

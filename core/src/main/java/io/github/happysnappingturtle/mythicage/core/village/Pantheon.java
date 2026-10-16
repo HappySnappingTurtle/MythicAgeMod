@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -37,15 +38,31 @@ public record Pantheon(Civilization civ, List<String> patrons, List<MinorGod> mi
         return new Pantheon(civ, List.of(), List.of());
     }
 
-    /** 已结识这些主神的玩家，在某时代可选的次神（去重，按表顺序）。 */
-    public List<MinorGod> candidates(Collection<String> knownPatrons, Age age) {
-        List<MinorGod> out = new ArrayList<>();
-        for (MinorGod g : minorGods) {
-            if (g.age() == age && g.available() && g.patrons().stream().anyMatch(knownPatrons::contains)) {
-                out.add(g);
+    /**
+     * 在主神为 villagePatron 的村庄举行仪式时，某时代可选的次神（18 号 §4：候选看举行地村庄的主神），
+     * 只列已有内容的（R1），按表顺序。
+     */
+    public List<MinorGod> candidates(String villagePatron, Age age) {
+        return minorGods.stream().filter(g -> g.age() == age && g.available() && g.patrons().contains(villagePatron))
+                .toList();
+    }
+
+    /** 本表中的全部神 id（主神 + 次神）。 */
+    public List<String> godIds() {
+        List<String> out = new ArrayList<>(patrons);
+        minorGods.forEach(g -> out.add(g.id()));
+        return out;
+    }
+
+    /** 在多个文明的表里重复出现的神 id（神名 key {@code mythic_age.god.<id>} 会冲突），按字母序。 */
+    public static List<String> duplicateIds(Collection<Pantheon> tables) {
+        Map<String, Integer> seen = new java.util.TreeMap<>();
+        for (Pantheon p : tables) {
+            for (String id : new HashSet<>(p.godIds())) {
+                seen.merge(id, 1, Integer::sum);
             }
         }
-        return out;
+        return seen.entrySet().stream().filter(e -> e.getValue() > 1).map(Map.Entry::getKey).toList();
     }
 
     /** 某位主神名下、某时代的次神（含尚未开放的），供祭司对话页展示。 */

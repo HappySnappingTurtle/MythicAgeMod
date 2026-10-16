@@ -1,32 +1,53 @@
 package io.github.happysnappingturtle.mythicage.core.config.world;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * {@code world_rules.json}：方块改变类开关（总纲 R2，决策 C3）。本文件独占这类开关。
+ * <p>
+ * 通用节不放任何一个文明专属的内容；文明专属的放在以文明 id 命名的节里（T10b 设计文档 §3.4）。
  *
  * @param beneficialConversions 施法者对自有方块做的有益、可逆转化（如神农田）
  * @param mobBlockDamage        生物破坏方块（同时遵守 mobGriefing）
  * @param blockEntityStall      方块实体（如刷怪笼）临时停摆
  * @param recipes               配方规则（T6）
- * @param growth                作物与果树的生长（T6b，含骨粉等催化效果的规则）
- * @param temples               神坛与神庙判定（T8a）
- * @param guardians             守护者（T9）
+ * @param shrines               神庙种类 id（如 {@code greek:altar}）→ 数量上限、间距与保护（T10b）
+ * @param guardians             祭司（T9，T10b 起对所有文明生效）
+ * @param greek                 希腊专属：作物生长（T6b）、神庙扫描预算（T8a）
  */
 public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
-                               GodPowers godPowers, Recipes recipes, Growth growth, Temples temples,
-                               Guardians guardians) {
-
-    /** 兼容旧调用：守护者规则用默认值。 */
-    public WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
-                            GodPowers godPowers, Recipes recipes, Growth growth, Temples temples) {
-        this(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, growth, temples,
-                Guardians.DEFAULTS);
+                               GodPowers godPowers, Recipes recipes, Map<String, Shrine> shrines,
+                               Guardians guardians, Greek greek) {
+    public WorldRulesConfig {
+        shrines = Map.copyOf(new LinkedHashMap<>(shrines));
     }
 
-    /** 兼容旧调用：神庙规则用默认值。 */
-    public WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
-                            GodPowers godPowers, Recipes recipes, Growth growth) {
-        this(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, growth, Temples.DEFAULTS,
-                Guardians.DEFAULTS);
+    /** 某种神庙的规则；配置里没有这一种时用 {@link Shrine#FALLBACK}。 */
+    public Shrine shrine(String kindId) {
+        return shrines.getOrDefault(kindId, Shrine.FALLBACK);
+    }
+
+    public WorldRulesConfig withRecipes(Recipes r) {
+        return new WorldRulesConfig(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, r, shrines,
+                guardians, greek);
+    }
+
+    public WorldRulesConfig withShrine(String kindId, Shrine rule) {
+        Map<String, Shrine> next = new LinkedHashMap<>(shrines);
+        next.put(kindId, rule);
+        return new WorldRulesConfig(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, next,
+                guardians, greek);
+    }
+
+    public WorldRulesConfig withGuardians(Guardians g) {
+        return new WorldRulesConfig(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, shrines,
+                g, greek);
+    }
+
+    public WorldRulesConfig withGreek(Greek g) {
+        return new WorldRulesConfig(beneficialConversions, mobBlockDamage, blockEntityStall, godPowers, recipes, shrines,
+                guardians, g);
     }
 
     /** @param terrainEdits 神力的永久地形破坏，默认关闭（红线 1） */
@@ -46,6 +67,51 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
     }
 
     /**
+     * 一种神庙（T10b 设计文档 §3）。数量上限按玩家在该神庙所属文明的时代计。
+     *
+     * @param spacing 同种神庙之间的最小水平切比雪夫距离
+     * @param protect 只有主人（或创造模式管理员）能挖掉
+     */
+    public record Shrine(int limitArchaic, int limitClassical, int limitHeroic, int limitMythic, int spacing,
+                         boolean protect) {
+        /** 配置里没有的种类：远古 1 座，逐级加到 3，不限间距，受保护。 */
+        public static final Shrine FALLBACK = new Shrine(1, 2, 3, 3, 1, true);
+        public static final Shrine GREEK_ALTAR = new Shrine(1, 2, 3, 3, 15, true);
+
+        /** 按时代 id（archaic / classical / heroic / mythic）取上限；其他（含 none）为 0。 */
+        public int limit(String ageId) {
+            return switch (ageId) {
+                case "archaic" -> limitArchaic;
+                case "classical" -> limitClassical;
+                case "heroic" -> limitHeroic;
+                case "mythic" -> limitMythic;
+                default -> 0;
+            };
+        }
+    }
+
+    /**
+     * 祭司（T9 设计文档 §7）。
+     *
+     * @param spawnInVillages 已登记村庄的中心旁出现本文明的祭司（决策 D1；对所有有祭司的文明生效）
+     * @param respawnDays     祭司死亡后在居所复原所需的 MC 日（决策 D4）
+     * @param interactRange   交易界面保持打开的最大距离（格）
+     */
+    public record Guardians(boolean spawnInVillages, int respawnDays, int interactRange) {
+        public static final Guardians DEFAULTS = new Guardians(true, 1, 8);
+    }
+
+    /** 希腊专属规则。 */
+    public record Greek(Growth growth, TempleBudget temple) {
+        public static final Greek DEFAULTS = new Greek(new Growth(24000, 12000, new BoneMeal(0.5, false)),
+                new TempleBudget(2048, 6000));
+
+        public Greek withGrowth(Growth g) {
+            return new Greek(g, temple);
+        }
+    }
+
+    /**
      * 生长（T6b 设计文档 §10.3）。
      *
      * @param oliveFruitTicks 橄榄树叶从无果到熟果的期望时长（按默认随机刻速度换算）
@@ -62,38 +128,11 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
     }
 
     /**
-     * 神坛与神庙判定（T8a 设计文档 §7）。
+     * 希腊神庙扫描（T8a 设计文档 §7）。
      *
-     * @param altarLimitArchaic   各时代每位玩家可拥有的希腊神坛数
-     * @param altarSpacing        任意两座神坛的最小水平切比雪夫距离（15 时扫描体不重叠）
-     * @param protectAltar        只有主人（或创造模式管理员）能挖掉神坛
      * @param scanCellsPerTick    全服神庙扫描每刻处理的格数上限
      * @param rescanIntervalTicks 兜底重扫间隔
      */
-    public record Temples(int altarLimitArchaic, int altarLimitClassical, int altarLimitHeroic, int altarLimitMythic,
-                          int altarSpacing, boolean protectAltar, int scanCellsPerTick, int rescanIntervalTicks) {
-        public static final Temples DEFAULTS = new Temples(1, 2, 3, 3, 15, true, 2048, 6000);
-
-        /** 按时代 id（archaic / classical / heroic / mythic）取上限；其他（含 none）为 0。 */
-        public int altarLimit(String ageId) {
-            return switch (ageId) {
-                case "archaic" -> altarLimitArchaic;
-                case "classical" -> altarLimitClassical;
-                case "heroic" -> altarLimitHeroic;
-                case "mythic" -> altarLimitMythic;
-                default -> 0;
-            };
-        }
-    }
-
-    /**
-     * 守护者（T9 设计文档 §7）。
-     *
-     * @param spawnInVillages 希腊地域的原版村庄聚会钟旁出现祭司（决策 D1）
-     * @param respawnDays     祭司死亡后在居所复原所需的 MC 日（决策 D4）
-     * @param interactRange   交易界面保持打开的最大距离（格）
-     */
-    public record Guardians(boolean spawnInVillages, int respawnDays, int interactRange) {
-        public static final Guardians DEFAULTS = new Guardians(true, 1, 8);
+    public record TempleBudget(int scanCellsPerTick, int rescanIntervalTicks) {
     }
 }

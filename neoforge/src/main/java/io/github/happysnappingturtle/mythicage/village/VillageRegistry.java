@@ -25,7 +25,8 @@ import java.util.UUID;
 
 /**
  * 村庄登记（T10a 设计文档 §2.1）：以聚会钟为唯一键。主世界 SavedData，维度写在钟的 GlobalPos 里。
- * 文明与主神一经登记永久不变；钟连续 7 个 MC 日不在时注销。
+ * 文明与主神一经登记不变；唯一的例外是登记时该文明还没有主神权重、主神为空的村庄，
+ * 之后有了权重会按同一坐标补抽一次（T10b，19 号 M2）。钟连续 7 个 MC 日不在时注销。
  */
 public final class VillageRegistry extends SavedData {
     public static final String NAME = "mythic_age_villages";
@@ -61,6 +62,10 @@ public final class VillageRegistry extends SavedData {
 
         Village withMissingSince(long day) {
             return new Village(id, bell, civ, patron, origin, founder, vanillaType, day);
+        }
+
+        Village withPatron(String p) {
+            return new Village(id, bell, civ, p, origin, founder, vanillaType, missingSinceDay);
         }
     }
 
@@ -98,6 +103,13 @@ public final class VillageRegistry extends SavedData {
             return true;
         }
         return false;
+    }
+
+    /** 补抽主神（只对主神为空的村庄生效）。 */
+    void setPatron(Village v, String patron) {
+        if (v.patron().isEmpty() && !patron.isEmpty()) {
+            add(v.withPatron(patron));
+        }
     }
 
     void setMissingSince(Village v, long day) {

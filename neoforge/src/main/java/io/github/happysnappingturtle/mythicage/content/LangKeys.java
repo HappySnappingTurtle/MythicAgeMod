@@ -47,10 +47,10 @@ public final class LangKeys {
         add("commands.mythic_age.dev.charge", "%s 个实体开始冲锋（%s 格）", "%s entit(ies) charging (%s blocks)", "%s 体が突進を開始（%s ブロック）");
         add("commands.mythic_age.dev.variant", "已将 %s 个实体的变体设为「%s」（缩放 %s）", "Set variant of %s entit(ies) to '%s' (scale %s)", "%s 体の変種を「%s」に設定しました（倍率 %s）");
         add("commands.mythic_age.dev.unknown_state", "未知动画状态：%s", "Unknown animation state: %s", "不明なアニメーション状態：%s");
-        add("mythic_age.altar.place.no_age", "尚未接触希腊文明，不能建立神坛", "You have not met the Greek pantheon yet; you cannot raise an altar", "まだギリシャの神々と接していないため、祭壇を建てられません");
-        add("mythic_age.altar.place.limit", "当前时代最多拥有 %s 座希腊神坛", "Your current age allows at most %s Greek altar(s)", "現在の時代ではギリシャの祭壇は最大 %s 基までです");
-        add("mythic_age.altar.place.spacing", "离已有神坛太近：两座神坛至少相隔 %s 格（%s, %s, %s，主人 %s）", "Too close to another altar: altars must be at least %s blocks apart (%s, %s, %s, owner %s)", "既存の祭壇に近すぎます：祭壇同士は %s ブロック以上離してください（%s, %s, %s、所有者 %s）");
-        add("mythic_age.altar.protected", "这是 %s 的神坛，只有主人能拆除", "This altar belongs to %s; only its owner can remove it", "これは %s の祭壇です。所有者だけが撤去できます");
+        add("mythic_age.shrine.place.no_age", "尚未接触%s文明，不能建立%s", "You have not met the %s pantheon yet; you cannot raise a %s", "まだ%sの神々と接していないため、%sを建てられません");
+        add("mythic_age.shrine.place.limit", "当前时代最多拥有 %2$s 座%1$s", "Your current age allows at most %2$s %1$s(s)", "現在の時代では%1$sは最大 %2$s 基までです");
+        add("mythic_age.shrine.place.spacing", "离已有的%s太近：至少相隔 %s 格（%s, %s, %s，主人 %s）", "Too close to another %s: keep at least %s blocks apart (%s, %s, %s, owner %s)", "既存の%sに近すぎます：%s ブロック以上離してください（%s, %s, %s、所有者 %s）");
+        add("mythic_age.shrine.protected", "这是 %s 的%s，只有主人能拆除", "This %2$s belongs to %1$s; only its owner can remove it", "これは %s の%sです。所有者だけが撤去できます");
         add("mythic_age.altar.title", "奥林匹斯祭坛", "Olympian Altar", "オリュンポスの祭壇");
         add("mythic_age.altar.owner", "主人：%s（%s时代）", "Owner: %s (%s Age)", "所有者：%s（%s時代）");
         add("mythic_age.altar.no_result", "尚未完成扫描", "Survey not finished yet", "調査はまだ終わっていません");
@@ -88,17 +88,17 @@ public final class LangKeys {
         add("mythic_age.recipe.age_locked", "%s 需要%s%s时代", "%s requires %s %s Age", "%sには%s・%s時代が必要です");
         // 守护者与兑换（T9）
         add("entity.mythic_age.greek_guardian", "神庙祭司", "Temple Priest", "神殿の神官");
-        add("mythic_age.guardian.talk.first", "远方来的旅人，奥林匹斯的众神注视着你。接受祝福，带走这座祭坛，在你的居所为众神立起香火。", "Traveller from afar, the gods of Olympus are watching you. Accept their blessing and take this altar; kindle an offering to the gods where you dwell.", "遠方からの旅人よ、オリュンポスの神々があなたを見守っている。祝福を受け、この祭壇を持ち帰り、住まいで神々に灯をともしなさい。");
-        add("mythic_age.guardian.talk.reissue", "你的祭坛遗失了？众神仍记得你。我可以再给你一座，但每天只能一次。", "Your altar is lost? The gods still remember you. I can give you another, but only once a day.", "祭壇をなくしたのか？神々はまだあなたを覚えている。もう一基渡そう。ただし一日に一度だけだ。");
-        add("mythic_age.guardian.talk.greet", "愿众神庇佑你。需要什么，就到兑换页看看。", "May the gods protect you. See the exchange page for what I can offer.", "神々のご加護を。必要なものは交換のページを見てほしい。");
+        add("mythic_age.guardian.greek.talk.first", "远方来的旅人，奥林匹斯的众神注视着你。接受祝福，带走这座祭坛，在你的居所为众神立起香火。", "Traveller from afar, the gods of Olympus are watching you. Accept their blessing and take this altar; kindle an offering to the gods where you dwell.", "遠方からの旅人よ、オリュンポスの神々があなたを見守っている。祝福を受け、この祭壇を持ち帰り、住まいで神々に灯をともしなさい。");
+        add("mythic_age.guardian.greek.talk.reissue", "你的祭坛遗失了？众神仍记得你。我可以再给你一座，但每天只能一次。", "Your altar is lost? The gods still remember you. I can give you another, but only once a day.", "祭壇をなくしたのか？神々はまだあなたを覚えている。もう一基渡そう。ただし一日に一度だけだ。");
+        add("mythic_age.guardian.greek.talk.greet", "愿众神庇佑你。需要什么，就到兑换页看看。", "May the gods protect you. See the exchange page for what I can offer.", "神々のご加護を。必要なものは交換のページを見てほしい。");
         add("mythic_age.guardian.accept_blessing", "接受祝福", "Accept the blessing", "祝福を受ける");
-        add("mythic_age.guardian.reissue", "补领祭坛", "Ask for another altar", "祭壇を再び受け取る");
+        add("mythic_age.guardian.reissue", "补领%s", "Ask for another %s", "%sを再び受け取る");
         add("mythic_age.guardian.to_trade", "去兑换", "Exchange", "交換へ");
         add("mythic_age.trade.tab.talk", "对话", "Talk", "会話");
         add("mythic_age.trade.tab.trade", "兑换", "Exchange", "交換");
-        add("mythic_age.trade.altar_title", "奥林匹斯祭坛 · 兑换", "Olympian Altar · Exchange", "オリュンポスの祭壇・交換");
-        add("mythic_age.trade.favor", "希腊恩宠 %s/%s · %s时代", "Greek Favor %s/%s · %s Age", "ギリシャの恩寵 %s/%s・%s時代");
-        add("mythic_age.trade.favor.none", "尚未得到希腊众神的祝福", "Not yet blessed by the Greek gods", "まだギリシャの神々の祝福を受けていません");
+        add("mythic_age.trade.shrine_title", "%s · 兑换", "%s · Exchange", "%s・交換");
+        add("mythic_age.trade.favor", "%s %s/%s · %s时代", "%s %s/%s · %s Age", "%s %s/%s・%s時代");
+        add("mythic_age.trade.favor.none", "尚未得到%s众神的祝福", "Not yet blessed by the %s gods", "まだ%sの神々の祝福を受けていません");
         add("mythic_age.trade.buy", "兑换", "Buy", "交換");
         add("mythic_age.trade.pending", "祭司正在准备……", "The priest is preparing…", "神官が準備しています……");
         add("mythic_age.trade.empty", "此处暂时没有可兑换的物品。", "Nothing to exchange here yet.", "ここで交換できるものはまだありません。");
@@ -125,7 +125,7 @@ public final class LangKeys {
         add("mythic_age.trade.result.inventory_full", "背包已满，腾出空间再来。", "Your inventory is full; make room first.", "持ち物がいっぱいです。空きを作ってから来てください。");
         add("mythic_age.trade.result.already_blessed", "你已经得到过众神的祝福。", "You have already received the gods' blessing.", "すでに神々の祝福を受けています。");
         add("mythic_age.trade.result.not_blessed", "请先接受祝福。", "Accept the blessing first.", "まず祝福を受けてください。");
-        add("mythic_age.trade.result.has_altar", "你名下已有祭坛，或背包里还有一座。", "You already own an altar or carry one.", "すでに祭壇を持っているか、持ち物に一基あります。");
+        add("mythic_age.trade.result.has_shrine", "你名下已有%2$s，或背包里还有一座。", "You already own a %2$s or carry one.", "すでに%2$sを持っているか、持ち物に一基あります。");
         add("mythic_age.trade.result.reissued_today", "今天已经补领过了，明天再来。", "You already received one today; come back tomorrow.", "本日はすでに受け取りました。また明日来てください。");
         // 聚落归属与主神（T10a）
         add("mythic_age.god.zeus", "宙斯", "Zeus", "ゼウス");
@@ -143,19 +143,31 @@ public final class LangKeys {
         add("mythic_age.village.title", "%s之村", "Village of %s", "%sの村");
         add("mythic_age.village.title.plain", "村庄", "Village", "村");
         add("mythic_age.village.neutral", "未有信仰", "No faith", "信仰なし");
-        add("mythic_age.village.patron_known", "你结识了%s之村。其古典时代的次神 %s 将进入你的晋升候选。", "You have come to know the village of %s. Its Classical minor gods, %s, join your candidates for the next Age.", "%sの村と縁を結びました。古典時代の小神 %s があなたの昇格候補に加わります。");
+        add("mythic_age.village.patron_known", "你结识了%s之村。", "You have come to know the village of %s.", "%sの村と縁を結びました。");
         add("mythic_age.village.patron_line", "本村供奉%s", "This village worships %s", "この村は%sを祀っている");
-        add("mythic_age.village.patron_gods", "%s：%s", "%s: %s", "%s：%s");
         add("mythic_age.trade.state.needs_god", "需要供奉%s", "Requires devotion to %s", "%sへの信仰が必要");
         add("mythic_age.trade.result.minor_god_locked", "你没有供奉这位次神。", "You do not worship the minor god this requires.", "この小神を信仰していません。");
         add("commands.mythic_age.village.entry", "%s · %s（%s，%s）%s %s %s %s", "%s · %s (%s, %s) %s %s %s %s", "%s・%s（%s、%s）%s %s %s %s");
         add("commands.mythic_age.village.count", "共 %s 个村庄", "%s village(s)", "村 %s 件");
         add("commands.mythic_age.village.none", "附近没有已登记的村庄", "No registered village nearby", "近くに登録された村はありません");
         add("commands.mythic_age.village.reset", "已注销该村庄登记，稍后按当前配置重新登记", "Village registration removed; it will be re-registered with the current config", "村の登録を削除しました。現在の設定で再登録されます");
-        add("commands.mythic_age.guardian.spawned", "已在 %s %s %s 生成神庙祭司", "Temple priest spawned at %s %s %s", "%s %s %s に神殿の神官を生成しました");
-        add("commands.mythic_age.guardian.count", "共 %s 位神庙祭司", "%s temple priest(s)", "神殿の神官 %s 人");
-        add("commands.mythic_age.guardian.alive", "· %s %s (%s, %s, %s) 在世", "· %s %s (%s, %s, %s) alive", "· %s %s (%s, %s, %s) 健在");
-        add("commands.mythic_age.guardian.dead", "· %s %s (%s, %s, %s) 已故，死于第 %s 日", "· %s %s (%s, %s, %s) dead since day %s", "· %s %s (%s, %s, %s) 死亡（%s 日目）");
+        add("commands.mythic_age.guardian.spawned", "已在 %2$s %3$s %4$s 生成%1$s", "%1$s spawned at %2$s %3$s %4$s", "%2$s %3$s %4$s に%1$sを生成しました");
+        add("commands.mythic_age.guardian.count", "共 %s 位祭司", "%s priest(s)", "神官 %s 人");
+        add("commands.mythic_age.guardian.alive", "· %s %s %s (%s, %s, %s) 在世", "· %s %s %s (%s, %s, %s) alive", "· %s %s %s (%s, %s, %s) 健在");
+        add("commands.mythic_age.guardian.dead", "· %s %s %s (%s, %s, %s) 已故，死于第 %s 日", "· %s %s %s (%s, %s, %s) dead since day %s", "· %s %s %s (%s, %s, %s) 死亡（%s 日目）");
+        add("commands.mythic_age.guardian.need_civ", "这里不在任何村庄里，请指定文明：/mythicage guardian spawn <文明>", "Not inside a village; specify a civilization: /mythicage guardian spawn <civ>", "村の中ではありません。文明を指定してください：/mythicage guardian spawn <文明>");
+        add("commands.mythic_age.guardian.unknown_civ", "未知文明：%s", "Unknown civilization: %s", "不明な文明：%s");
+        add("commands.mythic_age.guardian.no_guardian", "%s文明尚未开放，没有祭司", "The %s civilization is not available yet and has no priest", "%s文明はまだ開放されておらず、神官がいません");
+        add("mythic_age.guardian.title", "祭司", "Priest", "神官");
+        add("mythic_age.grace.unloaded", "区块未加载", "Area not loaded", "未読み込み");
+        add("mythic_age.rite.promotion", "晋升", "Ascension", "昇格");
+        add("mythic_age.rite.founding", "立祀", "Consecration", "奉祀");
+        add("mythic_age.rite.rededication", "改奉", "Rededication", "改宗");
+        add("mythic_age.favor.greek", "希腊恩宠", "Greek Favor", "ギリシャの恩寵");
+        add("mythic_age.rite.greek.promotion", "百牲大祭", "Hekatomb", "ヘカトンベー");
+        add("mythic_age.rite.greek.founding", "立像礼", "Hidrysis", "神像の安置");
+        add("mythic_age.rite.greek.rededication", "改奉", "Rededication", "改宗");
+        add("mythic_age.faith.greek.hint", "到平原与草甸的希腊村庄，找神庙祭司", "Find the temple priest in a Greek village on the plains or meadows", "平原や草原のギリシャの村で神殿の神官を探そう");
     }
 
     private LangKeys() {

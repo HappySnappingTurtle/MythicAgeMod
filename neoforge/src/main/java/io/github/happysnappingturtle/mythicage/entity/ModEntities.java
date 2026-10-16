@@ -1,6 +1,6 @@
 package io.github.happysnappingturtle.mythicage.entity;
 
-import io.github.happysnappingturtle.mythicage.guardian.GreekGuardianEntity;
+import io.github.happysnappingturtle.mythicage.content.greek.guardian.GreekGuardianEntity;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

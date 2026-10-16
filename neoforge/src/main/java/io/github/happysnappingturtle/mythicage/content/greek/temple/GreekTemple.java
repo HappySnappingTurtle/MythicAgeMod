@@ -5,9 +5,10 @@ import io.github.happysnappingturtle.mythicage.content.Content;
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
+import io.github.happysnappingturtle.mythicage.faith.GraceSources;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
-import io.github.happysnappingturtle.mythicage.temple.GreekAltarBlock;
-import io.github.happysnappingturtle.mythicage.temple.GreekAltarBlockEntity;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineKind;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineKinds;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -49,6 +50,10 @@ public final class GreekTemple {
             .tags(BlockTags.MINEABLE_WITH_PICKAXE)
             .lang("奥林匹斯祭坛", "Olympian Altar", "オリュンポスの祭壇")
             .register();
+
+    /** 希腊神坛这一种神庙（T10b）：同种间距的垂直范围 = 扫描体高度；扫描体相交、提示与扫描由 TempleService 接入。 */
+    public static final ShrineKind ALTAR_KIND = ShrineKinds.register(new ShrineKind("greek:altar", GREEK, GREEK_ALTAR,
+            TempleService.VERTICAL_SPACING, TempleService.HOOKS));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GreekAltarBlockEntity>> GREEK_ALTAR_BE =
             ModRegistries.BLOCK_ENTITY_TYPES.register("greek_altar",
@@ -95,6 +100,7 @@ public final class GreekTemple {
     }
 
     public static void init() {
+        GraceSources.register(GreekTempleSource.INSTANCE);
     }
 
     /** 不由 Content 条目声明的标签成员（原版方块、其他标签、大理石族），由 datagen 写出。 */

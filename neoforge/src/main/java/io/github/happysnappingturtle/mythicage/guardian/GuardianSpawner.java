@@ -4,7 +4,7 @@ import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
 import io.github.happysnappingturtle.mythicage.core.guardian.GuardianRules;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
-import io.github.happysnappingturtle.mythicage.entity.ModEntities;
+import io.github.happysnappingturtle.mythicage.faith.FaithProfiles;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import io.github.happysnappingturtle.mythicage.village.VillageService;
 import net.minecraft.core.BlockPos;
@@ -28,7 +28,8 @@ import java.util.UUID;
 /**
  * 守护者的出现、复原与去重（T9 设计文档 §7，决策 D1、D4）。
  * <ul>
- *   <li>村庄：每 100 刻对每位在线玩家查 48 格内的聚会钟；已登记为希腊村庄（T10a）且还没有祭司 → 在钟旁生成一位。</li>
+ *   <li>村庄：每 100 刻对每位在线玩家查 48 格内的聚会钟；已登记的村庄（T10a），其文明已开放（有文明档案）
+ *   且登记了祭司类型（T10b），还没有祭司 → 在钟旁生成一位本文明的祭司。</li>
  *   <li>复原：死亡满 {@code respawnDays} 个 MC 日、居所区块已加载 → 在居所生成，guardianId 不变。</li>
  *   <li>去重：实体进入世界时，若注册表记录的当前实体不是它（例如从旧区块读回的副本），拒绝加入。</li>
  * </ul>
@@ -50,10 +51,15 @@ public final class GuardianSpawner {
         return config().interactRange();
     }
 
-    /** 生成一位新祭司并登记。 */
+    /** 该文明能否有祭司：文明已开放（有档案）且登记了祭司类型。 */
+    public static boolean hasGuardian(Civilization civ) {
+        return FaithProfiles.open(civ) && GuardianTypes.typeFor(civ).isPresent();
+    }
+
+    /** 生成一位该文明的新祭司并登记；该文明没有祭司时为 null。 */
     @Nullable
-    public static GreekGuardianEntity spawnNew(ServerLevel level, BlockPos at, Optional<BlockPos> bell) {
-        GreekGuardianEntity g = ModEntities.GREEK_GUARDIAN.get().create(level);
+    public static GuardianEntity spawnNew(ServerLevel level, BlockPos at, Optional<BlockPos> bell, Civilization civ) {
+        GuardianEntity g = create(level, civ);
         if (g == null) {
             return null;
         }
@@ -64,18 +70,27 @@ public final class GuardianSpawner {
         return g;
     }
 
+    @Nullable
+    private static GuardianEntity create(ServerLevel level, Civilization civ) {
+        GuardianEntity g = GuardianTypes.typeFor(civ).map(t -> (GuardianEntity) t.create(level)).orElse(null);
+        if (g != null) {
+            g.setCiv(civ);
+        }
+        return g;
+    }
+
     /** 给没有身份的祭司登记一个新身份（刷怪蛋、命令、村庄规则共用）。 */
-    static void registerNew(ServerLevel level, GreekGuardianEntity g, BlockPos home, Optional<BlockPos> bell) {
+    static void registerNew(ServerLevel level, GuardianEntity g, BlockPos home, Optional<BlockPos> bell) {
         UUID id = UUID.randomUUID();
         g.assign(id, home);
         GuardianRegistry.get(level.getServer()).put(new GuardianRegistry.Entry(id, GlobalPos.of(level.dimension(), home),
-                bell.map(BlockPos::immutable), true, 0, g.getUUID()));
+                bell.map(BlockPos::immutable), true, 0, g.getUUID(), g.civ()));
     }
 
     // ───────────── 去重 ─────────────
 
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!(event.getEntity() instanceof GreekGuardianEntity g) || !(event.getLevel() instanceof ServerLevel level)) {
+        if (!(event.getEntity() instanceof GuardianEntity g) || !(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
         GuardianRegistry reg = GuardianRegistry.get(level.getServer());
@@ -88,7 +103,7 @@ public final class GuardianSpawner {
             // 结构或其它存档带来的祭司：按它自带的身份登记
             BlockPos home = g.home() != null ? g.home() : g.blockPosition();
             reg.put(new GuardianRegistry.Entry(g.guardianId(), GlobalPos.of(level.dimension(), home), Optional.empty(),
-                    true, 0, g.getUUID()));
+                    true, 0, g.getUUID(), g.civ()));
         } else if (!entry.get().alive() || !entry.get().entityUuid().equals(g.getUUID())) {
             event.setCanceled(true);
         }
@@ -115,7 +130,7 @@ public final class GuardianSpawner {
     }
 
     /**
-     * 在 pos 周围 48 格内、已登记且文明为希腊的村庄里补上祭司（T10a：祭司跟着村庄走，不再看群系）。
+     * 在 pos 周围 48 格内、已登记且文明有祭司的村庄里补上本文明的祭司（T10a：祭司跟着村庄走；T10b：按文明）。
      * 先登记附近的新聚会钟。返回新生成的数量。
      */
     public static int trySpawnNear(ServerLevel level, BlockPos pos) {
@@ -128,12 +143,12 @@ public final class GuardianSpawner {
         int spawned = 0;
         for (BlockPos bell : bells) {
             Optional<VillageRegistry.Village> v = villages.byBell(GlobalPos.of(level.dimension(), bell));
-            if (v.isEmpty() || !Civilization.GREEK.id().equals(v.get().civ())
-                    || reg.byBell(level.dimension(), bell).isPresent()) {
+            Optional<Civilization> civ = v.flatMap(x -> Civilization.byId(x.civ()));
+            if (civ.isEmpty() || !hasGuardian(civ.get()) || reg.byBell(level.dimension(), bell).isPresent()) {
                 continue;
             }
             Optional<BlockPos> spot = standableNear(level, bell, BELL_RADIUS);
-            if (spot.isPresent() && spawnNew(level, spot.get(), Optional.of(bell)) != null) {
+            if (spot.isPresent() && spawnNew(level, spot.get(), Optional.of(bell), civ.get()) != null) {
                 spawned++;
             }
         }
@@ -141,7 +156,7 @@ public final class GuardianSpawner {
     }
 
     /** 祭司所属的村庄（按其登记的钟）；刷怪蛋、命令生成的祭司没有。 */
-    public static Optional<VillageRegistry.Village> villageOf(GreekGuardianEntity g) {
+    public static Optional<VillageRegistry.Village> villageOf(GuardianEntity g) {
         if (!(g.level() instanceof ServerLevel level) || g.guardianId() == null) {
             return Optional.empty();
         }
@@ -164,7 +179,7 @@ public final class GuardianSpawner {
             if (level == null || !level.isLoaded(home)) {
                 continue;
             }
-            GreekGuardianEntity g = ModEntities.GREEK_GUARDIAN.get().create(level);
+            GuardianEntity g = create(level, e.civ());
             if (g == null) {
                 continue;
             }

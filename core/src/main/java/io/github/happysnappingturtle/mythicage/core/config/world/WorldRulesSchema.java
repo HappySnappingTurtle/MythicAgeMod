@@ -3,18 +3,29 @@ package io.github.happysnappingturtle.mythicage.core.config.world;
 import com.google.gson.JsonObject;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigSchema;
 import io.github.happysnappingturtle.mythicage.core.config.ObjectReader;
+import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
- * {@code world_rules.json} 的 schema（T3 设计文档 §5.2）。
+ * {@code world_rules.json} 的 schema（T3 设计文档 §5.2；T10b 设计文档 §3.4 升为第 2 版）。
+ * <p>
+ * 第 1 版的 {@code temples}（神坛上限、间距、保护、扫描预算）与顶层 {@code growth} 仍可读取，
+ * 分别读作 {@code shrines.greek.altar}、{@code greek.temple}、{@code greek.growth}，并告警指明新位置。
+ * 按 T3 规则不改写用户的文件；新旧同时存在时以新结构为准。
  */
 public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
     public static final WorldRulesSchema INSTANCE = new WorldRulesSchema();
+    /** 神庙种类 id 的后半段（文明 id 之后）。 */
+    private static final Pattern KIND = Pattern.compile("[a-z0-9_]+");
 
     private static final WorldRulesConfig DEFAULTS =
             new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
                     new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)),
-                    new WorldRulesConfig.Growth(24000, 12000, new WorldRulesConfig.BoneMeal(0.5, false)),
-                    WorldRulesConfig.Temples.DEFAULTS, WorldRulesConfig.Guardians.DEFAULTS);
+                    Map.of("greek:altar", WorldRulesConfig.Shrine.GREEK_ALTAR),
+                    WorldRulesConfig.Guardians.DEFAULTS, WorldRulesConfig.Greek.DEFAULTS);
 
     private WorldRulesSchema() {
     }
@@ -26,7 +37,7 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
 
     @Override
     public int currentVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -36,6 +47,32 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
 
     @Override
     public WorldRulesConfig read(ObjectReader root, WorldRulesConfig base) {
+        Map<String, WorldRulesConfig.Shrine> shrines = new LinkedHashMap<>(base.shrines());
+        WorldRulesConfig.Greek greek = base.greek();
+        // 第 1 版的位置：先读，作为新结构的底
+        if (root.isObject("temples")) {
+            ObjectReader t = root.object("temples");
+            WorldRulesConfig.Shrine altar = shrines.getOrDefault("greek:altar", WorldRulesConfig.Shrine.GREEK_ALTAR);
+            ObjectReader limits = t.object("altarLimitByAge");
+            altar = new WorldRulesConfig.Shrine(
+                    limits.intIn("archaic", altar.limitArchaic(), 0, 16),
+                    limits.intIn("classical", altar.limitClassical(), 0, 16),
+                    limits.intIn("heroic", altar.limitHeroic(), 0, 16),
+                    limits.intIn("mythic", altar.limitMythic(), 0, 16),
+                    t.intIn("altarSpacing", altar.spacing(), 1, 64),
+                    t.bool("protectAltar", altar.protect()));
+            shrines.put("greek:altar", altar);
+            greek = new WorldRulesConfig.Greek(greek.growth(), readTempleBudget(t, greek.temple()));
+            root.warn("temples", "第 1 版字段：神坛上限、间距、保护已改为 shrines.greek.altar，扫描预算已改为 greek.temple；本次按旧字段读取");
+        }
+        if (root.isObject("growth")) {
+            greek = greek.withGrowth(readGrowth(root.object("growth"), greek.growth()));
+            root.warn("growth", "第 1 版字段：已改为 greek.growth；本次按旧字段读取");
+        }
+        readShrines(root.object("shrines"), shrines);
+        ObjectReader g = root.object("greek");
+        greek = new WorldRulesConfig.Greek(readGrowth(g.object("growth"), greek.growth()),
+                readTempleBudget(g.object("temple"), greek.temple()));
         return new WorldRulesConfig(
                 root.bool("beneficialConversions", base.beneficialConversions()),
                 root.bool("mobBlockDamage", base.mobBlockDamage()),
@@ -43,9 +80,40 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 new WorldRulesConfig.GodPowers(
                         root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
                 readRecipes(root.object("recipes"), base.recipes()),
-                readGrowth(root.object("growth"), base.growth()),
-                readTemples(root.object("temples"), base.temples()),
-                readGuardians(root.object("guardians"), base.guardians()));
+                shrines,
+                readGuardians(root.object("guardians"), base.guardians()),
+                greek);
+    }
+
+    /** {@code shrines.<文明>.<种类>}：按文明、按种类与已有值合并。 */
+    private static void readShrines(ObjectReader s, Map<String, WorldRulesConfig.Shrine> out) {
+        for (String civ : s.keys()) {
+            ObjectReader c = s.object(civ);
+            if (Civilization.byId(civ).isEmpty()) {
+                s.warn(civ, "未知文明，已忽略");
+                continue;
+            }
+            for (String kind : c.keys()) {
+                if (!KIND.matcher(kind).matches()) {
+                    c.warn(kind, "神庙种类只能由小写字母、数字、下划线组成，已忽略");
+                    continue;
+                }
+                ObjectReader k = c.object(kind);
+                String id = civ + ":" + kind;
+                out.put(id, readShrine(k, out.getOrDefault(id, WorldRulesConfig.Shrine.FALLBACK)));
+            }
+        }
+    }
+
+    private static WorldRulesConfig.Shrine readShrine(ObjectReader k, WorldRulesConfig.Shrine base) {
+        ObjectReader limits = k.object("limitByAge");
+        return new WorldRulesConfig.Shrine(
+                limits.intIn("archaic", base.limitArchaic(), 0, 16),
+                limits.intIn("classical", base.limitClassical(), 0, 16),
+                limits.intIn("heroic", base.limitHeroic(), 0, 16),
+                limits.intIn("mythic", base.limitMythic(), 0, 16),
+                k.intIn("spacing", base.spacing(), 1, 64),
+                k.bool("protect", base.protect()));
     }
 
     private static WorldRulesConfig.Guardians readGuardians(ObjectReader g, WorldRulesConfig.Guardians base) {
@@ -55,15 +123,8 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 g.intIn("interactRange", base.interactRange(), 4, 32));
     }
 
-    private static WorldRulesConfig.Temples readTemples(ObjectReader t, WorldRulesConfig.Temples base) {
-        ObjectReader limits = t.object("altarLimitByAge");
-        return new WorldRulesConfig.Temples(
-                limits.intIn("archaic", base.altarLimitArchaic(), 0, 16),
-                limits.intIn("classical", base.altarLimitClassical(), 0, 16),
-                limits.intIn("heroic", base.altarLimitHeroic(), 0, 16),
-                limits.intIn("mythic", base.altarLimitMythic(), 0, 16),
-                t.intIn("altarSpacing", base.altarSpacing(), 1, 64),
-                t.bool("protectAltar", base.protectAltar()),
+    private static WorldRulesConfig.TempleBudget readTempleBudget(ObjectReader t, WorldRulesConfig.TempleBudget base) {
+        return new WorldRulesConfig.TempleBudget(
                 t.intIn("scanCellsPerTick", base.scanCellsPerTick(), 256, 65536),
                 t.intIn("rescanIntervalTicks", base.rescanIntervalTicks(), 1200, 72000));
     }
@@ -100,33 +161,45 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         JsonObject recipes = new JsonObject();
         recipes.add("ageGated", gated);
         root.add("recipes", recipes);
-        JsonObject growth = new JsonObject();
-        growth.addProperty("oliveFruitTicks", value.growth().oliveFruitTicks());
-        growth.addProperty("grapeStageTicks", value.growth().grapeStageTicks());
-        JsonObject bone = new JsonObject();
-        bone.addProperty("grapeChance", value.growth().boneMeal().grapeChance());
-        bone.addProperty("oliveLeaves", value.growth().boneMeal().oliveLeaves());
-        growth.add("boneMeal", bone);
-        root.add("growth", growth);
-        WorldRulesConfig.Temples t = value.temples();
-        JsonObject temples = new JsonObject();
-        JsonObject limits = new JsonObject();
-        limits.addProperty("archaic", t.altarLimitArchaic());
-        limits.addProperty("classical", t.altarLimitClassical());
-        limits.addProperty("heroic", t.altarLimitHeroic());
-        limits.addProperty("mythic", t.altarLimitMythic());
-        temples.add("altarLimitByAge", limits);
-        temples.addProperty("altarSpacing", t.altarSpacing());
-        temples.addProperty("protectAltar", t.protectAltar());
-        temples.addProperty("scanCellsPerTick", t.scanCellsPerTick());
-        temples.addProperty("rescanIntervalTicks", t.rescanIntervalTicks());
-        root.add("temples", temples);
+        JsonObject shrines = new JsonObject();
+        value.shrines().keySet().stream().sorted().forEach(id -> {
+            WorldRulesConfig.Shrine s = value.shrines().get(id);
+            String[] parts = id.split(":", 2);
+            JsonObject civ = shrines.has(parts[0]) ? shrines.getAsJsonObject(parts[0]) : new JsonObject();
+            JsonObject kind = new JsonObject();
+            JsonObject limits = new JsonObject();
+            limits.addProperty("archaic", s.limitArchaic());
+            limits.addProperty("classical", s.limitClassical());
+            limits.addProperty("heroic", s.limitHeroic());
+            limits.addProperty("mythic", s.limitMythic());
+            kind.add("limitByAge", limits);
+            kind.addProperty("spacing", s.spacing());
+            kind.addProperty("protect", s.protect());
+            civ.add(parts[1], kind);
+            shrines.add(parts[0], civ);
+        });
+        root.add("shrines", shrines);
         WorldRulesConfig.Guardians gd = value.guardians();
         JsonObject guardians = new JsonObject();
         guardians.addProperty("spawnInVillages", gd.spawnInVillages());
         guardians.addProperty("respawnDays", gd.respawnDays());
         guardians.addProperty("interactRange", gd.interactRange());
         root.add("guardians", guardians);
+        JsonObject greek = new JsonObject();
+        JsonObject growth = new JsonObject();
+        WorldRulesConfig.Growth gr = value.greek().growth();
+        growth.addProperty("oliveFruitTicks", gr.oliveFruitTicks());
+        growth.addProperty("grapeStageTicks", gr.grapeStageTicks());
+        JsonObject bone = new JsonObject();
+        bone.addProperty("grapeChance", gr.boneMeal().grapeChance());
+        bone.addProperty("oliveLeaves", gr.boneMeal().oliveLeaves());
+        growth.add("boneMeal", bone);
+        greek.add("growth", growth);
+        JsonObject temple = new JsonObject();
+        temple.addProperty("scanCellsPerTick", value.greek().temple().scanCellsPerTick());
+        temple.addProperty("rescanIntervalTicks", value.greek().temple().rescanIntervalTicks());
+        greek.add("temple", temple);
+        root.add("greek", greek);
         return root;
     }
 }

@@ -10,8 +10,8 @@ import io.github.happysnappingturtle.mythicage.content.greek.architecture.Facing
 import io.github.happysnappingturtle.mythicage.content.greek.architecture.MosaicBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
-import io.github.happysnappingturtle.mythicage.core.temple.ColumnCounter;
-import io.github.happysnappingturtle.mythicage.core.temple.Grid3;
+import io.github.happysnappingturtle.mythicage.core.greek.temple.ColumnCounter;
+import io.github.happysnappingturtle.mythicage.core.scan.Grid3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;

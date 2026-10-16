@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.guardian;
 
 import io.github.happysnappingturtle.mythicage.MythicAge;
+import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
@@ -31,15 +32,16 @@ public final class GuardianRegistry extends SavedData {
     /**
      * @param bell       所属村庄的聚会钟；刷怪蛋或命令生成的祭司没有
      * @param entityUuid 当前（或最后一个）实体的 UUID；复原后换新
+     * @param civ        所属文明（T10b）；T9 的旧记录没有，读取时视为希腊
      */
     public record Entry(UUID guardianId, GlobalPos home, Optional<BlockPos> bell, boolean alive, long deathDay,
-                        UUID entityUuid) {
+                        UUID entityUuid, Civilization civ) {
         Entry dead(long day) {
-            return new Entry(guardianId, home, bell, false, day, entityUuid);
+            return new Entry(guardianId, home, bell, false, day, entityUuid, civ);
         }
 
         Entry revived(UUID entity) {
-            return new Entry(guardianId, home, bell, true, 0, entity);
+            return new Entry(guardianId, home, bell, true, 0, entity, civ);
         }
     }
 
@@ -93,6 +95,7 @@ public final class GuardianRegistry extends SavedData {
 
     // ───────────── 存取 ─────────────
 
+    /** 读取存档；供 GameTest 验证旧格式迁移。 */
     public static GuardianRegistry read(CompoundTag tag, HolderLookup.Provider registries) {
         GuardianRegistry r = new GuardianRegistry();
         for (Tag t : tag.getList("guardians", Tag.TAG_COMPOUND)) {
@@ -100,8 +103,10 @@ public final class GuardianRegistry extends SavedData {
             try {
                 ResourceKey<Level> dim = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(c.getString("dim")));
                 Optional<BlockPos> bell = c.contains("bell") ? Optional.of(BlockPos.of(c.getLong("bell"))) : Optional.empty();
+                Civilization civ = c.contains("civ") ? Civilization.byId(c.getString("civ"))
+                        .orElseThrow(() -> new IllegalArgumentException("未知文明 " + c.getString("civ"))) : Civilization.GREEK;
                 Entry e = new Entry(c.getUUID("id"), GlobalPos.of(dim, BlockPos.of(c.getLong("home"))), bell,
-                        c.getBoolean("alive"), c.getLong("deathDay"), c.getUUID("entity"));
+                        c.getBoolean("alive"), c.getLong("deathDay"), c.getUUID("entity"), civ);
                 r.entries.put(e.guardianId(), e);
             } catch (RuntimeException e) {
                 MythicAge.LOGGER.warn("跳过损坏的守护者登记：{}（{}）", c, e.getMessage());
@@ -122,6 +127,7 @@ public final class GuardianRegistry extends SavedData {
             c.putBoolean("alive", e.alive());
             c.putLong("deathDay", e.deathDay());
             c.putUUID("entity", e.entityUuid());
+            c.putString("civ", e.civ().id());
             list.add(c);
         }
         tag.put("guardians", list);

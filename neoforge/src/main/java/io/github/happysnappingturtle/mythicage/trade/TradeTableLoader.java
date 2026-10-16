@@ -24,8 +24,7 @@ import java.util.OptionalInt;
  */
 public final class TradeTableLoader extends SimpleJsonResourceReloadListener {
     private static volatile Map<Civilization, TradeTable> tables = Map.of();
-    @Nullable
-    private static volatile TradeTable testOverride;
+    private static final Map<Civilization, TradeTable> TEST = new EnumMap<>(Civilization.class);
 
     private TradeTableLoader() {
         super(new Gson(), "mythic_age/trade");
@@ -36,9 +35,11 @@ public final class TradeTableLoader extends SimpleJsonResourceReloadListener {
     }
 
     public static TradeTable table(Civilization civ) {
-        TradeTable o = testOverride;
-        if (o != null && o.civ() == civ) {
-            return o;
+        synchronized (TEST) {
+            TradeTable o = TEST.get(civ);
+            if (o != null) {
+                return o;
+            }
         }
         return tables.getOrDefault(civ, TradeTable.empty(civ));
     }
@@ -50,9 +51,15 @@ public final class TradeTableLoader extends SimpleJsonResourceReloadListener {
                 .map(item -> OptionalInt.of(item.getDefaultMaxStackSize())).orElse(OptionalInt.empty());
     };
 
-    /** 只供 GameTest 使用：临时替换某个文明的表。 */
+    /** 只供 GameTest 使用：临时替换该表所属文明的表；传 null 清除全部替换。 */
     public static void overrideForTest(@Nullable TradeTable table) {
-        testOverride = table;
+        synchronized (TEST) {
+            if (table == null) {
+                TEST.clear();
+            } else {
+                TEST.put(table.civ(), table);
+            }
+        }
     }
 
     @Override

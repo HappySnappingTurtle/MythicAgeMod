@@ -121,17 +121,7 @@ public final class VillageService {
                     .orElse("");
         }
         if (!civ.isEmpty()) {
-            Map<String, Integer> pw = cfg.patronWeights().get(civ);
-            if (pw != null) {
-                pw = VillageRules.coastal(pw, VillageResolver.coastal(level, bell), cfg.coastalPoseidonBonus());
-                patron = VillageRules.pick(pw, VillageRules.unit(bell.getX(), bell.getY(), bell.getZ(), VillageRules.SALT_PATRON))
-                        .orElse("");
-                Optional<Civilization> c = Civilization.byId(civ);
-                if (!patron.isEmpty() && c.isPresent() && !PantheonLoader.get(c.get()).patrons().isEmpty()
-                        && !PantheonLoader.get(c.get()).hasPatron(patron)) {
-                    MythicAge.LOGGER.warn("villages.json 中 {} 的主神 {} 不在主神表里", civ, patron);
-                }
-            }
+            patron = pickPatron(level, bell, civ, cfg);
         }
         VillageRegistry.Village v = new VillageRegistry.Village(UUID.randomUUID(), key, civ, patron,
                 VillageRegistry.Origin.VANILLA, null, type.get(), -1);
@@ -139,7 +129,41 @@ public final class VillageService {
         return Optional.of(v);
     }
 
-    /** 检查玩家 64 格内已登记村庄的钟：不在则记下起始日，满 7 日注销；回来了就清除标记。 */
+    /**
+     * 按坐标哈希抽主神（T10a 设计文档 §2；T10b：群系加成按文明配置）。该文明还没有主神权重时为空。
+     * 同一位置结果固定，所以补抽与「当初就有权重」时的结果相同。
+     */
+    public static String pickPatron(ServerLevel level, BlockPos bell, String civ, VillagesConfig cfg) {
+        Map<String, Integer> pw = cfg.patronWeights().get(civ);
+        if (pw == null || pw.isEmpty()) {
+            return "";
+        }
+        pw = VillageRules.biomeBonus(pw, VillageResolver.matchedBonuses(level, bell, cfg.biomeBonus(civ)));
+        String patron = VillageRules.pick(pw, VillageRules.unit(bell.getX(), bell.getY(), bell.getZ(),
+                VillageRules.SALT_PATRON)).orElse("");
+        Optional<Civilization> c = Civilization.byId(civ);
+        if (!patron.isEmpty() && c.isPresent() && !PantheonLoader.get(c.get()).patrons().isEmpty()
+                && !PantheonLoader.get(c.get()).hasPatron(patron)) {
+            MythicAge.LOGGER.warn("villages.json 中 {} 的主神 {} 不在主神表里", civ, patron);
+        }
+        return patron;
+    }
+
+    /** 主神为空、但该文明现在有了主神权重的村庄：补抽一次（19 号 M2）。返回补上的主神，没有补抽时为空。 */
+    public static Optional<String> backfillPatron(ServerLevel level, VillageRegistry.Village v) {
+        if (v.neutral() || !v.patron().isEmpty()) {
+            return Optional.empty();
+        }
+        String patron = pickPatron(level, v.bell().pos(), v.civ(), config());
+        if (patron.isEmpty()) {
+            return Optional.empty();
+        }
+        VillageRegistry.get(level.getServer()).setPatron(v, patron);
+        MythicAge.LOGGER.info("村庄 {} 补抽主神：{}（{}）", v.bell().pos(), patron, v.civ());
+        return Optional.of(patron);
+    }
+
+    /** 检查玩家 64 格内已登记村庄的钟：不在则记下起始日，满 7 日注销；回来了就清除标记；主神为空的补抽。 */
     public static void checkBells(ServerLevel level, BlockPos pos) {
         VillageRegistry reg = VillageRegistry.get(level.getServer());
         long today = MythDays.today(level.getServer());
@@ -151,6 +175,7 @@ public final class VillageService {
             boolean present = level.getPoiManager().existsAtPosition(PoiTypes.MEETING, b);
             if (present) {
                 reg.setMissingSince(v, -1);
+                backfillPatron(level, reg.byBell(v.bell()).orElse(v));
             } else if (v.missingSinceDay() < 0) {
                 reg.setMissingSince(v, today);
             } else if (today - v.missingSinceDay() >= VillageRegistry.EXPIRE_DAYS) {

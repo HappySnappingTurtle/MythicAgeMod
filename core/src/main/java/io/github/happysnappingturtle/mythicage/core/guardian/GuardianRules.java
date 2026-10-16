@@ -13,9 +13,9 @@ public final class GuardianRules {
         return Math.floorDiv(worldClockTicks, TICKS_PER_DAY);
     }
 
-    /** 补领祭坛（决策 D3）：名下没有已放置的祭坛，背包里也没有。每日次数由收据控制。 */
-    public static boolean canReissue(long ownedAltars, boolean altarInInventory) {
-        return ownedAltars == 0 && !altarInInventory;
+    /** 补领神庙（决策 D3）：名下没有已放置的该种神庙，背包里也没有。每日次数由收据控制。 */
+    public static boolean canReissue(long ownedShrines, boolean shrineInInventory) {
+        return ownedShrines == 0 && !shrineInInventory;
     }
 
     /** 复原（决策 D4）：死亡后满 respawnDays 个 MC 日。 */
@@ -25,7 +25,7 @@ public final class GuardianRules {
 
     /** 补领收据：每 MC 日一张。 */
     public static String reissueReceipt(String civId, long day) {
-        return civId + ":altar_reissue:" + day;
+        return civId + ":altar_reissue:" + day; // 收据名沿用 T9，旧存档里的当日收据仍有效
     }
 
     /** 初见收据：每个玩家每个文明一张（UNIQUE）。 */

@@ -609,11 +609,10 @@ public final class AgricultureGameTests {
         BlockPos p = new BlockPos(1, 1, 1);
         helper.setBlock(p, GreekAgriculture.OLIVE_LEAVES.get().defaultBlockState().setValue(LeavesBlock.DISTANCE, 1));
         try {
-            WorldRulesConfig.Growth g = original.growth();
-            WorldRulesConfig next = new WorldRulesConfig(original.beneficialConversions(), original.mobBlockDamage(),
-                    original.blockEntityStall(), original.godPowers(), original.recipes(),
+            WorldRulesConfig.Growth g = original.greek().growth();
+            WorldRulesConfig next = original.withGreek(original.greek().withGrowth(
                     new WorldRulesConfig.Growth(g.oliveFruitTicks(), g.grapeStageTicks(),
-                            new WorldRulesConfig.BoneMeal(g.boneMeal().grapeChance(), true)), original.temples());
+                            new WorldRulesConfig.BoneMeal(g.boneMeal().grapeChance(), true))));
             holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
             ItemStack meal = new ItemStack(Items.BONE_MEAL, 5);
             helper.assertTrue(BoneMealItem.applyBonemeal(meal, helper.getLevel(), helper.absolutePos(p), null),

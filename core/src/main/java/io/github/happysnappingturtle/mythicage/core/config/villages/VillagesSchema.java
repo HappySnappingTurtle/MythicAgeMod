@@ -6,9 +6,16 @@ import io.github.happysnappingturtle.mythicage.core.config.ObjectReader;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-/** {@code villages.json} 的 schema（T10a 设计文档 §8）。不合法的条目告警并回退到默认值。 */
+/**
+ * {@code villages.json} 的 schema（T10a 设计文档 §8；T10b 设计文档 §7 升为第 2 版）。不合法的条目告警并回退到默认值。
+ * <p>
+ * 主神权重与群系加成都按文明与默认值合并：文件里只写了希腊时，默认里其他文明的条目保留（新版本加的文明不会丢）。
+ * 第 1 版的 {@code coastalPoseidonBonus} 读作 {@code patronBiomeBonus.greek.poseidon.multiplier}；按 T3 规则不改写文件。
+ */
 public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
     public static final VillagesSchema INSTANCE = new VillagesSchema();
 
@@ -17,7 +24,12 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
                     "taiga", Map.of("norse", 1), "snowy", Map.of("norse", 1)),
             true,
             Map.of("greek", orderedOf("zeus", 40, "poseidon", 35, "hades", 25)),
-            2.0, true);
+            Map.of("greek", Map.of("poseidon", new VillagesConfig.BiomeBonus(
+                    List.of("#minecraft:is_ocean", "#minecraft:is_beach"), 32, 2.0))),
+            true);
+    /** 群系 id 或标签：可选 #，命名空间:路径。 */
+    private static final Pattern BIOME = Pattern.compile("#?[a-z0-9_.-]+:[a-z0-9_./-]+");
+    private static final Pattern ID = Pattern.compile("[a-z0-9_]+");
 
     private VillagesSchema() {
     }
@@ -37,7 +49,7 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
 
     @Override
     public int currentVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -52,9 +64,18 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         Map<String, Map<String, Integer>> typeToCiv = readTypeToCiv(root, base.vanillaTypeToCiv());
         boolean replace = root.bool("replaceVanillaInRegion", base.replaceVanillaInRegion());
         Map<String, Map<String, Integer>> patrons = readPatrons(root.object("patronWeights"), base.patronWeights());
-        double coastal = root.doubleIn("coastalPoseidonBonus", base.coastalPoseidonBonus(), 1.0, 10.0);
+        Map<String, Map<String, VillagesConfig.BiomeBonus>> bonus = new LinkedHashMap<>(base.patronBiomeBonus());
+        if (root.isPresent("coastalPoseidonBonus")) {
+            Map<String, VillagesConfig.BiomeBonus> greek = new LinkedHashMap<>(bonus.getOrDefault("greek", Map.of()));
+            VillagesConfig.BiomeBonus old = greek.getOrDefault("poseidon", DEFAULTS.biomeBonus("greek").get("poseidon"));
+            double m = root.doubleIn("coastalPoseidonBonus", old.multiplier(), 1.0, 10.0);
+            greek.put("poseidon", new VillagesConfig.BiomeBonus(old.biomes(), old.radius(), m));
+            bonus.put("greek", greek);
+            root.warn("coastalPoseidonBonus", "第 1 版字段：已改为 patronBiomeBonus.greek.poseidon.multiplier；本次按旧字段读取");
+        }
+        readBiomeBonus(root.object("patronBiomeBonus"), bonus);
         boolean title = root.bool("titleOnEnter", base.titleOnEnter());
-        return new VillagesConfig(mode, typeToCiv, replace, patrons, coastal, title);
+        return new VillagesConfig(mode, typeToCiv, replace, patrons, bonus, title);
     }
 
     private static Map<String, Map<String, Integer>> readTypeToCiv(ObjectReader root, Map<String, Map<String, Integer>> base) {
@@ -83,11 +104,9 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         return out;
     }
 
+    /** 按文明合并：文件里写了的文明整表替换该文明，没写的文明保留 base。 */
     private static Map<String, Map<String, Integer>> readPatrons(ObjectReader p, Map<String, Map<String, Integer>> base) {
-        if (p.keys().isEmpty()) {
-            return base;
-        }
-        Map<String, Map<String, Integer>> out = new LinkedHashMap<>();
+        Map<String, Map<String, Integer>> out = new LinkedHashMap<>(base);
         for (String civ : p.keys()) {
             if (Civilization.byId(civ).isEmpty()) {
                 p.warn(civ, "未知文明，已忽略");
@@ -99,7 +118,37 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
                 out.put(civ, w);
             }
         }
-        return out.isEmpty() ? base : out;
+        return out;
+    }
+
+    /** {@code patronBiomeBonus.<文明>.<主神>}：按文明、按主神与已有值合并。 */
+    private static void readBiomeBonus(ObjectReader b, Map<String, Map<String, VillagesConfig.BiomeBonus>> out) {
+        for (String civ : b.keys()) {
+            ObjectReader c = b.object(civ);
+            if (Civilization.byId(civ).isEmpty()) {
+                b.warn(civ, "未知文明，已忽略");
+                continue;
+            }
+            Map<String, VillagesConfig.BiomeBonus> perCiv = new LinkedHashMap<>(out.getOrDefault(civ, Map.of()));
+            for (String patron : c.keys()) {
+                if (!ID.matcher(patron).matches()) {
+                    c.warn(patron, "主神 id 只能由小写字母、数字、下划线组成，已忽略");
+                    continue;
+                }
+                ObjectReader o = c.object(patron);
+                VillagesConfig.BiomeBonus old = perCiv.getOrDefault(patron,
+                        new VillagesConfig.BiomeBonus(List.of(), 32, 1.0));
+                List<String> biomes = o.strings("biomes", old.biomes());
+                if (biomes.stream().anyMatch(x -> !BIOME.matcher(x).matches())) {
+                    o.warn("biomes", "应为群系 id（minecraft:beach）或群系标签（#minecraft:is_ocean），已使用默认值");
+                    biomes = old.biomes();
+                }
+                int radius = o.intIn("radius", old.radius(), 0, 96);
+                double m = o.doubleIn("multiplier", old.multiplier(), 0.1, 10.0);
+                perCiv.put(patron, new VillagesConfig.BiomeBonus(biomes, radius, m));
+            }
+            out.put(civ, perCiv);
+        }
     }
 
     /** 权重表：值为 1–1000 的整数；civKeys 时键必须是文明 id。 */
@@ -146,7 +195,21 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
             patrons.add(civ, o);
         });
         root.add("patronWeights", patrons);
-        root.addProperty("coastalPoseidonBonus", value.coastalPoseidonBonus());
+        JsonObject bonus = new JsonObject();
+        value.patronBiomeBonus().forEach((civ, m) -> {
+            JsonObject c = new JsonObject();
+            m.forEach((patron, b) -> {
+                JsonObject o = new JsonObject();
+                com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
+                b.biomes().forEach(arr::add);
+                o.add("biomes", arr);
+                o.addProperty("radius", b.radius());
+                o.addProperty("multiplier", b.multiplier());
+                c.add(patron, o);
+            });
+            bonus.add(civ, c);
+        });
+        root.add("patronBiomeBonus", bonus);
         root.addProperty("titleOnEnter", value.titleOnEnter());
         return root;
     }

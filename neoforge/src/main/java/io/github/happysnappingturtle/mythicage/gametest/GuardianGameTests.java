@@ -2,6 +2,8 @@ package io.github.happysnappingturtle.mythicage.gametest;
 
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
+import io.github.happysnappingturtle.mythicage.content.greek.guardian.GreekGuardianEntity;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigHolder;
@@ -12,14 +14,13 @@ import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.player.PlayerMythData;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeReason;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeTable;
-import io.github.happysnappingturtle.mythicage.guardian.GreekGuardianEntity;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianEntity;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianRegistry;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.player.PlayerDataNbt;
-import io.github.happysnappingturtle.mythicage.temple.GreekAltarBlock;
-import io.github.happysnappingturtle.mythicage.temple.TempleService;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineService;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
 import net.minecraft.core.BlockPos;
@@ -85,9 +86,9 @@ public final class GuardianGameTests {
         }
     }
 
-    private static GreekGuardianEntity guardian(GameTestHelper h) {
+    private static GuardianEntity guardian(GameTestHelper h) {
         floor(h);
-        GreekGuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 5)), Optional.empty());
+        GuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(5, 1, 5)), Optional.empty(), Civilization.GREEK);
         if (g == null) {
             throw new net.minecraft.gametest.framework.GameTestAssertException("祭司没有生成");
         }
@@ -95,7 +96,7 @@ public final class GuardianGameTests {
         return g;
     }
 
-    private static FakePlayer player(GameTestHelper h, GreekGuardianEntity g, String name) {
+    private static FakePlayer player(GameTestHelper h, GuardianEntity g, String name) {
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), name));
         p.getInventory().clearContent();
         p.moveTo(g.getX() + 2, g.getY(), g.getZ());
@@ -106,7 +107,7 @@ public final class GuardianGameTests {
         return MythData.get(p);
     }
 
-    private static FakePlayer blessed(GameTestHelper h, GreekGuardianEntity g, String name, long favor) {
+    private static FakePlayer blessed(GameTestHelper h, GuardianEntity g, String name, long favor) {
         FakePlayer p = player(h, g, name);
         data(p).civ(GR).setAge(Age.ARCHAIC);
         data(p).civ(GR).setFavor(favor);
@@ -136,7 +137,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void first_blessing_gives_altar_and_archaic(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_bless");
         TradeService.openGuardian(p, g);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
@@ -151,7 +152,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void first_blessing_needs_room(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_full");
         fill(p);
         TradeService.openGuardian(p, g);
@@ -164,7 +165,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void two_players_bless_independently(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer a = player(h, g, "ma_a");
         FakePlayer b = player(h, g, "ma_b");
         TradeService.openGuardian(a, g);
@@ -180,7 +181,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void favor_trade(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_favor", 30);
         TradeService.Outcome o = buy(p, "test_bolt", 20);
         expect(h, o, TradeReason.OK);
@@ -196,7 +197,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void age_locked_trade(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_age", 99);
         expect(h, buy(p, "test_classical", 10), TradeReason.AGE_LOCKED);
         h.assertTrue(data(p).civ(GR).favor() == 99, "恩宠不变");
@@ -205,7 +206,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void full_inventory_trade(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_full2", 50);
         fill(p);
         int receipts = data(p).receipts().size(io.github.happysnappingturtle.mythicage.core.player.ReceiptBook.Scope.REQUEST);
@@ -218,7 +219,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void item_price_trade_and_daily_limit(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_libation", 0);
         p.getInventory().add(new ItemStack(Items.EMERALD, 20));
         expect(h, buy(p, "libation", 0), TradeReason.OK);
@@ -239,7 +240,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void item_price_missing(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_noemerald", 0);
         expect(h, buy(p, "libation", 0), TradeReason.NOT_ENOUGH_ITEMS);
         h.succeed();
@@ -247,7 +248,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void duplicate_request_settles_once(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_dup", 60);
         String id = UUID.randomUUID().toString();
         expect(h, TradeService.buy(p, "test_bolt", 20, id), TradeReason.OK);
@@ -258,7 +259,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void npc_gone_when_far_or_dead(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_gone", 60);
         g.teleportTo(g.getX() + 20, g.getY(), g.getZ());
         expect(h, buy(p, "test_bolt", 20), TradeReason.NPC_GONE);
@@ -273,7 +274,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void unknown_offer_and_price_changed(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = blessed(h, g, "ma_hot", 60);
         expect(h, buy(p, "removed_offer", 20), TradeReason.UNKNOWN_OFFER);
         TradeService.Outcome o = buy(p, "test_bolt", 25);
@@ -290,10 +291,10 @@ public final class GuardianGameTests {
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_altar"));
         BlockPos abs = h.absolutePos(rel);
         p.moveTo(abs.getX() + 2.5, abs.getY(), abs.getZ() + 0.5);
-        TempleService.bindForTest(h.getLevel(), abs, p.getUUID(), "ma_altar", Age.CLASSICAL);
+        ShrineService.bindForTest(h.getLevel(), abs, p.getUUID(), "ma_altar", Age.CLASSICAL, net.minecraft.core.Direction.SOUTH);
         data(p).civ(GR).setAge(Age.CLASSICAL);
         data(p).civ(GR).setFavor(50);
-        h.assertTrue(TradeService.openAltar(p, abs), "主人可以在自己的祭坛打开兑换");
+        h.assertTrue(TradeService.openShrine(p, abs), "主人可以在自己的祭坛打开兑换");
         expect(h, buy(p, "test_bolt", 20), TradeReason.WRONG_VENUE);
         expect(h, buy(p, "test_classical", 10), TradeReason.OK);
         h.succeed();
@@ -303,12 +304,12 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void reissue_once_per_day(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_reissue");
         TradeService.openGuardian(p, g);
         expect(h, TradeService.blessing(p, true), TradeReason.NOT_BLESSED);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
-        expect(h, TradeService.blessing(p, true), TradeReason.HAS_ALTAR);
+        expect(h, TradeService.blessing(p, true), TradeReason.HAS_SHRINE);
         p.getInventory().clearContent();
         expect(h, TradeService.blessing(p, true), TradeReason.OK);
         p.getInventory().clearContent();
@@ -324,15 +325,15 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = BATCH)
     public static void reissue_refused_with_placed_altar(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_placed");
         TradeService.openGuardian(p, g);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
         p.getInventory().clearContent();
         BlockPos rel = new BlockPos(1, 1, 1);
         h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        TempleService.bindForTest(h.getLevel(), h.absolutePos(rel), p.getUUID(), "ma_placed", Age.ARCHAIC);
-        expect(h, TradeService.blessing(p, true), TradeReason.HAS_ALTAR);
+        ShrineService.bindForTest(h.getLevel(), h.absolutePos(rel), p.getUUID(), "ma_placed", Age.ARCHAIC, net.minecraft.core.Direction.SOUTH);
+        expect(h, TradeService.blessing(p, true), TradeReason.HAS_SHRINE);
         h.succeed();
     }
 
@@ -356,7 +357,7 @@ public final class GuardianGameTests {
             }
             Optional<GuardianRegistry.Entry> e = GuardianRegistry.get(h.getLevel().getServer()).byBell(h.getLevel().dimension(), bell);
             h.assertTrue(e.isPresent(), "钟旁应登记 1 位祭司");
-            long near = h.getLevel().getEntitiesOfClass(GreekGuardianEntity.class,
+            long near = h.getLevel().getEntitiesOfClass(GuardianEntity.class,
                     new net.minecraft.world.phys.AABB(bell).inflate(4)).size();
             h.assertTrue(near == 1, "钟旁只有 1 位祭司，实际 " + near);
             h.succeed();
@@ -393,8 +394,7 @@ public final class GuardianGameTests {
     }
 
     private static void setGuardians(ConfigHolder<WorldRulesConfig> holder, WorldRulesConfig base, WorldRulesConfig.Guardians g) {
-        WorldRulesConfig next = new WorldRulesConfig(base.beneficialConversions(), base.mobBlockDamage(),
-                base.blockEntityStall(), base.godPowers(), base.recipes(), base.growth(), base.temples(), g);
+        WorldRulesConfig next = base.withGuardians(g);
         holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
     }
 
@@ -402,7 +402,7 @@ public final class GuardianGameTests {
 
     @GameTest(template = T, batch = "guardian_respawn")
     public static void killed_priest_returns_next_day(GameTestHelper h) {
-        GreekGuardianEntity g = guardian(h);
+        GuardianEntity g = guardian(h);
         UUID id = g.guardianId();
         MinecraftServerRef server = new MinecraftServerRef(h);
         boolean[] killedEvent = {false};
@@ -427,9 +427,9 @@ public final class GuardianGameTests {
         GuardianRegistry.Entry e = reg.get(id).orElseThrow();
         h.assertTrue(e.alive(), "次日复原");
         Entity revived = h.getLevel().getEntity(e.entityUuid());
-        h.assertTrue(revived instanceof GreekGuardianEntity rg && id.equals(rg.guardianId()), "身份不变");
+        h.assertTrue(revived instanceof GuardianEntity rg && id.equals(rg.guardianId()), "身份不变");
         // TC-T9-60：同 guardianId 的旧副本不能再进入世界
-        GreekGuardianEntity copy = new GreekGuardianEntity(
+        GuardianEntity copy = new GreekGuardianEntity(
                 io.github.happysnappingturtle.mythicage.entity.ModEntities.GREEK_GUARDIAN.get(), h.getLevel());
         copy.assign(id, e.home().pos());
         copy.moveTo(revived.getX(), revived.getY(), revived.getZ());
@@ -451,7 +451,7 @@ public final class GuardianGameTests {
                 h.setBlock(x, 0, z, Blocks.STONE);
             }
         }
-        GreekGuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(8, 1, 4)), Optional.empty());
+        GuardianEntity g = GuardianSpawner.spawnNew(h.getLevel(), h.absolutePos(new BlockPos(8, 1, 4)), Optional.empty(), Civilization.GREEK);
         h.assertTrue(g != null, "生成祭司");
         BlockPos home = g.home();
         BlockPos far = h.absolutePos(new BlockPos(8, 1, 30));
@@ -467,17 +467,17 @@ public final class GuardianGameTests {
         GuardianRegistry reg = new GuardianRegistry();
         UUID id = UUID.randomUUID();
         reg.put(new GuardianRegistry.Entry(id, net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), new BlockPos(1, 2, 3)),
-                Optional.of(new BlockPos(4, 5, 6)), false, 7, UUID.randomUUID()));
+                Optional.of(new BlockPos(4, 5, 6)), false, 7, UUID.randomUUID(), Civilization.GREEK));
         CompoundTag tag = reg.save(new CompoundTag(), h.getLevel().registryAccess());
         GuardianRegistry back = GuardianRegistry.read(tag, h.getLevel().registryAccess());
         h.assertTrue(back.get(id).equals(reg.get(id)), "注册表往返一致");
 
-        GreekGuardianEntity g = new GreekGuardianEntity(
+        GuardianEntity g = new GreekGuardianEntity(
                 io.github.happysnappingturtle.mythicage.entity.ModEntities.GREEK_GUARDIAN.get(), h.getLevel());
         g.assign(id, new BlockPos(9, 8, 7));
         CompoundTag et = new CompoundTag();
         g.saveWithoutId(et);
-        GreekGuardianEntity g2 = new GreekGuardianEntity(
+        GuardianEntity g2 = new GreekGuardianEntity(
                 io.github.happysnappingturtle.mythicage.entity.ModEntities.GREEK_GUARDIAN.get(), h.getLevel());
         g2.load(et);
         h.assertTrue(id.equals(g2.guardianId()) && new BlockPos(9, 8, 7).equals(g2.home()), "实体身份与居所往返一致");

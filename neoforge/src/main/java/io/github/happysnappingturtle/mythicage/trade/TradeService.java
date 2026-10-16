@@ -1,7 +1,7 @@
 package io.github.happysnappingturtle.mythicage.trade;
 
 import io.github.happysnappingturtle.mythicage.MythicAge;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
+import io.github.happysnappingturtle.mythicage.core.faith.FaithProfile;
 import io.github.happysnappingturtle.mythicage.core.guardian.GuardianRules;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
@@ -16,16 +16,18 @@ import io.github.happysnappingturtle.mythicage.core.trade.TradeOffer;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeReason;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeRules;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeTable;
-import io.github.happysnappingturtle.mythicage.guardian.GreekGuardianEntity;
+import io.github.happysnappingturtle.mythicage.faith.FaithProfiles;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianEntity;
+import io.github.happysnappingturtle.mythicage.guardian.GuardianGesture;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
 import io.github.happysnappingturtle.mythicage.player.MythData;
-import io.github.happysnappingturtle.mythicage.temple.AltarRegistry;
-import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -45,22 +47,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
 /**
- * 守护者与神坛的兑换（T9 设计文档 §5、§6）。服务端权威，按 12 号 §2 的顺序：
+ * 祭司与神庙的兑换（T9 设计文档 §5、§6；T10b：按文明）。服务端权威，按 12 号 §2 的顺序：
  * 验证 → 预留背包 → 提交事务（收据防重复）→ 发货 → 反馈。全部在服务端主线程的同一刻内完成。
  * <p>
  * 玩家打开界面时登记一个会话；会话每 10 刻校验一次（祭司是否还活着、是否在交互距离内），失效就通知客户端关闭。
+ * 会话的文明来自祭司或神庙；通用代码里不写任何文明的名字，与文明有关的文本与赠礼来自文明档案。
  */
 public final class TradeService {
-    public static final Civilization CIV = Civilization.GREEK;
     private static final int CHECK_INTERVAL = 10;
 
-    /** 一次打开的界面。guardianEntityId 在祭坛兑换时为 −1；altar 在守护者处为 null。 */
-    record Session(TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos altar, ResourceKey<Level> dim,
-                   String villagePatron) {
+    /** 一次打开的界面。guardianEntityId 在神庙兑换时为 −1；shrine 在祭司处为 null。 */
+    record Session(Civilization civ, TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos shrine,
+                   ResourceKey<Level> dim, String villagePatron) {
     }
 
     /** 请求结果：原因、附加数字、成功时的产物名与数量。 */
@@ -92,18 +95,30 @@ public final class TradeService {
 
     // ───────────── 会话 ─────────────
 
-    public static void openGuardian(ServerPlayer player, GreekGuardianEntity guardian) {
+    /** 与祭司交谈；该文明未开放（没有文明档案）时不打开。 */
+    public static boolean openGuardian(ServerPlayer player, GuardianEntity guardian) {
+        if (!FaithProfiles.open(guardian.civ())) {
+            return false;
+        }
         String patron = GuardianSpawner.villageOf(guardian).map(VillageRegistry.Village::patron).orElse("");
-        Session s = new Session(TradeOffer.Venue.GUARDIAN, guardian.getId(), null, guardian.level().dimension(), patron);
+        Session s = new Session(guardian.civ(), TradeOffer.Venue.GUARDIAN, guardian.getId(), null,
+                guardian.level().dimension(), patron);
         SESSIONS.put(player.getUUID(), s);
-        learnPatron(player, patron);
-        guardian.playGesture(GreekGuardianEntity.Gesture.GREET);
+        learnPatron(player, guardian.civ(), patron);
+        guardian.playGesture(GuardianGesture.GREET);
         send(player, new TradePayloads.Open(view(player, s)));
+        return true;
     }
 
-    /** 从神坛检视界面打开兑换页：神坛必须属于该玩家且在交互距离内。 */
-    public static boolean openAltar(ServerPlayer player, BlockPos pos) {
-        Session s = new Session(TradeOffer.Venue.ALTAR, -1, pos.immutable(), player.level().dimension(), "");
+    /** 从神庙检视界面打开兑换页：神庙必须属于该玩家且在交互距离内；文明取自神庙。 */
+    public static boolean openShrine(ServerPlayer player, BlockPos pos) {
+        Optional<ShrineRegistry.Entry> entry = ShrineRegistry.get(player.server)
+                .get(GlobalPos.of(player.level().dimension(), pos));
+        if (entry.isEmpty() || !FaithProfiles.open(entry.get().civ())) {
+            return false;
+        }
+        Session s = new Session(entry.get().civ(), TradeOffer.Venue.ALTAR, -1, pos.immutable(),
+                player.level().dimension(), "");
         if (!valid(player, s)) {
             return false;
         }
@@ -122,7 +137,7 @@ public final class TradeService {
 
     /** 正在与该祭司交易的玩家中最近的一位；没有时为 null。 */
     @Nullable
-    public static ServerPlayer nearestViewer(GreekGuardianEntity guardian) {
+    public static ServerPlayer nearestViewer(GuardianEntity guardian) {
         if (!(guardian.level() instanceof ServerLevel level) || SESSIONS.isEmpty()) {
             return null;
         }
@@ -145,7 +160,7 @@ public final class TradeService {
     }
 
     /** 祭司死亡或被移除：关闭所有对它打开的界面。 */
-    public static void onGuardianGone(GreekGuardianEntity guardian) {
+    public static void onGuardianGone(GuardianEntity guardian) {
         if (!(guardian.level() instanceof ServerLevel level)) {
             return;
         }
@@ -179,6 +194,12 @@ public final class TradeService {
         }
     }
 
+    /** 只供 GameTest：该玩家当前会话的界面数据；没有会话时为空。 */
+    public static Optional<TradeView> viewForTest(ServerPlayer player) {
+        Session s = SESSIONS.get(player.getUUID());
+        return s == null ? Optional.empty() : Optional.of(view(player, s));
+    }
+
     /** 只供 GameTest：清掉某玩家（例如 FakePlayer）的会话。 */
     public static void clearForTest() {
         SESSIONS.clear();
@@ -191,82 +212,63 @@ public final class TradeService {
         double max = (double) range() * range();
         if (s.venue() == TradeOffer.Venue.GUARDIAN) {
             Entity e = player.level().getEntity(s.guardianEntityId());
-            return e instanceof GreekGuardianEntity g && g.isAlive() && !g.isRemoved() && g.distanceToSqr(player) <= max;
+            return e instanceof GuardianEntity g && g.civ() == s.civ() && g.isAlive() && !g.isRemoved()
+                    && g.distanceToSqr(player) <= max;
         }
-        BlockPos altar = s.altar();
-        return altar != null && AltarRegistry.get(player.server).get(GlobalPos.of(s.dim(), altar))
-                .map(entry -> entry.owner().equals(player.getUUID())).orElse(false)
-                && player.distanceToSqr(altar.getCenter()) <= max;
+        BlockPos shrine = s.shrine();
+        return shrine != null && ShrineRegistry.get(player.server).get(GlobalPos.of(s.dim(), shrine))
+                .map(entry -> entry.owner().equals(player.getUUID()) && entry.civ() == s.civ()).orElse(false)
+                && player.distanceToSqr(shrine.getCenter()) <= max;
     }
 
     /**
-     * 结识村庄主神（T10a 设计文档 §4）：与村庄祭司交谈即记入；首次结识时提示该主神名下的次神候选。
+     * 结识村庄主神（T10a 设计文档 §4；18 号 §6：只作图鉴记录，不再决定晋升候选）：与村庄祭司交谈即记入。
      * 用 UNIQUE 收据保证提示只出现一次。
      */
-    static void learnPatron(ServerPlayer player, String patron) {
-        if (patron.isEmpty() || MythData.get(player).civ(CIV).knownPatrons().contains(patron)) {
+    static void learnPatron(ServerPlayer player, Civilization civ, String patron) {
+        if (patron.isEmpty() || MythData.get(player).civ(civ).knownPatrons().contains(patron)) {
             return;
         }
         Transactions.Result r = MythData.transact(player, Transactions.Request.unique(
-                "known_patron:" + CIV.id() + ":" + patron, TxSteps.knowPatron(CIV, patron)));
+                "known_patron:" + civ.id() + ":" + patron, TxSteps.knowPatron(civ, patron)));
         if (r.committed()) {
-            var pantheon = PantheonLoader.get(CIV);
-            net.minecraft.network.chat.MutableComponent gods = net.minecraft.network.chat.Component.empty();
-            boolean first = true;
-            for (var g : pantheon.underPatron(patron, Age.CLASSICAL)) {
-                if (!first) {
-                    gods.append("、");
-                }
-                gods.append(net.minecraft.network.chat.Component.translatable("mythic_age.god." + g.id()));
-                first = false;
-            }
-            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("mythic_age.village.patron_known",
-                    net.minecraft.network.chat.Component.translatable("mythic_age.god." + patron), gods));
+            player.sendSystemMessage(Component.translatable("mythic_age.village.patron_known",
+                    Component.translatable("mythic_age.god." + patron)));
         }
     }
 
     // ───────────── 界面数据 ─────────────
 
-    static long priceOf(ServerPlayer player, TradeOffer offer) {
-        return priceOf(player, offer, "");
-    }
-
-    static long priceOf(ServerPlayer player, TradeOffer offer, String villagePatron) {
+    static long priceOf(ServerPlayer player, Civilization civ, TradeOffer offer, String villagePatron) {
         if (!offer.price().isFavor()) {
             return 0;
         }
         List<Double> all = new ArrayList<>(discounts.apply(player, offer));
-        all.addAll(TradeRules.discounts(MythData.get(player), CIV, offer, villagePatron));
+        all.addAll(TradeRules.discounts(MythData.get(player), civ, offer, villagePatron));
         return PriceCalculator.favor(offer.price().favor(), all);
     }
 
     static TradeView view(ServerPlayer player, Session s) {
+        Civilization civ = s.civ();
         PlayerMythData data = MythData.get(player);
         long today = MythDays.today(player.server);
-        TradeTable table = TradeTableLoader.table(CIV);
+        TradeTable table = TradeTableLoader.table(civ);
         List<TradeView.OfferView> offers = new ArrayList<>();
         InventoryPlan inv = plan(player);
         for (TradeOffer o : table.offersAt(s.venue())) {
-            long price = priceOf(player, o, s.villagePatron());
-            boolean affordable = o.price().isFavor() ? data.civ(CIV).favor() >= price
+            long price = priceOf(player, civ, o, s.villagePatron());
+            boolean affordable = o.price().isFavor() ? data.civ(civ).favor() >= price
                     : o.price().items().stream().allMatch(a -> inv.count(a.item()) >= a.count());
             List<ItemStack> itemPrice = o.price().items().stream().map(a -> stack(a.item(), a.count())).toList();
-            boolean godLocked = !o.minorGod().isEmpty() && !data.civ(CIV).worships(o.minorGod());
+            boolean godLocked = !o.minorGod().isEmpty() && !data.civ(civ).worships(o.minorGod());
             offers.add(new TradeView.OfferView(o.id(), o.category(), stack(o.result().item(), o.result().count()), price,
-                    itemPrice, o.minAge(), !data.civ(CIV).age().atLeast(o.minAge()) || godLocked,
-                    TradeRules.remainingToday(data, CIV, o, today), affordable, godLocked ? o.minorGod() : ""));
+                    itemPrice, o.minAge(), !data.civ(civ).age().atLeast(o.minAge()) || godLocked,
+                    TradeRules.remainingToday(data, civ, o, today), affordable, godLocked ? o.minorGod() : ""));
         }
-        List<String> patronGods = new ArrayList<>();
-        if (!s.villagePatron().isEmpty()) {
-            var pantheon = PantheonLoader.get(CIV);
-            for (Age a : List.of(Age.CLASSICAL, Age.HEROIC, Age.MYTHIC)) {
-                for (var g : pantheon.underPatron(s.villagePatron(), a)) {
-                    patronGods.add(a.id() + ":" + g.id());
-                }
-            }
-        }
-        return new TradeView(s.venue(), s.guardianEntityId(), dialogue(player, s, today), data.civ(CIV).favor(),
-                MythData.cap(player, CIV), data.civ(CIV).age(), offers, s.villagePatron(), patronGods);
+        FaithProfile profile = FaithProfiles.get(civ).orElse(FaithProfile.defaults(civ));
+        return new TradeView(civ, new TradeView.Labels(profile.favor(), profile.shrine()), s.venue(),
+                s.guardianEntityId(), dialogue(player, s, today), data.civ(civ).favor(), MythData.cap(player, civ),
+                data.civ(civ).age(), offers, s.villagePatron());
     }
 
     private static TradeView.Dialogue dialogue(ServerPlayer player, Session s, long today) {
@@ -274,12 +276,14 @@ public final class TradeService {
             return TradeView.Dialogue.NONE;
         }
         PlayerMythData data = MythData.get(player);
-        if (data.civ(CIV).age() == Age.NONE) {
+        if (data.civ(s.civ()).age() == Age.NONE) {
             return TradeView.Dialogue.FIRST;
         }
-        boolean can = GuardianRules.canReissue(AltarRegistry.get(player.server).countOwned(player.getUUID()),
-                hasAltarItem(player))
-                && !data.receipts().contains(ReceiptBook.Scope.REQUEST, GuardianRules.reissueReceipt(CIV.id(), today));
+        Optional<FaithProfile.Reissue> reissue = FaithProfiles.get(s.civ()).flatMap(FaithProfile::reissue);
+        boolean can = reissue.isPresent()
+                && GuardianRules.canReissue(ShrineRegistry.get(player.server).countOwned(player.getUUID(),
+                reissue.get().shrineKind()), hasItem(player, reissue.get().item()))
+                && !data.receipts().contains(ReceiptBook.Scope.REQUEST, GuardianRules.reissueReceipt(s.civ().id(), today));
         return can ? TradeView.Dialogue.REISSUE : TradeView.Dialogue.NONE;
     }
 
@@ -296,19 +300,20 @@ public final class TradeService {
         if (data.receipts().contains(ReceiptBook.Scope.REQUEST, receipt)) {
             return Outcome.of(TradeReason.DUPLICATE);
         }
-        TradeOffer offer = TradeTableLoader.table(CIV).offer(offerId).orElse(null);
+        Civilization civ = s.civ();
+        TradeOffer offer = TradeTableLoader.table(civ).offer(offerId).orElse(null);
         if (offer == null) {
             return Outcome.of(TradeReason.UNKNOWN_OFFER);
         }
-        long price = priceOf(player, offer, s.villagePatron());
+        long price = priceOf(player, civ, offer, s.villagePatron());
         long today = MythDays.today(player.server);
         // 1 验证
-        TradeReason reason = TradeRules.check(data, CIV, offer, s.venue(), price, expectedPrice, today);
+        TradeReason reason = TradeRules.check(data, civ, offer, s.venue(), price, expectedPrice, today);
         if (reason == TradeReason.PRICE_CHANGED) {
             return new Outcome(reason, price, ItemStack.EMPTY);
         }
         if (reason == TradeReason.NOT_ENOUGH_FAVOR) {
-            return new Outcome(reason, price - data.civ(CIV).favor(), ItemStack.EMPTY);
+            return new Outcome(reason, price - data.civ(civ).favor(), ItemStack.EMPTY);
         }
         if (reason != TradeReason.OK) {
             return Outcome.of(reason);
@@ -326,11 +331,11 @@ public final class TradeService {
         }
         // 3 提交
         List<TxStep> steps = new ArrayList<>();
-        steps.add(TxSteps.requireAge(CIV, offer.minAge()));
+        steps.add(TxSteps.requireAge(civ, offer.minAge()));
         if (offer.price().isFavor()) {
-            steps.add(TxSteps.spendFavor(CIV, price));
+            steps.add(TxSteps.spendFavor(civ, price));
         }
-        steps.add(TxSteps.recordDaily(offer.key(CIV), today, offer.dailyLimit()));
+        steps.add(TxSteps.recordDaily(offer.key(civ), today, offer.dailyLimit()));
         Transactions.Result r = MythData.transact(player, new Transactions.Request(receipt, ReceiptBook.Scope.REQUEST, steps));
         if (r.status() == Transactions.Status.DUPLICATE) {
             return Outcome.of(TradeReason.DUPLICATE);
@@ -349,40 +354,55 @@ public final class TradeService {
 
     // ───────────── 初见与补领 ─────────────
 
+    /**
+     * 初见祝福（进入远古时代并领取文明档案里的赠礼）或补领神庙。赠礼一次预留全部，放不下则整单失败。
+     */
     public static Outcome blessing(ServerPlayer player, boolean reissue) {
         Session s = SESSIONS.get(player.getUUID());
         if (s == null || s.venue() != TradeOffer.Venue.GUARDIAN || !valid(player, s)) {
             SESSIONS.remove(player.getUUID());
             return Outcome.of(TradeReason.NPC_GONE);
         }
+        Civilization civ = s.civ();
+        FaithProfile profile = FaithProfiles.get(civ).orElse(null);
+        if (profile == null) {
+            return Outcome.of(TradeReason.NPC_GONE);
+        }
         PlayerMythData data = MythData.get(player);
-        ItemStack altar = new ItemStack(GreekTemple.GREEK_ALTAR.get());
+        List<ItemStack> gifts = new ArrayList<>();
         Transactions.Request request;
         if (!reissue) {
-            String receipt = GuardianRules.blessingReceipt(CIV.id());
+            String receipt = GuardianRules.blessingReceipt(civ.id());
             if (data.receipts().contains(ReceiptBook.Scope.UNIQUE, receipt)) {
                 return Outcome.of(TradeReason.DUPLICATE);
             }
-            if (data.civ(CIV).age() != Age.NONE) {
+            if (data.civ(civ).age() != Age.NONE) {
                 return Outcome.of(TradeReason.ALREADY_BLESSED);
             }
-            request = Transactions.Request.unique(receipt, TxSteps.requireAgeExactly(CIV, Age.NONE),
-                    TxSteps.setAge(CIV, Age.ARCHAIC));
+            profile.firstMeetGifts().forEach(g -> gifts.add(stack(g.item(), g.count())));
+            request = Transactions.Request.unique(receipt, TxSteps.requireAgeExactly(civ, Age.NONE),
+                    TxSteps.setAge(civ, Age.ARCHAIC));
         } else {
-            if (data.civ(CIV).age() == Age.NONE) {
+            if (data.civ(civ).age() == Age.NONE) {
                 return Outcome.of(TradeReason.NOT_BLESSED);
             }
-            if (!GuardianRules.canReissue(AltarRegistry.get(player.server).countOwned(player.getUUID()), hasAltarItem(player))) {
-                return Outcome.of(TradeReason.HAS_ALTAR);
+            FaithProfile.Reissue r = profile.reissue().orElse(null);
+            if (r == null || !GuardianRules.canReissue(ShrineRegistry.get(player.server).countOwned(player.getUUID(),
+                    r.shrineKind()), hasItem(player, r.item()))) {
+                return Outcome.of(TradeReason.HAS_SHRINE);
             }
-            String receipt = GuardianRules.reissueReceipt(CIV.id(), MythDays.today(player.server));
+            String receipt = GuardianRules.reissueReceipt(civ.id(), MythDays.today(player.server));
             if (data.receipts().contains(ReceiptBook.Scope.REQUEST, receipt)) {
                 return Outcome.of(TradeReason.REISSUED_TODAY);
             }
-            request = Transactions.Request.of(receipt, TxSteps.requireAge(CIV, Age.ARCHAIC));
+            gifts.add(stack(r.item(), 1));
+            request = Transactions.Request.of(receipt, TxSteps.requireAge(civ, Age.ARCHAIC));
         }
-        if (!plan(player).insert(key(altar), 1, altar.getMaxStackSize())) {
-            return Outcome.of(TradeReason.INVENTORY_FULL);
+        InventoryPlan plan = plan(player);
+        for (ItemStack g : gifts) {
+            if (g.isEmpty() || !plan.insert(key(g), g.getCount(), g.getMaxStackSize())) {
+                return Outcome.of(TradeReason.INVENTORY_FULL);
+            }
         }
         Transactions.Result r = MythData.transact(player, request);
         if (r.status() == Transactions.Status.DUPLICATE) {
@@ -391,11 +411,11 @@ public final class TradeService {
         if (!r.committed()) {
             return Outcome.of(reissue ? TradeReason.NOT_BLESSED : TradeReason.ALREADY_BLESSED);
         }
-        give(player, altar.copy());
-        if (!reissue && player.level().getEntity(s.guardianEntityId()) instanceof GreekGuardianEntity g) {
-            g.playGesture(GreekGuardianEntity.Gesture.ANNOUNCE);
+        gifts.forEach(g -> give(player, g.copy()));
+        if (!reissue && player.level().getEntity(s.guardianEntityId()) instanceof GuardianEntity g) {
+            g.playGesture(GuardianGesture.ANNOUNCE);
         }
-        return new Outcome(TradeReason.OK, 0, altar);
+        return new Outcome(TradeReason.OK, 0, gifts.isEmpty() ? ItemStack.EMPTY : gifts.getFirst());
     }
 
     // ───────────── 网络入口 ─────────────
@@ -418,9 +438,9 @@ public final class TradeService {
         }
     }
 
-    public static void handleOpenAltar(TradePayloads.OpenAltar p, IPayloadContext ctx) {
+    public static void handleOpenShrine(TradePayloads.OpenShrine p, IPayloadContext ctx) {
         if (ctx.player() instanceof ServerPlayer player) {
-            openAltar(player, p.pos());
+            openShrine(player, p.pos());
         }
     }
 
@@ -456,8 +476,9 @@ public final class TradeService {
         return new InventoryPlan(slots);
     }
 
-    private static boolean hasAltarItem(ServerPlayer player) {
-        return player.getInventory().contains(new ItemStack(GreekTemple.GREEK_ALTAR.get()));
+    private static boolean hasItem(ServerPlayer player, String itemId) {
+        ItemStack probe = stack(itemId, 1);
+        return !probe.isEmpty() && player.getInventory().contains(probe);
     }
 
     private static void removeItems(ServerPlayer player, String itemId, int amount) {

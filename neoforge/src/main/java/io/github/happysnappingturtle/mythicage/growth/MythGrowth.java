@@ -21,7 +21,7 @@ public final class MythGrowth {
     }
 
     public static WorldRulesConfig.Growth config() {
-        return ModConfigs.worldRules().current().growth();
+        return ModConfigs.worldRules().current().greek().growth();
     }
 
     /** 随机刻时按期望时长换算的几率决定是否推进。 */

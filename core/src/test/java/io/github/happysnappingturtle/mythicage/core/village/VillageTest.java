@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -65,10 +64,13 @@ class VillageTest {
 
     @Test
     void tc03CoastalPoseidon() {
-        Map<String, Integer> w = VillageRules.coastal(GREEK, true, 2.0);
+        // TC-T10b-13：通用群系加成与 T10a 的沿海加成结果相同
+        Map<String, Integer> w = VillageRules.biomeBonus(GREEK, Map.of("poseidon", 2.0));
         assertEquals(70, w.get("poseidon"));
         assertEquals(70.0 / 135, histogram(w, 10000, 7).get("poseidon") / 10000.0, 0.02);
-        assertEquals(GREEK, VillageRules.coastal(GREEK, false, 2.0));
+        assertEquals(GREEK, VillageRules.biomeBonus(GREEK, Map.of()));
+        assertEquals(GREEK, VillageRules.biomeBonus(GREEK, Map.of("odin", 3.0)), "不在权重表里的主神忽略");
+        assertEquals(1, VillageRules.biomeBonus(Map.of("zeus", 1), Map.of("zeus", 0.1)).get("zeus"), "至少为 1");
     }
 
     @Test
@@ -89,7 +91,52 @@ class VillageTest {
         assertEquals(Map.of("greek", 1), c.vanillaTypeToCiv().get("plains"));
         assertEquals(Map.of("norse", 1), c.vanillaTypeToCiv().get("snowy"));
         assertEquals(GREEK, c.patronWeights().get("greek"));
-        assertEquals(2.0, c.coastalPoseidonBonus());
+        VillagesConfig.BiomeBonus b = c.biomeBonus("greek").get("poseidon");
+        assertEquals(List.of("#minecraft:is_ocean", "#minecraft:is_beach"), b.biomes());
+        assertEquals(32, b.radius());
+        assertEquals(2.0, b.multiplier());
+    }
+
+    @Test
+    void tc_t10b_10_patronWeightsMergeByCiv() {
+        VillagesConfig base = new VillagesConfig(VillagesConfig.Mode.AFFILIATE, Map.of(), true,
+                Map.of("greek", GREEK, "egyptian", Map.of("ra", 40, "isis", 35, "set", 25)), Map.of(), true);
+        List<io.github.happysnappingturtle.mythicage.core.config.ConfigIssue> issues = new java.util.ArrayList<>();
+        VillagesConfig v = VillagesSchema.INSTANCE.read(io.github.happysnappingturtle.mythicage.core.config.ObjectReader.root(
+                com.google.gson.JsonParser.parseString("{\"patronWeights\":{\"greek\":{\"zeus\":1}}}").getAsJsonObject(),
+                issues), base);
+        assertEquals(Map.of("zeus", 1), v.patronWeights().get("greek"));
+        assertEquals(Map.of("ra", 40, "isis", 35, "set", 25), v.patronWeights().get("egyptian"), "文件没写的文明保留默认");
+        assertTrue(issues.isEmpty(), issues::toString);
+    }
+
+    @Test
+    void tc_t10b_11_biomeBonusParse() {
+        ConfigLoadResult<VillagesConfig> ok = ConfigLoader.load(VillagesSchema.INSTANCE, """
+                {"patronBiomeBonus":{"greek":{"hades":{"biomes":["minecraft:dark_forest"],"radius":16,"multiplier":1.5}}}}""",
+                null);
+        assertTrue(ok.issues().isEmpty(), () -> ok.issues().toString());
+        assertEquals(new VillagesConfig.BiomeBonus(List.of("minecraft:dark_forest"), 16, 1.5),
+                ok.value().biomeBonus("greek").get("hades"));
+        assertEquals(2.0, ok.value().biomeBonus("greek").get("poseidon").multiplier(), "同文明其他主神保留默认");
+        ConfigLoadResult<VillagesConfig> bad = ConfigLoader.load(VillagesSchema.INSTANCE, """
+                {"patronBiomeBonus":{"greek":{"poseidon":{"biomes":["Not A Biome"],"radius":200,"multiplier":0}},
+                 "elves":{"x":{}}}}""", null);
+        List<String> paths = bad.issues().stream().map(i -> i.path()).toList();
+        assertTrue(paths.containsAll(List.of("patronBiomeBonus.greek.poseidon.biomes", "patronBiomeBonus.greek.poseidon.radius",
+                "patronBiomeBonus.greek.poseidon.multiplier", "patronBiomeBonus.elves")), paths::toString);
+        assertEquals(VillagesSchema.INSTANCE.defaults().biomeBonus("greek"), bad.value().biomeBonus("greek"));
+    }
+
+    @Test
+    void tc_t10b_12_version1CoastalIsMigrated() {
+        ConfigLoadResult<VillagesConfig> r = ConfigLoader.load(VillagesSchema.INSTANCE,
+                "{\"schemaVersion\":1,\"coastalPoseidonBonus\":3.0}", null);
+        assertEquals(3.0, r.value().biomeBonus("greek").get("poseidon").multiplier());
+        assertEquals(List.of("coastalPoseidonBonus"), r.issues().stream().map(i -> i.path()).toList());
+        String out = ConfigLoader.toPrettyJson(VillagesSchema.INSTANCE, r.value());
+        assertFalse(out.contains("coastalPoseidonBonus"), "toJson 只输出新结构");
+        assertTrue(out.contains("patronBiomeBonus"));
     }
 
     @Test
@@ -143,12 +190,22 @@ class VillageTest {
 
     @Test
     void tc09to12Candidates() {
+        // 18 号 §4：候选看举行地村庄的主神
         Pantheon p = greek();
-        assertEquals(List.of("athena", "hermes"), ids(p.candidates(Set.of("zeus"), Age.CLASSICAL)));
-        assertEquals(List.of("athena", "hermes", "ares"), ids(p.candidates(Set.of("zeus", "hades"), Age.CLASSICAL)));
-        assertEquals(List.of("dionysus"), ids(p.candidates(Set.of("zeus"), Age.HEROIC)), "阿波罗未开放");
-        assertEquals(List.of(), ids(p.candidates(Set.of(), Age.CLASSICAL)));
+        assertEquals(List.of("athena", "hermes"), ids(p.candidates("zeus", Age.CLASSICAL)));
+        assertEquals(List.of("athena", "ares"), ids(p.candidates("hades", Age.CLASSICAL)));
+        assertEquals(List.of("dionysus"), ids(p.candidates("zeus", Age.HEROIC)), "阿波罗未开放");
+        assertEquals(List.of(), ids(p.candidates("odin", Age.CLASSICAL)));
         assertEquals(List.of("apollo", "dionysus"), ids(p.underPatron("zeus", Age.HEROIC)), "对话页列出含未开放的");
+    }
+
+    @Test
+    void tc_t10b_14_duplicateGodIdsAcrossCivs() {
+        Pantheon other = Pantheon.parse("""
+                {"schemaVersion":1,"civilization":"atlantean","patrons":["kronos","zeus"],
+                 "minorGods":[{"id":"athena","age":"classical","patrons":["kronos"]}]}""");
+        assertEquals(List.of("athena", "zeus"), Pantheon.duplicateIds(List.of(greek(), other)));
+        assertEquals(List.of(), Pantheon.duplicateIds(List.of(greek())));
     }
 
     @Test

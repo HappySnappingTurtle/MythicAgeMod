@@ -154,6 +154,33 @@ public final class ObjectReader {
         return fallback;
     }
 
+    /** 该键存在且不是 null（不标记为已读；用于兼容旧版字段）。 */
+    public boolean isPresent(String key) {
+        JsonElement e = peek(key);
+        return e != null && !e.isJsonNull();
+    }
+
+    /** 读取非空字符串数组；缺失时返回 fallback；类型不对或含非字符串元素时告警并返回 fallback。 */
+    public List<String> strings(String key, List<String> fallback) {
+        JsonElement element = take(key);
+        if (element == null) {
+            return fallback;
+        }
+        if (element.isJsonArray()) {
+            List<String> out = new ArrayList<>();
+            for (JsonElement e : element.getAsJsonArray()) {
+                if (!e.isJsonPrimitive() || !e.getAsJsonPrimitive().isString() || e.getAsString().isEmpty()) {
+                    warn(key, "应为非空字符串数组，已使用默认值");
+                    return fallback;
+                }
+                out.add(e.getAsString());
+            }
+            return List.copyOf(out);
+        }
+        warn(key, "应为非空字符串数组，已使用默认值");
+        return fallback;
+    }
+
     /** 记录一条与本对象某个键相关的告警（供 schema 做跨字段校验）。 */
     public void warn(String key, String message) {
         issues.add(ConfigIssue.warn(pathOf(key), message));

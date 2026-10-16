@@ -10,12 +10,15 @@ import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.content.greek.agri.GreekAgricultureEvents;
+import io.github.happysnappingturtle.mythicage.content.greek.guardian.GreekGuardian;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleRulesLoader;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleService;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.datagen.ModDataGen;
 import io.github.happysnappingturtle.mythicage.entity.EntityDevCommand;
 import io.github.happysnappingturtle.mythicage.entity.ModEntities;
-import io.github.happysnappingturtle.mythicage.guardian.GreekGuardian;
+import io.github.happysnappingturtle.mythicage.faith.FaithProfiles;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianCommand;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.player.ModAttachments;
@@ -25,17 +28,16 @@ import io.github.happysnappingturtle.mythicage.player.MythNetwork;
 import io.github.happysnappingturtle.mythicage.recipe.ModRecipes;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
-import io.github.happysnappingturtle.mythicage.temple.TempleRulesLoader;
-import io.github.happysnappingturtle.mythicage.temple.TempleService;
+import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
+import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
+import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
+import io.github.happysnappingturtle.mythicage.runtime.TestProducers;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineService;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
 import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
 import io.github.happysnappingturtle.mythicage.village.VillageCommand;
 import io.github.happysnappingturtle.mythicage.village.VillageService;
-import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
-import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
-import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
-import io.github.happysnappingturtle.mythicage.runtime.TestProducers;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -92,15 +94,20 @@ public final class MythicAge {
         game.addListener(RigRegistry::onAddReloadListeners);
         game.addListener(EntityDevCommand::onRegisterCommands);
 
-        // 希腊神坛与神庙判定（T8a）
+        // 神庙通用职责（T10b）与希腊神庙判定（T8a）
+        game.addListener(ShrineService::onServerTickPost);
+        game.addListener(ShrineService::onServerStopped);
+        game.addListener(ShrineService::onBreak);
         game.addListener(TempleRulesLoader::onAddReloadListeners);
         game.addListener(TempleService::onServerStarted);
         game.addListener(TempleService::onServerStopped);
         game.addListener(TempleService::onServerTickPost);
         game.addListener(TempleService::onNeighborNotify);
-        game.addListener(TempleService::onBreak);
 
-        // 守护者与恩宠兑换（T9）
+        // 文明档案（T10b）
+        game.addListener(FaithProfiles::onAddReloadListeners);
+
+        // 祭司与恩宠兑换（T9）
         game.addListener(TradeTableLoader::onAddReloadListeners);
         game.addListener(TradeService::onServerTickPost);
         game.addListener(GuardianSpawner::onServerTickPost);

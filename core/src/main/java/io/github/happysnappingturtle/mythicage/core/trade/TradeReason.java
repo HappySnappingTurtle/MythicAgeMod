@@ -18,7 +18,7 @@ public enum TradeReason {
     INVENTORY_FULL,
     ALREADY_BLESSED,
     NOT_BLESSED,
-    HAS_ALTAR,
+    HAS_SHRINE,
     REISSUED_TODAY;
 
     public String id() {

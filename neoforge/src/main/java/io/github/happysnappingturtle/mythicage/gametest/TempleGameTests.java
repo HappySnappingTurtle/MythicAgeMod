@@ -3,21 +3,22 @@ package io.github.happysnappingturtle.mythicage.gametest;
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.BrazierBlock;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlockEntity;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.StatueBlock;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleService;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigHolder;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigLoader;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
+import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleSurvey;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
-import io.github.happysnappingturtle.mythicage.core.temple.TempleSurvey;
 import io.github.happysnappingturtle.mythicage.player.MythData;
-import io.github.happysnappingturtle.mythicage.temple.AltarRegistry;
-import io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload;
-import io.github.happysnappingturtle.mythicage.temple.GreekAltarBlockEntity;
-import io.github.happysnappingturtle.mythicage.temple.TempleService;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineService;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -191,9 +192,9 @@ public final class TempleGameTests {
 
     private static UUID altar(GameTestHelper h, Age age) {
         h.setBlock(ALTAR, GreekTemple.GREEK_ALTAR.get().defaultBlockState()
-                .setValue(io.github.happysnappingturtle.mythicage.temple.GreekAltarBlock.FACING, Direction.SOUTH));
+                .setValue(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock.FACING, Direction.SOUTH));
         UUID owner = UUID.randomUUID();
-        TempleService.bindForTest(h.getLevel(), h.absolutePos(ALTAR), owner, "tester", age);
+        ShrineService.bindForTest(h.getLevel(), h.absolutePos(ALTAR), owner, "tester", age, Direction.SOUTH);
         return owner;
     }
 
@@ -355,7 +356,7 @@ public final class TempleGameTests {
         whenScanned(h, be -> {
             var v = be.verdict(TempleService.rules());
             h.assertTrue(v.grantedLevel() == 0 && !be.survey().openAltar(), "祭坛被遮应为 0 级：" + be.survey());
-            h.assertTrue(v.missing().contains(new io.github.happysnappingturtle.mythicage.core.temple.TempleVerdict
+            h.assertTrue(v.missing().contains(new io.github.happysnappingturtle.mythicage.core.greek.temple.TempleVerdict
                     .Missing("openAltar", 0, 1)), "应提示祭坛应露天");
         });
     }
@@ -456,7 +457,7 @@ public final class TempleGameTests {
         FakePlayer none = player(h, "ma_none", Age.NONE);
         h.assertTrue(!place(h, none, new BlockPos(8, 2, 19)), "未接触希腊不能放");
         h.assertTrue(h.getLevel().getBlockState(h.absolutePos(new BlockPos(1, 3, 1)))
-                .getValue(io.github.happysnappingturtle.mythicage.temple.GreekAltarBlock.FACING) == Direction.SOUTH,
+                .getValue(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock.FACING) == Direction.SOUTH,
                 "神坛朝向应取放置者的朝向");
         h.succeed();
     }
@@ -482,7 +483,7 @@ public final class TempleGameTests {
         h.assertBlockPresent(GreekTemple.GREEK_ALTAR.get(), ALTAR);
         h.assertTrue(owner.gameMode.destroyBlock(abs), "主人可以挖");
         h.assertBlockNotPresent(GreekTemple.GREEK_ALTAR.get(), ALTAR);
-        h.assertTrue(AltarRegistry.get(h.getLevel().getServer()).get(GlobalPos.of(h.getLevel().dimension(), abs)).isEmpty(),
+        h.assertTrue(ShrineRegistry.get(h.getLevel().getServer()).get(GlobalPos.of(h.getLevel().dimension(), abs)).isEmpty(),
                 "挖掉后应从登记中移除");
         h.succeed();
     }
@@ -490,11 +491,9 @@ public final class TempleGameTests {
     // ───────────── 预算、存档、检视（TC-T8a-76～78） ─────────────
 
     private static void setBudget(ConfigHolder<WorldRulesConfig> holder, WorldRulesConfig base, int budget) {
-        WorldRulesConfig.Temples t = base.temples();
-        WorldRulesConfig next = new WorldRulesConfig(base.beneficialConversions(), base.mobBlockDamage(),
-                base.blockEntityStall(), base.godPowers(), base.recipes(), base.growth(),
-                new WorldRulesConfig.Temples(t.altarLimitArchaic(), t.altarLimitClassical(), t.altarLimitHeroic(),
-                        t.altarLimitMythic(), t.altarSpacing(), t.protectAltar(), budget, t.rescanIntervalTicks()));
+        WorldRulesConfig.TempleBudget t = base.greek().temple();
+        WorldRulesConfig next = base.withGreek(new WorldRulesConfig.Greek(base.greek().growth(),
+                new WorldRulesConfig.TempleBudget(budget, t.rescanIntervalTicks())));
         holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
     }
 

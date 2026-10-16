@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 守护者交易界面（T9 设计文档 §9，12 号 §4「NPC 交易」）：对话页 + 兑换页。
+ * 祭司交易界面（T9 设计文档 §9，12 号 §4「NPC 交易」）：对话页 + 兑换页；也用于神庙兑换（只有兑换页）。
  * 只展示服务端算好的数据；点击后按钮置灰，收到结果再恢复；恩宠数字以服务端同步为准。
+ * 与文明有关的文字都按 {@link TradeView#civ()} 与文明档案给的 key 取（T10b），不写死任何文明。
  */
 public class GuardianScreen extends Screen {
     private static final int W = 360;
@@ -52,10 +53,23 @@ public class GuardianScreen extends Screen {
     private boolean closedByServer;
 
     public GuardianScreen(TradeView view) {
-        super(Component.translatable(view.venue() == TradeOffer.Venue.GUARDIAN
-                ? "entity.mythic_age.greek_guardian" : "mythic_age.trade.altar_title"));
+        super(titleOf(view));
         this.view = view;
         this.tab = view.dialogue() != TradeView.Dialogue.NONE ? Tab.DIALOGUE : Tab.TRADE;
+    }
+
+    /** 祭司处：祭司的名字；神庙处：「神庙名 · 兑换」。 */
+    private static Component titleOf(TradeView view) {
+        if (view.venue() == TradeOffer.Venue.GUARDIAN) {
+            var level = net.minecraft.client.Minecraft.getInstance().level;
+            var e = level == null ? null : level.getEntity(view.guardianEntityId());
+            return e != null ? e.getDisplayName() : Component.translatable("mythic_age.guardian.title");
+        }
+        return Component.translatable("mythic_age.trade.shrine_title", Component.translatable(view.labels().shrine()));
+    }
+
+    private Component shrineName() {
+        return Component.translatable(view.labels().shrine());
     }
 
     /** 服务端推送了新的界面数据（再次右键或刷新）。 */
@@ -80,7 +94,7 @@ public class GuardianScreen extends Screen {
                 tab = Tab.TRADE;
             }
         } else {
-            status = Component.translatable(r.reason().langKey(), r.arg());
+            status = Component.translatable(r.reason().langKey(), r.arg(), shrineName());
             statusColor = r.reason() == TradeReason.DUPLICATE ? DIM : BAD;
         }
         rebuildWidgets();
@@ -124,7 +138,7 @@ public class GuardianScreen extends Screen {
             addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.accept_blessing"),
                     b -> sendBlessing(false)).bounds(left + 8, y, 150, 20).build()).active = pending == null;
         } else if (view.dialogue() == TradeView.Dialogue.REISSUE) {
-            addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.reissue"),
+            addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.reissue", shrineName()),
                     b -> sendBlessing(true)).bounds(left + 8, y, 150, 20).build()).active = pending == null;
         }
         if (view.dialogue() != TradeView.Dialogue.FIRST) {
@@ -202,9 +216,10 @@ public class GuardianScreen extends Screen {
         super.render(g, mouseX, mouseY, partialTick);
         g.drawString(font, title, left + 8, top + 8, BORDER, false);
         Component favor = view.age() == io.github.happysnappingturtle.mythicage.core.player.Age.NONE
-                ? Component.translatable("mythic_age.trade.favor.none")
-                : Component.translatable("mythic_age.trade.favor", view.favor(), view.cap(),
-                Component.translatable("mythic_age.age." + view.age().id()));
+                ? Component.translatable("mythic_age.trade.favor.none",
+                Component.translatable("mythic_age.civ." + view.civ().id()))
+                : Component.translatable("mythic_age.trade.favor", Component.translatable(view.labels().favor()),
+                view.favor(), view.cap(), Component.translatable("mythic_age.age." + view.age().id()));
         g.drawString(font, favor, left + W - 8 - font.width(favor), top + 8, PURPLE, false);
         if (view.venue() == TradeOffer.Venue.GUARDIAN) {
             // 当前页签：按钮下方一条金线
@@ -223,34 +238,17 @@ public class GuardianScreen extends Screen {
     }
 
     private void renderDialogue(GuiGraphics g) {
-        String key = switch (view.dialogue()) {
-            case FIRST -> "mythic_age.guardian.talk.first";
-            case REISSUE -> "mythic_age.guardian.talk.reissue";
-            case NONE -> "mythic_age.guardian.talk.greet";
+        // 对话文本每个文明一套：mythic_age.guardian.<文明>.talk.<first|reissue|greet>
+        String key = "mythic_age.guardian." + view.civ().id() + ".talk." + switch (view.dialogue()) {
+            case FIRST -> "first";
+            case REISSUE -> "reissue";
+            case NONE -> "greet";
         };
         int y = line(g, Component.translatable(key), left + 12, top + 52, W - 24, TEXT);
         if (!view.villagePatron().isEmpty()) {
-            // 本村供奉的主神与其名下的次神（T10a）
-            y = line(g, Component.translatable("mythic_age.village.patron_line",
+            // 本村供奉的主神（T10a）；次神候选只在晋升页显示（18 号 §4）
+            line(g, Component.translatable("mythic_age.village.patron_line",
                     Component.translatable("mythic_age.god." + view.villagePatron())), left + 12, y + 6, W - 24, PURPLE);
-            for (String age : new String[]{"classical", "heroic", "mythic"}) {
-                MutableComponent gods = Component.empty();
-                boolean first = true;
-                for (String entry : view.patronGods()) {
-                    String[] parts = entry.split(":", 2);
-                    if (parts.length == 2 && parts[0].equals(age)) {
-                        if (!first) {
-                            gods.append("、");
-                        }
-                        gods.append(Component.translatable("mythic_age.god." + parts[1]));
-                        first = false;
-                    }
-                }
-                if (!first) {
-                    y = line(g, Component.translatable("mythic_age.village.patron_gods",
-                            Component.translatable("mythic_age.age." + age), gods), left + 18, y, W - 30, DIM);
-                }
-            }
         }
     }
 

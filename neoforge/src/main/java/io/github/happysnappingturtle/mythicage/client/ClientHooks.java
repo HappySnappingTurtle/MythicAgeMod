@@ -1,9 +1,9 @@
 package io.github.happysnappingturtle.mythicage.client;
 
-import io.github.happysnappingturtle.mythicage.client.screen.AltarScreen;
+import io.github.happysnappingturtle.mythicage.client.screen.GreekAltarScreen;
 import io.github.happysnappingturtle.mythicage.client.screen.GuardianScreen;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
 import io.github.happysnappingturtle.mythicage.trade.TradePayloads;
-import io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload;
 import net.minecraft.client.Minecraft;
 
 /** 网络处理器调用的客户端入口；只在客户端被加载。 */
@@ -12,7 +12,7 @@ public final class ClientHooks {
     }
 
     public static void openAltar(AltarSurveyPayload payload) {
-        Minecraft.getInstance().setScreen(new AltarScreen(payload));
+        Minecraft.getInstance().setScreen(new GreekAltarScreen(payload));
     }
 
     /** 打开或刷新交易界面（T9）。 */

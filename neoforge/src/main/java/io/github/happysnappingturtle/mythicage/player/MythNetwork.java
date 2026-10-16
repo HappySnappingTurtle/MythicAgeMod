@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "3";
+    private static final String PROTOCOL_VERSION = "4";
 
     private MythNetwork() {
     }
@@ -15,10 +15,10 @@ public final class MythNetwork {
         event.registrar(PROTOCOL_VERSION)
                 .playToClient(PlayerSyncPayload.TYPE, PlayerSyncPayload.STREAM_CODEC,
                         (payload, context) -> ClientMythData.accept(payload))
-                .playToClient(io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload.TYPE,
-                        io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload.STREAM_CODEC,
+                .playToClient(io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openAltar(payload))
-                // 守护者与神坛兑换（T9）
+                // 祭司与神庙兑换（T9；T10b 起按文明）
                 .playToClient(TradePayloads.Open.TYPE, TradePayloads.Open.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openTrade(payload))
                 .playToClient(TradePayloads.Result.TYPE, TradePayloads.Result.STREAM_CODEC,
@@ -28,6 +28,6 @@ public final class MythNetwork {
                 .playToServer(TradePayloads.Buy.TYPE, TradePayloads.Buy.STREAM_CODEC, TradeService::handleBuy)
                 .playToServer(TradePayloads.Blessing.TYPE, TradePayloads.Blessing.STREAM_CODEC, TradeService::handleBlessing)
                 .playToServer(TradePayloads.Closed.TYPE, TradePayloads.Closed.STREAM_CODEC, TradeService::handleClosed)
-                .playToServer(TradePayloads.OpenAltar.TYPE, TradePayloads.OpenAltar.STREAM_CODEC, TradeService::handleOpenAltar);
+                .playToServer(TradePayloads.OpenShrine.TYPE, TradePayloads.OpenShrine.STREAM_CODEC, TradeService::handleOpenShrine);
     }
 }

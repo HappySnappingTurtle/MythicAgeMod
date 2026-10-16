@@ -11,8 +11,6 @@ import java.util.Optional;
  * 权重表按键排序后抽取，不依赖 Map 的迭代顺序。
  */
 public final class VillageRules {
-    public static final String POSEIDON = "poseidon";
-
     private VillageRules() {
     }
 
@@ -47,13 +45,21 @@ public final class VillageRules {
         return Optional.of(keys.getLast());
     }
 
-    /** 沿海时波塞冬权重乘以 bonus（向下取整，至少 1）。 */
-    public static Map<String, Integer> coastal(Map<String, Integer> weights, boolean coastal, double bonus) {
-        if (!coastal || !weights.containsKey(POSEIDON)) {
+    /**
+     * 群系加成（T10b 设计文档 §7）：命中的主神权重乘以各自的倍率（向下取整，至少 1）；
+     * 不在权重表里的主神忽略。
+     */
+    public static Map<String, Integer> biomeBonus(Map<String, Integer> weights, Map<String, Double> matched) {
+        if (matched.isEmpty()) {
             return weights;
         }
         Map<String, Integer> out = new LinkedHashMap<>(weights);
-        out.put(POSEIDON, Math.max(1, (int) Math.floor(weights.get(POSEIDON) * bonus)));
+        matched.forEach((patron, mult) -> {
+            Integer w = weights.get(patron);
+            if (w != null) {
+                out.put(patron, Math.max(1, (int) Math.floor(w * mult)));
+            }
+        });
         return out;
     }
 

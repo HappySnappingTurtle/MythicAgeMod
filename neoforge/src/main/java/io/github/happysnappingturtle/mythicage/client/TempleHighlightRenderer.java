@@ -2,8 +2,8 @@ package io.github.happysnappingturtle.mythicage.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
-import io.github.happysnappingturtle.mythicage.temple.AltarSurveyPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;

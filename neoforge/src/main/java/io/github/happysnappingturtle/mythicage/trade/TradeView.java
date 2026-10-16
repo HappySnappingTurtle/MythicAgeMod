@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.trade;
 
 import io.github.happysnappingturtle.mythicage.core.player.Age;
+import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeOffer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -12,12 +13,17 @@ import java.util.List;
 /**
  * 交易界面的显示数据（T9 设计文档 §9）。全部由服务端算好，客户端只展示，不做判定。
  *
- * @param guardianEntityId 守护者实体 id；在祭坛兑换时为 −1
- * @param villagePatron    祭司所在村庄的主神；不在村庄或祭坛兑换时为空
- * @param patronGods       该主神名下的次神，格式「时代:次神 id」（对话页展示）
+ * @param civ              本次交易的文明（来自祭司或神庙，T10b）
+ * @param labels           与文明有关的文本 key（来自文明档案；客户端没有档案数据）
+ * @param guardianEntityId 祭司实体 id；在神庙兑换时为 −1
+ * @param villagePatron    祭司所在村庄的主神；不在村庄或在神庙兑换时为空
  */
-public record TradeView(TradeOffer.Venue venue, int guardianEntityId, Dialogue dialogue, long favor, long cap, Age age,
-                        List<OfferView> offers, String villagePatron, List<String> patronGods) {
+public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue, int guardianEntityId, Dialogue dialogue,
+                        long favor, long cap, Age age, List<OfferView> offers, String villagePatron) {
+
+    /** @param favor 「X 恩宠」；shrine 神庙名 */
+    public record Labels(String favor, String shrine) {
+    }
 
     /** 对话页要显示的按钮。 */
     public enum Dialogue { NONE, FIRST, REISSUE }
@@ -36,6 +42,9 @@ public record TradeView(TradeOffer.Venue venue, int guardianEntityId, Dialogue d
             TradeView::write, TradeView::read);
 
     private static void write(RegistryFriendlyByteBuf buf, TradeView v) {
+        buf.writeEnum(v.civ);
+        buf.writeUtf(v.labels.favor());
+        buf.writeUtf(v.labels.shrine());
         buf.writeEnum(v.venue);
         buf.writeVarInt(v.guardianEntityId);
         buf.writeEnum(v.dialogue);
@@ -59,11 +68,11 @@ public record TradeView(TradeOffer.Venue venue, int guardianEntityId, Dialogue d
             buf.writeUtf(o.needsMinorGod);
         }
         buf.writeUtf(v.villagePatron);
-        buf.writeVarInt(v.patronGods.size());
-        v.patronGods.forEach(buf::writeUtf);
     }
 
     private static TradeView read(RegistryFriendlyByteBuf buf) {
+        Civilization civ = buf.readEnum(Civilization.class);
+        Labels labels = new Labels(buf.readUtf(), buf.readUtf());
         TradeOffer.Venue venue = buf.readEnum(TradeOffer.Venue.class);
         int entityId = buf.readVarInt();
         Dialogue dialogue = buf.readEnum(Dialogue.class);
@@ -86,11 +95,6 @@ public record TradeView(TradeOffer.Venue venue, int guardianEntityId, Dialogue d
                     buf.readVarInt(), buf.readBoolean(), buf.readUtf()));
         }
         String patron = buf.readUtf();
-        int g = buf.readVarInt();
-        List<String> gods = new ArrayList<>(g);
-        for (int i = 0; i < g; i++) {
-            gods.add(buf.readUtf());
-        }
-        return new TradeView(venue, entityId, dialogue, favor, cap, age, offers, patron, gods);
+        return new TradeView(civ, labels, venue, entityId, dialogue, favor, cap, age, offers, patron);
     }
 }

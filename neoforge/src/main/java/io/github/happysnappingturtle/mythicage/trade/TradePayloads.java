@@ -116,13 +116,13 @@ public final class TradePayloads {
     }
 
     /** 从神坛检视界面打开「兑换」页。 */
-    public record OpenAltar(BlockPos pos) implements CustomPacketPayload {
-        public static final Type<OpenAltar> TYPE = payloadType("trade_open_altar");
-        public static final StreamCodec<FriendlyByteBuf, OpenAltar> STREAM_CODEC =
-                BlockPos.STREAM_CODEC.map(OpenAltar::new, OpenAltar::pos).cast();
+    public record OpenShrine(BlockPos pos) implements CustomPacketPayload {
+        public static final Type<OpenShrine> TYPE = payloadType("trade_open_shrine");
+        public static final StreamCodec<FriendlyByteBuf, OpenShrine> STREAM_CODEC =
+                BlockPos.STREAM_CODEC.map(OpenShrine::new, OpenShrine::pos).cast();
 
         @Override
-        public Type<OpenAltar> type() {
+        public Type<OpenShrine> type() {
             return TYPE;
         }
     }

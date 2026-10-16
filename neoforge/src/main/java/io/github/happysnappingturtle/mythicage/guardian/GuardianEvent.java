@@ -10,20 +10,20 @@ import java.util.Optional;
  * 本任务只发事件、不扣分。只有玩家造成的伤害才发 Harmed。
  */
 public abstract class GuardianEvent extends Event {
-    private final GreekGuardianEntity guardian;
+    private final GuardianEntity guardian;
 
-    protected GuardianEvent(GreekGuardianEntity guardian) {
+    protected GuardianEvent(GuardianEntity guardian) {
         this.guardian = guardian;
     }
 
-    public GreekGuardianEntity guardian() {
+    public GuardianEntity guardian() {
         return guardian;
     }
 
     public static final class Harmed extends GuardianEvent {
         private final ServerPlayer player;
 
-        public Harmed(GreekGuardianEntity guardian, ServerPlayer player) {
+        public Harmed(GuardianEntity guardian, ServerPlayer player) {
             super(guardian);
             this.player = player;
         }
@@ -37,7 +37,7 @@ public abstract class GuardianEvent extends Event {
     public static final class Killed extends GuardianEvent {
         private final Optional<ServerPlayer> killer;
 
-        public Killed(GreekGuardianEntity guardian, Optional<ServerPlayer> killer) {
+        public Killed(GuardianEntity guardian, Optional<ServerPlayer> killer) {
             super(guardian);
             this.killer = killer;
         }

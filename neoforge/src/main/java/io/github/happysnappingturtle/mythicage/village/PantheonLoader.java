@@ -10,8 +10,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,8 +29,42 @@ public final class PantheonLoader extends SimpleJsonResourceReloadListener {
         event.addListener(new PantheonLoader());
     }
 
+    private static final Map<Civilization, Pantheon> TEST = new EnumMap<>(Civilization.class);
+
     public static Pantheon get(Civilization civ) {
+        synchronized (TEST) {
+            Pantheon t = TEST.get(civ);
+            if (t != null) {
+                return t;
+            }
+        }
         return tables.getOrDefault(civ, Pantheon.empty(civ));
+    }
+
+    /** 只供 GameTest：临时替换该表所属文明的主神表；传 null 清除全部替换。 */
+    public static void overrideForTest(@Nullable Pantheon table) {
+        synchronized (TEST) {
+            if (table == null) {
+                TEST.clear();
+            } else {
+                TEST.put(table.civ(), table);
+            }
+        }
+        warnDuplicates();
+    }
+
+    /** 跨文明重名的神 id 会让神名翻译 key 冲突（T10b 设计文档 §9）。返回重名列表。 */
+    public static List<String> warnDuplicates() {
+        Map<Civilization, Pantheon> all = new EnumMap<>(Civilization.class);
+        all.putAll(tables);
+        synchronized (TEST) {
+            all.putAll(TEST);
+        }
+        List<String> dup = Pantheon.duplicateIds(all.values());
+        if (!dup.isEmpty()) {
+            MythicAge.LOGGER.warn("主神表：以下神 id 在多个文明中重复，神名翻译会冲突：{}", dup);
+        }
+        return dup;
     }
 
     @Override
@@ -52,5 +88,6 @@ public final class PantheonLoader extends SimpleJsonResourceReloadListener {
             }
         });
         tables = Map.copyOf(next);
+        warnDuplicates();
     }
 }
