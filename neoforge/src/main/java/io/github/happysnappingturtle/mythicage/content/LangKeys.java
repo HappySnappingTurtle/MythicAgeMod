@@ -66,8 +66,15 @@ public final class LangKeys {
         add("mythic_age.altar.row.marbleFloor", "大理石地面", "Marble floor", "大理石の床");
         add("mythic_age.altar.slots", "祈祷位：%s / %s", "Prayer spots: %s / %s", "祈りの場：%s / %s");
         add("mythic_age.altar.slots.short", "只找到 %s 个可站立且可达的祈祷位", "Only %s standable, reachable prayer spot(s) found", "立てて到達できる祈りの場が %s か所しかありません");
-        add("mythic_age.altar.estimate", "满员时预计 %s 恩宠/日", "Full attendance: about %s favor per day", "満員時の見込み：1日あたり約 %s の恩寵");
-        add("mythic_age.altar.estimate.note", "估算，不是发放承诺；信徒与结算在后续版本接入", "Estimate only, not a promise; worshippers and payout come in a later version", "見込みであり支給の約束ではありません。信徒と精算は今後の版で実装されます");
+        add("mythic_age.altar.estimate", "预计日产：%s 恩宠（估算）", "Expected: about %s favor per day", "見込み：1日あたり約 %s の恩寵");
+        add("mythic_age.altar.estimate.note", "按近7日信徒与祈祷位估算，不是发放承诺", "Based on the last 7 days' worshippers and the prayer spots; not a promise", "直近7日の信徒と祈りの場から見積もった値で、支給の約束ではありません");
+        add("mythic_age.altar.praying", "正在祈祷：%s 人", "Praying now: %s", "祈祷中：%s 人");
+        add("mythic_age.altar.believers", "近 7 日信徒：%s 人", "Worshippers (last 7 days): %s", "直近7日の信徒：%s 人");
+        add("mythic_age.altar.today", "今日已得：%s 恩宠", "Earned today: %s favor", "本日の獲得：%s の恩寵");
+        add("mythic_age.altar.rain", "下雨：露天祭坛产出减半", "Rain: an open-air altar yields half", "雨：露天の祭壇は産出が半分になります");
+        add("mythic_age.altar.too_close", "离家太近：%s 人不计入（信徒要从家走 8 格以上）", "Too close to home: %s not counted (worshippers must walk 8+ blocks from home)", "家に近すぎる：%s 人は数えません（家から8ブロック以上歩く必要があります）");
+        add("mythic_age.altar.unreachable", "有信徒走不到祈祷位，检查通路", "A worshipper cannot reach a prayer spot; check the path", "祈りの場にたどり着けない信徒がいます。通路を確認してください");
+        add("mythic_age.altar.favor_full", "恩宠已满，去兑换吧", "Favor is full: go and spend it", "恩寵が満杯です。交換しに行きましょう");
         add("mythic_age.altar.missing.title", "缺失项", "Missing", "不足している項目");
         add("mythic_age.altar.missing.row", "%s %s/%s", "%s %s/%s", "%s %s/%s");
         add("mythic_age.altar.missing.none", "下一级条件已全部满足", "All conditions for the next tier are met", "次の段階の条件はすべて満たしています");
@@ -160,6 +167,7 @@ public final class LangKeys {
         add("commands.mythic_age.guardian.no_guardian", "%s文明尚未开放，没有祭司", "The %s civilization is not available yet and has no priest", "%s文明はまだ開放されておらず、神官がいません");
         add("mythic_age.guardian.title", "祭司", "Priest", "神官");
         add("mythic_age.grace.unloaded", "区块未加载", "Area not loaded", "未読み込み");
+        add("mythic_age.grace.greek_temple.status", "%s · 信徒 %s · 今日 %s", "%s · %s worshippers · %s today", "%s・信徒 %s・本日 %s");
         add("mythic_age.rite.promotion", "晋升", "Ascension", "昇格");
         add("mythic_age.rite.founding", "立祀", "Consecration", "奉祀");
         add("mythic_age.rite.rededication", "改奉", "Rededication", "改宗");

@@ -6,6 +6,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 
 /** 退出世界时清空客户端缓存，避免把上一个存档的数据带进下一个存档。 */
 @EventBusSubscriber(modid = MythicAgeIds.MOD_ID, value = Dist.CLIENT)
@@ -16,5 +17,11 @@ public final class ClientSessionEvents {
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientMythData.reset();
+        ClientBelievers.onLoggingOut(event);
+    }
+
+    @SubscribeEvent
+    public static void onEntityLeave(EntityLeaveLevelEvent event) {
+        ClientBelievers.onLeaveLevel(event);
     }
 }

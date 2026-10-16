@@ -1,5 +1,6 @@
 package io.github.happysnappingturtle.mythicage.content.greek.temple;
 
+import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleRules;
 import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleSurvey;
@@ -19,16 +20,27 @@ import java.util.List;
  * 服务端 → 客户端：神坛检视（T8a 设计文档 §4）。只携带展示所需的数字与坐标，客户端不做判定。
  *
  * @param rows     下一级（结构等级 + 1）的每一项要求：当前值 / 需要值；已是最高级时为当前各项统计（need = 0）
- * @param estimate 满员时的预计日产出（估算，不是发放承诺）
+ * @param estimate 预计日产出（估算，不是发放承诺；T10 起按近 7 日信徒计）
  * @param altarOffers 交易表中有可在神坛兑换的商品，且查看者是主人（T9：显示「兑换」按钮）
+ * @param prayer   信徒祈祷的实时统计（T10 设计文档 §8）
  */
 public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerIsOwner, Age ownerAge, boolean hasResult,
                                  boolean unverified, int structuralLevel, int grantedLevel, List<String> tierNames,
                                  double coefficient, int slotsCap, int slotsFound, List<Row> rows, String ageRequired,
                                  double estimate, BlockPos scanMin, BlockPos scanMax, List<BlockPos> uncoveredRoof,
                                  List<BlockPos> countedColumns, List<BlockPos> shortColumns, List<BlockPos> unlitBraziers,
-                                 List<BlockPos> prayerSlots, List<BlockPos> altarCover, boolean altarOffers)
+                                 List<BlockPos> prayerSlots, List<BlockPos> altarCover, boolean altarOffers,
+                                 Prayer prayer)
         implements CustomPacketPayload {
+
+    /** 与 {@link PrayerService.Stats} 一一对应（预计日产在外层的 estimate）。 */
+    public record Prayer(int praying, int believers, double today, boolean rainHalved, int tooClose,
+                         boolean unreachable, boolean favorFull) {
+        static Prayer of(PrayerService.Stats s) {
+            return new Prayer(s.praying(), s.believers(), s.today(), s.rainHalved(), s.tooClose(), s.unreachable(),
+                    s.favorFull());
+        }
+    }
 
     /** 一项条件：have / need；布尔条件（露天祭坛、台基可达）用 0/1 表示。 */
     public record Row(String key, int have, int need) {
@@ -76,7 +88,7 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
             rows.add(new Row("marbleFloor", s.marbleFloor(), 0));
         }
         List<String> names = rules.tiers().stream().map(TempleRules.Tier::name).toList();
-        double estimate = GreekTempleSource.estimate(be, rules);
+        PrayerService.Stats stats = PrayerService.stats(be, rules);
         BlockPos p = be.getBlockPos();
         BlockPos[] bounds = TempleScan.bounds(p, be.getBlockState().getValue(GreekAltarBlock.FACING), rules.scan());
         BlockPos min = bounds[0];
@@ -85,12 +97,13 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
         boolean isOwner = be.owner().map(id -> id.equals(viewer.getUUID())).orElse(false);
         return new AltarSurveyPayload(p, be.ownerName(), isOwner, be.ownerAge(), be.hasResult(), be.unverified(),
                 v.structuralLevel(), v.grantedLevel(), names, granted.coefficient(), granted.prayerSlots(), found, rows,
-                v.ageRequired().map(Age::id).orElse(""), estimate, min, max,
+                v.ageRequired().map(Age::id).orElse(""), stats.estimate(), min, max,
                 h == null ? List.of() : h.uncoveredRoof(), h == null ? List.of() : h.countedColumns(),
                 h == null ? List.of() : h.shortColumns(), h == null ? List.of() : h.unlitBraziers(),
                 be.prayerSlots(rules), h == null ? List.of() : h.altarCover(),
                 isOwner && !io.github.happysnappingturtle.mythicage.trade.TradeTableLoader.table(be.kind().civ())
-                        .offersAt(io.github.happysnappingturtle.mythicage.core.trade.TradeOffer.Venue.ALTAR).isEmpty());
+                        .offersAt(io.github.happysnappingturtle.mythicage.core.trade.TradeOffer.Venue.ALTAR).isEmpty(),
+                Prayer.of(stats));
     }
 
     private static void row(List<Row> rows, String key, int have, int need) {
@@ -148,6 +161,14 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
                 writePositions(buf, p.prayerSlots());
                 writePositions(buf, p.altarCover());
                 buf.writeBoolean(p.altarOffers());
+                Prayer pr = p.prayer();
+                buf.writeVarInt(pr.praying());
+                buf.writeVarInt(pr.believers());
+                buf.writeDouble(pr.today());
+                buf.writeBoolean(pr.rainHalved());
+                buf.writeVarInt(pr.tooClose());
+                buf.writeBoolean(pr.unreachable());
+                buf.writeBoolean(pr.favorFull());
             },
             buf -> {
                 BlockPos pos = buf.readBlockPos();
@@ -175,10 +196,18 @@ public record AltarSurveyPayload(BlockPos pos, String ownerName, boolean viewerI
                 double estimate = buf.readDouble();
                 BlockPos min = buf.readBlockPos();
                 BlockPos max = buf.readBlockPos();
+                List<BlockPos> uncovered = readPositions(buf);
+                List<BlockPos> counted = readPositions(buf);
+                List<BlockPos> shortCols = readPositions(buf);
+                List<BlockPos> unlit = readPositions(buf);
+                List<BlockPos> slots = readPositions(buf);
+                List<BlockPos> cover = readPositions(buf);
+                boolean offers = buf.readBoolean();
+                Prayer prayer = new Prayer(buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readBoolean(),
+                        buf.readVarInt(), buf.readBoolean(), buf.readBoolean());
                 return new AltarSurveyPayload(pos, owner, isOwner, age, hasResult, unverified, structural, granted, names,
-                        coefficient, cap, found, rows, ageRequired, estimate, min, max, readPositions(buf),
-                        readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf), readPositions(buf),
-                        buf.readBoolean());
+                        coefficient, cap, found, rows, ageRequired, estimate, min, max, uncovered, counted, shortCols,
+                        unlit, slots, cover, offers, prayer);
             });
 
     @Override

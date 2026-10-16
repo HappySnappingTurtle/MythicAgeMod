@@ -115,4 +115,10 @@ public class GreekAltarBlock extends BaseEntityBlock {
                     pos.getY() + 0.95, pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.3, 0, 0.02, 0);
         }
     }
+
+    /** 实心但不是整格：原版默认当作「可走进去」，生物寻路会穿过它而卡住（T10 信徒绕神坛时发现）。 */
+    @Override
+    protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) {
+        return false;
+    }
 }

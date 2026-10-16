@@ -14,7 +14,7 @@ import java.util.Map;
  * @param recipes               配方规则（T6）
  * @param shrines               神庙种类 id（如 {@code greek:altar}）→ 数量上限、间距与保护（T10b）
  * @param guardians             祭司（T9，T10b 起对所有文明生效）
- * @param greek                 希腊专属：作物生长（T6b）、神庙扫描预算（T8a）
+ * @param greek                 希腊专属：作物生长（T6b）、神庙扫描预算（T8a）、信徒祈祷（T10）
  */
 public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDamage, boolean blockEntityStall,
                                GodPowers godPowers, Recipes recipes, Map<String, Shrine> shrines,
@@ -102,13 +102,29 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
     }
 
     /** 希腊专属规则。 */
-    public record Greek(Growth growth, TempleBudget temple) {
+    public record Greek(Growth growth, TempleBudget temple, Prayer prayer) {
         public static final Greek DEFAULTS = new Greek(new Growth(24000, 12000, new BoneMeal(0.5, false)),
-                new TempleBudget(2048, 6000));
+                new TempleBudget(2048, 6000), new Prayer(1));
 
         public Greek withGrowth(Growth g) {
-            return new Greek(g, temple);
+            return new Greek(g, temple, prayer);
         }
+
+        public Greek withTemple(TempleBudget t) {
+            return new Greek(growth, t, prayer);
+        }
+
+        public Greek withPrayer(Prayer p) {
+            return new Greek(growth, temple, p);
+        }
+    }
+
+    /**
+     * 信徒祈祷（T10 设计文档 §7，决策 F7）。
+     *
+     * @param restockLimit 当天祈祷过的有职业村民每日最多补货几次（原版 2，取 0–2）
+     */
+    public record Prayer(int restockLimit) {
     }
 
     /**

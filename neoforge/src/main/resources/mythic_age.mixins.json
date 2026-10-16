@@ -5,7 +5,12 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CraftingMenuMixin",
-    "ResultSlotMixin"
+    "ResultSlotMixin",
+    "VillagerGoalPackagesMixin",
+    "VillagerRestockMixin"
+  ],
+  "client": [
+    "client.VillagerModelPrayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

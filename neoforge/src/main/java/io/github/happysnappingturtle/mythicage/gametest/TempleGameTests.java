@@ -492,7 +492,7 @@ public final class TempleGameTests {
 
     private static void setBudget(ConfigHolder<WorldRulesConfig> holder, WorldRulesConfig base, int budget) {
         WorldRulesConfig.TempleBudget t = base.greek().temple();
-        WorldRulesConfig next = base.withGreek(new WorldRulesConfig.Greek(base.greek().growth(),
+        WorldRulesConfig next = base.withGreek(base.greek().withTemple(
                 new WorldRulesConfig.TempleBudget(budget, t.rescanIntervalTicks())));
         holder.reload(ConfigLoader.toPrettyJson(holder.schema(), next));
     }

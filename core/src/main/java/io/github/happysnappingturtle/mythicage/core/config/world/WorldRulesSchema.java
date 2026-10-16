@@ -62,7 +62,7 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                     t.intIn("altarSpacing", altar.spacing(), 1, 64),
                     t.bool("protectAltar", altar.protect()));
             shrines.put("greek:altar", altar);
-            greek = new WorldRulesConfig.Greek(greek.growth(), readTempleBudget(t, greek.temple()));
+            greek = greek.withTemple(readTempleBudget(t, greek.temple()));
             root.warn("temples", "第 1 版字段：神坛上限、间距、保护已改为 shrines.greek.altar，扫描预算已改为 greek.temple；本次按旧字段读取");
         }
         if (root.isObject("growth")) {
@@ -72,7 +72,8 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         readShrines(root.object("shrines"), shrines);
         ObjectReader g = root.object("greek");
         greek = new WorldRulesConfig.Greek(readGrowth(g.object("growth"), greek.growth()),
-                readTempleBudget(g.object("temple"), greek.temple()));
+                readTempleBudget(g.object("temple"), greek.temple()),
+                new WorldRulesConfig.Prayer(g.object("prayer").intIn("restockLimit", greek.prayer().restockLimit(), 0, 2)));
         return new WorldRulesConfig(
                 root.bool("beneficialConversions", base.beneficialConversions()),
                 root.bool("mobBlockDamage", base.mobBlockDamage()),
@@ -199,6 +200,9 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         temple.addProperty("scanCellsPerTick", value.greek().temple().scanCellsPerTick());
         temple.addProperty("rescanIntervalTicks", value.greek().temple().rescanIntervalTicks());
         greek.add("temple", temple);
+        JsonObject prayer = new JsonObject();
+        prayer.addProperty("restockLimit", value.greek().prayer().restockLimit());
+        greek.add("prayer", prayer);
         root.add("greek", greek);
         return root;
     }

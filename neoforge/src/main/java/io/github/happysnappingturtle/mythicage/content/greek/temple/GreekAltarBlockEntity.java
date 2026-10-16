@@ -14,11 +14,15 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 奥林匹斯祭坛的方块实体（T8a 设计文档 §5）：最近一次有效扫描的统计与祈祷位；主人与时代缓存在
- * {@link ShrineBlockEntity}（T10b）。
+ * {@link ShrineBlockEntity}（T10b）；近 7 日在此计入祈祷的信徒（T10 设计文档 §3.2）。
  * 服务器重启后不信任缓存：加载时重新入队扫描。
  */
 public class GreekAltarBlockEntity extends ShrineBlockEntity {
@@ -31,6 +35,10 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
     private int rulesHash;
     /** 只在内存中保留，供检视界面高亮。 */
     private TempleScan.Highlights highlights;
+    /** 近 {@link #RECENT_DAYS} 个 MC 日在此计入祈祷的村民 → 最近一次的日序号；按时间先后，最多 {@link #RECENT_LIMIT} 个。 */
+    private final LinkedHashMap<UUID, Long> recentPrayers = new LinkedHashMap<>();
+    public static final int RECENT_DAYS = 7;
+    public static final int RECENT_LIMIT = 64;
 
     public GreekAltarBlockEntity(BlockPos pos, BlockState state) {
         super(GreekTemple.GREEK_ALTAR_BE.get(), pos, state);
@@ -89,6 +97,48 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
         setChanged();
     }
 
+    // ───────────── 信徒（T10） ─────────────
+
+    /** 记下一次计入的祈祷；返回近 7 日信徒数是否因此变化。 */
+    public boolean notePrayer(UUID villager, long day) {
+        Long before = recentPrayers.remove(villager);
+        recentPrayers.put(villager, day);
+        boolean changed = before == null;
+        changed |= prune(day);
+        while (recentPrayers.size() > RECENT_LIMIT) {
+            recentPrayers.remove(recentPrayers.keySet().iterator().next());
+            changed = true;
+        }
+        if (before == null || before != day) {
+            setChanged();
+        }
+        return changed;
+    }
+
+    /** 测试与检视用的只读副本。 */
+    public Map<UUID, Long> recentPrayers() {
+        return Map.copyOf(recentPrayers);
+    }
+
+    /** 近 7 日（含今天）在此计入祈祷的信徒数。 */
+    public int believers(long today) {
+        if (prune(today)) {
+            setChanged();
+        }
+        return recentPrayers.size();
+    }
+
+    private boolean prune(long today) {
+        boolean removed = false;
+        for (Iterator<Map.Entry<UUID, Long>> it = recentPrayers.entrySet().iterator(); it.hasNext(); ) {
+            if (today - it.next().getValue() >= RECENT_DAYS) {
+                it.remove();
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
     void markUnverified(long gameTime) {
         this.unverified = true;
         this.lastScanTick = gameTime;
@@ -112,6 +162,14 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
         tag.putLong("LastScan", lastScanTick);
         tag.putBoolean("Unverified", unverified);
         tag.putInt("RulesHash", rulesHash);
+        ListTag recent = new ListTag();
+        recentPrayers.forEach((id, day) -> {
+            CompoundTag c = new CompoundTag();
+            c.putUUID("Id", id);
+            c.putLong("Day", day);
+            recent.add(c);
+        });
+        tag.put("RecentPrayers", recent);
     }
 
     @Override
@@ -129,5 +187,12 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
         lastScanTick = tag.getLong("LastScan");
         unverified = tag.getBoolean("Unverified");
         rulesHash = tag.getInt("RulesHash");
+        recentPrayers.clear();
+        for (Tag t : tag.getList("RecentPrayers", Tag.TAG_COMPOUND)) {
+            CompoundTag c = (CompoundTag) t;
+            if (c.hasUUID("Id")) {
+                recentPrayers.put(c.getUUID("Id"), c.getLong("Day"));
+            }
+        }
     }
 }

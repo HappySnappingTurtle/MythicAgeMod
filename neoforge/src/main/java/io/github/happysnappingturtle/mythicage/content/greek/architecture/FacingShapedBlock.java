@@ -69,4 +69,10 @@ public class FacingShapedBlock extends HorizontalDirectionalBlock {
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite())
                 .setValue(ALT, alternating && ((p.getX() + p.getZ()) & 1) == 1);
     }
+
+    /** 实心但不是整格：原版默认当作「可走进去」，生物寻路会穿过它而卡住（T10 信徒绕神坛时发现）。 */
+    @Override
+    protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) {
+        return false;
+    }
 }

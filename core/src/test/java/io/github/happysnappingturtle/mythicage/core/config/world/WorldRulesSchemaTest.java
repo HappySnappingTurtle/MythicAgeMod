@@ -146,4 +146,15 @@ class WorldRulesSchemaTest {
         java.util.List<String> paths = r.issues().stream().map(i -> i.path()).toList();
         assertTrue(paths.contains("shrines.elves") && paths.contains("shrines.greek.Bad-Kind"), paths::toString);
     }
+
+    /** TC-T10-14（配置部分）：greek.prayer.restockLimit 默认 1，取 0–2，越界回退。 */
+    @Test
+    void tc_t10_14_prayerRestockLimit() {
+        assertEquals(1, S.defaults().greek().prayer().restockLimit());
+        assertEquals(0, ConfigLoader.load(S, "{\"greek\":{\"prayer\":{\"restockLimit\":0}}}", null)
+                .value().greek().prayer().restockLimit());
+        ConfigLoadResult<WorldRulesConfig> bad = ConfigLoader.load(S, "{\"greek\":{\"prayer\":{\"restockLimit\":3}}}", null);
+        assertEquals(1, bad.value().greek().prayer().restockLimit());
+        assertEquals(1, bad.issues().size());
+    }
 }

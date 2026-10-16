@@ -8,6 +8,8 @@ import io.github.happysnappingturtle.mythicage.content.wood.ModWoodTypes;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.entity.ModEntities;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.entity.VillagerRenderer;
+import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,6 +37,19 @@ public final class ClientSetup {
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));
+    }
+
+    @SubscribeEvent
+    static void onLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(BelieverWreathLayer.LAYER, BelieverWreathLayer::createLayer);
+    }
+
+    /** 希腊信徒的橄榄枝饰（T10）。 */
+    @SubscribeEvent
+    static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        if (event.getRenderer(EntityType.VILLAGER) instanceof VillagerRenderer villager) {
+            villager.addLayer(new BelieverWreathLayer(villager, event.getEntityModels()));
+        }
     }
 
     @SubscribeEvent

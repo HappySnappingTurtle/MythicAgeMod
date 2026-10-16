@@ -108,10 +108,28 @@ public class GreekAltarScreen extends Screen {
         if (p.hasResult() && p.slotsFound() < p.slotsCap()) {
             y = line(g, Component.translatable("mythic_age.altar.slots.short", p.slotsFound()), c2, y, colW, BAD);
         }
+        AltarSurveyPayload.Prayer pr = p.prayer();
+        y = line(g, Component.translatable("mythic_age.altar.praying", pr.praying()), c2, y, colW, TEXT);
+        y = line(g, Component.translatable("mythic_age.altar.believers", pr.believers()), c2, y, colW, TEXT);
         y += 4;
+        y = line(g, Component.translatable("mythic_age.altar.today", String.format(Locale.ROOT, "%.1f", pr.today())),
+                c2, y, colW, TEXT);
         y = line(g, Component.translatable("mythic_age.altar.estimate", String.format(Locale.ROOT, "%.1f", p.estimate())),
                 c2, y, colW, TEXT);
-        line(g, Component.translatable("mythic_age.altar.estimate.note"), c2, y, colW, DIM);
+        y = line(g, Component.translatable("mythic_age.altar.estimate.note"), c2, y, colW, DIM);
+        y += 4;
+        if (pr.rainHalved()) {
+            y = line(g, Component.translatable("mythic_age.altar.rain"), c2, y, colW, BAD);
+        }
+        if (pr.tooClose() > 0) {
+            y = line(g, Component.translatable("mythic_age.altar.too_close", pr.tooClose()), c2, y, colW, BAD);
+        }
+        if (pr.unreachable()) {
+            y = line(g, Component.translatable("mythic_age.altar.unreachable"), c2, y, colW, BAD);
+        }
+        if (pr.favorFull()) {
+            line(g, Component.translatable("mythic_age.altar.favor_full"), c2, y, colW, BORDER);
+        }
 
         // 右栏：缺失项
         y = y0;

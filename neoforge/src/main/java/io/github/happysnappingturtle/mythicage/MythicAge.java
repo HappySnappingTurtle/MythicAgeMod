@@ -11,6 +11,7 @@ import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
 import io.github.happysnappingturtle.mythicage.content.greek.agri.GreekAgricultureEvents;
 import io.github.happysnappingturtle.mythicage.content.greek.guardian.GreekGuardian;
+import io.github.happysnappingturtle.mythicage.content.greek.prayer.GreekPrayer;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleRulesLoader;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleService;
@@ -119,5 +120,8 @@ public final class MythicAge {
         game.addListener(VillageService::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);
+
+        // 希腊恩宠来源：信徒祈祷（T10）
+        GreekPrayer.init(modBus, game);
     }
 }

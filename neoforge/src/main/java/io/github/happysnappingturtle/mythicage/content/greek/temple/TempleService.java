@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.content.greek.temple;
 
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
+import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
 import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleRules;
 import io.github.happysnappingturtle.mythicage.core.scan.ScanQueue;
@@ -61,6 +62,7 @@ public final class TempleService {
         public void onBound(ServerLevel level, BlockPos pos, Optional<ServerPlayer> placer) {
             placer.ifPresent(p -> p.displayClientMessage(Component.translatable("mythic_age.altar.place.hint"), true));
             submit(level, pos);
+            PrayerService.onBound(level, pos);
         }
 
         @Override
@@ -68,6 +70,7 @@ public final class TempleService {
             QUEUE.cancel(key);
             ACTIVE.remove(key);
             WAITING.remove(key);
+            PrayerService.onRemoved(level, key);
         }
     };
 
@@ -175,6 +178,7 @@ public final class TempleService {
             int maxSlots = loaded.rules().tiers().stream().mapToInt(TempleRules.Tier::prayerSlots).max().orElse(0);
             be.applyScan(scan.finish(maxSlots), level.getGameTime(), loaded.hash());
         }
+        PrayerService.refreshEstimate(be);
         Set<UUID> waiting = WAITING.remove(key);
         if (waiting != null) {
             for (UUID id : waiting) {

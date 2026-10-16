@@ -1,5 +1,6 @@
 package io.github.happysnappingturtle.mythicage.content.greek.temple;
 
+import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
 import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleRules;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.faith.GraceSource;
@@ -17,13 +18,11 @@ import java.util.UUID;
 
 /**
  * 希腊的恩宠来源：神庙（T10b 设计文档 §6）。信仰面板上每座自己的希腊神坛一行：
- * 神庙等级、预计日产出、所在村庄。信徒祈祷（T10）的结算也挂在这个来源上。
+ * 神庙等级、近 7 日信徒、今日已得、预计日产出、所在村庄。信徒祈祷（T10）的结算也挂在这个来源上；
+ * 数字与神坛检视界面取自同一份 {@link PrayerService.Stats}。
  */
 public final class GreekTempleSource implements GraceSource {
     public static final GreekTempleSource INSTANCE = new GreekTempleSource();
-    /** 每 MC 日祈祷时段内的基础产出（希腊分册 §3.3：B = 0.6/分钟 × 5.83 分钟）。 */
-    public static final double DAILY_BASE = 3.5;
-
     private GreekTempleSource() {
     }
 
@@ -37,10 +36,9 @@ public final class GreekTempleSource implements GraceSource {
         return "greek:temple";
     }
 
-    /** 满员时的预计日产出（估算，不是发放承诺）。检视界面与信仰面板共用这一个公式。 */
+    /** 预计日产出（估算，不是发放承诺）：按近 7 日信徒、祈祷位与神庙系数（T10 设计文档 §5.2）。 */
     public static double estimate(GreekAltarBlockEntity be, TempleRules rules) {
-        TempleRules.Tier granted = rules.tier(be.verdict(rules).grantedLevel());
-        return DAILY_BASE * Math.sqrt(be.prayerSlots(rules).size()) * granted.coefficient();
+        return PrayerService.estimate(be, rules);
     }
 
     @Override
@@ -58,8 +56,10 @@ public final class GreekTempleSource implements GraceSource {
             if (level != null && level.isLoaded(e.pos().pos())
                     && level.getBlockEntity(e.pos().pos()) instanceof GreekAltarBlockEntity be && be.hasResult()) {
                 TempleRules.Tier tier = rules.tier(be.verdict(rules).grantedLevel());
-                out.add(new Row(name, e.pos(), Component.translatable("mythic_age.temple.tier." + tier.name()),
-                        estimate(be, rules), village));
+                PrayerService.Stats st = PrayerService.stats(be, rules);
+                out.add(new Row(name, e.pos(), Component.translatable("mythic_age.grace.greek_temple.status",
+                        Component.translatable("mythic_age.temple.tier." + tier.name()), st.believers(),
+                        String.format(java.util.Locale.ROOT, "%.1f", st.today())), st.estimate(), village));
             } else {
                 out.add(new Row(name, e.pos(), Component.translatable("mythic_age.grace.unloaded"), 0, village));
             }
