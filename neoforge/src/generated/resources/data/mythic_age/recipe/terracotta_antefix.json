@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:ceramic_component"
+    },
+    {
+      "item": "mythic_age:ceramic_component"
+    },
+    {
+      "tag": "c:dyes/black"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "mythic_age:terracotta_antefix"
+  }
+}
