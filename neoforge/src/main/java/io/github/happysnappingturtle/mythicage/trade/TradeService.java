@@ -92,6 +92,7 @@ public final class TradeService {
     public static void openGuardian(ServerPlayer player, GreekGuardianEntity guardian) {
         Session s = new Session(TradeOffer.Venue.GUARDIAN, guardian.getId(), null, guardian.level().dimension());
         SESSIONS.put(player.getUUID(), s);
+        guardian.playGesture(GreekGuardianEntity.Gesture.GREET);
         send(player, new TradePayloads.Open(view(player, s)));
     }
 
@@ -341,6 +342,9 @@ public final class TradeService {
             return Outcome.of(reissue ? TradeReason.NOT_BLESSED : TradeReason.ALREADY_BLESSED);
         }
         give(player, altar.copy());
+        if (!reissue && player.level().getEntity(s.guardianEntityId()) instanceof GreekGuardianEntity g) {
+            g.playGesture(GreekGuardianEntity.Gesture.ANNOUNCE);
+        }
         return new Outcome(TradeReason.OK, 0, altar);
     }
 

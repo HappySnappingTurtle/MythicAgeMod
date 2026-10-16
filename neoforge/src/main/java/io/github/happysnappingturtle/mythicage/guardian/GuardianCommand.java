@@ -15,6 +15,7 @@ import java.util.Optional;
  * <pre>
  * /mythicage guardian spawn     在执行者脚下生成一位祭司，居所即此处
  * /mythicage guardian list      列出注册表中的全部祭司
+ * /mythicage guardian gesture &lt;实体&gt; &lt;greet|announce|point|none&gt;   播放一次手势（审阅截图用）
  * </pre>
  */
 public final class GuardianCommand {
@@ -40,6 +41,25 @@ public final class GuardianCommand {
                                     at.getX(), at.getY(), at.getZ()), true);
                             return 1;
                         }))
+                        .then(Commands.literal("gesture")
+                                .then(Commands.argument("targets", net.minecraft.commands.arguments.EntityArgument.entities())
+                                        .then(Commands.argument("gesture", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
+                                                        java.util.Arrays.stream(GreekGuardianEntity.Gesture.values())
+                                                                .map(GreekGuardianEntity.Gesture::id), b))
+                                                .executes(c -> {
+                                                    String id = com.mojang.brigadier.arguments.StringArgumentType.getString(c, "gesture");
+                                                    GreekGuardianEntity.Gesture g = java.util.Arrays.stream(GreekGuardianEntity.Gesture.values())
+                                                            .filter(x -> x.id().equals(id)).findFirst().orElse(GreekGuardianEntity.Gesture.NONE);
+                                                    int n = 0;
+                                                    for (net.minecraft.world.entity.Entity e : net.minecraft.commands.arguments.EntityArgument.getEntities(c, "targets")) {
+                                                        if (e instanceof GreekGuardianEntity gg) {
+                                                            gg.playGesture(g);
+                                                            n++;
+                                                        }
+                                                    }
+                                                    return n;
+                                                }))))
                         .then(Commands.literal("list").executes(c -> {
                             var all = GuardianRegistry.get(c.getSource().getServer()).all();
                             c.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.guardian.count",

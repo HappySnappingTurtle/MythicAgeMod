@@ -8,7 +8,7 @@
     const fs = req('fs');
     const path = req('path');
     const crypto = req('crypto');
-    const REPO = '/Users/hongyuwu/Documents/MythicAgeMod';
+    const REPO = window.MA_REPO || '/Users/hongyuwu/Documents/MythicAgeMod';
 
     const MA = (window.MA = window.MA || {});
     MA.REPO = REPO;

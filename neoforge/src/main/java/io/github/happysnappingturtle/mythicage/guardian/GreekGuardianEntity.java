@@ -1,6 +1,16 @@
 package io.github.happysnappingturtle.mythicage.guardian;
 
+import io.github.happysnappingturtle.mythicage.entity.MythVariantHolder;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
@@ -34,13 +44,51 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 希腊守护者：神庙祭司 Hiereus（T9 设计文档 §7；外观见 VI-GR-PRI-01，模型在 T9b）。
+ * 希腊守护者：神庙祭司 Hiereus（T9 设计文档 §7；外观见 VI-GR-PRI-01，GeckoLib 模型与动画见 T9b 设计文档）。
  * 有固定身份 guardianId 与居所 home；白天在居所 8 格内走动，夜里留在 3 格内；
  * 有玩家打开交易界面时停步并面向该玩家。死亡后由 {@link GuardianSpawner} 按注册表在居所复原。
  */
-public class GreekGuardianEntity extends PathfinderMob {
+public class GreekGuardianEntity extends PathfinderMob implements GeoEntity, MythVariantHolder {
     public static final int DAY_RADIUS = 8;
     public static final int NIGHT_RADIUS = 3;
+    /** 客户端判定「在走路」的水平速度阈值（格/刻）。 */
+    public static final double WALK_THRESHOLD = 0.02;
+    /** 行走动画每循环前进的距离（格）：大腿摆幅 ±14°、腿长 14u，两步约 0.85 格。 */
+    public static final double WALK_CYCLE_BLOCKS = 0.85;
+
+    /** 一次性手势（T9b 设计文档 §3）：服务端触发，同步给客户端，播完回到待机/行走。 */
+    public enum Gesture {
+        NONE(null, 0), GREET("greet", 32), ANNOUNCE("announce", 44), POINT("point", 28);
+
+        private final String animation;
+        private final int ticks;
+
+        Gesture(String animation, int ticks) {
+            this.animation = animation;
+            this.ticks = ticks;
+        }
+
+        public String animation() {
+            return animation;
+        }
+
+        public String id() {
+            return name().toLowerCase(java.util.Locale.ROOT);
+        }
+
+        static Gesture byOrdinal(int o) {
+            return o >= 0 && o < values().length ? values()[o] : NONE;
+        }
+    }
+
+    private static final EntityDataAccessor<Byte> GESTURE = SynchedEntityData.defineId(GreekGuardianEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Integer> GESTURE_START = SynchedEntityData.defineId(GreekGuardianEntity.class, EntityDataSerializers.INT);
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private int gestureEndTick;
+    private int clientSeenGestureStart = -1;
 
     @Nullable
     private UUID guardianId;
@@ -50,6 +98,13 @@ public class GreekGuardianEntity extends PathfinderMob {
     public GreekGuardianEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
         setPersistenceRequired();
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(GESTURE, (byte) Gesture.NONE.ordinal());
+        builder.define(GESTURE_START, 0);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -112,6 +167,77 @@ public class GreekGuardianEntity extends PathfinderMob {
         if (tickCount % 100 == 0) {
             updateRestriction();
         }
+        if (gesture() != Gesture.NONE && tickCount >= gestureEndTick) {
+            entityData.set(GESTURE, (byte) Gesture.NONE.ordinal());
+        }
+    }
+
+    // ───────────── 手势与动画 ─────────────
+
+    public Gesture gesture() {
+        return Gesture.byOrdinal(entityData.get(GESTURE));
+    }
+
+    /** 服务端播放一次手势；同一手势再次触发会从头播放。 */
+    public void playGesture(Gesture g) {
+        entityData.set(GESTURE, (byte) g.ordinal());
+        entityData.set(GESTURE_START, tickCount);
+        gestureEndTick = tickCount + g.ticks;
+    }
+
+    @Override
+    public String variant() {
+        return "";
+    }
+
+    @Override
+    public float variantScale() {
+        return 1.0F;
+    }
+
+    /** 宣告时抬头望天：不叠加视线方向。 */
+    @Override
+    public boolean headLookLocked() {
+        return gesture() == Gesture.ANNOUNCE;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        AnimationController<GreekGuardianEntity> main = new AnimationController<>(this, "main", 4, state -> {
+            Gesture g = gesture();
+            int start = entityData.get(GESTURE_START);
+            if (start != clientSeenGestureStart) {
+                clientSeenGestureStart = start;
+                if (g != Gesture.NONE) {
+                    state.getController().forceAnimationReset();
+                }
+            }
+            if (g != Gesture.NONE) {
+                return state.setAndContinue(RawAnimation.begin().thenPlayAndHold(g.animation()));
+            }
+            return state.setAndContinue(horizontalSpeed() > WALK_THRESHOLD ? WALK : IDLE);
+        });
+        main.setAnimationSpeedHandler(e -> e.animationSpeed());
+        controllers.add(main);
+    }
+
+    private double horizontalSpeed() {
+        double dx = getX() - xo;
+        double dz = getZ() - zo;
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /** 行走时按实际步速调整播放速度，避免滑步。 */
+    private double animationSpeed() {
+        if (gesture() == Gesture.NONE && horizontalSpeed() > WALK_THRESHOLD) {
+            return net.minecraft.util.Mth.clamp(horizontalSpeed() * 20.0 / WALK_CYCLE_BLOCKS, 0.4, 3.0);
+        }
+        return 1.0;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     @Override
