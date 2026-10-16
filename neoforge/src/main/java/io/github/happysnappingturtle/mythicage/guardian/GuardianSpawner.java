@@ -1,11 +1,12 @@
 package io.github.happysnappingturtle.mythicage.guardian;
 
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
-import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
 import io.github.happysnappingturtle.mythicage.core.guardian.GuardianRules;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.entity.ModEntities;
+import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
+import io.github.happysnappingturtle.mythicage.village.VillageService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -27,7 +28,7 @@ import java.util.UUID;
 /**
  * 守护者的出现、复原与去重（T9 设计文档 §7，决策 D1、D4）。
  * <ul>
- *   <li>村庄：每 100 刻对每位在线玩家查 48 格内的聚会钟；钟在希腊主群系、且还没有祭司 → 在钟旁生成一位。</li>
+ *   <li>村庄：每 100 刻对每位在线玩家查 48 格内的聚会钟；已登记为希腊村庄（T10a）且还没有祭司 → 在钟旁生成一位。</li>
  *   <li>复原：死亡满 {@code respawnDays} 个 MC 日、居所区块已加载 → 在居所生成，guardianId 不变。</li>
  *   <li>去重：实体进入世界时，若注册表记录的当前实体不是它（例如从旧区块读回的副本），拒绝加入。</li>
  * </ul>
@@ -113,16 +114,22 @@ public final class GuardianSpawner {
         return config().spawnInVillages() ? trySpawnNear(level, pos) : 0;
     }
 
-    /** 在 pos 周围 48 格内的聚会钟旁补上祭司。返回新生成的数量。 */
+    /**
+     * 在 pos 周围 48 格内、已登记且文明为希腊的村庄里补上祭司（T10a：祭司跟着村庄走，不再看群系）。
+     * 先登记附近的新聚会钟。返回新生成的数量。
+     */
     public static int trySpawnNear(ServerLevel level, BlockPos pos) {
+        VillageService.registerNear(level, pos);
         GuardianRegistry reg = GuardianRegistry.get(level.getServer());
+        VillageRegistry villages = VillageRegistry.get(level.getServer());
         List<BlockPos> bells = level.getPoiManager()
                 .findAll(h -> h.is(PoiTypes.MEETING), b -> true, pos, VILLAGE_RADIUS, PoiManager.Occupancy.ANY)
                 .map(BlockPos::immutable).toList();
         int spawned = 0;
         for (BlockPos bell : bells) {
-            if (reg.byBell(level.dimension(), bell).isPresent()
-                    || !level.getBiome(bell).is(ModTags.region(Civilization.GREEK))) {
+            Optional<VillageRegistry.Village> v = villages.byBell(GlobalPos.of(level.dimension(), bell));
+            if (v.isEmpty() || !Civilization.GREEK.id().equals(v.get().civ())
+                    || reg.byBell(level.dimension(), bell).isPresent()) {
                 continue;
             }
             Optional<BlockPos> spot = standableNear(level, bell, BELL_RADIUS);
@@ -131,6 +138,16 @@ public final class GuardianSpawner {
             }
         }
         return spawned;
+    }
+
+    /** 祭司所属的村庄（按其登记的钟）；刷怪蛋、命令生成的祭司没有。 */
+    public static Optional<VillageRegistry.Village> villageOf(GreekGuardianEntity g) {
+        if (!(g.level() instanceof ServerLevel level) || g.guardianId() == null) {
+            return Optional.empty();
+        }
+        return GuardianRegistry.get(level.getServer()).get(g.guardianId())
+                .flatMap(GuardianRegistry.Entry::bell)
+                .flatMap(b -> VillageRegistry.get(level.getServer()).byBell(GlobalPos.of(level.dimension(), b)));
     }
 
     /** 复原到期的祭司。返回复原数量。 */

@@ -36,7 +36,7 @@ public final class ConfigCommand {
                                 .executes(ctx -> reload(ctx, "all"))
                                 .then(Commands.argument("name", StringArgumentType.word())
                                         .suggests((ctx, b) -> SharedSuggestionProvider.suggest(
-                                                new String[]{"all", "runtime", "world_rules", "conduct"}, b))
+                                                new String[]{"all", "runtime", "world_rules", "conduct", "villages"}, b))
                                         .executes(ctx -> reload(ctx, StringArgumentType.getString(ctx, "name")))))
                         .then(Commands.literal("show")
                                 .then(Commands.argument("name", StringArgumentType.word())
@@ -103,6 +103,6 @@ public final class ConfigCommand {
 
     private static Component unknown(String name) {
         return Component.translatableWithFallback("commands.mythic_age.config.unknown",
-                "Unknown config '%s'. Valid: all, runtime, world_rules, conduct", name);
+                "Unknown config '%s'. Valid: all, runtime, world_rules, conduct, villages", name);
     }
 }

@@ -345,8 +345,15 @@ public final class GuardianGameTests {
         h.setBlock(rel, Blocks.BELL);
         BlockPos bell = h.absolutePos(rel);
         h.runAfterDelay(2, () -> {
-            GuardianSpawner.spawnForArea(h.getLevel(), bell);
-            GuardianSpawner.spawnForArea(h.getLevel(), bell);
+            // T10a：祭司只在已登记的希腊村庄生成；测试结构里放不下原版村庄，注入「这个钟属于平原村庄」
+            io.github.happysnappingturtle.mythicage.village.VillageResolver.overrideTypeForTest(
+                    (l, b) -> b.equals(bell) ? Optional.of("plains") : Optional.empty());
+            try {
+                GuardianSpawner.spawnForArea(h.getLevel(), bell);
+                GuardianSpawner.spawnForArea(h.getLevel(), bell);
+            } finally {
+                io.github.happysnappingturtle.mythicage.village.VillageResolver.overrideTypeForTest(null);
+            }
             Optional<GuardianRegistry.Entry> e = GuardianRegistry.get(h.getLevel().getServer()).byBell(h.getLevel().dimension(), bell);
             h.assertTrue(e.isPresent(), "钟旁应登记 1 位祭司");
             long near = h.getLevel().getEntitiesOfClass(GreekGuardianEntity.class,
@@ -357,7 +364,7 @@ public final class GuardianGameTests {
     }
 
     @GameTest(template = T, batch = "guardian_village_off")
-    public static void village_spawn_respects_biome_and_config(GameTestHelper h) {
+    public static void village_spawn_respects_civ_and_config(GameTestHelper h) {
         floor(h);
         BlockPos rel = new BlockPos(5, 1, 5);
         h.setBlock(rel, Blocks.BELL);
@@ -371,14 +378,14 @@ public final class GuardianGameTests {
                 h.assertTrue(GuardianRegistry.get(h.getLevel().getServer()).byBell(h.getLevel().dimension(), bell).isEmpty(),
                         "配置关闭时不生成");
                 setGuardians(holder, original, original.guardians());
-                h.getLevel().getServer().getCommands().performPrefixedCommand(
-                        h.getLevel().getServer().createCommandSourceStack().withSuppressedOutput(),
-                        "fillbiome " + (bell.getX() - 2) + " " + (bell.getY() - 2) + " " + (bell.getZ() - 2) + " "
-                                + (bell.getX() + 2) + " " + (bell.getY() + 2) + " " + (bell.getZ() + 2) + " minecraft:desert");
+                // 沙漠村庄 → 埃及（尚未实现）：登记但不生成希腊祭司
+                io.github.happysnappingturtle.mythicage.village.VillageResolver.overrideTypeForTest(
+                        (l, b) -> b.equals(bell) ? Optional.of("desert") : Optional.empty());
                 GuardianSpawner.trySpawnNear(h.getLevel(), bell);
                 h.assertTrue(GuardianRegistry.get(h.getLevel().getServer()).byBell(h.getLevel().dimension(), bell).isEmpty(),
-                        "非希腊群系的钟不生成");
+                        "非希腊村庄的钟不生成祭司");
             } finally {
+                io.github.happysnappingturtle.mythicage.village.VillageResolver.overrideTypeForTest(null);
                 setGuardians(holder, original, original.guardians());
             }
             h.succeed();

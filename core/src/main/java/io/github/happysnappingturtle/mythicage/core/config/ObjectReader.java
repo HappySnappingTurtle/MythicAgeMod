@@ -130,6 +130,30 @@ public final class ObjectReader {
         return fallback;
     }
 
+    /** 本对象当前有哪些键（不标记为已读；用于读取「键 → 值」表）。缺失对象时为空。 */
+    public java.util.List<String> keys() {
+        return json == null ? java.util.List.of() : java.util.List.copyOf(json.keySet());
+    }
+
+    /** 该键存在且是 JSON 对象。 */
+    public boolean isObject(String key) {
+        JsonElement e = peek(key);
+        return e != null && e.isJsonObject();
+    }
+
+    /** 读取非空字符串；缺失或类型不对时告警并返回 fallback。 */
+    public String string(String key, String fallback) {
+        JsonElement element = take(key);
+        if (element == null) {
+            return fallback;
+        }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString() && !element.getAsString().isEmpty()) {
+            return element.getAsString();
+        }
+        warn(key, "应为非空字符串，已使用默认值 " + fallback);
+        return fallback;
+    }
+
     /** 记录一条与本对象某个键相关的告警（供 schema 做跨字段校验）。 */
     public void warn(String key, String message) {
         issues.add(ConfigIssue.warn(pathOf(key), message));

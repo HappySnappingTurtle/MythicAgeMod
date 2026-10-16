@@ -5,7 +5,7 @@ import io.github.happysnappingturtle.mythicage.core.player.PlayerMythData;
 
 /**
  * 交易的纯判定（T9 设计文档 §5 第 1 步，背包与物品价格除外）。按固定顺序检查，返回第一个不满足的原因：
- * 地点 → 时代 → 价格是否变化 → 每日限购 → 恩宠。
+ * 地点 → 时代 → 次神 → 价格是否变化 → 每日限购 → 恩宠。
  */
 public final class TradeRules {
     private TradeRules() {
@@ -23,6 +23,9 @@ public final class TradeRules {
         if (!data.civ(civ).age().atLeast(offer.minAge())) {
             return TradeReason.AGE_LOCKED;
         }
+        if (!offer.minorGod().isEmpty() && !data.civ(civ).worships(offer.minorGod())) {
+            return TradeReason.MINOR_GOD_LOCKED;
+        }
         if (price != expectedPrice) {
             return TradeReason.PRICE_CHANGED;
         }
@@ -33,6 +36,24 @@ public final class TradeRules {
             return TradeReason.NOT_ENOUGH_FAVOR;
         }
         return TradeReason.OK;
+    }
+
+    /**
+     * 该玩家在某村庄祭司处购买此商品适用的折扣：供奉的次神折扣 + 村庄主神折扣（T10a）。
+     *
+     * @param villagePatron 卖家所在村庄的主神；不在村庄或祭坛兑换时为空
+     */
+    public static java.util.List<Double> discounts(PlayerMythData data, Civilization civ, TradeOffer offer, String villagePatron) {
+        java.util.List<Double> out = new java.util.ArrayList<>();
+        offer.minorGodDiscount().forEach((god, d) -> {
+            if (data.civ(civ).worships(god)) {
+                out.add(d);
+            }
+        });
+        if (!offer.patron().isEmpty() && offer.patron().equals(villagePatron) && offer.patronDiscount() > 0) {
+            out.add(offer.patronDiscount());
+        }
+        return out;
     }
 
     /** 今日剩余次数；不限购时为 −1。 */

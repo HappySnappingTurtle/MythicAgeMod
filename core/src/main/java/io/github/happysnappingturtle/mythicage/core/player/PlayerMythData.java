@@ -23,6 +23,10 @@ public final class PlayerMythData {
     public static final class CivState {
         private long favor;
         private Age age = Age.NONE;
+        /** 已结识的村庄主神（T10a）：决定晋升时的次神候选。 */
+        private final Set<String> knownPatrons = new LinkedHashSet<>();
+        /** 各时代供奉的次神（T11 写入）：时代 → 次神 id。 */
+        private final EnumMap<Age, String> minorGods = new EnumMap<>(Age.class);
 
         public long favor() {
             return favor;
@@ -41,14 +45,28 @@ public final class PlayerMythData {
             this.age = Objects.requireNonNull(age);
         }
 
+        public Set<String> knownPatrons() {
+            return knownPatrons;
+        }
+
+        public Map<Age, String> minorGods() {
+            return minorGods;
+        }
+
+        /** 当前是否供奉某位次神（任一时代）。 */
+        public boolean worships(String minorGod) {
+            return minorGods.containsValue(minorGod);
+        }
+
         @Override
         public boolean equals(Object o) {
-            return o instanceof CivState c && c.favor == favor && c.age == age;
+            return o instanceof CivState c && c.favor == favor && c.age == age
+                    && List.copyOf(c.knownPatrons).equals(List.copyOf(knownPatrons)) && c.minorGods.equals(minorGods);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(favor, age);
+            return Objects.hash(favor, age, knownPatrons, minorGods);
         }
     }
 
@@ -159,6 +177,8 @@ public final class PlayerMythData {
         for (Civilization civ : Civilization.values()) {
             c.civ(civ).setFavor(civ(civ).favor());
             c.civ(civ).setAge(civ(civ).age());
+            c.civ(civ).knownPatrons.addAll(civ(civ).knownPatrons);
+            c.civ(civ).minorGods.putAll(civ(civ).minorGods);
         }
         c.firstKills.addAll(firstKills);
         c.discoveries.addAll(discoveries);

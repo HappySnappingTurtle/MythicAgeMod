@@ -100,6 +100,21 @@ public final class TxSteps {
         };
     }
 
+    /** 结识村庄主神（T10a）：记入该文明的已结识主神集合；已结识时不变。 */
+    public static TxStep knowPatron(Civilization civ, String patron) {
+        return new TxStep() {
+            @Override
+            public Optional<String> check(PlayerMythData data) {
+                return Optional.empty();
+            }
+
+            @Override
+            public void apply(PlayerMythData data) {
+                data.civ(civ).knownPatrons().add(patron);
+            }
+        };
+    }
+
     /** 设定某文明的时代（晋升、首次交谈进入远古）。 */
     public static TxStep setAge(Civilization civ, Age age) {
         return new TxStep() {

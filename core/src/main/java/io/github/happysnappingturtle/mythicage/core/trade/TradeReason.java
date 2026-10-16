@@ -10,6 +10,7 @@ public enum TradeReason {
     UNKNOWN_OFFER,
     WRONG_VENUE,
     AGE_LOCKED,
+    MINOR_GOD_LOCKED,
     PRICE_CHANGED,
     DAILY_LIMIT,
     NOT_ENOUGH_FAVOR,

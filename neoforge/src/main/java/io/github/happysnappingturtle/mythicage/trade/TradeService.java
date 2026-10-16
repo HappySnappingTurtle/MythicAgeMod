@@ -21,6 +21,8 @@ import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.temple.AltarRegistry;
+import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
+import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -57,7 +59,8 @@ public final class TradeService {
     private static final int CHECK_INTERVAL = 10;
 
     /** 一次打开的界面。guardianEntityId 在祭坛兑换时为 −1；altar 在守护者处为 null。 */
-    record Session(TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos altar, ResourceKey<Level> dim) {
+    record Session(TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos altar, ResourceKey<Level> dim,
+                   String villagePatron) {
     }
 
     /** 请求结果：原因、附加数字、成功时的产物名与数量。 */
@@ -90,15 +93,17 @@ public final class TradeService {
     // ───────────── 会话 ─────────────
 
     public static void openGuardian(ServerPlayer player, GreekGuardianEntity guardian) {
-        Session s = new Session(TradeOffer.Venue.GUARDIAN, guardian.getId(), null, guardian.level().dimension());
+        String patron = GuardianSpawner.villageOf(guardian).map(VillageRegistry.Village::patron).orElse("");
+        Session s = new Session(TradeOffer.Venue.GUARDIAN, guardian.getId(), null, guardian.level().dimension(), patron);
         SESSIONS.put(player.getUUID(), s);
+        learnPatron(player, patron);
         guardian.playGesture(GreekGuardianEntity.Gesture.GREET);
         send(player, new TradePayloads.Open(view(player, s)));
     }
 
     /** 从神坛检视界面打开兑换页：神坛必须属于该玩家且在交互距离内。 */
     public static boolean openAltar(ServerPlayer player, BlockPos pos) {
-        Session s = new Session(TradeOffer.Venue.ALTAR, -1, pos.immutable(), player.level().dimension());
+        Session s = new Session(TradeOffer.Venue.ALTAR, -1, pos.immutable(), player.level().dimension(), "");
         if (!valid(player, s)) {
             return false;
         }
@@ -194,10 +199,45 @@ public final class TradeService {
                 && player.distanceToSqr(altar.getCenter()) <= max;
     }
 
+    /**
+     * 结识村庄主神（T10a 设计文档 §4）：与村庄祭司交谈即记入；首次结识时提示该主神名下的次神候选。
+     * 用 UNIQUE 收据保证提示只出现一次。
+     */
+    static void learnPatron(ServerPlayer player, String patron) {
+        if (patron.isEmpty() || MythData.get(player).civ(CIV).knownPatrons().contains(patron)) {
+            return;
+        }
+        Transactions.Result r = MythData.transact(player, Transactions.Request.unique(
+                "known_patron:" + CIV.id() + ":" + patron, TxSteps.knowPatron(CIV, patron)));
+        if (r.committed()) {
+            var pantheon = PantheonLoader.get(CIV);
+            net.minecraft.network.chat.MutableComponent gods = net.minecraft.network.chat.Component.empty();
+            boolean first = true;
+            for (var g : pantheon.underPatron(patron, Age.CLASSICAL)) {
+                if (!first) {
+                    gods.append("、");
+                }
+                gods.append(net.minecraft.network.chat.Component.translatable("mythic_age.god." + g.id()));
+                first = false;
+            }
+            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("mythic_age.village.patron_known",
+                    net.minecraft.network.chat.Component.translatable("mythic_age.god." + patron), gods));
+        }
+    }
+
     // ───────────── 界面数据 ─────────────
 
     static long priceOf(ServerPlayer player, TradeOffer offer) {
-        return offer.price().isFavor() ? PriceCalculator.favor(offer.price().favor(), discounts.apply(player, offer)) : 0;
+        return priceOf(player, offer, "");
+    }
+
+    static long priceOf(ServerPlayer player, TradeOffer offer, String villagePatron) {
+        if (!offer.price().isFavor()) {
+            return 0;
+        }
+        List<Double> all = new ArrayList<>(discounts.apply(player, offer));
+        all.addAll(TradeRules.discounts(MythData.get(player), CIV, offer, villagePatron));
+        return PriceCalculator.favor(offer.price().favor(), all);
     }
 
     static TradeView view(ServerPlayer player, Session s) {
@@ -207,16 +247,26 @@ public final class TradeService {
         List<TradeView.OfferView> offers = new ArrayList<>();
         InventoryPlan inv = plan(player);
         for (TradeOffer o : table.offersAt(s.venue())) {
-            long price = priceOf(player, o);
+            long price = priceOf(player, o, s.villagePatron());
             boolean affordable = o.price().isFavor() ? data.civ(CIV).favor() >= price
                     : o.price().items().stream().allMatch(a -> inv.count(a.item()) >= a.count());
             List<ItemStack> itemPrice = o.price().items().stream().map(a -> stack(a.item(), a.count())).toList();
+            boolean godLocked = !o.minorGod().isEmpty() && !data.civ(CIV).worships(o.minorGod());
             offers.add(new TradeView.OfferView(o.id(), o.category(), stack(o.result().item(), o.result().count()), price,
-                    itemPrice, o.minAge(), !data.civ(CIV).age().atLeast(o.minAge()),
-                    TradeRules.remainingToday(data, CIV, o, today), affordable));
+                    itemPrice, o.minAge(), !data.civ(CIV).age().atLeast(o.minAge()) || godLocked,
+                    TradeRules.remainingToday(data, CIV, o, today), affordable, godLocked ? o.minorGod() : ""));
+        }
+        List<String> patronGods = new ArrayList<>();
+        if (!s.villagePatron().isEmpty()) {
+            var pantheon = PantheonLoader.get(CIV);
+            for (Age a : List.of(Age.CLASSICAL, Age.HEROIC, Age.MYTHIC)) {
+                for (var g : pantheon.underPatron(s.villagePatron(), a)) {
+                    patronGods.add(a.id() + ":" + g.id());
+                }
+            }
         }
         return new TradeView(s.venue(), s.guardianEntityId(), dialogue(player, s, today), data.civ(CIV).favor(),
-                MythData.cap(player, CIV), data.civ(CIV).age(), offers);
+                MythData.cap(player, CIV), data.civ(CIV).age(), offers, s.villagePatron(), patronGods);
     }
 
     private static TradeView.Dialogue dialogue(ServerPlayer player, Session s, long today) {
@@ -250,7 +300,7 @@ public final class TradeService {
         if (offer == null) {
             return Outcome.of(TradeReason.UNKNOWN_OFFER);
         }
-        long price = priceOf(player, offer);
+        long price = priceOf(player, offer, s.villagePatron());
         long today = MythDays.today(player.server);
         // 1 验证
         TradeReason reason = TradeRules.check(data, CIV, offer, s.venue(), price, expectedPrice, today);

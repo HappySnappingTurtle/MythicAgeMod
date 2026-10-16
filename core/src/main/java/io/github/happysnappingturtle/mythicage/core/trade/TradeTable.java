@@ -29,7 +29,9 @@ public record TradeTable(Civilization civ, List<TradeOffer> offers) {
     public static final int MAX_PRICE_ITEMS = 3;
     private static final Pattern ID = Pattern.compile("[a-z0-9_]+");
     private static final Set<String> ROOT_KEYS = Set.of("schemaVersion", "civilization", "offers");
-    private static final Set<String> OFFER_KEYS = Set.of("id", "category", "result", "price", "minAge", "venues", "dailyLimit");
+    private static final Set<String> OFFER_KEYS = Set.of("id", "category", "result", "price", "minAge", "venues", "dailyLimit",
+            "minorGod", "minorGodDiscount", "patron", "patronDiscount");
+    public static final double MAX_DISCOUNT = 0.5;
 
     public TradeTable {
         offers = List.copyOf(offers);
@@ -128,7 +130,24 @@ public record TradeTable(Civilization civ, List<TradeOffer> offers) {
                     .orElseThrow(() -> new TradeTableException(vp + ": 未知地点 " + v.getAsString())));
         }
         int dailyLimit = o.has("dailyLimit") ? intIn(o, "dailyLimit", path + ".dailyLimit", 1, 1000) : 0;
-        return new TradeOffer(id, category, result, price, minAge, venues, dailyLimit);
+        String minorGod = o.has("minorGod") ? idString(o, "minorGod", path + ".minorGod") : "";
+        Map<String, Double> godDiscount = new LinkedHashMap<>();
+        if (o.has("minorGodDiscount")) {
+            JsonObject d = object(o.get("minorGodDiscount"), path + ".minorGodDiscount");
+            for (String g : d.keySet()) {
+                if (!ID.matcher(g).matches()) {
+                    throw new TradeTableException(path + ".minorGodDiscount." + g + ": 非法次神 id");
+                }
+                godDiscount.put(g, discount(d.get(g), path + ".minorGodDiscount." + g));
+            }
+        }
+        String patron = o.has("patron") ? idString(o, "patron", path + ".patron") : "";
+        double patronDiscount = o.has("patronDiscount") ? discount(o.get("patronDiscount"), path + ".patronDiscount") : 0;
+        if (patronDiscount > 0 && patron.isEmpty()) {
+            throw new TradeTableException(path + ".patronDiscount: 需要同时写 patron");
+        }
+        return new TradeOffer(id, category, result, price, minAge, venues, dailyLimit, minorGod, godDiscount, patron,
+                patronDiscount);
     }
 
     private static TradeOffer.Price price(JsonElement el, String path, ItemLookup items) {
@@ -167,6 +186,25 @@ public record TradeTable(Civilization civ, List<TradeOffer> offers) {
         }
         int count = intIn(o, "count", path + ".count", 1, max.getAsInt());
         return new TradeOffer.ItemAmount(item, count);
+    }
+
+    private static String idString(JsonObject o, String key, String path) {
+        String v = string(o, key, path);
+        if (!ID.matcher(v).matches()) {
+            throw new TradeTableException(path + ": 只能用小写字母、数字和下划线，实际 " + v);
+        }
+        return v;
+    }
+
+    private static double discount(JsonElement e, String path) {
+        if (e == null || !e.isJsonPrimitive() || !e.getAsJsonPrimitive().isNumber()) {
+            throw new TradeTableException(path + ": 缺失或不是数字");
+        }
+        double d = e.getAsDouble();
+        if (!Double.isFinite(d) || d <= 0 || d > MAX_DISCOUNT) {
+            throw new TradeTableException(path + ": 折扣必须在 (0, " + MAX_DISCOUNT + "]，实际 " + d);
+        }
+        return d;
     }
 
     private static void unknownKeys(JsonObject o, Set<String> allowed, String prefix) {

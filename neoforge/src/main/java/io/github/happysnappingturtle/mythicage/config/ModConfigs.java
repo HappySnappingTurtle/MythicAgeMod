@@ -10,6 +10,8 @@ import io.github.happysnappingturtle.mythicage.core.config.ConfigSchema;
 import io.github.happysnappingturtle.mythicage.core.config.conduct.ConductConfig;
 import io.github.happysnappingturtle.mythicage.core.config.conduct.ConductSchema;
 import io.github.happysnappingturtle.mythicage.core.config.runtime.RuntimeConfig;
+import io.github.happysnappingturtle.mythicage.core.config.villages.VillagesConfig;
+import io.github.happysnappingturtle.mythicage.core.config.villages.VillagesSchema;
 import io.github.happysnappingturtle.mythicage.core.config.runtime.RuntimeConfigSchema;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesSchema;
@@ -22,13 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 三份服务端配置的持有者。每次服务器启动（ServerAboutToStartEvent，最高优先级）重新加载并创建 holder；
+ * 四份服务端配置的持有者。每次服务器启动（ServerAboutToStartEvent，最高优先级）重新加载并创建 holder；
  * 需要生效前钩子的系统应在同一事件的普通优先级中向新的 holder 注册钩子。
  */
 public final class ModConfigs {
     private static ConfigHolder<RuntimeConfig> runtime;
     private static ConfigHolder<WorldRulesConfig> worldRules;
     private static ConfigHolder<ConductConfig> conduct;
+    private static ConfigHolder<VillagesConfig> villages;
 
     private ModConfigs() {
     }
@@ -53,12 +56,17 @@ public final class ModConfigs {
         return require(conduct, "conduct");
     }
 
-    /** 按文件名取 holder，顺序固定：runtime、world_rules、conduct。 */
+    public static ConfigHolder<VillagesConfig> villages() {
+        return require(villages, "villages");
+    }
+
+    /** 按文件名取 holder，顺序固定：runtime、world_rules、conduct、villages。 */
     public static Map<String, ConfigHolder<?>> all() {
         Map<String, ConfigHolder<?>> map = new LinkedHashMap<>();
         map.put(RuntimeConfigSchema.INSTANCE.name(), runtime());
         map.put(WorldRulesSchema.INSTANCE.name(), worldRules());
         map.put(ConductSchema.INSTANCE.name(), conduct());
+        map.put(VillagesSchema.INSTANCE.name(), villages());
         return map;
     }
 
@@ -66,6 +74,7 @@ public final class ModConfigs {
         runtime = load(RuntimeConfigSchema.INSTANCE);
         worldRules = load(WorldRulesSchema.INSTANCE);
         conduct = load(ConductSchema.INSTANCE);
+        villages = load(VillagesSchema.INSTANCE);
     }
 
     private static <T> ConfigHolder<T> load(ConfigSchema<T> schema) {

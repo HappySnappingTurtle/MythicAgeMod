@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "civilization": "greek",
+  "patrons": ["zeus", "poseidon", "hades"],
+  "minorGods": [
+    {"id": "athena", "age": "classical", "patrons": ["zeus", "hades"], "available": true},
+    {"id": "hermes", "age": "classical", "patrons": ["zeus", "poseidon"], "available": true},
+    {"id": "ares", "age": "classical", "patrons": ["poseidon", "hades"], "available": true},
+    {"id": "apollo", "age": "heroic", "patrons": ["zeus", "hades"], "available": false},
+    {"id": "dionysus", "age": "heroic", "patrons": ["zeus", "poseidon"], "available": true},
+    {"id": "aphrodite", "age": "heroic", "patrons": ["poseidon", "hades"], "available": true},
+    {"id": "hera", "age": "mythic", "patrons": ["zeus"], "available": false},
+    {"id": "artemis", "age": "mythic", "patrons": ["poseidon", "hades"], "available": false},
+    {"id": "hephaestus", "age": "mythic", "patrons": ["zeus", "poseidon", "hades"], "available": false}
+  ]
+}

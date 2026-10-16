@@ -1,0 +1,231 @@
+package io.github.happysnappingturtle.mythicage.village;
+
+import io.github.happysnappingturtle.mythicage.MythicAge;
+import io.github.happysnappingturtle.mythicage.config.ModConfigs;
+import io.github.happysnappingturtle.mythicage.core.config.villages.VillagesConfig;
+import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+import io.github.happysnappingturtle.mythicage.core.village.VillageRules;
+import io.github.happysnappingturtle.mythicage.guardian.MythDays;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * 村庄登记服务（T10a 设计文档 §2、§6）：
+ * <ul>
+ *   <li>每 100 刻，登记在线玩家 48 格内的新聚会钟；不在原版村庄结构里的钟只判定一次（缓存）；</li>
+ *   <li>同时检查玩家附近已登记村庄的钟是否还在，连续 7 个 MC 日不在即注销；</li>
+ *   <li>每 20 刻检查玩家是否进入村庄范围，进入时显示「宙斯之村 / 希腊」。</li>
+ * </ul>
+ */
+public final class VillageService {
+    public static final int REGISTER_INTERVAL = 100;
+    public static final int TITLE_INTERVAL = 20;
+    /** T18 之前的临时村庄范围（钟周围水平距离）。 */
+    public static final int RANGE = 48;
+    public static final int LEAVE_RANGE = 64;
+
+    private static final Set<GlobalPos> NON_VILLAGE = new HashSet<>();
+    private static final Map<UUID, UUID> INSIDE = new HashMap<>();
+
+    private VillageService() {
+    }
+
+    static VillagesConfig config() {
+        return ModConfigs.villages().current();
+    }
+
+    public static void onServerStopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event) {
+        NON_VILLAGE.clear();
+        INSIDE.clear();
+    }
+
+    /** 忘掉某个钟的「非村庄钟」缓存（reset 命令、测试用）。 */
+    public static void forget(GlobalPos bell) {
+        NON_VILLAGE.remove(bell);
+    }
+
+    /** 只供 GameTest：清空缓存与进村状态。 */
+    public static void clearCachesForTest() {
+        NON_VILLAGE.clear();
+        INSIDE.clear();
+    }
+
+    public static void onServerTickPost(ServerTickEvent.Post event) {
+        MinecraftServer server = event.getServer();
+        int t = server.getTickCount();
+        if (t % REGISTER_INTERVAL == 0) {
+            for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+                if (!p.isSpectator()) {
+                    registerNear(p.serverLevel(), p.blockPosition());
+                    checkBells(p.serverLevel(), p.blockPosition());
+                }
+            }
+        }
+        if (t % TITLE_INTERVAL == 0 && config().titleOnEnter()) {
+            for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+                updateTitle(p);
+            }
+        }
+    }
+
+    /** 登记 pos 周围 48 格内的新聚会钟，返回本次新登记的村庄。 */
+    public static List<VillageRegistry.Village> registerNear(ServerLevel level, BlockPos pos) {
+        VillageRegistry reg = VillageRegistry.get(level.getServer());
+        return level.getPoiManager()
+                .findAll(h -> h.is(PoiTypes.MEETING), b -> true, pos, RANGE, PoiManager.Occupancy.ANY)
+                .map(BlockPos::immutable)
+                .filter(b -> reg.byBell(GlobalPos.of(level.dimension(), b)).isEmpty())
+                .map(b -> register(level, b))
+                .flatMap(Optional::stream)
+                .toList();
+    }
+
+    /** 判定并登记一个钟；不在原版村庄结构里时缓存为「非村庄钟」并返回空。 */
+    public static Optional<VillageRegistry.Village> register(ServerLevel level, BlockPos bell) {
+        GlobalPos key = GlobalPos.of(level.dimension(), bell);
+        VillageRegistry reg = VillageRegistry.get(level.getServer());
+        Optional<VillageRegistry.Village> existing = reg.byBell(key);
+        if (existing.isPresent() || NON_VILLAGE.contains(key)) {
+            return existing;
+        }
+        Optional<String> type = VillageResolver.vanillaType(level, bell);
+        if (type.isEmpty()) {
+            NON_VILLAGE.add(key);
+            return Optional.empty();
+        }
+        VillagesConfig cfg = config();
+        String civ = "";
+        String patron = "";
+        if (cfg.vanillaVillages() == VillagesConfig.Mode.AFFILIATE) {
+            Map<String, Integer> civWeights = cfg.vanillaTypeToCiv().getOrDefault(type.get(), Map.of());
+            civ = VillageRules.pick(civWeights, VillageRules.unit(bell.getX(), bell.getY(), bell.getZ(), VillageRules.SALT_CIV))
+                    .orElse("");
+        }
+        if (!civ.isEmpty()) {
+            Map<String, Integer> pw = cfg.patronWeights().get(civ);
+            if (pw != null) {
+                pw = VillageRules.coastal(pw, VillageResolver.coastal(level, bell), cfg.coastalPoseidonBonus());
+                patron = VillageRules.pick(pw, VillageRules.unit(bell.getX(), bell.getY(), bell.getZ(), VillageRules.SALT_PATRON))
+                        .orElse("");
+                Optional<Civilization> c = Civilization.byId(civ);
+                if (!patron.isEmpty() && c.isPresent() && !PantheonLoader.get(c.get()).patrons().isEmpty()
+                        && !PantheonLoader.get(c.get()).hasPatron(patron)) {
+                    MythicAge.LOGGER.warn("villages.json 中 {} 的主神 {} 不在主神表里", civ, patron);
+                }
+            }
+        }
+        VillageRegistry.Village v = new VillageRegistry.Village(UUID.randomUUID(), key, civ, patron,
+                VillageRegistry.Origin.VANILLA, null, type.get(), -1);
+        reg.add(v);
+        return Optional.of(v);
+    }
+
+    /** 检查玩家 64 格内已登记村庄的钟：不在则记下起始日，满 7 日注销；回来了就清除标记。 */
+    public static void checkBells(ServerLevel level, BlockPos pos) {
+        VillageRegistry reg = VillageRegistry.get(level.getServer());
+        long today = MythDays.today(level.getServer());
+        for (VillageRegistry.Village v : reg.in(level.dimension())) {
+            BlockPos b = v.bell().pos();
+            if (b.distManhattan(pos) > LEAVE_RANGE * 2 || !level.isLoaded(b)) {
+                continue;
+            }
+            boolean present = level.getPoiManager().existsAtPosition(PoiTypes.MEETING, b);
+            if (present) {
+                reg.setMissingSince(v, -1);
+            } else if (v.missingSinceDay() < 0) {
+                reg.setMissingSince(v, today);
+            } else if (today - v.missingSinceDay() >= VillageRegistry.EXPIRE_DAYS) {
+                reg.remove(v.bell());
+            }
+        }
+    }
+
+    /** pos 所在（48 格内最近）的已登记村庄。 */
+    public static Optional<VillageRegistry.Village> villageAt(ServerLevel level, BlockPos pos, int range) {
+        VillageRegistry reg = VillageRegistry.get(level.getServer());
+        VillageRegistry.Village best = null;
+        double bestD = Double.MAX_VALUE;
+        for (VillageRegistry.Village v : reg.in(level.dimension())) {
+            BlockPos b = v.bell().pos();
+            double dx = b.getX() - pos.getX();
+            double dz = b.getZ() - pos.getZ();
+            double d = dx * dx + dz * dz;
+            if (d <= (double) range * range && d < bestD) {
+                bestD = d;
+                best = v;
+            }
+        }
+        return Optional.ofNullable(best);
+    }
+
+    static void updateTitle(ServerPlayer p) {
+        if (p instanceof FakePlayer || p.connection == null) {
+            return;
+        }
+        UUID inside = INSIDE.get(p.getUUID());
+        if (inside != null) {
+            Optional<VillageRegistry.Village> cur = VillageRegistry.get(p.server).byId(inside);
+            if (cur.isPresent() && cur.get().bell().dimension().equals(p.level().dimension())
+                    && horizontal(cur.get().bell().pos(), p.blockPosition()) <= LEAVE_RANGE) {
+                return;
+            }
+            INSIDE.remove(p.getUUID());
+        }
+        villageAt(p.serverLevel(), p.blockPosition(), RANGE).ifPresent(v -> {
+            INSIDE.put(p.getUUID(), v.id());
+            p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
+            p.connection.send(new ClientboundSetTitleTextPacket(title(v)));
+            p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle(v)));
+        });
+    }
+
+    /** 只供 GameTest：玩家此刻若会看到进村标题，返回该村庄。 */
+    public static Optional<VillageRegistry.Village> titleFor(ServerPlayer p) {
+        UUID inside = INSIDE.get(p.getUUID());
+        if (inside != null) {
+            Optional<VillageRegistry.Village> cur = VillageRegistry.get(p.server).byId(inside);
+            if (cur.isPresent() && horizontal(cur.get().bell().pos(), p.blockPosition()) <= LEAVE_RANGE) {
+                return Optional.empty();
+            }
+            INSIDE.remove(p.getUUID());
+        }
+        Optional<VillageRegistry.Village> v = villageAt(p.serverLevel(), p.blockPosition(), RANGE);
+        v.ifPresent(x -> INSIDE.put(p.getUUID(), x.id()));
+        return v;
+    }
+
+    private static double horizontal(BlockPos a, BlockPos b) {
+        double dx = a.getX() - b.getX();
+        double dz = a.getZ() - b.getZ();
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    public static Component title(VillageRegistry.Village v) {
+        return v.patron().isEmpty() ? Component.translatable("mythic_age.village.title.plain")
+                : Component.translatable("mythic_age.village.title", Component.translatable("mythic_age.god." + v.patron()));
+    }
+
+    public static Component subtitle(VillageRegistry.Village v) {
+        return v.civ().isEmpty() ? Component.translatable("mythic_age.village.neutral")
+                : Component.translatable("mythic_age.civ." + v.civ());
+    }
+}

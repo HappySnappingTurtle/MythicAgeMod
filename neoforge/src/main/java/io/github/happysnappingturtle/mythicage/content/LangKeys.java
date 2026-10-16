@@ -14,7 +14,7 @@ public final class LangKeys {
     static {
         add("commands.mythic_age.config.result", "%s：%s（版本 %s，%s 个问题）%s", "%s: %s (version %s, %s issue(s)) %s", "%s：%s（バージョン %s、問題 %s 件）%s");
         add("commands.mythic_age.config.show", "%s（版本 %s）：\n%s", "%s (version %s):\n%s", "%s（バージョン %s）：\n%s");
-        add("commands.mythic_age.config.unknown", "未知配置「%s」。可选：all、runtime、world_rules、conduct", "Unknown config '%s'. Valid: all, runtime, world_rules, conduct", "不明な設定「%s」。選択肢：all、runtime、world_rules、conduct");
+        add("commands.mythic_age.config.unknown", "未知配置「%s」。可选：all、runtime、world_rules、conduct、villages", "Unknown config '%s'. Valid: all, runtime, world_rules, conduct, villages", "不明な設定「%s」。選択肢：all、runtime、world_rules、conduct、villages");
         add("mythic_age.civ.greek", "希腊", "Greek", "ギリシャ");
         add("mythic_age.civ.egyptian", "埃及", "Egyptian", "エジプト");
         add("mythic_age.civ.norse", "北欧", "Norse", "北欧");
@@ -127,6 +127,31 @@ public final class LangKeys {
         add("mythic_age.trade.result.not_blessed", "请先接受祝福。", "Accept the blessing first.", "まず祝福を受けてください。");
         add("mythic_age.trade.result.has_altar", "你名下已有祭坛，或背包里还有一座。", "You already own an altar or carry one.", "すでに祭壇を持っているか、持ち物に一基あります。");
         add("mythic_age.trade.result.reissued_today", "今天已经补领过了，明天再来。", "You already received one today; come back tomorrow.", "本日はすでに受け取りました。また明日来てください。");
+        // 聚落归属与主神（T10a）
+        add("mythic_age.god.zeus", "宙斯", "Zeus", "ゼウス");
+        add("mythic_age.god.poseidon", "波塞冬", "Poseidon", "ポセイドン");
+        add("mythic_age.god.hades", "哈迪斯", "Hades", "ハデス");
+        add("mythic_age.god.athena", "雅典娜", "Athena", "アテナ");
+        add("mythic_age.god.hermes", "赫尔墨斯", "Hermes", "ヘルメス");
+        add("mythic_age.god.ares", "阿瑞斯", "Ares", "アレス");
+        add("mythic_age.god.apollo", "阿波罗", "Apollo", "アポロン");
+        add("mythic_age.god.dionysus", "狄俄尼索斯", "Dionysus", "ディオニュソス");
+        add("mythic_age.god.aphrodite", "阿佛洛狄忒", "Aphrodite", "アプロディテ");
+        add("mythic_age.god.hera", "赫拉", "Hera", "ヘラ");
+        add("mythic_age.god.artemis", "阿耳忒弥斯", "Artemis", "アルテミス");
+        add("mythic_age.god.hephaestus", "赫菲斯托斯", "Hephaestus", "ヘパイストス");
+        add("mythic_age.village.title", "%s之村", "Village of %s", "%sの村");
+        add("mythic_age.village.title.plain", "村庄", "Village", "村");
+        add("mythic_age.village.neutral", "未有信仰", "No faith", "信仰なし");
+        add("mythic_age.village.patron_known", "你结识了%s之村。其古典时代的次神 %s 将进入你的晋升候选。", "You have come to know the village of %s. Its Classical minor gods, %s, join your candidates for the next Age.", "%sの村と縁を結びました。古典時代の小神 %s があなたの昇格候補に加わります。");
+        add("mythic_age.village.patron_line", "本村供奉%s", "This village worships %s", "この村は%sを祀っている");
+        add("mythic_age.village.patron_gods", "%s：%s", "%s: %s", "%s：%s");
+        add("mythic_age.trade.state.needs_god", "需要供奉%s", "Requires devotion to %s", "%sへの信仰が必要");
+        add("mythic_age.trade.result.minor_god_locked", "你没有供奉这位次神。", "You do not worship the minor god this requires.", "この小神を信仰していません。");
+        add("commands.mythic_age.village.entry", "%s · %s（%s，%s）%s %s %s %s", "%s · %s (%s, %s) %s %s %s %s", "%s・%s（%s、%s）%s %s %s %s");
+        add("commands.mythic_age.village.count", "共 %s 个村庄", "%s village(s)", "村 %s 件");
+        add("commands.mythic_age.village.none", "附近没有已登记的村庄", "No registered village nearby", "近くに登録された村はありません");
+        add("commands.mythic_age.village.reset", "已注销该村庄登记，稍后按当前配置重新登记", "Village registration removed; it will be re-registered with the current config", "村の登録を削除しました。現在の設定で再登録されます");
         add("commands.mythic_age.guardian.spawned", "已在 %s %s %s 生成神庙祭司", "Temple priest spawned at %s %s %s", "%s %s %s に神殿の神官を生成しました");
         add("commands.mythic_age.guardian.count", "共 %s 位神庙祭司", "%s temple priest(s)", "神殿の神官 %s 人");
         add("commands.mythic_age.guardian.alive", "· %s %s (%s, %s, %s) 在世", "· %s %s (%s, %s, %s) alive", "· %s %s (%s, %s, %s) 健在");

@@ -35,7 +35,7 @@ public final class ConfigGameTests {
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
     public static void configs_load_and_reload_unchanged(GameTestHelper helper) {
         Map<String, ConfigHolder<?>> all = ModConfigs.all();
-        helper.assertTrue(all.size() == 3, "应有 3 份配置");
+        helper.assertTrue(all.size() == 4, "应有 4 份配置（含 T10a 的 villages）");
         for (Map.Entry<String, ConfigHolder<?>> e : all.entrySet()) {
             helper.assertTrue(e.getValue().version() >= 1, e.getKey() + " 版本号应 ≥1");
             helper.assertTrue(Files.isRegularFile(ModConfigs.file(e.getValue().schema())), e.getKey() + " 文件应存在");

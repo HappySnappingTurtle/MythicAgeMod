@@ -29,6 +29,9 @@ import io.github.happysnappingturtle.mythicage.temple.TempleRulesLoader;
 import io.github.happysnappingturtle.mythicage.temple.TempleService;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
+import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
+import io.github.happysnappingturtle.mythicage.village.VillageCommand;
+import io.github.happysnappingturtle.mythicage.village.VillageService;
 import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeCommand;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
@@ -103,5 +106,11 @@ public final class MythicAge {
         game.addListener(GuardianSpawner::onServerTickPost);
         game.addListener(GuardianSpawner::onEntityJoin);
         game.addListener(GuardianCommand::onRegisterCommands);
+
+        // 聚落归属与主神（T10a）
+        game.addListener(PantheonLoader::onAddReloadListeners);
+        game.addListener(VillageService::onServerTickPost);
+        game.addListener(VillageService::onServerStopped);
+        game.addListener(VillageCommand::onRegisterCommands);
     }
 }

@@ -228,7 +228,30 @@ public class GuardianScreen extends Screen {
             case REISSUE -> "mythic_age.guardian.talk.reissue";
             case NONE -> "mythic_age.guardian.talk.greet";
         };
-        line(g, Component.translatable(key), left + 12, top + 52, W - 24, TEXT);
+        int y = line(g, Component.translatable(key), left + 12, top + 52, W - 24, TEXT);
+        if (!view.villagePatron().isEmpty()) {
+            // 本村供奉的主神与其名下的次神（T10a）
+            y = line(g, Component.translatable("mythic_age.village.patron_line",
+                    Component.translatable("mythic_age.god." + view.villagePatron())), left + 12, y + 6, W - 24, PURPLE);
+            for (String age : new String[]{"classical", "heroic", "mythic"}) {
+                MutableComponent gods = Component.empty();
+                boolean first = true;
+                for (String entry : view.patronGods()) {
+                    String[] parts = entry.split(":", 2);
+                    if (parts.length == 2 && parts[0].equals(age)) {
+                        if (!first) {
+                            gods.append("、");
+                        }
+                        gods.append(Component.translatable("mythic_age.god." + parts[1]));
+                        first = false;
+                    }
+                }
+                if (!first) {
+                    y = line(g, Component.translatable("mythic_age.village.patron_gods",
+                            Component.translatable("mythic_age.age." + age), gods), left + 18, y, W - 30, DIM);
+                }
+            }
+        }
     }
 
     private void renderTrade(GuiGraphics g, int mouseX, int mouseY, int y0) {
@@ -271,6 +294,10 @@ public class GuardianScreen extends Screen {
     }
 
     private static MutableComponent stateOf(TradeView.OfferView o) {
+        if (!o.needsMinorGod().isEmpty()) {
+            return Component.translatable("mythic_age.trade.state.needs_god",
+                    Component.translatable("mythic_age.god." + o.needsMinorGod()));
+        }
         if (o.locked()) {
             return Component.translatable("mythic_age.trade.state.locked", Component.translatable("mythic_age.age." + o.minAge().id()));
         }

@@ -31,6 +31,10 @@ public final class PlayerDataNbt {
             CompoundTag c = new CompoundTag();
             c.putLong("favor", state.favor());
             c.putString("age", state.age().id());
+            c.put("knownPatrons", strings(state.knownPatrons()));
+            CompoundTag gods = new CompoundTag();
+            state.minorGods().forEach((a, g) -> gods.putString(a.id(), g));
+            c.put("minorGods", gods);
             civs.put(civ.id(), c);
         });
         root.put("civs", civs);
@@ -93,6 +97,11 @@ public final class PlayerDataNbt {
                 data.civ(civ.get()).setAge(age.get());
             } else if (!ageId.isEmpty()) {
                 MythicAge.LOGGER.warn("[player data] {} 时代非法（{}），按未接触处理", key, ageId);
+            }
+            readStrings(c, "knownPatrons", data.civ(civ.get()).knownPatrons());
+            CompoundTag gods = c.getCompound("minorGods");
+            for (String a : gods.getAllKeys()) {
+                Age.byId(a).ifPresent(godAge -> data.civ(civ.get()).minorGods().put(godAge, gods.getString(a)));
             }
         }
         readStrings(root, "firstKills", data.firstKills());
