@@ -126,6 +126,14 @@ class PowerRulesTest {
         assertPath(HIT.replace("\"scroll\"", "\"wand\""), "$.form");
     }
 
+    @Test
+    void tc86_radius() {
+        assertEquals(0, spec(HIT).radius(), "缺省 0");
+        assertEquals(6, spec(HIT.replace("\"castTicks\":10", "\"castTicks\":10,\"radius\":6")).radius());
+        assertPath(HIT.replace("\"castTicks\":10", "\"castTicks\":10,\"radius\":65"), "$.radius");
+        assertPath(HIT.replace("\"castTicks\":10", "\"castTicks\":10,\"radius\":-1"), "$.radius");
+    }
+
     private static void assertPath(String json, String path) {
         PowerSpec.PowerSpecException e = assertThrows(PowerSpec.PowerSpecException.class, () -> spec(json));
         assertTrue(e.getMessage().startsWith(path), e.getMessage());

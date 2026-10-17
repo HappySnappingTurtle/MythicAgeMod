@@ -133,6 +133,10 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onDamage);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedOut);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedIn);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onChunkWatch);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerDevCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onRightClickItem);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerShields::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerTickPost);

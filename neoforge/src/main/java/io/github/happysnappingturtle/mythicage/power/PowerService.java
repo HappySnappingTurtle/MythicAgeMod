@@ -48,6 +48,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,6 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PowerService {
     private static final ResourceLocation SLOW_ID = ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "power_channel");
     private static final double SLOW = -0.6;
+    private static final int HOVER_INTERVAL = 2;
 
     /** 进行中的会话。 */
     static final class Active {
@@ -79,6 +81,9 @@ public final class PowerService {
         Vec3 origin;
         @Nullable BlockPos blockPos;
         @Nullable Direction face;
+        /** 上次发给客户端的悬停判定（瞄准预览）。 */
+        int hoverId = Integer.MIN_VALUE;
+        boolean hoverValid;
 
         Active(ServerPlayer player, CastSession session, PowerSpec spec, InteractionHand hand, int slot, Item item) {
             this.player = player;
@@ -147,8 +152,9 @@ public final class PowerService {
         CastSession s = CastSession.aim(UUID.randomUUID().toString(), id.get(), now, config().aimTimeoutTicks());
         int slot = hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : -1;
         SESSIONS.put(player.getUUID(), new Active(player, s, spec.get(), hand, slot, stack.getItem()));
+        PowerFx.sendTo(player, PowerAimPayload.start(s.castId(), spec.get()));
         player.displayClientMessage(Component.translatable("mythic_age.power.aiming",
-                Component.translatable("mythic_age.power." + id.get())), true);
+                powerName(id.get())), true);
         return PowerReason.OK;
     }
 
@@ -170,8 +176,10 @@ public final class PowerService {
         }
         a.session.confirm(WorldClock.now(a.player.server), a.spec.castTicks());
         slow(a.player, true);
+        PowerFx.sendTo(a.player, PowerAimPayload.stop(a.session.castId()));
+        PowerFx.send(a.player, fx(a, PowerFxPayload.Phase.CHANNEL_START, a.spec.castTicks(), ""), a.player.position());
         a.player.displayClientMessage(Component.translatable("mythic_age.power.channeling",
-                Component.translatable("mythic_age.power." + a.spec.id())), true);
+                powerName(a.spec.id())), true);
         return PowerReason.OK;
     }
 
@@ -187,17 +195,12 @@ public final class PowerService {
         Vec3 look = p.getViewVector(1);
         Vec3 end = eye.add(look.scale(spec.range()));
         BlockHitResult block = p.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
-        double reach = block.getType() == HitResult.Type.MISS ? spec.range() : block.getLocation().distanceTo(eye);
         switch (spec.profile().pick()) {
             case ENTITY -> {
-                Vec3 to = eye.add(look.scale(reach));
-                EntityHitResult hit = ProjectileUtil.getEntityHitResult(p.level(), p, eye, to,
-                        p.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0),
-                        e -> !e.isSpectator() && e.isPickable() && e != p);
-                if (hit == null) {
+                Entity e = entityUnderCrosshair(p, spec.range());
+                if (e == null) {
                     return PowerReason.NO_TARGET;
                 }
-                Entity e = hit.getEntity();
                 TargetFacts facts = TargetFactsCollector.collect(p, e, TargetFactsCollector.ownVillages(p));
                 String reaction = TargetClassifier.reaction(spec, facts);
                 if (TargetClassifier.NONE.equals(reaction)) {
@@ -225,6 +228,33 @@ public final class PowerService {
         }
     }
 
+    /** 准星下的实体（被方块挡住的不算）。 */
+    @Nullable
+    static Entity entityUnderCrosshair(ServerPlayer p, double range) {
+        Vec3 eye = p.getEyePosition();
+        Vec3 look = p.getViewVector(1);
+        BlockHitResult block = p.level().clip(new ClipContext(eye, eye.add(look.scale(range)), ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, p));
+        double reach = block.getType() == HitResult.Type.MISS ? range : block.getLocation().distanceTo(eye);
+        EntityHitResult hit = ProjectileUtil.getEntityHitResult(p.level(), p, eye, eye.add(look.scale(reach)),
+                p.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0),
+                e -> !e.isSpectator() && e.isPickable() && e != p);
+        return hit == null ? null : hit.getEntity();
+    }
+
+    /** 瞄准预览：准星下实体的合法性（只判矩阵），变了才发给施法者。 */
+    static void hover(Active a) {
+        Entity e = entityUnderCrosshair(a.player, a.spec.range());
+        int id = e == null ? -1 : e.getId();
+        boolean valid = e != null && !TargetClassifier.NONE.equals(TargetClassifier.reaction(a.spec,
+                TargetFactsCollector.collect(a.player, e, TargetFactsCollector.ownVillages(a.player))));
+        if (id != a.hoverId || valid != a.hoverValid) {
+            a.hoverId = id;
+            a.hoverValid = valid;
+            PowerFx.sendTo(a.player, PowerAimPayload.hover(a.session.castId(), id, valid));
+        }
+    }
+
     // ───────────── 逐刻 ─────────────
 
     public static void onServerTickPost(ServerTickEvent.Post event) {
@@ -236,6 +266,10 @@ public final class PowerService {
             if (interrupt.isPresent()) {
                 end(a, interrupt.get());
                 continue;
+            }
+            if (a.session.state() == CastSession.State.AIMING && a.spec.profile().pick() == TargetProfile.Pick.ENTITY
+                    && !a.spec.selfCentered() && server.getTickCount() % HOVER_INTERVAL == 0) {
+                hover(a);
             }
             CastSession.Event ev = a.session.tick(now);
             if (ev == CastSession.Event.AIM_TIMEOUT) {
@@ -280,6 +314,23 @@ public final class PowerService {
             Active a = SESSIONS.get(p.getUUID());
             if (a != null && a.session.state() == CastSession.State.CHANNELING) {
                 end(a, PowerReason.INTERRUPTED_DAMAGE);
+            }
+        }
+    }
+
+    /** 原版物品冷却不存档：登录时按玩家数据里剩余的冷却重新下发遮罩。 */
+    public static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer p) {
+            long now = WorldClock.now(p.server);
+            for (Item item : BuiltInRegistries.ITEM) {
+                if (item instanceof GodPowerItem g) {
+                    PowerSpecLoader.get(g.powerId()).ifPresent(s -> {
+                        long left = CooldownRules.remaining(MythData.get(p), s.civ(), s.id(), now);
+                        if (left > 0) {
+                            p.getCooldowns().addCooldown(item, (int) left);
+                        }
+                    });
+                }
             }
         }
     }
@@ -359,6 +410,8 @@ public final class PowerService {
             // 大型神力：框架自动登记护盾（05 号 §1.2），持续 = 数据里的持续上界
             PowerShields.add((ServerLevel) p.level(), a.origin, a.spec.durationTicks());
         }
+        // 先发提交表现，效果代码随后发的 HIT 等排在它后面
+        PowerFx.send(p, fx(a, PowerFxPayload.Phase.COMMIT, a.spec.durationTicks(), ""), a.origin);
         power.get().execute(ctx);
         return PowerReason.COMMITTED;
     }
@@ -380,9 +433,21 @@ public final class PowerService {
 
     // ───────────── 收尾 ─────────────
 
+    private static PowerFxPayload fx(Active a, PowerFxPayload.Phase phase, int duration, String cancelReason) {
+        return PowerFx.payload(a.player, a.session.castId(), a.spec.id(), phase, a.origin,
+                a.target == null ? List.of() : List.of(a.target), a.session.castId().hashCode(), duration, cancelReason);
+    }
+
     private static void end(Active a, PowerReason reason) {
         SESSIONS.remove(a.player.getUUID(), a);
         LAST.put(a.player.getUUID(), reason);
+        CastSession.State was = a.session.state();
+        // 瞄准超时时会话自己已经转为 DONE
+        if (was == CastSession.State.AIMING || reason == PowerReason.AIM_TIMEOUT) {
+            PowerFx.sendTo(a.player, PowerAimPayload.stop(a.session.castId()));
+        } else if (was == CastSession.State.CHANNELING && reason != PowerReason.COMMITTED) {
+            PowerFx.send(a.player, fx(a, PowerFxPayload.Phase.CHANNEL_CANCEL, 0, reason.name()), a.player.position());
+        }
         if (reason == PowerReason.COMMITTED) {
             a.session.finish();
         } else {
@@ -404,6 +469,11 @@ public final class PowerService {
         if (on) {
             speed.addTransientModifier(new AttributeModifier(SLOW_ID, SLOW, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
+    }
+
+    /** 神力名；没有翻译（开发神力）时显示 id。 */
+    static Component powerName(String id) {
+        return Component.translatableWithFallback("mythic_age.power." + id, id);
     }
 
     private static PowerReason tell(ServerPlayer p, PowerReason reason, long seconds) {

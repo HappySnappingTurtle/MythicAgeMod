@@ -26,10 +26,11 @@ import java.util.regex.Pattern;
  * @param large         大型神力（受神力护盾约束，§2.6）
  * @param matrix        12 列 → 反应键；缺省 {@code none}
  * @param durationTicks 提交后到结束的上界（表现包用）
+ * @param radius        作用半径（瞄准时的范围圈；效果代码也用它）；0 表示没有范围
  */
 public record PowerSpec(String id, String card, Civilization civ, Form form, int castTicks, int cooldownTicks, double range,
                         TargetProfile profile, boolean selfCentered, boolean large, Map<TargetCategory, String> matrix,
-                        int durationTicks) {
+                        int durationTicks, double radius) {
 
     public enum Form {
         SCROLL(32), PLACEABLE(4.5), THROWABLE(24);
@@ -50,7 +51,7 @@ public record PowerSpec(String id, String card, Civilization civ, Form form, int
     private static final Pattern ID = Pattern.compile("[a-z0-9_]+");
     private static final Pattern KEY = Pattern.compile("[a-z0-9_]+");
     private static final Set<String> KEYS = Set.of("schemaVersion", "id", "card", "civilization", "form", "castTicks",
-            "cooldownTicks", "range", "targetProfile", "selfCentered", "large", "matrix", "durationTicks");
+            "cooldownTicks", "range", "targetProfile", "selfCentered", "large", "matrix", "durationTicks", "radius");
 
     public PowerSpec {
         matrix = Map.copyOf(matrix);
@@ -127,9 +128,13 @@ public record PowerSpec(String id, String card, Civilization civ, Form form, int
                 matrix.put(c, v);
             }
         }
+        double radius = o.has("radius") ? o.get("radius").getAsDouble() : 0;
+        if (radius < 0 || radius > 64) {
+            throw err("$.radius", "应在 [0, 64]：" + radius);
+        }
         return new PowerSpec(id, o.has("card") ? o.get("card").getAsString() : "", civ, form, cast, cooldown, range, profile,
                 o.has("selfCentered") && o.get("selfCentered").getAsBoolean(),
-                o.has("large") && o.get("large").getAsBoolean(), matrix, intIn(o, "durationTicks", 0, 24000, 0));
+                o.has("large") && o.get("large").getAsBoolean(), matrix, intIn(o, "durationTicks", 0, 24000, 0), radius);
     }
 
     private static String str(JsonObject o, String k) {

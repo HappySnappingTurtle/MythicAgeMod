@@ -68,6 +68,16 @@ public final class ClientHooks {
         }
     }
 
+    /** 神力表现（T12 阶段 ③）。 */
+    public static void powerFx(io.github.happysnappingturtle.mythicage.power.PowerFxPayload payload) {
+        io.github.happysnappingturtle.mythicage.client.power.ClientPowerFx.accept(payload);
+    }
+
+    /** 神力瞄准预览（T12 阶段 ③）。 */
+    public static void powerAim(io.github.happysnappingturtle.mythicage.power.PowerAimPayload payload) {
+        io.github.happysnappingturtle.mythicage.client.power.ClientPowerAim.accept(payload);
+    }
+
     /** 界面关闭时的回调；目前没有需要清理的客户端状态，留作 T9b 的动画联动入口。 */
     public static void clearTradeScreen(GuardianScreen screen) {
     }

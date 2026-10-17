@@ -15,6 +15,15 @@ import io.github.happysnappingturtle.mythicage.power.CastContext;
 import io.github.happysnappingturtle.mythicage.power.GodPower;
 import io.github.happysnappingturtle.mythicage.power.GodPowers;
 import io.github.happysnappingturtle.mythicage.power.PowerItems;
+import io.github.happysnappingturtle.mythicage.power.PowerAimPayload;
+import io.github.happysnappingturtle.mythicage.power.PowerFx;
+import io.github.happysnappingturtle.mythicage.power.PowerFxPayload;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 import io.github.happysnappingturtle.mythicage.power.PowerService;
 import io.github.happysnappingturtle.mythicage.power.PowerSpecLoader;
 import io.github.happysnappingturtle.mythicage.power.TargetFactsCollector;
@@ -50,7 +59,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * T12 阶段 ①：施放全流程（TC-T12-60～67）。测试神力只在本批次登记：
  * {@code test_hit}（单体、伤害 5、吟唱 10 刻、长冷却 100 刻、距离 8）、{@code test_slow}（同上但吟唱 40 刻）、
- * {@code test_area}（以施法者为中心半径 4 的敌方，伤害 5）。
+ * {@code test_area}（以施法者为中心半径 4 的敌方，伤害 5）；阶段 ② ③ 另加大型、临时实体、产物、补播用的测试神力。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -145,13 +154,20 @@ public final class PowerGameTests {
                  "targetProfile":"WORLD_AREA","selfCentered":true,"large":true,"durationTicks":200}""", new ArrayList<>());
     }
 
+    /** 非大型、以施法者为中心、持续上界 20 刻（补播用）。 */
+    static PowerSpec linger() {
+        return PowerSpec.parse("""
+                {"schemaVersion":1,"id":"test_linger","civilization":"greek","form":"scroll","castTicks":0,"cooldownTicks":0,
+                 "targetProfile":"WORLD_AREA","selfCentered":true,"durationTicks":20}""", new ArrayList<>());
+    }
+
     @BeforeBatch(batch = BATCH)
     public static void before(ServerLevel level) {
         for (PowerSpec s : List.of(spec("test_hit", 10, "HOSTILE_1", false), spec("test_slow", 40, "HOSTILE_1", false),
                 spec("test_area", 10, "HOSTILE_AREA", true), big(), spec("test_summon", 0, "PLACEMENT", true),
-                spec("test_product", 0, "PLACEMENT", true))) {
+                spec("test_product", 0, "PLACEMENT", true), linger())) {
             PowerSpecLoader.overrideForTest(s.id().equals("test_summon") || s.id().equals("test_product")
-                    ? new PowerSpec(s.id(), "", s.civ(), s.form(), 0, 0, s.range(), s.profile(), true, false, s.matrix(), 0)
+                    ? new PowerSpec(s.id(), "", s.civ(), s.form(), 0, 0, s.range(), s.profile(), true, false, s.matrix(), 0, 0)
                     : s);
         }
         GodPowers.overrideForTest(new Hit("test_hit"));
@@ -160,6 +176,7 @@ public final class PowerGameTests {
         GodPowers.overrideForTest(new Big("test_big"));
         GodPowers.overrideForTest(new Summon("test_summon"));
         GodPowers.overrideForTest(new Product("test_product"));
+        GodPowers.overrideForTest(new Big("test_linger"));
         io.github.happysnappingturtle.mythicage.power.PowerShields.clearForTest();
         io.github.happysnappingturtle.mythicage.power.TransientEntities.clearForTest();
     }
@@ -533,6 +550,131 @@ public final class PowerGameTests {
             h.assertTrue(level.getBlockState(grass).is(Blocks.GRASS_BLOCK), "草方块复原");
             h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST), "箱子没动");
             h.assertTrue(level.getBlockState(changed).is(Blocks.STONE), "被改过的格不覆盖");
+            h.succeed();
+        });
+    }
+
+    // ───────────── 表现与瞄准预览（TC-T12-80～85） ─────────────
+
+    @GameTest(template = T, batch = BATCH)
+    public static void fx_payload_codec(GameTestHelper h) {
+        List<Integer> many = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            many.add(i * 7);
+        }
+        PowerFxPayload fx = new PowerFxPayload("c1", "gp_gr_bolt", PowerFxPayload.Phase.CHANNEL_CANCEL, 42,
+                ResourceLocation.withDefaultNamespace("overworld"), new Vec3(1.5, -2, 3.25), many, 1234L, -99L, 30,
+                "INTERRUPTED_DAMAGE");
+        h.assertTrue(fx.targets().size() == PowerFxPayload.MAX_TARGETS, "超过 16 个截断");
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        PowerFxPayload.STREAM_CODEC.encode(buf, fx);
+        h.assertTrue(PowerFxPayload.STREAM_CODEC.decode(buf).equals(fx), "表现包往返一致");
+        for (PowerAimPayload a : List.of(PowerAimPayload.start("c2", spec("test_hit", 10, "HOSTILE_1", false)),
+                PowerAimPayload.hover("c2", -1, false), PowerAimPayload.hover("c2", 77, true), PowerAimPayload.stop("c2"))) {
+            FriendlyByteBuf b = new FriendlyByteBuf(Unpooled.buffer());
+            PowerAimPayload.STREAM_CODEC.encode(b, a);
+            h.assertTrue(PowerAimPayload.STREAM_CODEC.decode(b).equals(a), "瞄准包往返一致：" + a);
+        }
+        h.succeed();
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void fx_recipients_include_caster(GameTestHelper h) {
+        Vulnerable p = caster(h, "pw_rcpt", "test_hit", 1);
+        List<net.minecraft.server.level.ServerPlayer> to = PowerFx.recipients(h.getLevel(), p, p.position());
+        h.assertTrue(to.contains(p), "施法者总在接收者里");
+        h.assertTrue(to.stream().distinct().count() == to.size(), "不重复");
+        h.succeed();
+    }
+
+    private static List<CustomPacketPayload> sent(Vulnerable p) {
+        return PowerService.sessionForTest(p).map(s -> PowerFx.sentForTest(s.castId())).orElse(List.of());
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void aim_hover_and_channel_sequence(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = caster(h, "pw_aim", "test_hit", 3);
+        Mob zombie = mob(h, EntityType.ZOMBIE, 4, 9);
+        Mob villager = mob(h, EntityType.VILLAGER, 12, 9);
+        look(p, zombie);
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        String castId = PowerService.sessionForTest(p).orElseThrow().castId();
+        h.runAfterDelay(4, () -> {
+            h.assertTrue(sent(p).getFirst() instanceof PowerAimPayload a && a.kind() == PowerAimPayload.Kind.START
+                    && a.range() == 8, "先发 START：" + sent(p));
+            h.assertTrue(sent(p).contains(PowerAimPayload.hover(castId, zombie.getId(), true)), "对准僵尸：合法");
+            look(p, villager);
+        });
+        h.runAfterDelay(8, () -> {
+            h.assertTrue(sent(p).contains(PowerAimPayload.hover(castId, villager.getId(), false)), "对准村民：不合法");
+            look(p, zombie);
+            h.assertTrue(PowerService.use(p, InteractionHand.MAIN_HAND) == PowerReason.OK, "确认");
+            List<CustomPacketPayload> l = PowerFx.sentForTest(castId);
+            h.assertTrue(l.get(l.size() - 2).equals(PowerAimPayload.stop(castId)), "确认后 STOP：" + l);
+            h.assertTrue(l.getLast() instanceof PowerFxPayload f && f.phase() == PowerFxPayload.Phase.CHANNEL_START
+                    && f.duration() == 10 && f.targets().equals(List.of(zombie.getId())) && f.caster() == p.getId(),
+                    "CHANNEL_START 带吟唱刻数与目标：" + l.getLast());
+        });
+        h.runAfterDelay(30, () -> {
+            List<CustomPacketPayload> l = PowerFx.sentForTest(castId);
+            h.assertTrue(l.getLast() instanceof PowerFxPayload f && f.phase() == PowerFxPayload.Phase.COMMIT
+                    && f.duration() == 0, "提交后 COMMIT：" + l.getLast());
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 300)
+    public static void aim_timeout_sends_stop(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = caster(h, "pw_aimto", "test_hit", 3);
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        String castId = PowerService.sessionForTest(p).orElseThrow().castId();
+        h.succeedWhen(() -> {
+            h.assertTrue(PowerService.lastResultForTest(p).orElse(null) == PowerReason.AIM_TIMEOUT, "等待瞄准超时");
+            List<CustomPacketPayload> l = PowerFx.sentForTest(castId);
+            h.assertTrue(!l.isEmpty() && l.getLast().equals(PowerAimPayload.stop(castId)), "超时也发 STOP：" + l);
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void channel_cancel_carries_reason(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = caster(h, "pw_fxcancel", "test_slow", 3);
+        Mob zombie = mob(h, EntityType.ZOMBIE, 8, 9);
+        look(p, zombie);
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        String castId = PowerService.sessionForTest(p).orElseThrow().castId();
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        h.runAfterDelay(5, () -> p.hurt(h.getLevel().damageSources().fellOutOfWorld(), 1));
+        h.runAfterDelay(10, () -> {
+            List<CustomPacketPayload> l = PowerFx.sentForTest(castId);
+            h.assertTrue(l.getLast() instanceof PowerFxPayload f && f.phase() == PowerFxPayload.Phase.CHANNEL_CANCEL
+                    && f.cancelReason().equals("INTERRUPTED_DAMAGE"), "打断发 CHANNEL_CANCEL：" + l);
+            h.assertTrue(l.stream().noneMatch(x -> x instanceof PowerFxPayload f && f.phase() == PowerFxPayload.Phase.COMMIT),
+                    "没有 COMMIT");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void commit_replayed_while_live(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = caster(h, "pw_replay", "test_linger", 3);
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        String castId = PowerService.sessionForTest(p).orElseThrow().castId();
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        ChunkPos chunk = new ChunkPos(p.blockPosition());
+        h.runAfterDelay(3, () -> {
+            h.assertTrue(PowerService.lastResultForTest(p).orElse(null) == PowerReason.COMMITTED, "已提交");
+            h.assertTrue(PowerFx.replay(p, h.getLevel(), chunk).contains(castId), "持续期内补发");
+            h.assertTrue(PowerFx.sentForTest(castId).getLast() instanceof PowerFxPayload f
+                    && f.phase() == PowerFxPayload.Phase.COMMIT && f.duration() > 0 && f.duration() < 20, "补发的是剩余时长");
+            h.assertTrue(!PowerFx.replay(p, h.getLevel(), new ChunkPos(chunk.x + 3, chunk.z)).contains(castId),
+                    "别的区块不补");
+        });
+        h.runAfterDelay(30, () -> {
+            h.assertTrue(!PowerFx.replay(p, h.getLevel(), chunk).contains(castId), "过期后不补发");
             h.succeed();
         });
     }
