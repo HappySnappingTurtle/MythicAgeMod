@@ -26,8 +26,6 @@ class FaithProfileTest {
             {"schemaVersion":1,"civilization":"greek",
              "guardian":"entity.mythic_age.greek_guardian","shrine":"block.mythic_age.greek_altar",
              "favor":"mythic_age.favor.greek",
-             "rites":{"promotion":"mythic_age.rite.greek.promotion","founding":"mythic_age.rite.greek.founding",
-                      "rededication":"mythic_age.rite.greek.rededication"},
              "hint":"mythic_age.faith.greek.hint",
              "firstMeetGifts":[{"item":"mythic_age:greek_altar","count":1}],
              "reissue":{"item":"mythic_age:greek_altar","shrineKind":"greek:altar"}}""";
@@ -41,7 +39,6 @@ class FaithProfileTest {
         assertEquals("entity.mythic_age.greek_guardian", p.guardian());
         assertEquals("block.mythic_age.greek_altar", p.shrine());
         assertEquals("mythic_age.favor.greek", p.favor());
-        assertEquals("mythic_age.rite.greek.founding", p.rites().founding());
         assertEquals("mythic_age.faith.greek.hint", p.hint());
         assertEquals(List.of(new FaithProfile.Gift("mythic_age:greek_altar", 1)), p.firstMeetGifts());
         assertEquals(Optional.of(new FaithProfile.Reissue("mythic_age:greek_altar", "greek:altar")), p.reissue());

@@ -44,12 +44,6 @@ public class GreekAltarScreen extends Screen {
             TempleHighlightRenderer.show(p);
             onClose();
         }).bounds(left + W - 130, top + H - 28, 120, 20).build());
-        if (p.altarOffers()) {
-            addRenderableWidget(Button.builder(Component.translatable("mythic_age.trade.tab.trade"), b ->
-                    net.neoforged.neoforge.network.PacketDistributor.sendToServer(
-                            new io.github.happysnappingturtle.mythicage.trade.TradePayloads.OpenShrine(p.pos())))
-                    .bounds(left + W - 130, top + H - 52, 120, 20).build());
-        }
     }
 
     @Override

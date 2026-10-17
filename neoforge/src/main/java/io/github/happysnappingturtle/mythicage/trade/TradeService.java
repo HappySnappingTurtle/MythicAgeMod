@@ -23,6 +23,7 @@ import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
+import io.github.happysnappingturtle.mythicage.statue.PatronStatues;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -48,11 +49,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
 /**
- * 祭司与神庙的兑换（T9 设计文档 §5、§6；T10b：按文明）。服务端权威，按 12 号 §2 的顺序：
+ * 祭司与主神像的兑换（T9 设计文档 §5、§6；T10b：按文明；T11a：地点为村庄祭司或玩家自己的主神像）。服务端权威，按 12 号 §2 的顺序：
  * 验证 → 预留背包 → 提交事务（收据防重复）→ 发货 → 反馈。全部在服务端主线程的同一刻内完成。
  * <p>
  * 玩家打开界面时登记一个会话；会话每 10 刻校验一次（祭司是否还活着、是否在交互距离内），失效就通知客户端关闭。
@@ -61,9 +63,16 @@ import java.util.function.BiFunction;
 public final class TradeService {
     private static final int CHECK_INTERVAL = 10;
 
-    /** 一次打开的界面。guardianEntityId 在神庙兑换时为 −1；shrine 在祭司处为 null。 */
-    record Session(Civilization civ, TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos shrine,
-                   ResourceKey<Level> dim, String villagePatron) {
+    /**
+     * 一次打开的界面。
+     *
+     * @param guardianEntityId 祭司实体 id；在主神像处为 −1
+     * @param statue           主神像核心坐标；在祭司处为 null
+     * @param villageId        祭司所属村庄；在主神像处或无村庄的祭司为 null
+     * @param patron           本村主神 / 此像主神
+     */
+    public record Session(Civilization civ, TradeOffer.Venue venue, int guardianEntityId, @Nullable BlockPos statue,
+                          ResourceKey<Level> dim, @Nullable UUID villageId, String patron) {
     }
 
     /** 请求结果：原因、附加数字、成功时的产物名与数量。 */
@@ -100,9 +109,10 @@ public final class TradeService {
         if (!FaithProfiles.open(guardian.civ())) {
             return false;
         }
-        String patron = GuardianSpawner.villageOf(guardian).map(VillageRegistry.Village::patron).orElse("");
+        Optional<VillageRegistry.Village> village = GuardianSpawner.villageOf(guardian);
+        String patron = village.map(VillageRegistry.Village::patron).orElse("");
         Session s = new Session(guardian.civ(), TradeOffer.Venue.GUARDIAN, guardian.getId(), null,
-                guardian.level().dimension(), patron);
+                guardian.level().dimension(), village.map(VillageRegistry.Village::id).orElse(null), patron);
         SESSIONS.put(player.getUUID(), s);
         learnPatron(player, guardian.civ(), patron);
         guardian.playGesture(GuardianGesture.GREET);
@@ -110,21 +120,44 @@ public final class TradeService {
         return true;
     }
 
-    /** 从神庙检视界面打开兑换页：神庙必须属于该玩家且在交互距离内；文明取自神庙。 */
-    public static boolean openShrine(ServerPlayer player, BlockPos pos) {
-        Optional<ShrineRegistry.Entry> entry = ShrineRegistry.get(player.server)
-                .get(GlobalPos.of(player.level().dimension(), pos));
-        if (entry.isEmpty() || !FaithProfiles.open(entry.get().civ())) {
+    /** 在自己的主神像前兑换（T11a 修订 1）：主神像必须属于该玩家、完整且在交互距离内。 */
+    public static boolean openStatue(ServerPlayer player, BlockPos core) {
+        Optional<PatronStatues.Info> info = PatronStatues.info(player.serverLevel(), core);
+        if (info.isEmpty() || !FaithProfiles.open(info.get().civ())) {
             return false;
         }
-        Session s = new Session(entry.get().civ(), TradeOffer.Venue.ALTAR, -1, pos.immutable(),
-                player.level().dimension(), "");
+        Session s = new Session(info.get().civ(), TradeOffer.Venue.STATUE, -1, core.immutable(),
+                player.level().dimension(), null, info.get().patron());
         if (!valid(player, s)) {
             return false;
         }
         SESSIONS.put(player.getUUID(), s);
         send(player, new TradePayloads.Open(view(player, s)));
         return true;
+    }
+
+    /** 当前会话（仪式页用）；没有时为空。 */
+    public static Optional<Session> session(ServerPlayer player) {
+        return Optional.ofNullable(SESSIONS.get(player.getUUID()));
+    }
+
+    /** 会话所在的村庄；在主神像处、无村庄的祭司为空。 */
+    public static Optional<VillageRegistry.Village> village(ServerPlayer player, Session s) {
+        return s.villageId() == null ? Optional.empty() : VillageRegistry.get(player.server).byId(s.villageId());
+    }
+
+    /** 兑换上下文：每次重新取村庄阶段与次神祠（可能刚被别人推进过）。 */
+    public static TradeRules.VenueContext context(ServerPlayer player, Session s) {
+        if (s.venue() == TradeOffer.Venue.STATUE) {
+            Set<String> gods = new java.util.LinkedHashSet<>();
+            io.github.happysnappingturtle.mythicage.village.PantheonLoader.get(s.civ()).minorGods().stream()
+                    .filter(g -> g.patrons().contains(s.patron())).forEach(g -> gods.add(g.id()));
+            return TradeRules.VenueContext.statue(s.patron(), gods);
+        }
+        Optional<VillageRegistry.Village> v = village(player, s);
+        // 不属于任何村庄的祭司（刷怪蛋、命令生成）：按远古阶段出售
+        return TradeRules.VenueContext.guardian(v.map(VillageRegistry.Village::stage).orElse(Age.ARCHAIC), s.patron(),
+                v.map(VillageRegistry.Village::shrineGods).orElse(Set.of()));
     }
 
     public static void close(ServerPlayer player) {
@@ -205,7 +238,7 @@ public final class TradeService {
         SESSIONS.clear();
     }
 
-    static boolean valid(ServerPlayer player, Session s) {
+    public static boolean valid(ServerPlayer player, Session s) {
         if (!player.isAlive() || player.level().dimension() != s.dim()) {
             return false;
         }
@@ -215,10 +248,10 @@ public final class TradeService {
             return e instanceof GuardianEntity g && g.civ() == s.civ() && g.isAlive() && !g.isRemoved()
                     && g.distanceToSqr(player) <= max;
         }
-        BlockPos shrine = s.shrine();
-        return shrine != null && ShrineRegistry.get(player.server).get(GlobalPos.of(s.dim(), shrine))
-                .map(entry -> entry.owner().equals(player.getUUID()) && entry.civ() == s.civ()).orElse(false)
-                && player.distanceToSqr(shrine.getCenter()) <= max;
+        BlockPos statue = s.statue();
+        return statue != null && PatronStatues.info(player.serverLevel(), statue)
+                .map(i -> i.owner().equals(player.getUUID()) && i.civ() == s.civ() && i.intact()).orElse(false)
+                && player.distanceToSqr(statue.getCenter()) <= max;
     }
 
     /**
@@ -239,13 +272,32 @@ public final class TradeService {
 
     // ───────────── 界面数据 ─────────────
 
-    static long priceOf(ServerPlayer player, Civilization civ, TradeOffer offer, String villagePatron) {
+    static long priceOf(ServerPlayer player, Civilization civ, TradeOffer offer, TradeRules.VenueContext ctx) {
         if (!offer.price().isFavor()) {
             return 0;
         }
         List<Double> all = new ArrayList<>(discounts.apply(player, offer));
-        all.addAll(TradeRules.discounts(MythData.get(player), civ, offer, villagePatron));
+        all.addAll(TradeRules.discounts(MythData.get(player), civ, offer, ctx));
         return PriceCalculator.favor(offer.price().favor(), all);
+    }
+
+    /** 列在界面上但不能买的原因（时代、次神、阶段……）；可买时为 OK。 */
+    private static final Set<TradeReason> LOCKS = Set.of(TradeReason.AGE_LOCKED, TradeReason.MINOR_GOD_LOCKED,
+            TradeReason.STAGE_LOCKED, TradeReason.NO_SHRINE, TradeReason.WRONG_PATRON);
+    /** 主神像道具：结果按本村主神带上数据组件（T11a §5.2）。 */
+    static final String STATUE_ITEM = "mythic_age:patron_statue";
+
+    /** 主神像的额外条件：已被本村主神认可到古典、还没有这位主神的像。 */
+    static TradeReason statueLock(ServerPlayer player, Civilization civ, String patron) {
+        if (patron.isEmpty() || !MythData.get(player).civ(civ).approval(patron).atLeast(Age.CLASSICAL)) {
+            return TradeReason.NEED_APPROVAL;
+        }
+        return PatronStatues.owns(player, civ, patron) ? TradeReason.HAS_STATUE : TradeReason.OK;
+    }
+
+    static ItemStack resultOf(TradeOffer o, Civilization civ, Session s) {
+        return o.result().item().equals(STATUE_ITEM) ? PatronStatues.stack(civ, s.patron())
+                : stack(o.result().item(), o.result().count());
     }
 
     static TradeView view(ServerPlayer player, Session s) {
@@ -253,22 +305,40 @@ public final class TradeService {
         PlayerMythData data = MythData.get(player);
         long today = MythDays.today(player.server);
         TradeTable table = TradeTableLoader.table(civ);
+        TradeRules.VenueContext ctx = context(player, s);
         List<TradeView.OfferView> offers = new ArrayList<>();
         InventoryPlan inv = plan(player);
-        for (TradeOffer o : table.offersAt(s.venue())) {
-            long price = priceOf(player, civ, o, s.villagePatron());
+        for (TradeOffer o : table.offers()) {
+            if (!TradeRules.visible(o, ctx)) {
+                continue;
+            }
+            long price = priceOf(player, civ, o, ctx);
             boolean affordable = o.price().isFavor() ? data.civ(civ).favor() >= price
                     : o.price().items().stream().allMatch(a -> inv.count(a.item()) >= a.count());
             List<ItemStack> itemPrice = o.price().items().stream().map(a -> stack(a.item(), a.count())).toList();
-            boolean godLocked = !o.minorGod().isEmpty() && !data.civ(civ).worships(o.minorGod());
-            offers.add(new TradeView.OfferView(o.id(), o.category(), stack(o.result().item(), o.result().count()), price,
-                    itemPrice, o.minAge(), !data.civ(civ).age().atLeast(o.minAge()) || godLocked,
-                    TradeRules.remainingToday(data, civ, o, today), affordable, godLocked ? o.minorGod() : ""));
+            TradeReason r = TradeRules.check(data, civ, o, ctx, price, price, today);
+            TradeReason lock = LOCKS.contains(r) ? r : TradeReason.OK;
+            if (lock == TradeReason.OK && o.result().item().equals(STATUE_ITEM)) {
+                lock = statueLock(player, civ, s.patron());
+            }
+            String lockArg = switch (lock) {
+                case NEED_APPROVAL, HAS_STATUE -> s.patron();
+                case MINOR_GOD_LOCKED, NO_SHRINE -> o.minorGod();
+                case AGE_LOCKED, STAGE_LOCKED -> o.minAge().id();
+                case WRONG_PATRON -> o.patron().isEmpty() ? o.minorGod() : o.patron();
+                default -> "";
+            };
+            offers.add(new TradeView.OfferView(o.id(), o.category(), resultOf(o, civ, s), price,
+                    itemPrice, o.minAge(), lock, lockArg, TradeRules.remainingToday(data, civ, o, today), affordable));
         }
         FaithProfile profile = FaithProfiles.get(civ).orElse(FaithProfile.defaults(civ));
+        Optional<VillageRegistry.Village> village = village(player, s);
+        io.github.happysnappingturtle.mythicage.rite.RitesView rites = s.venue() == TradeOffer.Venue.GUARDIAN
+                ? village.map(v -> io.github.happysnappingturtle.mythicage.rite.RiteService.view(player, civ, v)).orElse(null)
+                : null;
         return new TradeView(civ, new TradeView.Labels(profile.favor(), profile.shrine()), s.venue(),
                 s.guardianEntityId(), dialogue(player, s, today), data.civ(civ).favor(), MythData.cap(player, civ),
-                data.civ(civ).age(), offers, s.villagePatron());
+                data.civ(civ).age(), offers, s.patron(), ctx.villageStage(), Optional.ofNullable(rites));
     }
 
     private static TradeView.Dialogue dialogue(ServerPlayer player, Session s, long today) {
@@ -305,15 +375,19 @@ public final class TradeService {
         if (offer == null) {
             return Outcome.of(TradeReason.UNKNOWN_OFFER);
         }
-        long price = priceOf(player, civ, offer, s.villagePatron());
+        TradeRules.VenueContext ctx = context(player, s);
+        long price = priceOf(player, civ, offer, ctx);
         long today = MythDays.today(player.server);
         // 1 验证
-        TradeReason reason = TradeRules.check(data, civ, offer, s.venue(), price, expectedPrice, today);
+        TradeReason reason = TradeRules.check(data, civ, offer, ctx, price, expectedPrice, today);
         if (reason == TradeReason.PRICE_CHANGED) {
             return new Outcome(reason, price, ItemStack.EMPTY);
         }
         if (reason == TradeReason.NOT_ENOUGH_FAVOR) {
             return new Outcome(reason, price - data.civ(civ).favor(), ItemStack.EMPTY);
+        }
+        if (reason == TradeReason.OK && offer.result().item().equals(STATUE_ITEM)) {
+            reason = statueLock(player, civ, s.patron());
         }
         if (reason != TradeReason.OK) {
             return Outcome.of(reason);
@@ -325,13 +399,15 @@ public final class TradeService {
                 return Outcome.of(TradeReason.NOT_ENOUGH_ITEMS);
             }
         }
-        ItemStack result = stack(offer.result().item(), offer.result().count());
+        ItemStack result = resultOf(offer, civ, s);
         if (result.isEmpty() || !plan.insert(offer.result().item(), result.getCount(), result.getMaxStackSize())) {
             return Outcome.of(TradeReason.INVENTORY_FULL);
         }
         // 3 提交
         List<TxStep> steps = new ArrayList<>();
-        steps.add(TxSteps.requireAge(civ, offer.minAge()));
+        if (offer.category() == TradeOffer.Category.GOD_POWER || offer.category() == TradeOffer.Category.SUMMON) {
+            steps.add(TxSteps.requireAge(civ, offer.minAge()));
+        }
         if (offer.price().isFavor()) {
             steps.add(TxSteps.spendFavor(civ, price));
         }
@@ -438,9 +514,16 @@ public final class TradeService {
         }
     }
 
-    public static void handleOpenShrine(TradePayloads.OpenShrine p, IPayloadContext ctx) {
-        if (ctx.player() instanceof ServerPlayer player) {
-            openShrine(player, p.pos());
+    /** 某会话的界面数据（仪式结果回发用）。 */
+    public static TradeView viewOf(ServerPlayer player, Session s) {
+        return view(player, s);
+    }
+
+    /** 仪式等改变了界面数据后刷新（不改会话）。 */
+    public static void refresh(ServerPlayer player) {
+        Session s = SESSIONS.get(player.getUUID());
+        if (s != null) {
+            send(player, new TradePayloads.Open(view(player, s)));
         }
     }
 
@@ -450,11 +533,10 @@ public final class TradeService {
             send(player, new TradePayloads.Close());
             return;
         }
-        String name = o.given().isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(o.given().getItem()).toString();
-        send(player, new TradePayloads.Result(requestId, o.reason(), o.arg(), name, o.given().getCount(), view(player, s)));
+        send(player, new TradePayloads.Result(requestId, o.reason(), o.arg(), o.given().copy(), view(player, s)));
     }
 
-    private static void send(ServerPlayer player, CustomPacketPayload payload) {
+    public static void send(ServerPlayer player, CustomPacketPayload payload) {
         if (player.connection != null && !(player instanceof net.neoforged.neoforge.common.util.FakePlayer)) {
             PacketDistributor.sendToPlayer(player, payload);
         }
@@ -463,12 +545,12 @@ public final class TradeService {
     // ───────────── 背包 ─────────────
 
     /** 物品价与产物都是不带组件的普通物品；背包里带组件的同种物品不参与扣除与合堆。 */
-    static String key(ItemStack s) {
+    public static String key(ItemStack s) {
         String id = BuiltInRegistries.ITEM.getKey(s.getItem()).toString();
         return s.getComponentsPatch().isEmpty() ? id : id + "#" + s.getComponentsPatch().hashCode();
     }
 
-    static InventoryPlan plan(ServerPlayer player) {
+    public static InventoryPlan plan(ServerPlayer player) {
         List<InventoryPlan.Slot> slots = new ArrayList<>();
         for (ItemStack s : player.getInventory().items) {
             slots.add(s.isEmpty() ? InventoryPlan.Slot.empty() : new InventoryPlan.Slot(key(s), s.getCount(), s.getMaxStackSize()));
@@ -481,7 +563,7 @@ public final class TradeService {
         return !probe.isEmpty() && player.getInventory().contains(probe);
     }
 
-    private static void removeItems(ServerPlayer player, String itemId, int amount) {
+    public static void removeItems(ServerPlayer player, String itemId, int amount) {
         List<ItemStack> items = player.getInventory().items;
         int left = amount;
         for (int i = items.size() - 1; i >= 0 && left > 0; i--) {
@@ -495,7 +577,7 @@ public final class TradeService {
         player.getInventory().setChanged();
     }
 
-    private static void give(ServerPlayer player, ItemStack stack) {
+    public static void give(ServerPlayer player, ItemStack stack) {
         if (!player.getInventory().add(stack) || !stack.isEmpty()) {
             MythicAge.LOGGER.warn("预留后仍放不下 {}，掉落在 {} 脚下", stack, player.getScoreboardName());
             player.drop(stack, false);
@@ -503,7 +585,7 @@ public final class TradeService {
         player.getInventory().setChanged();
     }
 
-    static ItemStack stack(String itemId, int count) {
+    public static ItemStack stack(String itemId, int count) {
         ResourceLocation rl = ResourceLocation.tryParse(itemId);
         Item item = rl == null ? null : BuiltInRegistries.ITEM.getOptional(rl).orElse(null);
         return item == null ? ItemStack.EMPTY : new ItemStack(item, count);

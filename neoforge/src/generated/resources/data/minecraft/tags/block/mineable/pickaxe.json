@@ -38,6 +38,8 @@
     "mythic_age:terracotta_roof_slab",
     "mythic_age:terracotta_ridge",
     "mythic_age:terracotta_antefix",
-    "mythic_age:pebble_mosaic"
+    "mythic_age:pebble_mosaic",
+    "mythic_age:patron_statue_core",
+    "mythic_age:patron_statue_part"
   ]
 }

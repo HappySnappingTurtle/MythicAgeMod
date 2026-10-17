@@ -37,7 +37,7 @@ public final class TradePayloads {
      *
      * @param arg 与原因相关的数字：恩宠不足时为还差多少，改价时为新价格，其余为 0
      */
-    public record Result(String requestId, TradeReason reason, long arg, String itemName, int count, TradeView view)
+    public record Result(String requestId, TradeReason reason, long arg, net.minecraft.world.item.ItemStack given, TradeView view)
             implements CustomPacketPayload {
         public static final Type<Result> TYPE = payloadType("trade_result");
         public static final StreamCodec<RegistryFriendlyByteBuf, Result> STREAM_CODEC = StreamCodec.of(
@@ -45,12 +45,11 @@ public final class TradePayloads {
                     buf.writeUtf(r.requestId);
                     buf.writeEnum(r.reason);
                     buf.writeVarLong(r.arg);
-                    buf.writeUtf(r.itemName);
-                    buf.writeVarInt(r.count);
+                    net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.given);
                     TradeView.STREAM_CODEC.encode(buf, r.view);
                 },
-                buf -> new Result(buf.readUtf(), buf.readEnum(TradeReason.class), buf.readVarLong(), buf.readUtf(),
-                        buf.readVarInt(), TradeView.STREAM_CODEC.decode(buf)));
+                buf -> new Result(buf.readUtf(), buf.readEnum(TradeReason.class), buf.readVarLong(),
+                        net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), TradeView.STREAM_CODEC.decode(buf)));
 
         @Override
         public Type<Result> type() {
@@ -111,18 +110,6 @@ public final class TradePayloads {
 
         @Override
         public Type<Closed> type() {
-            return TYPE;
-        }
-    }
-
-    /** 从神坛检视界面打开「兑换」页。 */
-    public record OpenShrine(BlockPos pos) implements CustomPacketPayload {
-        public static final Type<OpenShrine> TYPE = payloadType("trade_open_shrine");
-        public static final StreamCodec<FriendlyByteBuf, OpenShrine> STREAM_CODEC =
-                BlockPos.STREAM_CODEC.map(OpenShrine::new, OpenShrine::pos).cast();
-
-        @Override
-        public Type<OpenShrine> type() {
             return TYPE;
         }
     }

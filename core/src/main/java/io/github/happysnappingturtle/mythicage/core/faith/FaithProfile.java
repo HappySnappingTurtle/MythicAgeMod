@@ -18,28 +18,24 @@ import java.util.regex.Pattern;
 /**
  * 文明档案（T10b 设计文档 §2；19 号 U2：每个文明都有祭司，名字不同、作用相同）。
  * 来自数据包 {@code data/<ns>/mythic_age/faith/<文明>.json}。界面上与文明有关的名字都从这里取，
- * 通用代码里不写任何文明的名字。没有档案的文明视为「未开放」：不生成祭司、不能交易。
+ * 通用代码里不写任何文明的名字。仪式一律用通用名（晋升 / 立祀 / 改奉，用户 2026-10-16：本土名玩家看不懂）。没有档案的文明视为「未开放」：不生成祭司、不能交易。
  *
  * @param guardian       祭司名的翻译 key
  * @param shrine         神庙名的翻译 key
  * @param favor          「X 恩宠」的翻译 key
- * @param rites          晋升 / 立祀 / 改奉的本土名（20 号 §1）
  * @param hint           未接触该文明时的线索（信仰面板）；可为空
  * @param firstMeetGifts 第一次与祭司交谈时的赠礼
  * @param reissue        神庙全部丢失时的补领；为空表示该文明没有补领
  */
-public record FaithProfile(Civilization civ, String guardian, String shrine, String favor, Rites rites, String hint,
+public record FaithProfile(Civilization civ, String guardian, String shrine, String favor, String hint,
                            List<Gift> firstMeetGifts, Optional<Reissue> reissue) {
     private static final Pattern ITEM = Pattern.compile("[a-z0-9_.-]+:[a-z0-9_./-]+");
     private static final Pattern KIND = Pattern.compile("[a-z]+:[a-z0-9_]+");
     private static final Set<String> KNOWN = Set.of("schemaVersion", "civilization", "guardian", "shrine", "favor",
-            "rites", "hint", "firstMeetGifts", "reissue");
+            "hint", "firstMeetGifts", "reissue");
 
     public FaithProfile {
         firstMeetGifts = List.copyOf(firstMeetGifts);
-    }
-
-    public record Rites(String promotion, String founding, String rededication) {
     }
 
     public record Gift(String item, int count) {
@@ -53,8 +49,7 @@ public record FaithProfile(Civilization civ, String guardian, String shrine, Str
     public static FaithProfile defaults(Civilization civ) {
         String c = civ.id();
         return new FaithProfile(civ, "mythic_age.faith." + c + ".guardian", "mythic_age.faith." + c + ".shrine",
-                "mythic_age.favor." + c, new Rites("mythic_age.rite.promotion", "mythic_age.rite.founding",
-                "mythic_age.rite.rededication"), "", List.of(), Optional.empty());
+                "mythic_age.favor." + c, "", List.of(), Optional.empty());
     }
 
     public static final class FaithProfileException extends RuntimeException {
@@ -92,18 +87,6 @@ public record FaithProfile(Civilization civ, String guardian, String shrine, Str
         String shrine = text(root, "shrine", d.shrine(), warnings);
         String favor = text(root, "favor", d.favor(), warnings);
         String hint = text(root, "hint", d.hint(), warnings);
-        Rites rites = d.rites();
-        JsonElement r = root.get("rites");
-        if (r != null) {
-            if (r.isJsonObject()) {
-                JsonObject o = r.getAsJsonObject();
-                rites = new Rites(text(o, "promotion", rites.promotion(), warnings, "rites."),
-                        text(o, "founding", rites.founding(), warnings, "rites."),
-                        text(o, "rededication", rites.rededication(), warnings, "rites."));
-            } else {
-                warnings.add("rites: 应为对象，已使用通用名");
-            }
-        }
         List<Gift> gifts = new ArrayList<>();
         JsonElement g = root.get("firstMeetGifts");
         if (g != null) {
@@ -135,7 +118,7 @@ public record FaithProfile(Civilization civ, String guardian, String shrine, Str
                 }
             }
         }
-        return new FaithProfile(civ, guardian, shrine, favor, rites, hint, gifts, reissue);
+        return new FaithProfile(civ, guardian, shrine, favor, hint, gifts, reissue);
     }
 
     public static FaithProfile parse(String json, Function<String, OptionalInt> maxStack, List<String> warnings) {

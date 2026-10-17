@@ -1,5 +1,9 @@
 package io.github.happysnappingturtle.mythicage.trade;
 
+import io.github.happysnappingturtle.mythicage.core.trade.TradeReason;
+import io.github.happysnappingturtle.mythicage.rite.RitesView;
+import java.util.Optional;
+
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeOffer;
@@ -15,11 +19,14 @@ import java.util.List;
  *
  * @param civ              本次交易的文明（来自祭司或神庙，T10b）
  * @param labels           与文明有关的文本 key（来自文明档案；客户端没有档案数据）
- * @param guardianEntityId 祭司实体 id；在神庙兑换时为 −1
- * @param villagePatron    祭司所在村庄的主神；不在村庄或在神庙兑换时为空
+ * @param guardianEntityId 祭司实体 id；在主神像处为 −1
+ * @param villagePatron    本村主神 / 此像主神；无村庄的祭司为空
+ * @param villageStage     本村阶段（T11a）；主神像处为 NONE
+ * @param rites            晋升页数据（T11a）；只在有村庄的祭司处
  */
 public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue, int guardianEntityId, Dialogue dialogue,
-                        long favor, long cap, Age age, List<OfferView> offers, String villagePatron) {
+                        long favor, long cap, Age age, List<OfferView> offers, String villagePatron, Age villageStage,
+                        Optional<RitesView> rites) {
 
     /** @param favor 「X 恩宠」；shrine 神庙名 */
     public record Labels(String favor, String shrine) {
@@ -30,12 +37,16 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
 
     /**
      * @param favorPrice     恩宠价（已含折扣）；物品价商品为 0
+     * @param lock           列出但不能买的原因（时代、次神、本村阶段、次神祠、主神不符）；可买时为 OK
+     * @param lockArg        原因的参数：次神 / 主神 id 或时代 id
      * @param remainingToday 今日剩余次数，不限购为 −1
-     * @param needsMinorGod  因未供奉某位次神而锁定时为该次神 id，否则为空
      */
     public record OfferView(String id, TradeOffer.Category category, ItemStack result, long favorPrice,
-                            List<ItemStack> itemPrice, Age minAge, boolean locked, int remainingToday,
-                            boolean affordable, String needsMinorGod) {
+                            List<ItemStack> itemPrice, Age minAge, TradeReason lock, String lockArg, int remainingToday,
+                            boolean affordable) {
+        public boolean locked() {
+            return lock != TradeReason.OK;
+        }
     }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TradeView> STREAM_CODEC = StreamCodec.of(
@@ -62,12 +73,15 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
                 ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, s);
             }
             buf.writeEnum(o.minAge);
-            buf.writeBoolean(o.locked);
+            buf.writeEnum(o.lock);
+            buf.writeUtf(o.lockArg);
             buf.writeVarInt(o.remainingToday);
             buf.writeBoolean(o.affordable);
-            buf.writeUtf(o.needsMinorGod);
         }
         buf.writeUtf(v.villagePatron);
+        buf.writeEnum(v.villageStage);
+        buf.writeBoolean(v.rites.isPresent());
+        v.rites.ifPresent(r -> RitesView.STREAM_CODEC.encode(buf, r));
     }
 
     private static TradeView read(RegistryFriendlyByteBuf buf) {
@@ -91,10 +105,12 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
             for (int j = 0; j < m; j++) {
                 price.add(ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
             }
-            offers.add(new OfferView(id, category, result, favorPrice, price, buf.readEnum(Age.class), buf.readBoolean(),
-                    buf.readVarInt(), buf.readBoolean(), buf.readUtf()));
+            offers.add(new OfferView(id, category, result, favorPrice, price, buf.readEnum(Age.class),
+                    buf.readEnum(TradeReason.class), buf.readUtf(), buf.readVarInt(), buf.readBoolean()));
         }
         String patron = buf.readUtf();
-        return new TradeView(civ, labels, venue, entityId, dialogue, favor, cap, age, offers, patron);
+        Age stage = buf.readEnum(Age.class);
+        Optional<RitesView> rites = buf.readBoolean() ? Optional.of(RitesView.STREAM_CODEC.decode(buf)) : Optional.empty();
+        return new TradeView(civ, labels, venue, entityId, dialogue, favor, cap, age, offers, patron, stage, rites);
     }
 }

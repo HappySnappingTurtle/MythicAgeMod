@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -237,13 +238,17 @@ class VillageTest {
         PlayerMythData d = new PlayerMythData();
         d.civ(Civilization.GREEK).setAge(Age.CLASSICAL);
         d.civ(Civilization.GREEK).setFavor(99);
-        assertEquals(TradeReason.MINOR_GOD_LOCKED, TradeRules.check(d, Civilization.GREEK, shield,
-                TradeOffer.Venue.GUARDIAN, 10, 10, 0));
+        // T11a：补给类次神商品只在立了该次神祠的村庄出售（对所有人），供奉者有折扣
+        TradeRules.VenueContext noShrine = TradeRules.VenueContext.guardian(Age.CLASSICAL, "zeus", Set.of());
+        TradeRules.VenueContext athenaShrine = TradeRules.VenueContext.guardian(Age.CLASSICAL, "zeus", Set.of("athena"));
+        assertEquals(TradeReason.NO_SHRINE, TradeRules.check(d, Civilization.GREEK, shield, noShrine, 10, 10, 0));
+        assertEquals(TradeReason.OK, TradeRules.check(d, Civilization.GREEK, shield, athenaShrine, 10, 10, 0));
+        assertEquals(List.of(), TradeRules.discounts(d, Civilization.GREEK, shield, athenaShrine));
         d.civ(Civilization.GREEK).minorGods().put(Age.CLASSICAL, "athena");
-        assertEquals(TradeReason.OK, TradeRules.check(d, Civilization.GREEK, shield, TradeOffer.Venue.GUARDIAN, 10, 10, 0));
-        assertEquals(List.of(0.1), TradeRules.discounts(d, Civilization.GREEK, shield, ""));
-        assertEquals(List.of(0.1), TradeRules.discounts(d, Civilization.GREEK, bolt, "zeus"));
-        assertEquals(List.of(), TradeRules.discounts(d, Civilization.GREEK, bolt, "hades"));
+        assertEquals(List.of(0.1), TradeRules.discounts(d, Civilization.GREEK, shield, athenaShrine));
+        assertEquals(List.of(0.1), TradeRules.discounts(d, Civilization.GREEK, bolt, noShrine));
+        assertEquals(List.of(), TradeRules.discounts(d, Civilization.GREEK, bolt,
+                TradeRules.VenueContext.guardian(Age.CLASSICAL, "hades", Set.of())));
         assertThrows(TradeTable.TradeTableException.class, () -> TradeTable.parse(json.replace("0.1}", "0.6}"),
                 TradeTable.ItemLookup.ANY));
         assertThrows(TradeTable.TradeTableException.class, () -> TradeTable.parse(

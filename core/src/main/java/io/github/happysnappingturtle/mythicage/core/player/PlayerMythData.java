@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * 一个玩家的神话数据（T4 设计文档 §2）。可变聚合，只应在服务端主线程上修改；
@@ -23,10 +24,20 @@ public final class PlayerMythData {
     public static final class CivState {
         private long favor;
         private Age age = Age.NONE;
-        /** 已结识的村庄主神（T10a）：决定晋升时的次神候选。 */
+        /** 已结识的村庄主神（T10a）：只作图鉴记录（18 号 §6），不参与候选计算。 */
         private final Set<String> knownPatrons = new LinkedHashSet<>();
-        /** 各时代供奉的次神（T11 写入）：时代 → 次神 id。 */
+        /** 各时代供奉的次神（T11a 写入）：时代 → 次神 id。 */
         private final EnumMap<Age, String> minorGods = new EnumMap<>(Age.class);
+        /** 主神认可（T11a）：主神 → 在奉祀该主神的村庄以之晋升或立祀过的最高时代。 */
+        private final Map<String, Age> approvals = new LinkedHashMap<>();
+        /** Boss 凭证（T11a，按试炼档）：classical = 古典试炼（用于英雄级），heroic = 英雄试炼（用于神话级）。 */
+        private final EnumMap<Age, Integer> trialVouchers = new EnumMap<>(Age.class);
+        /** 最近一次改奉的 MC 日；−1 = 从未。 */
+        private long rededicatedDay = -1;
+        /** 举行过仪式的村庄（T11a，信仰面板「你的村庄」）。 */
+        private final Map<UUID, RiteMark> riteVillages = new LinkedHashMap<>();
+        /** 已晋升、还没弹过成功界面的时代（按晋升顺序）。 */
+        private final List<Age> pendingUnlocks = new java.util.ArrayList<>();
 
         public long favor() {
             return favor;
@@ -58,16 +69,90 @@ public final class PlayerMythData {
             return minorGods.containsValue(minorGod);
         }
 
+        public Map<String, Age> approvals() {
+            return approvals;
+        }
+
+        /** 某位主神认可到的最高时代；没有时为 NONE。 */
+        public Age approval(String patron) {
+            return approvals.getOrDefault(patron, Age.NONE);
+        }
+
+        /** 认可只升不降。 */
+        public void approve(String patron, Age age) {
+            if (age.atLeast(approval(patron)) && age != Age.NONE) {
+                approvals.put(patron, age);
+            }
+        }
+
+        public Map<Age, Integer> trialVouchers() {
+            return trialVouchers;
+        }
+
+        public int vouchers(Age tier) {
+            return trialVouchers.getOrDefault(tier, 0);
+        }
+
+        public void setVouchers(Age tier, int count) {
+            if (count <= 0) {
+                trialVouchers.remove(tier);
+            } else {
+                trialVouchers.put(tier, count);
+            }
+        }
+
+        public long rededicatedDay() {
+            return rededicatedDay;
+        }
+
+        public void setRededicatedDay(long day) {
+            this.rededicatedDay = day;
+        }
+
+        public Map<UUID, RiteMark> riteVillages() {
+            return riteVillages;
+        }
+
+        /** 记下在某村举行过的仪式：最高时代取大，晋升过则一直标为晋升地。 */
+        public void markRiteVillage(UUID village, Age age, boolean promotion) {
+            RiteMark old = riteVillages.get(village);
+            Age highest = old == null || age.atLeast(old.highest()) ? age : old.highest();
+            riteVillages.put(village, new RiteMark(highest, promotion || (old != null && old.promotedHere())));
+        }
+
+        public List<Age> pendingUnlocks() {
+            return pendingUnlocks;
+        }
+
         @Override
         public boolean equals(Object o) {
             return o instanceof CivState c && c.favor == favor && c.age == age
-                    && List.copyOf(c.knownPatrons).equals(List.copyOf(knownPatrons)) && c.minorGods.equals(minorGods);
+                    && List.copyOf(c.knownPatrons).equals(List.copyOf(knownPatrons)) && c.minorGods.equals(minorGods)
+                    && c.approvals.equals(approvals) && c.trialVouchers.equals(trialVouchers)
+                    && c.rededicatedDay == rededicatedDay && c.riteVillages.equals(riteVillages)
+                    && c.pendingUnlocks.equals(pendingUnlocks);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(favor, age, knownPatrons, minorGods);
+            return Objects.hash(favor, age, knownPatrons, minorGods, approvals, trialVouchers, rededicatedDay);
         }
+
+        void copyFrom(CivState o) {
+            favor = o.favor;
+            age = o.age;
+            knownPatrons.addAll(o.knownPatrons);
+            minorGods.putAll(o.minorGods);
+            approvals.putAll(o.approvals);
+            trialVouchers.putAll(o.trialVouchers);
+            rededicatedDay = o.rededicatedDay;
+            riteVillages.putAll(o.riteVillages);
+            pendingUnlocks.addAll(o.pendingUnlocks);
+        }
+    }
+
+    /** 在某村举行过的仪式：最高时代、是否在此晋升过（否则是立祀或改奉）。 */
+    public record RiteMark(Age highest, boolean promotedHere) {
     }
 
     /** 神器锻造记录：generation 每次重铸 +1（决策 D2）。 */
@@ -85,6 +170,8 @@ public final class PlayerMythData {
 
     private final EnumMap<Civilization, CivState> civs = new EnumMap<>(Civilization.class);
     private final Set<String> firstKills = new LinkedHashSet<>();
+    /** 试炼 Boss 合法击败次数（T11a）：Boss 实体 id → 次数。 */
+    private final Map<String, Integer> trialKills = new LinkedHashMap<>();
     private final Set<String> discoveries = new LinkedHashSet<>();
     private final Set<String> blueprints = new LinkedHashSet<>();
     private final Map<String, ForgeRecord> forgeRecords = new LinkedHashMap<>();
@@ -106,6 +193,10 @@ public final class PlayerMythData {
 
     public Set<String> firstKills() {
         return firstKills;
+    }
+
+    public Map<String, Integer> trialKills() {
+        return trialKills;
     }
 
     public Set<String> discoveries() {
@@ -175,12 +266,10 @@ public final class PlayerMythData {
     public PlayerMythData copy() {
         PlayerMythData c = new PlayerMythData();
         for (Civilization civ : Civilization.values()) {
-            c.civ(civ).setFavor(civ(civ).favor());
-            c.civ(civ).setAge(civ(civ).age());
-            c.civ(civ).knownPatrons.addAll(civ(civ).knownPatrons);
-            c.civ(civ).minorGods.putAll(civ(civ).minorGods);
+            c.civ(civ).copyFrom(civ(civ));
         }
         c.firstKills.addAll(firstKills);
+        c.trialKills.putAll(trialKills);
         c.discoveries.addAll(discoveries);
         c.blueprints.addAll(blueprints);
         c.forgeRecords.putAll(forgeRecords);
@@ -202,6 +291,7 @@ public final class PlayerMythData {
         return o instanceof PlayerMythData d
                 && civs.equals(d.civs)
                 && List.copyOf(firstKills).equals(List.copyOf(d.firstKills))
+                && trialKills.equals(d.trialKills)
                 && List.copyOf(discoveries).equals(List.copyOf(d.discoveries))
                 && List.copyOf(blueprints).equals(List.copyOf(d.blueprints))
                 && forgeRecords.equals(d.forgeRecords)

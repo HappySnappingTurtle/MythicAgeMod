@@ -37,6 +37,9 @@ public final class ClientSetup {
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));
+        // 主神像（T11a）
+        event.registerBlockEntityRenderer(io.github.happysnappingturtle.mythicage.statue.PatronStatues.CORE_BE.get(),
+                StatueCoreRenderer::new);
     }
 
     @SubscribeEvent

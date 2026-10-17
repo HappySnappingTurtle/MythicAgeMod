@@ -54,7 +54,7 @@ class TradeTableTest {
         assertEquals(Set.of(TradeOffer.Venue.GUARDIAN), o.venues());
         assertEquals(8, o.dailyLimit());
         assertEquals("greek:libation", o.key(Civilization.GREEK));
-        assertEquals(List.of(), t.offersAt(TradeOffer.Venue.ALTAR));
+        assertEquals(List.of(), t.offersAt(TradeOffer.Venue.STATUE));
     }
 
     @Test
@@ -64,7 +64,7 @@ class TradeTableTest {
         assertTrue(o.price().isFavor());
         assertEquals(20, o.price().favor());
         assertEquals(0, o.dailyLimit(), "省略 dailyLimit 为不限");
-        assertEquals(1, t.offersAt(TradeOffer.Venue.ALTAR).size());
+        assertEquals(1, t.offersAt(TradeOffer.Venue.STATUE).size());
     }
 
     @Test

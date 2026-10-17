@@ -229,7 +229,7 @@ public final class VillageGameTests {
         TradeService.setDiscountProvider((pl, o) -> o.id().equals("aegis") ? java.util.List.of(0.1) : java.util.List.of());
         try {
             BlockPos zeusBell = bell(h, 2, 2);
-            village(h, zeusBell, "zeus");
+            VillageRegistry.Village zeus = village(h, zeusBell, "zeus");
             h.setBlock(new BlockPos(9, 1, 9), Blocks.BELL);
             BlockPos hadesBell = h.absolutePos(new BlockPos(9, 1, 9));
             village(h, hadesBell, "hades");
@@ -238,8 +238,12 @@ public final class VillageGameTests {
             FakePlayer p = player(h, zeusPriest, "ma_gods");
             MythData.get(p).civ(Civilization.GREEK).setFavor(100);
             TradeService.openGuardian(p, zeusPriest);
-            var o1 = TradeService.buy(p, "aegis", 20, UUID.randomUUID().toString());
-            h.assertTrue(o1.reason() == TradeReason.MINOR_GOD_LOCKED, "未供奉雅典娜：" + o1.reason());
+            // T11a：次神商品只在立了该次神祠的村庄出售（对所有人），供奉者再打折
+            var o1 = TradeService.buy(p, "aegis", 18, UUID.randomUUID().toString());
+            h.assertTrue(o1.reason() == TradeReason.NO_SHRINE, "宙斯村没有雅典娜祠：" + o1.reason());
+            VillageRegistry.get(h.getLevel().getServer()).update(zeus.withRite(Age.CLASSICAL, Age.CLASSICAL, "athena"));
+            var o1b = TradeService.buy(p, "aegis", 18, UUID.randomUUID().toString());
+            h.assertTrue(o1b.reason() == TradeReason.OK, "立祠后未供奉者也能买，20×0.9=18：" + o1b.reason() + " " + o1b.arg());
             MythData.get(p).civ(Civilization.GREEK).minorGods().put(Age.CLASSICAL, "athena");
             var o2 = TradeService.buy(p, "aegis", 17, UUID.randomUUID().toString());
             h.assertTrue(o2.reason() == TradeReason.OK, "供奉后 20×0.9×0.9=16.2 → 17：" + o2.reason() + " " + o2.arg());
@@ -247,8 +251,8 @@ public final class VillageGameTests {
             h.assertTrue(o3.reason() == TradeReason.OK, "宙斯村雷击九折 18：" + o3.reason() + " " + o3.arg());
             p.moveTo(hadesPriest.getX() + 2, hadesPriest.getY(), hadesPriest.getZ());
             TradeService.openGuardian(p, hadesPriest);
-            var o4 = TradeService.buy(p, "bolt", 18, UUID.randomUUID().toString());
-            h.assertTrue(o4.reason() == TradeReason.PRICE_CHANGED && o4.arg() == 20, "哈迪斯村不打折：" + o4.reason() + " " + o4.arg());
+            var o4 = TradeService.buy(p, "bolt", 20, UUID.randomUUID().toString());
+            h.assertTrue(o4.reason() == TradeReason.WRONG_PATRON, "T11a：哈迪斯村不卖宙斯的远古神力：" + o4.reason());
         } finally {
             TradeTableLoader.overrideForTest(null);
             TradeService.setDiscountProvider((pl, o) -> java.util.List.of());

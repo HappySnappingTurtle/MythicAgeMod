@@ -63,6 +63,7 @@ public final class MythicAge {
         GreekTemple.init();
         GreekArchitecture.init();
         GreekGuardian.init();
+        io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
@@ -120,6 +121,11 @@ public final class MythicAge {
         game.addListener(VillageService::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);
+
+        // 晋升、立祀、改奉与主神像（T11a）
+        game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteCommand::onRegisterCommands);
+        game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
 
         // 希腊恩宠来源：信徒祈祷（T10）
         GreekPrayer.init(modBus, game);

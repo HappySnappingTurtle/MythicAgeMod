@@ -80,7 +80,7 @@ public final class MultiCivGameTests {
     private static final ShrineKind TEST_KIND = new ShrineKind("egyptian:test", TC, () -> Blocks.LODESTONE, 4,
             ShrineKind.Hooks.NONE);
     private static final FaithProfile TEST_PROFILE = new FaithProfile(TC, "entity.mythic_age.greek_guardian",
-            "block.minecraft.lodestone", "mythic_age.favor.greek", FaithProfile.defaults(TC).rites(), "",
+            "block.minecraft.lodestone", "mythic_age.favor.greek", "",
             List.of(new FaithProfile.Gift("minecraft:bread", 2), new FaithProfile.Gift("minecraft:paper", 1)),
             Optional.of(new FaithProfile.Reissue("minecraft:lodestone", TEST_KIND.id())));
     private static final String TEST_TABLE = """
@@ -396,23 +396,6 @@ public final class MultiCivGameTests {
         } finally {
             reg.remove(greekAltar);
         }
-        h.succeed();
-    }
-
-    @GameTest(template = T, batch = ON)
-    public static void greek_shrine_session_is_greek(GameTestHelper h) {
-        floor(h);
-        BlockPos rel = new BlockPos(5, 1, 5);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_shrine_civ"));
-        BlockPos abs = h.absolutePos(rel);
-        p.moveTo(abs.getX() + 2.5, abs.getY(), abs.getZ() + 0.5);
-        ShrineService.bindForTest(h.getLevel(), abs, p.getUUID(), "ma_shrine_civ", Age.ARCHAIC, Direction.SOUTH);
-        data(p).civ(GR).setAge(Age.ARCHAIC);
-        h.assertTrue(TradeService.openShrine(p, abs), "打开自己的神坛");
-        TradeView v = view(h, p);
-        h.assertTrue(v.civ() == GR && v.venue() == io.github.happysnappingturtle.mythicage.core.trade.TradeOffer.Venue.ALTAR,
-                "神坛会话的文明取自神坛");
         h.succeed();
     }
 

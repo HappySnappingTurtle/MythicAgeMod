@@ -19,7 +19,17 @@ public enum TradeReason {
     ALREADY_BLESSED,
     NOT_BLESSED,
     HAS_SHRINE,
-    REISSUED_TODAY;
+    REISSUED_TODAY,
+    /** 本村阶段不够（T11a）。 */
+    STAGE_LOCKED,
+    /** 本村没有该次神的祠（T11a）。 */
+    NO_SHRINE,
+    /** 此主神像不卖该主神 / 次神的商品（T11a）。 */
+    WRONG_PATRON,
+    /** 主神像：尚未被本村主神认可到古典（T11a）。 */
+    NEED_APPROVAL,
+    /** 主神像：已有这位主神的像（T11a，每位主神 1 座）。 */
+    HAS_STATUE;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

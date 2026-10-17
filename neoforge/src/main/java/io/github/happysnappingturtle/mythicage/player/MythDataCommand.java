@@ -125,8 +125,15 @@ public final class MythDataCommand {
         Civilization c = civ(ctx);
         String id = StringArgumentType.getString(ctx, "age");
         Age age = Age.byId(id).orElseThrow(() -> UNKNOWN_AGE.create(id));
-        MythData.get(player).civ(c).setAge(age);
+        PlayerMythData.CivState s = MythData.get(player).civ(c);
+        // 升级时补上成功界面（跨级时按逐级合并为一个窗口，T11a §6.2）；降级不弹
+        for (int i = Math.max(s.age().ordinal() + 1, Age.CLASSICAL.ordinal()); i <= age.ordinal(); i++) {
+            s.pendingUnlocks().add(Age.values()[i]);
+        }
+        s.setAge(age);
         MythData.changed(player);
+        io.github.happysnappingturtle.mythicage.rite.RiteService.refreshShrines(player, c);
+        io.github.happysnappingturtle.mythicage.rite.UnlockService.flush(player);
         ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.age.set",
                 "%s %s → %s", player.getDisplayName(), c.id(), age.id()), true);
         return 1;

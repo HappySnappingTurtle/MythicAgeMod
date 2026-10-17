@@ -35,7 +35,12 @@ class TradeRulesTest {
     }
 
     private static TradeReason check(PlayerMythData d, TradeOffer o, TradeOffer.Venue venue, long expected) {
-        return TradeRules.check(d, GREEK, o, venue, 20, expected, 3);
+        return TradeRules.check(d, GREEK, o, ctx(venue), 20, expected, 3);
+    }
+
+    private static TradeRules.VenueContext ctx(TradeOffer.Venue venue) {
+        return venue == G ? TradeRules.VenueContext.guardian(Age.ARCHAIC, "", Set.of())
+                : TradeRules.VenueContext.statue("", Set.of());
     }
 
     @Test
@@ -65,7 +70,7 @@ class TradeRulesTest {
     @Test
     void tc10WrongVenue() {
         assertEquals(TradeReason.WRONG_VENUE,
-                check(player(Age.ARCHAIC, 99), favorOffer(Age.ARCHAIC, 0, Set.of(G)), TradeOffer.Venue.ALTAR, 20));
+                check(player(Age.ARCHAIC, 99), favorOffer(Age.ARCHAIC, 0, Set.of(G)), TradeOffer.Venue.STATUE, 20));
     }
 
     @Test
@@ -78,7 +83,7 @@ class TradeRulesTest {
         }
         assertEquals(TradeReason.DAILY_LIMIT, check(d, o, G, 20));
         assertEquals(0, TradeRules.remainingToday(d, GREEK, o, 3));
-        assertEquals(TradeReason.OK, TradeRules.check(d, GREEK, o, G, 20, 20, 4), "次日旧日期视为 0");
+        assertEquals(TradeReason.OK, TradeRules.check(d, GREEK, o, ctx(G), 20, 20, 4), "次日旧日期视为 0");
         assertEquals(8, TradeRules.remainingToday(d, GREEK, o, 4));
         assertEquals(-1, TradeRules.remainingToday(d, GREEK, favorOffer(Age.ARCHAIC, 0, Set.of(G)), 4));
     }

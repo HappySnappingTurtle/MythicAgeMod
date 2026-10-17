@@ -283,23 +283,6 @@ public final class GuardianGameTests {
         h.succeed();
     }
 
-    @GameTest(template = T, batch = BATCH)
-    public static void altar_venue_rejects_guardian_only(GameTestHelper h) {
-        floor(h);
-        BlockPos rel = new BlockPos(5, 1, 5);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_altar"));
-        BlockPos abs = h.absolutePos(rel);
-        p.moveTo(abs.getX() + 2.5, abs.getY(), abs.getZ() + 0.5);
-        ShrineService.bindForTest(h.getLevel(), abs, p.getUUID(), "ma_altar", Age.CLASSICAL, net.minecraft.core.Direction.SOUTH);
-        data(p).civ(GR).setAge(Age.CLASSICAL);
-        data(p).civ(GR).setFavor(50);
-        h.assertTrue(TradeService.openShrine(p, abs), "主人可以在自己的祭坛打开兑换");
-        expect(h, buy(p, "test_bolt", 20), TradeReason.WRONG_VENUE);
-        expect(h, buy(p, "test_classical", 10), TradeReason.OK);
-        h.succeed();
-    }
-
     // ───────────── 补领（TC-T9-55～56） ─────────────
 
     @GameTest(template = T, batch = BATCH)

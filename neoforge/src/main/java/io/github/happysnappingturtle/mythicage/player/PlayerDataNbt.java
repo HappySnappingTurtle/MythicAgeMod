@@ -16,9 +16,11 @@ import java.util.Optional;
 /**
  * 玩家神话数据与 NBT 的互转（T4 设计文档 §4）。根标签带 {@code format} 版本号。
  * 读取时遇到未知文明、非法时代或负数恩宠，只跳过或修正那一项并记录警告，不让整份数据作废。
+ * 格式 2（T11a）：各文明加主神认可、Boss 凭证、改奉日、仪式村庄、待弹成功界面，根加试炼击败次数；
+ * 格式 1 的存档缺这些字段，读作空。
  */
 public final class PlayerDataNbt {
-    public static final int FORMAT = 1;
+    public static final int FORMAT = 2;
 
     private PlayerDataNbt() {
     }
@@ -35,10 +37,32 @@ public final class PlayerDataNbt {
             CompoundTag gods = new CompoundTag();
             state.minorGods().forEach((a, g) -> gods.putString(a.id(), g));
             c.put("minorGods", gods);
+            CompoundTag approvals = new CompoundTag();
+            state.approvals().forEach((patron, a) -> approvals.putString(patron, a.id()));
+            c.put("approvals", approvals);
+            CompoundTag vouchers = new CompoundTag();
+            state.trialVouchers().forEach((a, n) -> vouchers.putInt(a.id(), n));
+            c.put("trialVouchers", vouchers);
+            c.putLong("rededicatedDay", state.rededicatedDay());
+            ListTag villages = new ListTag();
+            state.riteVillages().forEach((id, mark) -> {
+                CompoundTag t = new CompoundTag();
+                t.putUUID("id", id);
+                t.putString("age", mark.highest().id());
+                t.putBoolean("promoted", mark.promotedHere());
+                villages.add(t);
+            });
+            c.put("riteVillages", villages);
+            ListTag pending = new ListTag();
+            state.pendingUnlocks().forEach(a -> pending.add(StringTag.valueOf(a.id())));
+            c.put("pendingUnlocks", pending);
             civs.put(civ.id(), c);
         });
         root.put("civs", civs);
         root.put("firstKills", strings(data.firstKills()));
+        CompoundTag trialKills = new CompoundTag();
+        data.trialKills().forEach(trialKills::putInt);
+        root.put("trialKills", trialKills);
         root.put("discoveries", strings(data.discoveries()));
         root.put("blueprints", strings(data.blueprints()));
         CompoundTag forge = new CompoundTag();
@@ -103,8 +127,15 @@ public final class PlayerDataNbt {
             for (String a : gods.getAllKeys()) {
                 Age.byId(a).ifPresent(godAge -> data.civ(civ.get()).minorGods().put(godAge, gods.getString(a)));
             }
+            readRites(c, data.civ(civ.get()));
         }
         readStrings(root, "firstKills", data.firstKills());
+        CompoundTag trialKills = root.getCompound("trialKills");
+        for (String boss : trialKills.getAllKeys()) {
+            if (trialKills.getInt(boss) > 0) {
+                data.trialKills().put(boss, trialKills.getInt(boss));
+            }
+        }
         readStrings(root, "discoveries", data.discoveries());
         readStrings(root, "blueprints", data.blueprints());
         CompoundTag forge = root.getCompound("forge");
@@ -135,6 +166,29 @@ public final class PlayerDataNbt {
         }
         data.setDataVersion(root.getLong("version"));
         return data;
+    }
+
+    /** 格式 2 的仪式字段（T11a）；格式 1 没有这些键，全部读作空。 */
+    private static void readRites(CompoundTag c, PlayerMythData.CivState state) {
+        CompoundTag approvals = c.getCompound("approvals");
+        for (String patron : approvals.getAllKeys()) {
+            Age.byId(approvals.getString(patron)).ifPresent(a -> state.approve(patron, a));
+        }
+        CompoundTag vouchers = c.getCompound("trialVouchers");
+        for (String a : vouchers.getAllKeys()) {
+            Age.byId(a).ifPresent(tier -> state.setVouchers(tier, vouchers.getInt(a)));
+        }
+        state.setRededicatedDay(c.contains("rededicatedDay") ? c.getLong("rededicatedDay") : -1);
+        for (Tag t : c.getList("riteVillages", Tag.TAG_COMPOUND)) {
+            CompoundTag v = (CompoundTag) t;
+            if (v.hasUUID("id")) {
+                state.riteVillages().put(v.getUUID("id"), new PlayerMythData.RiteMark(
+                        Age.byId(v.getString("age")).orElse(Age.NONE), v.getBoolean("promoted")));
+            }
+        }
+        for (Tag t : c.getList("pendingUnlocks", Tag.TAG_STRING)) {
+            Age.byId(t.getAsString()).filter(a -> a != Age.NONE).ifPresent(state.pendingUnlocks()::add);
+        }
     }
 
     private static ListTag strings(Collection<String> values) {

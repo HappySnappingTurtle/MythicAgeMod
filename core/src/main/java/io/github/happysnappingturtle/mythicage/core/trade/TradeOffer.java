@@ -63,14 +63,21 @@ public record TradeOffer(String id, Category category, ItemAmount result, Price 
     }
 
     /** 出售地点：守护者本人，或玩家自己的神坛。 */
+    /**
+     * 兑换地点（T11a 修订 1）：村庄祭司、玩家自己的主神像。T9 的 {@code altar}（玩家神坛）已由主神像取代，
+     * 数据里的 {@code altar} 读作 {@code statue}。
+     */
     public enum Venue {
-        GUARDIAN, ALTAR;
+        GUARDIAN, STATUE;
 
         public String id() {
             return name().toLowerCase(Locale.ROOT);
         }
 
         public static Optional<Venue> byId(String id) {
+            if ("altar".equals(id)) {
+                return Optional.of(STATUE);
+            }
             for (Venue v : values()) {
                 if (v.id().equals(id)) {
                     return Optional.of(v);

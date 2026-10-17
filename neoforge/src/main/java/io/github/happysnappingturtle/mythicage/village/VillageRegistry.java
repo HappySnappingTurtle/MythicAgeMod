@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.village;
 
 import io.github.happysnappingturtle.mythicage.MythicAge;
+import io.github.happysnappingturtle.mythicage.core.player.Age;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,22 +52,81 @@ public final class VillageRegistry extends SavedData {
     }
 
     /**
-     * @param civ             文明 id；中立为空串
-     * @param patron          主神 id；中立或该文明没有主神权重时为空串
-     * @param missingSinceDay 钟不在的起始 MC 日；钟在时为 −1
+     * @param civ              文明 id；中立为空串
+     * @param patron           主神 id；中立或该文明没有主神权重时为空串
+     * @param missingSinceDay  钟不在的起始 MC 日；钟在时为 −1
+     * @param stage            村庄信仰阶段（T11a）：有文明的村庄登记时为远古，中立为 NONE；只升不降
+     * @param shrines          各时代立过祠的次神（T11a）
+     * @param baseline         远古基线人口：首次升到古典时的成员数；−1 = 未记录（T11a 阶段 ③）
+     * @param lastMigrationDay 上次吸纳移民的 MC 日；−1 = 从未
      */
     public record Village(UUID id, GlobalPos bell, String civ, String patron, Origin origin, @Nullable UUID founder,
-                          String vanillaType, long missingSinceDay) {
+                          String vanillaType, long missingSinceDay, Age stage, Map<Age, List<String>> shrines,
+                          int baseline, long lastMigrationDay) {
+        public Village {
+            EnumMap<Age, List<String>> copy = new EnumMap<>(Age.class);
+            shrines.forEach((a, l) -> copy.put(a, List.copyOf(l)));
+            shrines = java.util.Collections.unmodifiableMap(copy);
+        }
+
+        /** T10a 的构造方式：阶段按文明给出缺省值，没有祠。 */
+        public Village(UUID id, GlobalPos bell, String civ, String patron, Origin origin, @Nullable UUID founder,
+                       String vanillaType, long missingSinceDay) {
+            this(id, bell, civ, patron, origin, founder, vanillaType, missingSinceDay, defaultStage(civ), Map.of(), -1, -1);
+        }
+
+        public static Age defaultStage(String civ) {
+            return civ.isEmpty() ? Age.NONE : Age.ARCHAIC;
+        }
+
         public boolean neutral() {
             return civ.isEmpty();
         }
 
+        public boolean hasShrine(String god) {
+            return shrines.values().stream().anyMatch(l -> l.contains(god));
+        }
+
+        /** 全部立过祠的次神。 */
+        public java.util.Set<String> shrineGods() {
+            java.util.Set<String> out = new java.util.LinkedHashSet<>();
+            shrines.values().forEach(out::addAll);
+            return out;
+        }
+
         Village withMissingSince(long day) {
-            return new Village(id, bell, civ, patron, origin, founder, vanillaType, day);
+            return new Village(id, bell, civ, patron, origin, founder, vanillaType, day, stage, shrines, baseline,
+                    lastMigrationDay);
         }
 
         Village withPatron(String p) {
-            return new Village(id, bell, civ, p, origin, founder, vanillaType, missingSinceDay);
+            return new Village(id, bell, civ, p, origin, founder, vanillaType, missingSinceDay, stage, shrines, baseline,
+                    lastMigrationDay);
+        }
+
+        /** 阶段取最高；为某时代的次神立祠（已有则不重复）。 */
+        public Village withRite(Age newStage, Age shrineAge, String god) {
+            Age st = newStage.atLeast(stage) ? newStage : stage;
+            EnumMap<Age, List<String>> sh = new EnumMap<>(Age.class);
+            shrines.forEach((a, l) -> sh.put(a, new ArrayList<>(l)));
+            if (!god.isEmpty() && shrineAge != Age.NONE) {
+                List<String> l = sh.computeIfAbsent(shrineAge, k -> new ArrayList<>());
+                if (!l.contains(god)) {
+                    l.add(god);
+                }
+            }
+            return new Village(id, bell, civ, patron, origin, founder, vanillaType, missingSinceDay, st, sh, baseline,
+                    lastMigrationDay);
+        }
+
+        public Village withStage(Age newStage) {
+            return new Village(id, bell, civ, patron, origin, founder, vanillaType, missingSinceDay, newStage, shrines,
+                    baseline, lastMigrationDay);
+        }
+
+        public Village withPopulation(int newBaseline, long migrationDay) {
+            return new Village(id, bell, civ, patron, origin, founder, vanillaType, missingSinceDay, stage, shrines,
+                    newBaseline, migrationDay);
         }
     }
 
@@ -105,6 +166,13 @@ public final class VillageRegistry extends SavedData {
         return false;
     }
 
+    /** 用新的记录替换（仪式、管理命令、移民）。 */
+    public void update(Village v) {
+        if (byId.containsKey(v.id())) {
+            add(v);
+        }
+    }
+
     /** 补抽主神（只对主神为空的村庄生效）。 */
     void setPatron(Village v, String patron) {
         if (v.patron().isEmpty() && !patron.isEmpty()) {
@@ -134,10 +202,26 @@ public final class VillageRegistry extends SavedData {
             CompoundTag c = (CompoundTag) t;
             try {
                 ResourceKey<Level> dim = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(c.getString("dim")));
-                Village v = new Village(c.getUUID("id"), GlobalPos.of(dim, BlockPos.of(c.getLong("bell"))), c.getString("civ"),
+                String civ = c.getString("civ");
+                Age stage = c.contains("stage") ? Age.byId(c.getString("stage")).orElse(Village.defaultStage(civ))
+                        : Village.defaultStage(civ);
+                EnumMap<Age, List<String>> shrines = new EnumMap<>(Age.class);
+                CompoundTag sh = c.getCompound("shrines");
+                for (String a : sh.getAllKeys()) {
+                    Age.byId(a).ifPresent(age -> {
+                        List<String> gods = new ArrayList<>();
+                        for (Tag g : sh.getList(a, Tag.TAG_STRING)) {
+                            gods.add(g.getAsString());
+                        }
+                        shrines.put(age, gods);
+                    });
+                }
+                Village v = new Village(c.getUUID("id"), GlobalPos.of(dim, BlockPos.of(c.getLong("bell"))), civ,
                         c.getString("patron"), Origin.byId(c.getString("origin")),
                         c.hasUUID("founder") ? c.getUUID("founder") : null, c.getString("vanillaType"),
-                        c.contains("missingSince") ? c.getLong("missingSince") : -1);
+                        c.contains("missingSince") ? c.getLong("missingSince") : -1, stage, shrines,
+                        c.contains("baseline") ? c.getInt("baseline") : -1,
+                        c.contains("lastMigration") ? c.getLong("lastMigration") : -1);
                 r.byId.put(v.id(), v);
                 r.byBell.put(v.bell(), v.id());
             } catch (RuntimeException e) {
@@ -165,6 +249,16 @@ public final class VillageRegistry extends SavedData {
             if (v.missingSinceDay() >= 0) {
                 c.putLong("missingSince", v.missingSinceDay());
             }
+            c.putString("stage", v.stage().id());
+            CompoundTag sh = new CompoundTag();
+            v.shrines().forEach((a, gods) -> {
+                ListTag l = new ListTag();
+                gods.forEach(g -> l.add(net.minecraft.nbt.StringTag.valueOf(g)));
+                sh.put(a.id(), l);
+            });
+            c.put("shrines", sh);
+            c.putInt("baseline", v.baseline());
+            c.putLong("lastMigration", v.lastMigrationDay());
             list.add(c);
         }
         tag.put("villages", list);
