@@ -109,6 +109,21 @@
         }
     }
 
+    /** 直长发（哈迪斯）：每 2 列一道竖向暗缕，长短参差。 */
+    function straight(H, group, faces, base, seed) {
+        const dark = MA.shade(base, 0.8);
+        const light = MA.shade(base, 1.12);
+        for (const f of faces) {
+            const L = H.local(group, f);
+            if (!L.r) continue;
+            for (let u = 0; u < L.r[2]; u += 2) {
+                const len = Math.max(2, Math.round(L.r[3] * (0.6 + 0.4 * hash(u, 0, seed))));
+                L.px(u, 0, dark, 1, len);
+                if (hash(u, 1, seed) > 0.6) L.px(u + 1, 1, light, 1, Math.max(1, len - 3));
+            }
+        }
+    }
+
     /** 海浪纹（卷浪）：高 ≥4 像素的带子上画一行，周期 6。 */
     function wavePattern(L, color, top) {
         if (!L.r || L.r[3] - top < 4) return;
@@ -134,11 +149,23 @@
     function paint(ctx, nets, P, god) {
         const H = helpers(ctx, nets);
         const { local, modulate, mirror } = H;
+        // 各尊的配色（哈迪斯是深色大理石）；缺省为白大理石（宙斯、波塞冬）
+        const PC = P.colors || {};
+        const PM = PC.skin || MARBLE;
+        const PS = PC.cloth || SHADE;
+        const PH = PC.hair || HAIR;
+        const PP = PC.plinth || PLINTH;
+        const IRIS = PC.iris || '#6E665C';
+        const MAT = Object.assign({}, MATERIAL);
+        for (const [k, m] of [['skin', 'marble'], ['cloth', 'cloth'], ['hair', 'hair'], ['plinth', 'stone'], ['metal', 'gold'],
+            ['border', 'border'], ['beast', 'gold']]) {
+            if (PC[k]) MAT[PC[k].toUpperCase()] = m;
+        }
 
         // ── 材质 ──
         let k = 0;
         for (const net of Object.values(nets)) {
-            const mat = MATERIAL[net.color.toUpperCase()];
+            const mat = MAT[net.color.toUpperCase()];
             for (const [face, r] of Object.entries(net.faces)) {
                 k++;
                 const seed = k;
@@ -163,24 +190,27 @@
         }
 
         // ── 须发：卷发、卷须（宙斯）或波浪发（波塞冬，P.hair_style = 'waves'）──
-        const hairFn = P.hair_style === 'waves' ? waves : curls;
-        hairFn(H, 'hair_cap', ['top', 'left', 'right', 'back', 'front'], HAIR, 11);
-        hairFn(H, 'fringe', ['front', 'top'], HAIR, 12);
-        hairFn(H, 'hair_side', SIDES, HAIR, 13);
-        hairFn(H, 'beard_front', ['front', 'left', 'right', 'bottom'], HAIR, 14);
-        hairFn(H, 'beard_chin', SIDES.concat(['bottom']), HAIR, 15);
-        hairFn(H, 'beard_mid', SIDES.concat(['bottom']), HAIR, 17);
-        hairFn(H, 'beard_lower', SIDES.concat(['bottom']), HAIR, 18);
-        hairFn(H, 'beard_side', SIDES, HAIR, 16);
-        hairFn(H, 'beard_fork', SIDES.concat(['bottom']), HAIR, 19);
-        hairFn(H, 'hair_front_lock', SIDES, HAIR, 20);
-        if (P.hair_style === 'waves') hairFn(H, 'hair_lock', SIDES, HAIR, 21);  // 宙斯定版时垂肩发绺没画卷纹，保持不变
+        const hairFn = P.hair_style === 'waves' ? waves : P.hair_style === 'straight' ? straight : curls;
+        hairFn(H, 'hair_cap', ['top', 'left', 'right', 'back', 'front'], PH, 11);
+        hairFn(H, 'fringe', ['front', 'top'], PH, 12);
+        hairFn(H, 'hair_side', SIDES, PH, 13);
+        hairFn(H, 'beard_front', ['front', 'left', 'right', 'bottom'], PH, 14);
+        hairFn(H, 'beard_chin', SIDES.concat(['bottom']), PH, 15);
+        hairFn(H, 'beard_mid', SIDES.concat(['bottom']), PH, 17);
+        hairFn(H, 'beard_lower', SIDES.concat(['bottom']), PH, 18);
+        hairFn(H, 'beard_side', SIDES, PH, 16);
+        hairFn(H, 'beard_fork', SIDES.concat(['bottom']), PH, 19);
+        hairFn(H, 'hair_front_lock', SIDES, PH, 20);
+        hairFn(H, 'beard_point', SIDES.concat(['bottom']), PH, 22);
+        hairFn(H, 'beard_tip', SIDES.concat(['bottom']), PH, 23);
+        if (P.hair_style === 'straight') hairFn(H, 'hair_lock', SIDES, PH, 21);
+        if (P.hair_style === 'waves') hairFn(H, 'hair_lock', SIDES, PH, 21);  // 宙斯定版时垂肩发绺没画卷纹，保持不变
         // 后发：竖向发缕（每 2 列一道暗缝），末端参差
         {
             const L = local('hair_back', 'back');
             if (L.r) {
-                for (let u = 1; u < L.r[2]; u += 2) L.px(u, 0, MA.shade(HAIR, 0.86), 1, L.r[3] - 1);
-                for (let u = 0; u < L.r[2]; u++) if (hash(u, 3, 21) < 0.5) L.px(u, L.r[3] - 1, MA.shade(HAIR, 0.8));
+                for (let u = 1; u < L.r[2]; u += 2) L.px(u, 0, MA.shade(PH, 0.86), 1, L.r[3] - 1);
+                for (let u = 0; u < L.r[2]; u++) if (hash(u, 3, 21) < 0.5) L.px(u, L.r[3] - 1, MA.shade(PH, 0.8));
             }
         }
 
@@ -200,13 +230,13 @@
                     [[at(1), 'L'], [at(2), 'L'], [at(3), 'L'], [at(4), 'L']],
                     [[at(1), 'w'], [at(2), 'I'], [at(3), 'I'], [at(4), 'w'], [at(5), 'c']],
                     [[at(2), 'l'], [at(3), 'l']],
-                ], { L: MA.shade(MARBLE, 0.7), w: MA.shade(MARBLE, 1.04), I: '#6E665C', l: MA.shade(MARBLE, 0.88),
-                    c: MA.shade(MARBLE, 0.9) }, F.eyeTop);
+                ], { L: MA.shade(PM, 0.7), w: MA.shade(PM, 1.04), I: IRIS, l: MA.shade(PM, 0.88),
+                    c: MA.shade(PM, 0.9) }, F.eyeTop);
                 mirror('head', 'front', [
                     [[at(1), 'f'], [at(2), 'f'], [at(3), 'f']],
                     [],
                     [[at(2), 'f'], [at(3), 'f'], [at(4), 'f']],
-                ], { f: MA.shade(MARBLE, 0.92) }, F.eyeTop - 6);
+                ], { f: MA.shade(PM, 0.92) }, F.eyeTop - 6);
             } else {
                 //   L 上眼睑阴影  P 瞳孔刻痕  l 下眼睑浅影  c 颧骨浅影
                 mirror('head', 'front', [
@@ -214,42 +244,42 @@
                     [[at(2), 'P'], [at(1), 'l'], [at(3), 'l']],
                     [[at(2), 'l']],
                     [[at(3), 'c'], [at(4), 'c']],
-                ], { L: MA.shade(MARBLE, 0.74), P: '#6E665C', l: MA.shade(MARBLE, 0.88), c: MA.shade(MARBLE, 0.94) }, F.eyeTop);
+                ], { L: MA.shade(PM, 0.74), P: IRIS, l: MA.shade(PM, 0.88), c: MA.shade(PM, 0.94) }, F.eyeTop);
             }
         }
         // 粗眉：发丝竖纹、下沿压暗；颧骨下沿（法令纹的起点）一道浅影
         for (const f of ['front', 'top']) {
             const E = local('eyebrow', f);
-            if (E.r) for (let u = 1; u < E.r[2]; u += 3) E.px(u, 0, MA.shade(HAIR, 0.92), 1, E.r[3]);
+            if (E.r) for (let u = 1; u < E.r[2]; u += 3) E.px(u, 0, MA.shade(PH, 0.92), 1, E.r[3]);
         }
         {
             const E = local('eyebrow', 'front');
-            if (E.r) E.px(0, E.r[3] - 1, MA.shade(HAIR, 0.75), E.r[2], 1);
+            if (E.r) E.px(0, E.r[3] - 1, MA.shade(PH, 0.75), E.r[2], 1);
             const C = local('cheek', 'front');
-            if (C.r) C.px(0, C.r[3] - 1, MA.shade(MARBLE, 0.86), C.r[2], 1);
+            if (C.r) C.px(0, C.r[3] - 1, MA.shade(PM, 0.86), C.r[2], 1);
             const T = local('nose_tip', 'bottom');
             if (T.r) {
-                T.px(0, 0, MA.shade(MARBLE, 0.6), 1, T.r[3]);
-                T.px(T.r[2] - 1, 0, MA.shade(MARBLE, 0.6), 1, T.r[3]);
+                T.px(0, 0, MA.shade(PM, 0.6), 1, T.r[3]);
+                T.px(T.r[2] - 1, 0, MA.shade(PM, 0.6), 1, T.r[3]);
             }
             const N = local('nose_tip', 'front');
-            if (N.r) N.px(1, 0, MA.shade(MARBLE, 1.05), Math.max(1, N.r[2] - 2), 1);
+            if (N.r) N.px(1, 0, MA.shade(PM, 1.05), Math.max(1, N.r[2] - 2), 1);
             const Lp = local('lower_lip', 'front');
-            if (Lp.r) Lp.px(0, 0, MA.shade(MARBLE, 0.86), Lp.r[2], 1);
+            if (Lp.r) Lp.px(0, 0, MA.shade(PM, 0.86), Lp.r[2], 1);
             for (const f of ['front', 'left', 'right']) {
                 const M = local('moustache_end', f);
-                if (M.r) for (let u = 0; u < M.r[2]; u += 2) M.px(u, 0, MA.shade(HAIR, 0.82), 1, M.r[3]);
+                if (M.r) for (let u = 0; u < M.r[2]; u += 2) M.px(u, 0, MA.shade(PH, 0.82), 1, M.r[3]);
             }
         }
         // 眉骨下沿压一道阴影，鼻梁两侧浅影
         {
             const B = local('brow', 'front');
-            if (B.r) B.px(0, B.r[3] - 1, MA.shade(MARBLE, 0.84), B.r[2], 1);
+            if (B.r) B.px(0, B.r[3] - 1, MA.shade(PM, 0.84), B.r[2], 1);
             const N = local('nose', 'front');
             if (N.r) {
-                N.px(0, 0, MA.shade(MARBLE, 0.95), 1, N.r[3]);
-                N.px(N.r[2] - 1, 0, MA.shade(MARBLE, 0.95), 1, N.r[3]);
-                N.px(1, N.r[3] - 1, MA.shade(MARBLE, 0.82), Math.max(1, N.r[2] - 2), 1);
+                N.px(0, 0, MA.shade(PM, 0.95), 1, N.r[3]);
+                N.px(N.r[2] - 1, 0, MA.shade(PM, 0.95), 1, N.r[3]);
+                N.px(1, N.r[3] - 1, MA.shade(PM, 0.82), Math.max(1, N.r[2] - 2), 1);
             }
         }
         // 嘴：胡须前片宽 16 像素（偶数），唇线 4 像素居中，下唇一点亮
@@ -262,42 +292,42 @@
             ] : [
                 [[c0, 'm'], [c0 + 1, 'm']],
                 [[c0, 'u']],
-            ], { m: MA.shade(HAIR, 0.62), u: MA.shade(MARBLE, 1.04) }, (P.face || {}).mouthTop || 3);
+            ], { m: MA.shade(PH, 0.62), u: MA.shade(PM, 1.04) }, (P.face || {}).mouthTop || 3);
         }
         // 八字须：两端向下卷
         {
             const M = local('moustache', 'front');
             if (M.r) {
-                M.px(0, 0, MA.shade(HAIR, 0.82), M.r[2], 1);
-                M.px(0, 1, MA.shade(HAIR, 0.78));
-                M.px(M.r[2] - 1, 1, MA.shade(HAIR, 0.78));
+                M.px(0, 0, MA.shade(PH, 0.82), M.r[2], 1);
+                M.px(0, 1, MA.shade(PH, 0.78));
+                M.px(M.r[2] - 1, 1, MA.shade(PH, 0.78));
             }
         }
 
         // ── 躯干肌肉：胸肌下缘、腹直肌（中线 + 两道横线）、肚脐 ──
         {
             const pec = local('pec', 'front');
-            if (pec.r) pec.px(0, pec.r[3] - 1, MA.shade(MARBLE, 0.86), pec.r[2], 1);
+            if (pec.r) pec.px(0, pec.r[3] - 1, MA.shade(PM, 0.86), pec.r[2], 1);
             const ab = local('abdomen', 'front');
             if (ab.r) {
                 const mid = Math.floor(ab.r[2] / 2);
-                ab.px(mid - 1, 0, MA.shade(MARBLE, 0.9), 2, ab.r[3] - 1);
+                ab.px(mid - 1, 0, MA.shade(PM, 0.9), 2, ab.r[3] - 1);
                 for (const v of [2, 5]) {
-                    ab.px(mid - 5, v, MA.shade(MARBLE, 0.92), 4, 1);
-                    ab.px(mid + 1, v, MA.shade(MARBLE, 0.92), 4, 1);
+                    ab.px(mid - 5, v, MA.shade(PM, 0.92), 4, 1);
+                    ab.px(mid + 1, v, MA.shade(PM, 0.92), 4, 1);
                 }
-                ab.px(mid - 1, ab.r[3] - 2, MA.shade(MARBLE, 0.78), 2, 1);
+                ab.px(mid - 1, ab.r[3] - 2, MA.shade(PM, 0.78), 2, 1);
             }
             const ch = local('chest', 'front');
             if (ch.r) {
                 const mid = Math.floor(ch.r[2] / 2);
-                ch.px(mid - 1, 4, MA.shade(MARBLE, 0.92), 2, ch.r[3] - 4);
+                ch.px(mid - 1, 4, MA.shade(PM, 0.92), 2, ch.r[3] - 4);
             }
         }
 
         {
             const A = local('abs', 'front');
-            if (A.r) A.px(0, A.r[3] - 1, MA.shade(MARBLE, 0.86), A.r[2], 1);
+            if (A.r) A.px(0, A.r[3] - 1, MA.shade(PM, 0.86), A.r[2], 1);
         }
 
         // ── 布料：斜披带两侧金边；下摆彩绘回纹（蓝底金纹）；垂布底边金线 ──
@@ -310,7 +340,7 @@
         }
         const band = P.pattern === 'wave' ? wavePattern : meander;
         for (const f of SIDES) {
-            band(local('skirt_hem', f), GOLD, 0);
+            band(local('skirt_hem', f), PC.pattern || GOLD, 0);
         }
         for (const f of SIDES) {
             const L = local('drape_tip', f);
@@ -318,7 +348,7 @@
         }
         for (const f of SIDES) {
             const L = local('waist_roll', f);
-            if (L.r) for (let u = 0; u < L.r[2]; u += 3) L.px(u, 1, MA.shade(SHADE, 0.88), 2, 1);
+            if (L.r) for (let u = 0; u < L.r[2]; u += 3) L.px(u, 1, MA.shade(PS, 0.88), 2, 1);
         }
 
         // ── 金件：雷霆握柄的螺旋纹、叉尖提亮；冠叶叶脉；凉鞋带 ──
@@ -346,9 +376,9 @@
 
         // ── 台座：上台四周浅刻回纹，下台顶边一道亮线 ──
         for (const f of SIDES) {
-            (P.pattern === 'wave' ? wavePattern : meander)(local('plinth_top', f), MA.shade(PLINTH, 0.84), 0);
+            (P.pattern === 'wave' ? wavePattern : meander)(local('plinth_top', f), MA.shade(PP, 0.84), 0);
             const L = local('plinth_base', f);
-            if (L.r) L.px(0, 0, MA.shade(PLINTH, 1.08), L.r[2], 1);
+            if (L.r) L.px(0, 0, MA.shade(PP, 1.08), L.r[2], 1);
         }
 
         const extra = EXTRA[god];
@@ -356,6 +386,102 @@
     }
 
     const EXTRA = {};
+
+    // ── 发光贴图（_glowmask）：只画发光的像素，其余透明。各尊按需要提供 GLOW[主神] ──
+    const GLOW = {};
+
+    /** 由 build_statue.js 调用：在透明画布上画出发光像素。 */
+    function glow(ctx, nets, P, god) {
+        const H = helpers(ctx, nets);
+        if (GLOW[god]) GLOW[god](H, P);
+    }
+
+    GLOW.hades = (H, P) => {
+        // 眼睛：虹膜两像素发冷蓝光（位置与 paint 里 v2 五官一致）
+        const F = P.face || { eyeTop: 7 };
+        const W = H.local('head', 'front').r[2];
+        const c0 = W / 2;
+        H.mirror('head', 'front', [[], [[c0 + 2, 'G'], [c0 + 3, 'G']]], { G: '#A8ECFF' }, F.eyeTop);
+        // 三头犬：每颗头两侧各一只红眼
+        for (const g of ['cer_head', 'cer_head_side']) {
+            for (const f of ['left', 'right']) {
+                const L = H.local(g, f);
+                if (L.r) L.px(f === 'left' ? L.r[2] - 2 : 1, 1, '#FF4A2A');
+            }
+        }
+    };
+
+    EXTRA.hades = (H) => {
+        const { local } = H;
+        const SKIN = '#8A8790';
+        const BEAST = '#3E3A44';
+        const METAL = '#8C6A3A';
+        for (const f of ['front', 'left', 'right']) {
+            const L = local('fist', f);
+            if (!L.r) continue;
+            for (let i = 1; i <= 3; i++) L.px(Math.round(L.r[2] * i / 4), 1, MA.shade(SKIN, 0.8), 1, L.r[3] - 2);
+        }
+        // 张开的右手：指缝
+        for (const f of ['left', 'right']) {
+            const L = local('fingers_r', f);
+            if (L.r) for (let i = 1; i <= 3; i++) L.px(Math.round(L.r[2] * i / 4), 0, MA.shade(SKIN, 0.78), 1, L.r[3]);
+        }
+        // 骷髅饰：两个眼窝、鼻孔、一排牙
+        {
+            const L = local('crown_skull', 'front');
+            if (L.r) {
+                L.px(0, 1, '#2A2620', 2, 1);
+                L.px(L.r[2] - 2, 1, '#2A2620', 2, 1);
+                L.px(Math.floor(L.r[2] / 2), 2, '#2A2620');
+                for (let u = 0; u < L.r[2]; u += 2) L.px(u, L.r[3] - 1, '#6A6258');
+            }
+        }
+        // 戟杆螺旋纹、叉尖提亮
+        for (const f of SIDES) {
+            const L = local('bident_shaft', f);
+            if (L.r) for (let v = 0; v < L.r[3]; v += 4) L.px(0, v, MA.shade('#5C4A36', 0.7), L.r[2], 1);
+            const T = local('bident_tip', f);
+            if (T.r) T.px(0, 0, '#D8B070', T.r[2], 1);
+        }
+        // 三头犬：毛纹、项圈尖刺（银）、口鼻下缘獠牙、鼻头
+        for (const g of ['cer_body', 'cer_chest', 'cer_haunch', 'cer_frontleg', 'cer_neck', 'cer_neck_side', 'cer_head',
+            'cer_head_side']) {
+            for (const f of SIDES.concat(['top'])) {
+                const L = local(g, f);
+                if (!L.r) continue;
+                for (let u = 0; u < L.r[2]; u += 2) {
+                    for (let v = (u % 4 === 0 ? 0 : 1); v < L.r[3]; v += 3) L.px(u, v, MA.shade(BEAST, 0.78));
+                }
+            }
+        }
+        for (const f of SIDES) {
+            const L = local('cer_collar', f);
+            if (L.r) for (let u = 1; u < L.r[2]; u += 3) L.px(u, 0, '#C8C4CC', 1, L.r[3]);
+        }
+        for (const g of ['cer_snout', 'cer_snout_side']) {
+            for (const f of ['front', 'left', 'right']) {
+                const L = local(g, f);
+                if (!L.r) continue;
+                L.px(0, L.r[3] - 1, '#1E1B20', L.r[2], 1);
+                for (let u = 0; u < L.r[2]; u += 2) L.px(u, L.r[3] - 2, '#E8E2D6');
+            }
+            const N = local(g, 'top');
+            if (N.r) N.px(0, N.r[3] - 1, '#141216', N.r[2], 1);
+        }
+        // 披风竖褶、冠带亮点
+        for (const g of ['cape_upper', 'cape_lower']) {
+            for (const f of ['front', 'back']) {
+                const L = local(g, f);
+                if (L.r) for (let u = 2; u < L.r[2]; u += 5) L.px(u, 0, MA.shade('#5C5866', 0.86), 1, L.r[3]);
+            }
+        }
+        for (const g of ['crown_front', 'crown_side', 'crown_back']) {
+            for (const f of SIDES) {
+                const L = local(g, f);
+                if (L.r) for (let u = 0; u < L.r[2]; u += 3) L.px(u, 0, MA.shade(METAL, 1.25));
+            }
+        }
+    };
 
     EXTRA.poseidon = (H) => {
         const { local } = H;
@@ -487,5 +613,5 @@
             if (L.r) L.px(0, Math.floor(L.r[3] / 2), MA.shade(GOLD, 0.78), L.r[2], 1);
         }
     };
-    return { paint, EXTRA };
+    return { paint, glow, EXTRA, GLOW };
 })();

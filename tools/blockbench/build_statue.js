@@ -107,8 +107,15 @@
     };
     const geo = MA.exportGeo(out.geo);
     MA.exportTexture(tex, out.texture);
-    MA.saveProject('art/blockbench/greek/' + NAME + '/' + NAME + '.bbmodel',
-        { [out.geo]: geo, [out.texture]: MA.fs.readFileSync(MA.abs(out.texture)) });
+    const exportsByPath = { [out.geo]: geo, [out.texture]: MA.fs.readFileSync(MA.abs(out.texture)) };
+    // 发光贴图（哈迪斯的眼睛等）：透明画布上只画发光像素，渲染器见到 <主神>_glowmask.png 就叠加发光层
+    if (P.glow) {
+        const glowTex = MA.canvasTexture(NAME + '_glowmask', ATLAS, ATLAS, (ctx) => painter.glow(ctx, nets, P, GOD));
+        out.glowmask = 'neoforge/src/main/resources/assets/mythic_age/textures/statue/' + GOD + '_glowmask.png';
+        MA.exportTexture(glowTex, out.glowmask);
+        exportsByPath[out.glowmask] = MA.fs.readFileSync(MA.abs(out.glowmask));
+    }
+    MA.saveProject('art/blockbench/greek/' + NAME + '/' + NAME + '.bbmodel', exportsByPath);
 
     // 实测包围盒（摆好姿势后的世界坐标，卡片 Y 即 Blockbench Y）
     const box = new THREE.Box3();

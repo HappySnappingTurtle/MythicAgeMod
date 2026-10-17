@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,17 +26,25 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 主神像核心的渲染器（T11a 设计文档 §5.2；T11b §6）：有该主神的神像模型
  * （{@code geo/block/statue_<主神>.geo.json} + {@code textures/statue/<主神>.png}）时用 GeckoLib 画整尊神像，
- * 朝向随核心方块；没有时退回 T11a 的占位（T8a 神像放大 1.5 倍）。
+ * 朝向随核心方块；有 {@code <主神>_glowmask.png} 时叠加发光层；没有模型时退回 T11a 的占位（T8a 神像放大 1.5 倍）。
  */
 public class StatueCoreRenderer implements BlockEntityRenderer<StatueCoreBlockEntity> {
     private static final float SCALE = 1.5f;
     private final BlockRenderDispatcher blocks;
     private final GeoBlockRenderer<StatueCoreBlockEntity> geo = new GeoBlockRenderer<>(new Model());
-    /** 主神 → 是否有神像模型（资源重载后客户端会重建渲染器，缓存随之清空）。 */
+    /** 带发光层的渲染器：有 {@code textures/statue/<主神>_glowmask.png} 的神像（如哈迪斯的眼睛）用它。 */
+    private final GeoBlockRenderer<StatueCoreBlockEntity> geoGlow = new GeoBlockRenderer<>(new Model());
+    /** 主神 → 是否有神像模型 / 发光贴图（资源重载后客户端会重建渲染器，缓存随之清空）。 */
     private final Map<String, Boolean> hasModel = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> hasGlow = new ConcurrentHashMap<>();
 
     public StatueCoreRenderer(BlockEntityRendererProvider.Context ctx) {
         this.blocks = ctx.getBlockRenderDispatcher();
+        geoGlow.addRenderLayer(new AutoGlowingGeoLayer<>(geoGlow));
+    }
+
+    static ResourceLocation glowOf(String patron) {
+        return ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "textures/statue/" + patron + "_glowmask.png");
     }
 
     static ResourceLocation geoOf(String patron) {
@@ -57,7 +66,9 @@ public class StatueCoreRenderer implements BlockEntityRenderer<StatueCoreBlockEn
     public void render(StatueCoreBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers, int light,
                        int overlay) {
         if (modelFor(be.patron())) {
-            geo.render(be, partialTick, pose, buffers, light, overlay);
+            boolean glow = hasGlow.computeIfAbsent(be.patron(),
+                    p -> Minecraft.getInstance().getResourceManager().getResource(glowOf(p)).isPresent());
+            (glow ? geoGlow : geo).render(be, partialTick, pose, buffers, light, overlay);
             return;
         }
         BlockState core = be.getBlockState();
