@@ -95,15 +95,73 @@ public final class PowerGameTests {
         }
     }
 
+    /** 大型神力：以施法者为中心、持续上界 200 刻（护盾时长）。 */
+    record Big(String id) implements GodPower {
+        @Override
+        public void execute(CastContext ctx) {
+            EXECUTED.incrementAndGet();
+        }
+    }
+
+    /** 产 10 只临时鸡（寿命 60 刻）。 */
+    record Summon(String id) implements GodPower {
+        @Override
+        public void execute(CastContext ctx) {
+            List<net.minecraft.world.entity.animal.Chicken> out = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                var c = EntityType.CHICKEN.create(ctx.level());
+                c.moveTo(ctx.caster().getX() + (i % 5) - 2, ctx.caster().getY(), ctx.caster().getZ() + 3 + i / 5);
+                c.setNoAi(true);
+                ctx.level().addFreshEntity(c);
+                out.add(c);
+            }
+            SUMMONED.add(out);
+            io.github.happysnappingturtle.mythicage.power.TransientEntities.registerTransient(ctx.caster(), out, 60);
+        }
+    }
+
+    /** 产一组 3 个盔甲架（产物）。 */
+    record Product(String id) implements GodPower {
+        @Override
+        public void execute(CastContext ctx) {
+            List<net.minecraft.world.entity.decoration.ArmorStand> out = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                var a = EntityType.ARMOR_STAND.create(ctx.level());
+                a.moveTo(ctx.caster().getX() + i - 1, ctx.caster().getY(), ctx.caster().getZ() + 6);
+                ctx.level().addFreshEntity(a);
+                out.add(a);
+            }
+            PRODUCED.add(out);
+            io.github.happysnappingturtle.mythicage.power.TransientEntities.registerProducts(ctx.caster(), id, out);
+        }
+    }
+
+    static final List<List<net.minecraft.world.entity.animal.Chicken>> SUMMONED = new java.util.concurrent.CopyOnWriteArrayList<>();
+    static final List<List<net.minecraft.world.entity.decoration.ArmorStand>> PRODUCED = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    static PowerSpec big() {
+        return PowerSpec.parse("""
+                {"schemaVersion":1,"id":"test_big","civilization":"greek","form":"scroll","castTicks":0,"cooldownTicks":0,
+                 "targetProfile":"WORLD_AREA","selfCentered":true,"large":true,"durationTicks":200}""", new ArrayList<>());
+    }
+
     @BeforeBatch(batch = BATCH)
     public static void before(ServerLevel level) {
         for (PowerSpec s : List.of(spec("test_hit", 10, "HOSTILE_1", false), spec("test_slow", 40, "HOSTILE_1", false),
-                spec("test_area", 10, "HOSTILE_AREA", true))) {
-            PowerSpecLoader.overrideForTest(s);
+                spec("test_area", 10, "HOSTILE_AREA", true), big(), spec("test_summon", 0, "PLACEMENT", true),
+                spec("test_product", 0, "PLACEMENT", true))) {
+            PowerSpecLoader.overrideForTest(s.id().equals("test_summon") || s.id().equals("test_product")
+                    ? new PowerSpec(s.id(), "", s.civ(), s.form(), 0, 0, s.range(), s.profile(), true, false, s.matrix(), 0)
+                    : s);
         }
         GodPowers.overrideForTest(new Hit("test_hit"));
         GodPowers.overrideForTest(new Hit("test_slow"));
         GodPowers.overrideForTest(new Area("test_area"));
+        GodPowers.overrideForTest(new Big("test_big"));
+        GodPowers.overrideForTest(new Summon("test_summon"));
+        GodPowers.overrideForTest(new Product("test_product"));
+        io.github.happysnappingturtle.mythicage.power.PowerShields.clearForTest();
+        io.github.happysnappingturtle.mythicage.power.TransientEntities.clearForTest();
     }
 
     @AfterBatch(batch = BATCH)
@@ -112,6 +170,8 @@ public final class PowerGameTests {
         GodPowers.overrideForTest(null);
         PowerService.clearForTest();
         level.getServer().setPvpAllowed(true);
+        io.github.happysnappingturtle.mythicage.power.PowerShields.clearForTest();
+        io.github.happysnappingturtle.mythicage.power.TransientEntities.clearForTest();
     }
 
     // ───────────── 搭建 ─────────────
@@ -339,5 +399,178 @@ public final class PowerGameTests {
         PlayerMythData old = io.github.happysnappingturtle.mythicage.player.PlayerDataNbt.read(tag);
         h.assertTrue(old.civ(Civilization.GREEK).powerCooldownUntil() == 0 && old.powerCooldowns().isEmpty(), "旧档缺省 0");
         h.succeed();
+    }
+
+    // ───────────── 共享约束（TC-T12-70～76） ─────────────
+
+    private static void resetCooldowns(Vulnerable p) {
+        data(p).civ(Civilization.GREEK).setPowerCooldownUntil(0);
+        data(p).powerCooldowns().clear();
+    }
+
+    /** 瞄准 + 确认（吟唱 0 刻的神力下一刻就提交）。 */
+    private static PowerReason cast(Vulnerable p) {
+        PowerService.use(p, InteractionHand.MAIN_HAND);
+        return PowerService.use(p, InteractionHand.MAIN_HAND);
+    }
+
+    private static Vulnerable at(GameTestHelper h, String name, String power, int x, int z) {
+        Vulnerable p = caster(h, name, power, 5);
+        BlockPos a = h.absolutePos(new BlockPos(x, 2, z));
+        p.moveTo(a.getX() + 0.5, a.getY(), a.getZ() + 0.5, 0, 0);
+        return p;
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void shield_blocks_large_powers(GameTestHelper h) {
+        floor(h);
+        Vulnerable a = at(h, "pw_big_a", "test_big", 8, 2);
+        Vulnerable b = at(h, "pw_big_b", "test_big", 8, 22);
+        h.assertTrue(cast(a) == PowerReason.OK, "第一个大型神力");
+        h.runAfterDelay(3, () -> {
+            h.assertTrue(PowerService.lastResultForTest(a).orElse(null) == PowerReason.COMMITTED, "已提交");
+            PowerReason r = cast(b);
+            h.assertTrue(r == PowerReason.SHIELDED, "20 格内被护盾拒绝：" + r);
+            h.assertTrue(b.getItemInHand(InteractionHand.MAIN_HAND).getCount() == 5, "不消耗");
+            net.minecraft.world.phys.Vec3 far = a.position().add(40, 0, 0);
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.PowerShields.remaining(h.getLevel(), far) == 0,
+                    "40 格外不受护盾影响");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 160)
+    public static void transient_budget_and_expiry(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = at(h, "pw_summon", "test_summon", 8, 4);
+        SUMMONED.clear();
+        cast(p);
+        h.runAfterDelay(3, () -> {
+            resetCooldowns(p);
+            cast(p);
+        });
+        h.runAfterDelay(8, () -> {
+            h.assertTrue(SUMMONED.size() == 2, "两次各 10 只：" + SUMMONED.size());
+            List<net.minecraft.world.entity.animal.Chicken> first = SUMMONED.get(0);
+            long removed = first.stream().filter(Entity::isRemoved).count();
+            h.assertTrue(removed == 4 && first.subList(0, 4).stream().allMatch(Entity::isRemoved), "第一批最早的 4 只退场");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.TransientEntities.countForTest(p.getUUID()) == 16,
+                    "账上 16 只");
+        });
+        h.runAfterDelay(90, () -> {
+            h.assertTrue(SUMMONED.stream().flatMap(List::stream).allMatch(Entity::isRemoved), "60 刻后全部到期退场");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.TransientEntities.countForTest(p.getUUID()) == 0,
+                    "账已清空");
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void expired_transient_not_loaded(GameTestHelper h) {
+        var c = EntityType.CHICKEN.create(h.getLevel());
+        BlockPos at = h.absolutePos(new BlockPos(4, 2, 4));
+        c.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+        net.minecraft.nbt.CompoundTag t = new net.minecraft.nbt.CompoundTag();
+        t.putUUID("owner", UUID.randomUUID());
+        t.putLong("expires", WorldClock.now(h.getLevel().getServer()) - 1);
+        t.putString("kind", "transient");
+        c.getPersistentData().put("mythic_age:power", t);
+        h.getLevel().addFreshEntity(c);
+        h.assertTrue(h.getLevel().getEntity(c.getUUID()) == null, "载入时已过期的临时实体不进入世界（TC-T12-73）");
+        h.succeed();
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 60)
+    public static void product_group_replaced(GameTestHelper h) {
+        floor(h);
+        Vulnerable p = at(h, "pw_product", "test_product", 8, 4);
+        PRODUCED.clear();
+        cast(p);
+        h.runAfterDelay(3, () -> {
+            resetCooldowns(p);
+            cast(p);
+        });
+        h.runAfterDelay(8, () -> {
+            h.assertTrue(PRODUCED.size() == 2, "两组");
+            h.assertTrue(PRODUCED.get(0).stream().allMatch(Entity::isRemoved), "旧组全部退场");
+            h.assertTrue(PRODUCED.get(1).stream().noneMatch(Entity::isRemoved), "新组在");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.TransientEntities.productsForTest(p.getUUID(),
+                    "test_product").size() == 3, "账上一组 3 个");
+            PRODUCED.get(1).forEach(Entity::discard);
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 120)
+    public static void temp_blocks_restore(GameTestHelper h) {
+        floor(h);
+        ServerLevel level = h.getLevel();
+        UUID owner = UUID.randomUUID();
+        BlockPos air = h.absolutePos(new BlockPos(2, 2, 2));
+        BlockPos grass = h.absolutePos(new BlockPos(4, 1, 2));
+        BlockPos chest = h.absolutePos(new BlockPos(6, 2, 2));
+        BlockPos changed = h.absolutePos(new BlockPos(8, 2, 2));
+        level.setBlock(grass, Blocks.GRASS_BLOCK.defaultBlockState(), 3);
+        level.setBlock(chest, Blocks.CHEST.defaultBlockState(), 3);
+        var glass = Blocks.GLASS.defaultBlockState();
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, air, glass, 40, owner, false)
+                == io.github.happysnappingturtle.mythicage.power.TempBlocks.Result.PLACED, "空气上放");
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, grass, glass, 40, owner, false)
+                == io.github.happysnappingturtle.mythicage.power.TempBlocks.Result.PLACED, "草方块上放");
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, chest, glass, 40, owner, false)
+                == io.github.happysnappingturtle.mythicage.power.TempBlocks.Result.REFUSED_BLOCK_ENTITY, "箱子拒绝");
+        io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, changed, glass, 40, owner, false);
+        h.assertTrue(level.getBlockState(air).is(Blocks.GLASS) && level.getBlockState(grass).is(Blocks.GLASS), "已放下");
+        // TC-T12-76：登记存档往返
+        var data = io.github.happysnappingturtle.mythicage.power.TempBlocks.get(level.getServer());
+        var back = io.github.happysnappingturtle.mythicage.power.TempBlocks.load(data.save(new net.minecraft.nbt.CompoundTag(),
+                level.registryAccess()), level.registryAccess());
+        h.assertTrue(back.entries().containsAll(data.entries()) && back.entries().size() == data.entries().size(),
+                "登记往返一致");
+        h.runAfterDelay(10, () -> level.setBlock(changed, Blocks.STONE.defaultBlockState(), 3));
+        h.runAfterDelay(70, () -> {
+            h.assertTrue(level.getBlockState(air).isAir(), "空气复原");
+            h.assertTrue(level.getBlockState(grass).is(Blocks.GRASS_BLOCK), "草方块复原");
+            h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST), "箱子没动");
+            h.assertTrue(level.getBlockState(changed).is(Blocks.STONE), "被改过的格不覆盖");
+            h.succeed();
+        });
+    }
+
+    // ───────────── terrainEdits（TC-T12-77，单独一批：要临时改全局配置） ─────────────
+
+    private static final String TERRAIN = "power_terrain";
+    private static String savedWorldRules;
+
+    @BeforeBatch(batch = TERRAIN)
+    public static void beforeTerrain(ServerLevel level) {
+        var holder = io.github.happysnappingturtle.mythicage.config.ModConfigs.worldRules();
+        com.google.gson.JsonObject j = holder.schema().toJson(holder.current());
+        j.addProperty("schemaVersion", holder.schema().currentVersion());
+        savedWorldRules = j.toString();
+        j.getAsJsonObject("godPowers").addProperty("terrainEdits", true);
+        holder.reload(j.toString());
+    }
+
+    @AfterBatch(batch = TERRAIN)
+    public static void afterTerrain(ServerLevel level) {
+        io.github.happysnappingturtle.mythicage.config.ModConfigs.worldRules().reload(savedWorldRules);
+    }
+
+    @GameTest(template = T, batch = TERRAIN, timeoutTicks = 80)
+    public static void terrain_edits_permanent_branch(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos perm = h.absolutePos(new BlockPos(2, 2, 2));
+        BlockPos temp = h.absolutePos(new BlockPos(4, 2, 2));
+        var glass = Blocks.GLASS.defaultBlockState();
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, perm, glass, 20, UUID.randomUUID(), true)
+                == io.github.happysnappingturtle.mythicage.power.TempBlocks.Result.PERMANENT, "永久分支：直接放");
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.TempBlocks.place(level, temp, glass, 20, UUID.randomUUID(), false)
+                == io.github.happysnappingturtle.mythicage.power.TempBlocks.Result.PLACED, "没声明永久分支的仍是临时");
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(level.getBlockState(perm).is(Blocks.GLASS), "永久方块不复原");
+            h.assertTrue(level.getBlockState(temp).isAir(), "临时方块照常复原");
+            h.succeed();
+        });
     }
 }

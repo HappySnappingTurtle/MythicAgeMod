@@ -134,6 +134,15 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onDamage);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedOut);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onRightClickItem);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerShields::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onEntityJoin);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onEntityLeave);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onChunkUnload);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onChunkLoad);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerStopping);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
 

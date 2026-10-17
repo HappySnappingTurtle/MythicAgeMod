@@ -155,6 +155,12 @@ public final class PowerService {
     /** 确认：按目标入口选目标或点，校验矩阵、距离、视线与效果自己的条件；通过则开始吟唱。 */
     private static PowerReason confirm(Active a) {
         PowerReason r = pick(a);
+        if (r == PowerReason.OK && a.spec.large()) {
+            long wait = PowerShields.remaining((ServerLevel) a.player.level(), a.origin);
+            if (wait > 0) {
+                return tell(a.player, PowerReason.SHIELDED, CooldownRules.remainingSeconds(wait));
+            }
+        }
         if (r == PowerReason.OK) {
             r = GodPowers.get(a.spec.id()).flatMap(p -> p.validate(context(a, 0))).orElse(PowerReason.OK);
         }
@@ -306,6 +312,13 @@ public final class PowerService {
             }
             a.reaction = reaction;
         }
+        if (a.spec.large()) {
+            long wait = PowerShields.remaining((ServerLevel) p.level(), a.origin);
+            if (wait > 0) {
+                tell(p, PowerReason.SHIELDED, CooldownRules.remainingSeconds(wait));
+                return PowerReason.SHIELDED;
+            }
+        }
         CastContext ctx = context(a, now);
         Optional<PowerReason> bad = power.get().validate(ctx);
         if (bad.isPresent()) {
@@ -334,12 +347,18 @@ public final class PowerService {
             return PowerReason.DUPLICATE;
         }
         if (!r.committed()) {
+            tell(p, PowerReason.ON_COOLDOWN, CooldownRules.remainingSeconds(
+                    CooldownRules.remaining(MythData.get(p), a.spec.civ(), a.spec.id(), now)));
             return PowerReason.ON_COOLDOWN;
         }
         if (!p.getAbilities().instabuild) {
             held.shrink(1);
         }
         showCooldowns(p, a.spec, shared, own);
+        if (a.spec.large()) {
+            // 大型神力：框架自动登记护盾（05 号 §1.2），持续 = 数据里的持续上界
+            PowerShields.add((ServerLevel) p.level(), a.origin, a.spec.durationTicks());
+        }
         power.get().execute(ctx);
         return PowerReason.COMMITTED;
     }
@@ -370,7 +389,8 @@ public final class PowerService {
             a.session.cancel(reason);
         }
         slow(a.player, false);
-        if (reason != PowerReason.COMMITTED) {
+        // 冷却、护盾带剩余秒数，已在源头提示过
+        if (reason != PowerReason.COMMITTED && reason != PowerReason.SHIELDED && reason != PowerReason.ON_COOLDOWN) {
             tell(a.player, reason, 0);
         }
     }
