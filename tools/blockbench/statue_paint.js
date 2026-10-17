@@ -13,6 +13,9 @@
     const OCHRE = '#C79A3E';
     const BRONZE = '#A8782E';
     const DARK_GOLD = '#8A6420';
+    const TEAL = '#2E7D7A';
+    const PATINA = '#5E9C8F';
+    const PATINA_DARK = '#3F6F68';
 
     const hash = (x, y, k) => {
         let h = (x * 374761393 + y * 668265263 + k * 2147483647) | 0;
@@ -22,7 +25,7 @@
 
     const MATERIAL = {
         [MARBLE]: 'marble', [SHADE]: 'cloth', [HAIR]: 'hair', [PLINTH]: 'stone', [GOLD]: 'gold', [BORDER]: 'border',
-        [BRONZE]: 'gold', [DARK_GOLD]: 'gold',
+        [BRONZE]: 'gold', [DARK_GOLD]: 'gold', [TEAL]: 'border', [PATINA]: 'gold', [PATINA_DARK]: 'gold',
     };
 
     const SIDES = ['left', 'front', 'right', 'back'];
@@ -88,6 +91,35 @@
         }
     }
 
+    /** 波浪发（波塞冬）：每 3 行一道起伏的暗线，行间错开，像湿漉漉的长卷浪。 */
+    function waves(H, group, faces, base, seed) {
+        const dark = MA.shade(base, 0.8);
+        const light = MA.shade(base, 1.07);
+        for (const f of faces) {
+            const L = H.local(group, f);
+            if (!L.r) continue;
+            for (let v = 0; v < L.r[3]; v += 3) {
+                const off = (v / 3) % 2 === 0 ? 0 : 2;
+                for (let u = 0; u < L.r[2]; u++) {
+                    const ph = (u + off) % 4;
+                    if (ph === 0 || ph === 1) L.px(u, v + (ph === 1 ? 1 : 0), dark);
+                    else if (ph === 2 && hash(u, v, seed) > 0.5) L.px(u, v, light);
+                }
+            }
+        }
+    }
+
+    /** 海浪纹（卷浪）：高 ≥4 像素的带子上画一行，周期 6。 */
+    function wavePattern(L, color, top) {
+        if (!L.r || L.r[3] - top < 4) return;
+        const key = ['..XXX.', '.X...X', 'X..X..', 'XXX...'];
+        for (let u = 0; u < L.r[2]; u++) {
+            key.forEach((row, j) => {
+                if (row[u % 6] === 'X') L.px(u, top + j, color);
+            });
+        }
+    }
+
     /** 回纹（希腊钥匙纹）：高 ≥4 像素的带子上画一行，周期 6。 */
     function meander(L, color, top) {
         if (!L.r || L.r[3] - top < 4) return;
@@ -130,15 +162,19 @@
             }
         }
 
-        // ── 须发：卷发、卷须 ──
-        curls(H, 'hair_cap', ['top', 'left', 'right', 'back', 'front'], HAIR, 11);
-        curls(H, 'fringe', ['front', 'top'], HAIR, 12);
-        curls(H, 'hair_side', SIDES, HAIR, 13);
-        curls(H, 'beard_front', ['front', 'left', 'right', 'bottom'], HAIR, 14);
-        curls(H, 'beard_chin', SIDES.concat(['bottom']), HAIR, 15);
-        curls(H, 'beard_mid', SIDES.concat(['bottom']), HAIR, 17);
-        curls(H, 'beard_lower', SIDES.concat(['bottom']), HAIR, 18);
-        curls(H, 'beard_side', SIDES, HAIR, 16);
+        // ── 须发：卷发、卷须（宙斯）或波浪发（波塞冬，P.hair_style = 'waves'）──
+        const hairFn = P.hair_style === 'waves' ? waves : curls;
+        hairFn(H, 'hair_cap', ['top', 'left', 'right', 'back', 'front'], HAIR, 11);
+        hairFn(H, 'fringe', ['front', 'top'], HAIR, 12);
+        hairFn(H, 'hair_side', SIDES, HAIR, 13);
+        hairFn(H, 'beard_front', ['front', 'left', 'right', 'bottom'], HAIR, 14);
+        hairFn(H, 'beard_chin', SIDES.concat(['bottom']), HAIR, 15);
+        hairFn(H, 'beard_mid', SIDES.concat(['bottom']), HAIR, 17);
+        hairFn(H, 'beard_lower', SIDES.concat(['bottom']), HAIR, 18);
+        hairFn(H, 'beard_side', SIDES, HAIR, 16);
+        hairFn(H, 'beard_fork', SIDES.concat(['bottom']), HAIR, 19);
+        hairFn(H, 'hair_front_lock', SIDES, HAIR, 20);
+        if (P.hair_style === 'waves') hairFn(H, 'hair_lock', SIDES, HAIR, 21);  // 宙斯定版时垂肩发绺没画卷纹，保持不变
         // 后发：竖向发缕（每 2 列一道暗缝），末端参差
         {
             const L = local('hair_back', 'back');
@@ -272,8 +308,9 @@
                 L.px(L.r[2] - 1, 0, OCHRE, 1, L.r[3]);
             }
         }
+        const band = P.pattern === 'wave' ? wavePattern : meander;
         for (const f of SIDES) {
-            meander(local('skirt_hem', f), GOLD, 0);
+            band(local('skirt_hem', f), GOLD, 0);
         }
         for (const f of SIDES) {
             const L = local('drape_tip', f);
@@ -309,7 +346,7 @@
 
         // ── 台座：上台四周浅刻回纹，下台顶边一道亮线 ──
         for (const f of SIDES) {
-            meander(local('plinth_top', f), MA.shade(PLINTH, 0.84), 0);
+            (P.pattern === 'wave' ? wavePattern : meander)(local('plinth_top', f), MA.shade(PLINTH, 0.84), 0);
             const L = local('plinth_base', f);
             if (L.r) L.px(0, 0, MA.shade(PLINTH, 1.08), L.r[2], 1);
         }
@@ -319,6 +356,60 @@
     }
 
     const EXTRA = {};
+
+    EXTRA.poseidon = (H) => {
+        const { local } = H;
+        for (const f of ['front', 'left', 'right']) {
+            const L = local('fist', f);
+            if (!L.r) continue;
+            for (let i = 1; i <= 3; i++) L.px(Math.round(L.r[2] * i / 4), 1, MA.shade(MARBLE, 0.8), 1, L.r[3] - 2);
+        }
+        // 戟杆螺旋暗纹；戟头叉尖提亮
+        for (const f of SIDES) {
+            const L = local('trident_shaft', f);
+            if (L.r) for (let v = 0; v < L.r[3]; v += 4) L.px(0, v, MA.shade(BRONZE, 0.75), L.r[2], 1);
+            for (const g of ['trident_prong_mid', 'trident_prong_side', 'trident_tip_mid']) {
+                const P2 = local(g, f);
+                if (P2.r) P2.px(0, 0, '#F4DC8A', P2.r[2], 1);
+            }
+        }
+        // 冠齿：顶端提亮
+        for (const g of ['crown_spike_mid', 'crown_spike1', 'crown_spike2', 'crown_spike_side']) {
+            for (const f of SIDES) {
+                const L = local(g, f);
+                if (L.r) L.px(0, 0, '#F4DC8A', L.r[2], 1);
+            }
+        }
+        // 后垂布与斜披带：竖褶
+        for (const g of ['back_drape']) {
+            for (const f of ['back', 'front']) {
+                const L = local(g, f);
+                if (L.r) for (let u = 2; u < L.r[2]; u += 4) L.px(u, 0, MA.shade(SHADE, 0.86), 1, L.r[3]);
+            }
+        }
+        // 海豚：浅色腹部（底面与正背两面的下缘）、眼睛（胸段正背两面靠喙一端）、背鳍暗边
+        for (const g of ['dolphin_tail', 'dolphin_body', 'dolphin_chest', 'dolphin_beak']) {
+            const B = local(g, 'bottom');
+            if (B.r) B.px(0, 0, MA.shade(PATINA, 1.3), B.r[2], B.r[3]);
+            for (const f of ['front', 'back']) {
+                const L = local(g, f);
+                if (L.r) L.px(0, L.r[3] - 1, MA.shade(PATINA, 1.28), L.r[2], 1);
+            }
+        }
+        for (const f of ['front', 'back']) {
+            const L = local('dolphin_chest', f);
+            // 胸段绕 z 转了约 160°，本地 +x 指向喙：正面的 u 随本地 x 增大，眼睛靠高 u 一端；背面相反
+            if (L.r) L.px(f === 'front' ? L.r[2] - 2 : 1, 1, '#1E2A28');
+        }
+        for (const g of ['dolphin_wave', 'dolphin_wave_crest']) {
+            const T = local(g, 'top');
+            if (T.r) for (let u = 0; u < T.r[2]; u++) for (let v = 0; v < T.r[3]; v++) if ((u + v) % 3 === 0) T.px(u, v, '#E8F2EE');
+            for (const f of SIDES) {
+                const L = local(g, f);
+                if (L.r) for (let u = 0; u < L.r[2]; u += 2) L.px(u, 0, '#E8F2EE');
+            }
+        }
+    };
 
     EXTRA.zeus = (H) => {
         const { local } = H;

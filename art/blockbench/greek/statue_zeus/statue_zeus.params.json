@@ -103,25 +103,6 @@
    ]
   },
   {
-   "id": "cape",
-   "parent": "torso",
-   "pivot_model_units": [
-    0,
-    47,
-    -4.4
-   ],
-   "rest_rotation_degrees": [
-    0,
-    0,
-    0
-   ],
-   "pivot_parent_local_units": [
-    0,
-    14,
-    -4.4
-   ]
-  },
-  {
    "id": "upper_arm_r",
    "parent": "torso",
    "pivot_model_units": [
@@ -179,25 +160,6 @@
    ]
   },
   {
-   "id": "bolt",
-   "parent": "hand_r",
-   "pivot_model_units": [
-    -10.4,
-    25,
-    0.3
-   ],
-   "rest_rotation_degrees": [
-    0,
-    0,
-    0
-   ],
-   "pivot_parent_local_units": [
-    0.0,
-    -2,
-    0.0
-   ]
-  },
-  {
    "id": "upper_arm_l",
    "parent": "torso",
    "pivot_model_units": [
@@ -252,25 +214,6 @@
     0.0,
     -9,
     0.3
-   ]
-  },
-  {
-   "id": "sceptre",
-   "parent": "hand_l",
-   "pivot_model_units": [
-    10.4,
-    25,
-    0.3
-   ],
-   "rest_rotation_degrees": [
-    0,
-    0,
-    0
-   ],
-   "pivot_parent_local_units": [
-    0.0,
-    -2,
-    0.0
    ]
   },
   {
@@ -347,6 +290,63 @@
     0.0,
     -12.4,
     0
+   ]
+  },
+  {
+   "id": "cape",
+   "parent": "torso",
+   "pivot_model_units": [
+    0,
+    47,
+    -4.4
+   ],
+   "rest_rotation_degrees": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    14,
+    -4.4
+   ]
+  },
+  {
+   "id": "bolt",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -10.4,
+    25,
+    0.3
+   ],
+   "rest_rotation_degrees": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -2,
+    0.0
+   ]
+  },
+  {
+   "id": "sceptre",
+   "parent": "hand_l",
+   "pivot_model_units": [
+    10.4,
+    25,
+    0.3
+   ],
+   "rest_rotation_degrees": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -2,
+    0.0
    ]
   },
   {
@@ -3660,7 +3660,7 @@
   }
  ],
  "revisions": [
-  "v2.2（2026-10-17 用户：左手有点夸张、面部再精细）：左手收到腰侧前方握杖；面部加粗眉、颧骨、鼻头、三层胡须、下垂的八字须与下唇，眼睛画出眼白与虹膜。",
+  "v2.2（2026-10-17 用户：左手有点夸张、面部再精细）：左手收到腰侧前方握杖；面部加粗眉、颧骨、鼻头、三层胡须、下垂的八字须与下唇，眼睛画出眼白与虹膜。用户定版（「先用这个版本」）；身体与五官抽成 statue_common.py 供三尊共用。",
   "v2.1（自查）：额前加细冠带（只有两鬓的金叶时像耳罩）、瞳孔加深；雷霆锯齿首尾相接；去掉像木板的斜搭布与像眉毛的额前冠叶；鹰改为约 10u 高的金鹰（钩喙、收拢长翅、扇尾）；权杖顶降到 63u 内；台座顶加宽到整格。",
   "v2（2026-10-16 用户：「不太好，参考神话时代」→ 选王者立像）：正面站立，左手拄长权杖、右手把雷霆横举在肩旁，脚边一只鹰，背后披风及踵；英雄比例（肩宽 22u）；高 64u（4 格），底座模板改为 3×5×3。",
   "v1.1：阿耳忒弥西翁式投掷姿势（已废弃）。"
