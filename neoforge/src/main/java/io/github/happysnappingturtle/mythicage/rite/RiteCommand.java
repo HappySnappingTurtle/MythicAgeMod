@@ -107,6 +107,8 @@ public final class RiteCommand {
         }
         Age age = age(ctx);
         reg.update(v.get().withStage(age));
+        reg.byId(v.get().id()).ifPresent(x -> io.github.happysnappingturtle.mythicage.village.VillagePopulation
+                .recordBaseline(ctx.getSource().getLevel(), x));
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.village.stage_set",
                 bell.toShortString(), age.id()), true);
         return 1;

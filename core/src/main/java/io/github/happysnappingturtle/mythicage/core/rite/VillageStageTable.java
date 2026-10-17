@@ -60,6 +60,17 @@ public record VillageStageTable(Civilization civ, Map<Age, Stage> stages) {
         return total;
     }
 
+    /** 吸纳移民的间隔天数：本阶段的 migrationDays，没写（0）时沿用较低阶段的，都没有时为 1。 */
+    public int migrationInterval(Age stage) {
+        for (int i = stage.ordinal(); i >= Age.CLASSICAL.ordinal(); i--) {
+            int d = stage(Age.values()[i]).migrationDays();
+            if (d > 0) {
+                return d;
+            }
+        }
+        return 1;
+    }
+
     /** 卫兵上限：min(6, ⌊人口 × 0.25⌋，人口 ≥ 4 时至少 1) + 当前阶段的加成。 */
     public int guardCap(int population, Age stage) {
         int base = Math.min(GUARD_HARD_CAP, population / 4);

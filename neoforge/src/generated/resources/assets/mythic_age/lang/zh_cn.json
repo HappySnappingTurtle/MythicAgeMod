@@ -96,6 +96,7 @@
   "commands.mythic_age.village.count": "共 %s 个村庄",
   "commands.mythic_age.village.entry": "%s · %s（%s，%s）%s %s %s %s",
   "commands.mythic_age.village.none": "附近没有已登记的村庄",
+  "commands.mythic_age.village.population": "阶段 %s · 成员 %s / 目标 %s（基线 %s）· 空床 %s · 卫兵上限 %s · 上次移民第 %s 天",
   "commands.mythic_age.village.reset": "已注销该村庄登记，稍后按当前配置重新登记",
   "commands.mythic_age.village.stage_set": "村庄 %s 阶段设为 %s",
   "commands.mythic_age.village.unknown": "该位置没有已登记的村庄钟",
@@ -286,8 +287,8 @@
   "mythic_age.rite.offers": "可兑换：",
   "mythic_age.rite.perform": "举行%s",
   "mythic_age.rite.preview.already": "本村已是%s阶段",
-  "mythic_age.rite.preview.guards": "卫兵上限 +%s",
-  "mythic_age.rite.preview.population": "人口目标 +%s、开始吸纳移民",
+  "mythic_age.rite.preview.guards": "卫兵上限 %s → %s",
+  "mythic_age.rite.preview.population": "人口目标 %s → %s，村外会有移民来投奔（要有空床）",
   "mythic_age.rite.preview.rededicate": "你的%s时代次神改为所选次神",
   "mythic_age.rite.preview.shrine": "为所选次神立祠",
   "mythic_age.rite.preview.shrine_of": "立%s祠",
@@ -370,10 +371,12 @@
   "mythic_age.trade.tab.trade": "兑换",
   "mythic_age.trial.classical": "古典试炼",
   "mythic_age.trial.heroic": "英雄试炼",
+  "mythic_age.village.needs_housing": "村里住满了：多盖几间带床的房子，才会有新人来投奔。",
   "mythic_age.village.neutral": "未有信仰",
   "mythic_age.village.patron_known": "你结识了%s之村。",
   "mythic_age.village.patron_line": "本村供奉%s",
   "mythic_age.village.stage_up": "%s升为%s阶段！",
   "mythic_age.village.title": "%s之村",
-  "mythic_age.village.title.plain": "村庄"
+  "mythic_age.village.title.plain": "村庄",
+  "mythic_age.village.title.staged": "%s · %s"
 }

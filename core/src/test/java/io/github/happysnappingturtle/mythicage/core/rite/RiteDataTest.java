@@ -275,4 +275,35 @@ class RiteDataTest {
         assertEquals(2 + 2, s.guardCap(8, Age.HEROIC));
         assertEquals(6 + 3, s.guardCap(40, Age.MYTHIC));
     }
+    // ───────────── 移民判定（TC-T11a-70～72 的规则部分） ─────────────
+
+    private static MigrationRules.Decision decide(Age stage, int members, int target, int beds, long today, long last,
+                                                  boolean near) {
+        return MigrationRules.decide(new MigrationRules.Input(stage, members, target, beds, today, last, 2, near));
+    }
+
+    @Test
+    void tc70_72_migrationDecision() {
+        assertEquals(MigrationRules.Decision.MIGRATE, decide(Age.CLASSICAL, 2, 6, 3, 10, -1, true), "从未吸纳过");
+        assertEquals(MigrationRules.Decision.MIGRATE, decide(Age.CLASSICAL, 2, 6, 3, 10, 8, true), "间隔恰好 2 天");
+        assertEquals(MigrationRules.Decision.NO_BED, decide(Age.CLASSICAL, 2, 6, 0, 10, -1, true));
+        assertEquals(MigrationRules.Decision.WAITING, decide(Age.CLASSICAL, 2, 6, 3, 10, 9, true));
+        assertEquals(MigrationRules.Decision.FULL, decide(Age.CLASSICAL, 6, 6, 3, 10, -1, true));
+        assertEquals(MigrationRules.Decision.FULL, decide(Age.HEROIC, 7, 6, 0, 10, -1, true), "已满时不算缺住居");
+        assertEquals(MigrationRules.Decision.INACTIVE, decide(Age.ARCHAIC, 2, 6, 3, 10, -1, true));
+        assertEquals(MigrationRules.Decision.INACTIVE, decide(Age.NONE, 2, 6, 3, 10, -1, true));
+        assertEquals(MigrationRules.Decision.NO_PLAYER, decide(Age.CLASSICAL, 2, 6, 3, 10, -1, false));
+        assertEquals(MigrationRules.Decision.WAITING, MigrationRules.decide(
+                new MigrationRules.Input(Age.CLASSICAL, 2, 6, 3, 10, 10, 0, true)), "间隔 0 按 1 天");
+    }
+
+    @Test
+    void migrationIntervalFallsBack() {
+        VillageStageTable s = VillageStageTable.parse("""
+                {"schemaVersion":1,"civilization":"greek","stages":{
+                 "classical":{"population":4,"migrationDays":3},"heroic":{"population":6}}}""", new ArrayList<>());
+        assertEquals(3, s.migrationInterval(Age.CLASSICAL));
+        assertEquals(3, s.migrationInterval(Age.HEROIC), "英雄没写，沿用古典");
+        assertEquals(1, VillageStageTable.empty(C).migrationInterval(Age.MYTHIC), "都没有时 1 天");
+    }
 }

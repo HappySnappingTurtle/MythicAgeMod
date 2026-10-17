@@ -119,6 +119,7 @@ public final class MythicAge {
         // 聚落归属与主神（T10a）
         game.addListener(PantheonLoader::onAddReloadListeners);
         game.addListener(VillageService::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);
 

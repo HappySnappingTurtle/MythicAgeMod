@@ -145,7 +145,9 @@ public final class EntityGameTests {
         chargeScenario(helper, e, 8, 5, 65, (start, samples) -> {
             helper.assertTrue(count(samples, ChargeTimeline.Phase.WINDUP) == 19 || count(samples, ChargeTimeline.Phase.WINDUP) == 20,
                     "蓄力应为 20 刻（采样 " + count(samples, ChargeTimeline.Phase.WINDUP) + "）");
-            helper.assertTrue(count(samples, ChargeTimeline.Phase.RECOVER) == 16, "收势应为 16 刻（采样 " + count(samples, ChargeTimeline.Phase.RECOVER) + "）");
+            // 与蓄力一样允许 1 刻采样抖动（2026-10-16：整套并行时 11 轮里 2 次采到 15）
+            int recover16 = count(samples, ChargeTimeline.Phase.RECOVER);
+            helper.assertTrue(recover16 == 15 || recover16 == 16, "收势应为 16 刻（采样 " + recover16 + "）");
             helper.assertTrue(count(samples, ChargeTimeline.Phase.RUN) == 10, "8 格冲刺应为 10 刻（采样 " + count(samples, ChargeTimeline.Phase.RUN) + "）");
             Sample run = first(samples, ChargeTimeline.Phase.RUN);
             Sample recover = first(samples, ChargeTimeline.Phase.RECOVER);

@@ -8,6 +8,8 @@ import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeOffer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
@@ -23,10 +25,11 @@ import java.util.List;
  * @param villagePatron    本村主神 / 此像主神；无村庄的祭司为空
  * @param villageStage     本村阶段（T11a）；主神像处为 NONE
  * @param rites            晋升页数据（T11a）；只在有村庄的祭司处
+ * @param villageNotes     祭司对话页上关于本村的提示（T11a 阶段 ③：「需要更多住居」）
  */
 public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue, int guardianEntityId, Dialogue dialogue,
                         long favor, long cap, Age age, List<OfferView> offers, String villagePatron, Age villageStage,
-                        Optional<RitesView> rites) {
+                        Optional<RitesView> rites, List<Component> villageNotes) {
 
     /** @param favor 「X 恩宠」；shrine 神庙名 */
     public record Labels(String favor, String shrine) {
@@ -82,6 +85,8 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
         buf.writeEnum(v.villageStage);
         buf.writeBoolean(v.rites.isPresent());
         v.rites.ifPresent(r -> RitesView.STREAM_CODEC.encode(buf, r));
+        buf.writeVarInt(v.villageNotes.size());
+        v.villageNotes.forEach(c -> ComponentSerialization.STREAM_CODEC.encode(buf, c));
     }
 
     private static TradeView read(RegistryFriendlyByteBuf buf) {
@@ -111,6 +116,14 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
         String patron = buf.readUtf();
         Age stage = buf.readEnum(Age.class);
         Optional<RitesView> rites = buf.readBoolean() ? Optional.of(RitesView.STREAM_CODEC.decode(buf)) : Optional.empty();
-        return new TradeView(civ, labels, venue, entityId, dialogue, favor, cap, age, offers, patron, stage, rites);
+        int k = buf.readVarInt();
+        if (k > 16) {
+            throw new IllegalArgumentException("村庄提示过多：" + k);
+        }
+        List<Component> notes = new ArrayList<>(k);
+        for (int i = 0; i < k; i++) {
+            notes.add(ComponentSerialization.STREAM_CODEC.decode(buf));
+        }
+        return new TradeView(civ, labels, venue, entityId, dialogue, favor, cap, age, offers, patron, stage, rites, notes);
     }
 }

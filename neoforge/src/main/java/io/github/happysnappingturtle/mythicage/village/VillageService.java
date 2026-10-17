@@ -218,7 +218,7 @@ public final class VillageService {
         villageAt(p.serverLevel(), p.blockPosition(), RANGE).ifPresent(v -> {
             INSIDE.put(p.getUUID(), v.id());
             p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
-            p.connection.send(new ClientboundSetTitleTextPacket(title(v)));
+            p.connection.send(new ClientboundSetTitleTextPacket(stagedTitle(v)));
             p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle(v)));
         });
     }
@@ -247,6 +247,15 @@ public final class VillageService {
     public static Component title(VillageRegistry.Village v) {
         return v.patron().isEmpty() ? Component.translatable("mythic_age.village.title.plain")
                 : Component.translatable("mythic_age.village.title", Component.translatable("mythic_age.god." + v.patron()));
+    }
+
+    /** 进村标题：有文明的村庄一律带阶段后缀，「宙斯之村 · 远古」（U10）；中立村庄不带。 */
+    public static Component stagedTitle(VillageRegistry.Village v) {
+        if (v.civ().isEmpty() || v.stage() == io.github.happysnappingturtle.mythicage.core.player.Age.NONE) {
+            return title(v);
+        }
+        return Component.translatable("mythic_age.village.title.staged", title(v),
+                Component.translatable("mythic_age.age." + v.stage().id()));
     }
 
     public static Component subtitle(VillageRegistry.Village v) {

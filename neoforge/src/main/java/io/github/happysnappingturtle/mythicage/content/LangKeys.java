@@ -138,8 +138,8 @@ public final class LangKeys {
         add("mythic_age.rite.preview.you_age", "你进入%s时代", "You enter the %s Age", "あなたは%s時代に入ります");
         add("mythic_age.rite.preview.rededicate", "你的%s时代次神改为所选次神", "Your %s-Age god becomes the chosen one", "あなたの%s時代の小神が選んだ神に変わります");
         add("mythic_age.rite.preview.stage", "本村升为%s阶段", "The village rises to the %s stage", "村が%s段階に上がります");
-        add("mythic_age.rite.preview.population", "人口目标 +%s、开始吸纳移民", "Population goal +%s, newcomers start to arrive", "人口目標 +%s、移住者が来るようになります");
-        add("mythic_age.rite.preview.guards", "卫兵上限 +%s", "Guard limit +%s", "衛兵上限 +%s");
+        add("mythic_age.rite.preview.population", "人口目标 %s → %s，村外会有移民来投奔（要有空床）", "Population goal %s → %s; newcomers arrive if there are free beds", "人口目標 %s → %s。空きベッドがあれば移住者が来ます");
+        add("mythic_age.rite.preview.guards", "卫兵上限 %s → %s", "Guard limit %s → %s", "衛兵上限 %s → %s");
         add("mythic_age.rite.preview.already", "本村已是%s阶段", "The village is already at the %s stage", "村はすでに%s段階です");
         add("mythic_age.rite.preview.shrine", "为所选次神立祠", "A shrine to the chosen god is raised", "選んだ神の祠が建ちます");
         add("mythic_age.rite.preview.shrine_of", "立%s祠", "A shrine to %s is raised", "%sの祠が建ちます");
@@ -211,6 +211,7 @@ public final class LangKeys {
         add("commands.mythic_age.rite.cannot", "当前时代 %s 不能再晋升", "Cannot advance from %s", "%sからは昇格できません");
         add("commands.mythic_age.rite.promoted", "%s 的 %s 晋升为 %s（次神 %s）", "%s %s → %s (minor god %s)", "%s の %s が %s に昇格（小神 %s）");
         add("commands.mythic_age.village.unknown", "该位置没有已登记的村庄钟", "No registered village bell there", "そこに登録済みの村の鐘はありません");
+        add("commands.mythic_age.village.population", "阶段 %s · 成员 %s / 目标 %s（基线 %s）· 空床 %s · 卫兵上限 %s · 上次移民第 %s 天", "Stage %s · members %s / goal %s (baseline %s) · free beds %s · guard limit %s · last newcomer on day %s", "段階 %s・住民 %s / 目標 %s（基準 %s）・空きベッド %s・衛兵上限 %s・最後の移住 %s 日目");
         add("commands.mythic_age.village.stage_set", "村庄 %s 阶段设为 %s", "Village %s stage set to %s", "村 %s の段階を %s に設定");
         add("commands.mythic_age.trial.bad_tier", "试炼档只能是 classical 或 heroic", "Trial tier must be classical or heroic", "試練は classical か heroic のみ");
         add("commands.mythic_age.trial.granted", "%s 的 %s %s 凭证现为 %s", "%s %s %s tokens: %s", "%s の %s %s の証：%s");
@@ -259,6 +260,8 @@ public final class LangKeys {
         add("mythic_age.god.hephaestus", "赫菲斯托斯", "Hephaestus", "ヘパイストス");
         add("mythic_age.village.title", "%s之村", "Village of %s", "%sの村");
         add("mythic_age.village.title.plain", "村庄", "Village", "村");
+        add("mythic_age.village.title.staged", "%s · %s", "%s · %s", "%s・%s");
+        add("mythic_age.village.needs_housing", "村里住满了：多盖几间带床的房子，才会有新人来投奔。", "The village is full: build more houses with beds and newcomers will come.", "村は満員です。ベッドのある家を増やせば、新しい住民がやって来ます。");
         add("mythic_age.village.neutral", "未有信仰", "No faith", "信仰なし");
         add("mythic_age.village.patron_known", "你结识了%s之村。", "You have come to know the village of %s.", "%sの村と縁を結びました。");
         add("mythic_age.village.patron_line", "本村供奉%s", "This village worships %s", "この村は%sを祀っている");

@@ -338,7 +338,16 @@ public final class TradeService {
                 : null;
         return new TradeView(civ, new TradeView.Labels(profile.favor(), profile.shrine()), s.venue(),
                 s.guardianEntityId(), dialogue(player, s, today), data.civ(civ).favor(), MythData.cap(player, civ),
-                data.civ(civ).age(), offers, s.patron(), ctx.villageStage(), Optional.ofNullable(rites));
+                data.civ(civ).age(), offers, s.patron(), ctx.villageStage(), Optional.ofNullable(rites),
+                s.venue() == TradeOffer.Venue.GUARDIAN ? villageNotes(village) : List.of());
+    }
+
+    /** 祭司对话页的本村提示。 */
+    private static List<Component> villageNotes(Optional<VillageRegistry.Village> village) {
+        List<Component> out = new ArrayList<>();
+        village.filter(v -> io.github.happysnappingturtle.mythicage.village.VillagePopulation.needsHousing(v.id()))
+                .ifPresent(v -> out.add(Component.translatable("mythic_age.village.needs_housing")));
+        return out;
     }
 
     private static TradeView.Dialogue dialogue(ServerPlayer player, Session s, long today) {

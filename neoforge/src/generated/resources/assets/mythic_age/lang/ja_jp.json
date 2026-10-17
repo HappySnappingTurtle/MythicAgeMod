@@ -96,6 +96,7 @@
   "commands.mythic_age.village.count": "村 %s 件",
   "commands.mythic_age.village.entry": "%s・%s（%s、%s）%s %s %s %s",
   "commands.mythic_age.village.none": "近くに登録された村はありません",
+  "commands.mythic_age.village.population": "段階 %s・住民 %s / 目標 %s（基準 %s）・空きベッド %s・衛兵上限 %s・最後の移住 %s 日目",
   "commands.mythic_age.village.reset": "村の登録を削除しました。現在の設定で再登録されます",
   "commands.mythic_age.village.stage_set": "村 %s の段階を %s に設定",
   "commands.mythic_age.village.unknown": "そこに登録済みの村の鐘はありません",
@@ -286,8 +287,8 @@
   "mythic_age.rite.offers": "交換可能：",
   "mythic_age.rite.perform": "%sを執り行う",
   "mythic_age.rite.preview.already": "村はすでに%s段階です",
-  "mythic_age.rite.preview.guards": "衛兵上限 +%s",
-  "mythic_age.rite.preview.population": "人口目標 +%s、移住者が来るようになります",
+  "mythic_age.rite.preview.guards": "衛兵上限 %s → %s",
+  "mythic_age.rite.preview.population": "人口目標 %s → %s。空きベッドがあれば移住者が来ます",
   "mythic_age.rite.preview.rededicate": "あなたの%s時代の小神が選んだ神に変わります",
   "mythic_age.rite.preview.shrine": "選んだ神の祠が建ちます",
   "mythic_age.rite.preview.shrine_of": "%sの祠が建ちます",
@@ -370,10 +371,12 @@
   "mythic_age.trade.tab.trade": "交換",
   "mythic_age.trial.classical": "古典の試練",
   "mythic_age.trial.heroic": "英雄の試練",
+  "mythic_age.village.needs_housing": "村は満員です。ベッドのある家を増やせば、新しい住民がやって来ます。",
   "mythic_age.village.neutral": "信仰なし",
   "mythic_age.village.patron_known": "%sの村と縁を結びました。",
   "mythic_age.village.patron_line": "この村は%sを祀っている",
   "mythic_age.village.stage_up": "%sが%s段階に上がりました！",
   "mythic_age.village.title": "%sの村",
-  "mythic_age.village.title.plain": "村"
+  "mythic_age.village.title.plain": "村",
+  "mythic_age.village.title.staged": "%s・%s"
 }

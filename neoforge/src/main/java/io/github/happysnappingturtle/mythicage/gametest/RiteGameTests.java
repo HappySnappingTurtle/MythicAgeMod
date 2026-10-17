@@ -48,7 +48,16 @@ import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
 import io.github.happysnappingturtle.mythicage.trade.TradeView;
 import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
+import io.github.happysnappingturtle.mythicage.village.VillagePopulation;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
+import io.github.happysnappingturtle.mythicage.village.VillageService;
+import io.github.happysnappingturtle.mythicage.core.rite.MigrationRules;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -83,7 +92,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * T11a 阶段 ①② 的集成测试：晋升、立祀、改奉、Boss 凭证、兑换地点、主神像、信仰面板（TC-T11a-40～68、90～99）。
+ * T11a 的集成测试：晋升、立祀、改奉、Boss 凭证、兑换地点、主神像、信仰面板、移民与标题（TC-T11a-40～75、90～99）。
  * 测试文明借用埃及的 id，主神表、晋升表、阶段表、交易表与两个可开关的建筑条件只在本批次注入、批次结束清除。
  * 主神 a、b；古典次神 x(a,b)、y(a)、z(b，未开放)；英雄次神 h(a,b)。
  */
@@ -91,6 +100,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @PrefixGameTestTemplate(false)
 public final class RiteGameTests {
     private static final String BATCH = "rite";
+    private static final String BATCH_MIGRATE = "rite_migrate";
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
     private static final Civilization TC = Civilization.EGYPTIAN;
     private static final Civilization GR = Civilization.GREEK;
@@ -169,6 +179,16 @@ public final class RiteGameTests {
         RiteTables.overridePromotionForTest(promotion(GR, PROMOTION));
         RiteTables.overrideStagesForTest(VillageStageTable.parse(STAGES, new ArrayList<>()));
         TradeTableLoader.overrideForTest(TradeTable.parse(TABLE, TradeTableLoader.ITEMS));
+    }
+
+    @BeforeBatch(batch = BATCH_MIGRATE)
+    public static void beforeMigrate(ServerLevel level) {
+        before(level);
+    }
+
+    @AfterBatch(batch = BATCH_MIGRATE)
+    public static void afterMigrate(ServerLevel level) {
+        after(level);
     }
 
     @AfterBatch(batch = BATCH)
@@ -253,6 +273,7 @@ public final class RiteGameTests {
             s.priest().discard();
         }
         TradeService.clearForTest();
+        VillagePopulation.clearForTest();
     }
 
     // ───────────── 晋升（TC-T11a-40～44） ─────────────
@@ -757,6 +778,156 @@ public final class RiteGameTests {
             GraceSources.overrideForTest(TC, null);
         }
         cleanup(h, v1, v2, v3);
+        h.succeed();
+    }
+
+    // ───────────── 阶段效果：移民、基线、标题、卫兵上限（TC-T11a-70～75） ─────────────
+
+    /** 只登记、不放祭司的村庄。 */
+    private static VillageRegistry.Village village(GameTestHelper h, String patron, Age stage, int x, int z, int baseline) {
+        BlockPos bell = h.absolutePos(new BlockPos(x, 2, z));
+        VillageRegistry.Village v = new VillageRegistry.Village(UUID.randomUUID(), GlobalPos.of(h.getLevel().dimension(), bell),
+                TC.id(), patron, VillageRegistry.Origin.VANILLA, null, "plains", -1, stage, Map.of(), baseline, -1);
+        VillageRegistry.get(h.getLevel().getServer()).add(v);
+        return v;
+    }
+
+    /** n 名聚会点指向该钟、不动的成年村民。 */
+    private static List<Villager> members(GameTestHelper h, GlobalPos bell, int n, int x, int z) {
+        List<Villager> out = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            Villager v = h.spawn(EntityType.VILLAGER, new BlockPos(x + i, 2, z));
+            v.setNoAi(true);
+            v.getBrain().setMemory(MemoryModuleType.MEETING_POINT, bell);
+            out.add(v);
+        }
+        return out;
+    }
+
+    private static void bed(GameTestHelper h, int x, int z) {
+        h.setBlock(new BlockPos(x, 2, z), Blocks.RED_BED.defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH)
+                .setValue(BedBlock.PART, BedPart.FOOT));
+        h.setBlock(new BlockPos(x, 2, z - 1), Blocks.RED_BED.defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH)
+                .setValue(BedBlock.PART, BedPart.HEAD));
+    }
+
+    private static VillageRegistry.Village current(GameTestHelper h, VillageRegistry.Village v) {
+        return VillageRegistry.get(h.getLevel().getServer()).byId(v.id()).orElseThrow();
+    }
+
+    private static List<Villager> villagersNear(GameTestHelper h, GlobalPos bell) {
+        return h.getLevel().getEntitiesOfClass(Villager.class, new AABB(bell.pos()).inflate(20), x -> x.isAlive());
+    }
+
+    // 单独一批：床会被 48 格内别的测试村庄数到
+    @GameTest(template = T, batch = BATCH_MIGRATE, skyAccess = true, timeoutTicks = 600)
+    public static void migration_spawns_and_walks(GameTestHelper h) {
+        floor(h);
+        // TC-T11a-70：古典、基线 2 → 目标 6；成员 2、空床 3、附近有玩家、从未吸纳
+        VillageRegistry.Village v = village(h, "a", Age.CLASSICAL, 8, 18, 2);
+        members(h, v.bell(), 2, 6, 32);
+        bed(h, 1, 2);
+        bed(h, 3, 2);
+        bed(h, 5, 2);
+        h.assertTrue(VillagePopulation.freeBeds(h.getLevel(), v.bell().pos()) == 3, "3 张空床：" + VillagePopulation.freeBeds(h.getLevel(), v.bell().pos()));
+        h.assertTrue(VillagePopulation.members(h.getLevel(), v.bell()) == 2 && VillagePopulation.target(v, 2) == 6, "成员 2、目标 6");
+        List<Villager> before = villagersNear(h, v.bell());
+        // 结构只有 17 格宽：半径固定 8 格，落在场地内；移民离钟 6 格内算到达（VillagePopulation.ARRIVED）
+        MigrationRules.Decision d = VillagePopulation.step(h.getLevel(), v, true, h.getLevel().getRandom(), 8, 8);
+        h.assertTrue(d == MigrationRules.Decision.MIGRATE, "应吸纳：" + d);
+        List<Villager> after = villagersNear(h, v.bell());
+        after.removeAll(before);
+        h.assertTrue(after.size() == 1, "生成 1 名移民：" + after.size());
+        Villager m = after.getFirst();
+        double start = Math.sqrt(m.blockPosition().distSqr(v.bell().pos()));
+        h.assertTrue(start >= 7 && start <= 9.5, "在钟外约 8 格：" + start);
+        h.assertTrue(m.getBrain().getMemory(MemoryModuleType.MEETING_POINT).filter(v.bell()::equals).isPresent(), "聚会点为本钟");
+        h.assertTrue(current(h, v).lastMigrationDay() == MythDays.today(h.getLevel().getServer()), "记下吸纳日");
+        h.assertTrue(VillagePopulation.members(h.getLevel(), v.bell()) == 3, "成员 3");
+        // TC-T11a-72：同一天再查——间隔未到
+        h.assertTrue(VillagePopulation.step(h.getLevel(), current(h, v), true, h.getLevel().getRandom(), 8, 8)
+                == MigrationRules.Decision.WAITING, "间隔未到");
+        h.succeedWhen(() -> {
+            double dist = Math.sqrt(m.blockPosition().distSqr(v.bell().pos()));
+            h.assertTrue(dist < VillagePopulation.ARRIVED, "移民走到钟附近：" + start + " → " + dist);
+            VillageRegistry.get(h.getLevel().getServer()).remove(v.bell());
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void migration_blocked_cases(GameTestHelper h) {
+        floor(h);
+        // TC-T11a-71：没有空床 → 不生成；祭司对话页「需要更多住居」
+        Site s = site(h, TC, "a", Age.CLASSICAL, 4, 4);
+        VillageRegistry reg = VillageRegistry.get(h.getLevel().getServer());
+        reg.update(s.current(h).withPopulation(2, -1));
+        members(h, s.village().bell(), 2, 2, 12);
+        int n0 = villagersNear(h, s.village().bell()).size();
+        h.assertTrue(VillagePopulation.step(h.getLevel(), s.current(h), true, h.getLevel().getRandom(), 5, 7)
+                == MigrationRules.Decision.NO_BED && VillagePopulation.needsHousing(s.village().id()), "没有空床");
+        FakePlayer p = player(h, "rt_housing", TC, Age.CLASSICAL, 10);
+        at(p, s);
+        List<Component> notes = TradeService.viewForTest(p).orElseThrow().villageNotes();
+        h.assertTrue(notes.size() == 1 && ((TranslatableContents) notes.getFirst().getContents()).getKey()
+                .equals("mythic_age.village.needs_housing"), "对话页提示：" + notes);
+        // TC-T11a-72：附近没有玩家 / 成员已满 / 远古 → 都不生成
+        bed(h, 14, 30);
+        h.assertTrue(VillagePopulation.step(h.getLevel(), s.current(h), false, h.getLevel().getRandom(), 5, 7)
+                == MigrationRules.Decision.NO_PLAYER, "没有玩家");
+        reg.update(s.current(h).withPopulation(0, -1));
+        members(h, s.village().bell(), 2, 6, 12);
+        h.assertTrue(VillagePopulation.step(h.getLevel(), s.current(h), true, h.getLevel().getRandom(), 5, 7)
+                == MigrationRules.Decision.FULL && !VillagePopulation.needsHousing(s.village().id()), "目标 4、成员 4：已满");
+        reg.update(s.current(h).withStage(Age.ARCHAIC).withPopulation(2, -1));
+        h.assertTrue(VillagePopulation.step(h.getLevel(), s.current(h), true, h.getLevel().getRandom(), 5, 7)
+                == MigrationRules.Decision.INACTIVE, "远古不吸纳");
+        h.assertTrue(villagersNear(h, s.village().bell()).size() == n0 + 2, "除补的 2 名成员外一个都没生成");
+        cleanup(h, s);
+        h.succeed();
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void baseline_title_and_guards(GameTestHelper h) {
+        floor(h);
+        Site s = site(h, TC, "a", Age.ARCHAIC, 4, 4);
+        members(h, s.village().bell(), 4, 2, 12);
+        FakePlayer p = player(h, "rt_baseline", TC, Age.ARCHAIC, 40);
+        p.getInventory().add(new ItemStack(Items.COBBLESTONE, 2));
+        at(p, s);
+        // TC-T11a-75：晋升页预告的人口目标与卫兵上限 = 同一套公式
+        RitesView.Option opt = TradeService.viewForTest(p).orElseThrow().rites().orElseThrow().options().getFirst();
+        VillageStageTable table = RiteTables.stages(TC);
+        Object[] guards = opt.preview().stream().map(c -> c.getContents()).filter(c -> c instanceof TranslatableContents t
+                && t.getKey().equals("mythic_age.rite.preview.guards")).map(c -> ((TranslatableContents) c).getArgs())
+                .findFirst().orElseThrow(() -> new GameTestAssertException("预告里没有卫兵上限：" + opt.preview()));
+        h.assertTrue(guards[0].equals(table.guardCap(4, Age.ARCHAIC)) && guards[1].equals(table.guardCap(4, Age.CLASSICAL))
+                && guards[0].equals(1) && guards[1].equals(2), "卫兵上限 1 → 2：" + java.util.Arrays.toString(guards));
+        Object[] pop = opt.preview().stream().map(c -> c.getContents()).filter(c -> c instanceof TranslatableContents t
+                && t.getKey().equals("mythic_age.rite.preview.population")).map(c -> ((TranslatableContents) c).getArgs())
+                .findFirst().orElseThrow();
+        h.assertTrue(pop[0].equals(4) && pop[1].equals(8), "人口目标 4 → 8：" + java.util.Arrays.toString(pop));
+        // TC-T11a-74：远古标题也带后缀
+        Object[] title = ((TranslatableContents) VillageService.stagedTitle(s.current(h)).getContents()).getArgs();
+        h.assertTrue(title.length == 2 && ((TranslatableContents) ((Component) title[1]).getContents()).getKey()
+                .equals("mythic_age.age.archaic"), "「a之村 · 远古」");
+        // TC-T11a-73：首次升到古典时记下基线 = 当时成员数
+        h.assertTrue(s.current(h).baseline() < 0, "远古未记基线");
+        expect(h, rite(h, p, s, TC, RiteKind.PROMOTION, Age.NONE, "x"), RiteService.Reason.OK);
+        h.assertTrue(s.current(h).baseline() == 4, "基线 4：" + s.current(h).baseline());
+        title = ((TranslatableContents) VillageService.stagedTitle(s.current(h)).getContents()).getArgs();
+        h.assertTrue(((TranslatableContents) ((Component) title[1]).getContents()).getKey().equals("mythic_age.age.classical"),
+                "「a之村 · 古典」");
+        // 无主神：「村庄 · 远古」；中立：不带后缀
+        VillageRegistry.Village plain = new VillageRegistry.Village(UUID.randomUUID(), s.village().bell(), TC.id(), "",
+                VillageRegistry.Origin.VANILLA, null, "plains", -1, Age.ARCHAIC, Map.of(), -1, -1);
+        Object[] pt = ((TranslatableContents) VillageService.stagedTitle(plain).getContents()).getArgs();
+        h.assertTrue(((TranslatableContents) ((Component) pt[0]).getContents()).getKey().equals("mythic_age.village.title.plain"),
+                "无主神：村庄 · 远古");
+        VillageRegistry.Village neutral = new VillageRegistry.Village(UUID.randomUUID(), s.village().bell(), "", "",
+                VillageRegistry.Origin.VANILLA, null, "plains", -1, Age.NONE, Map.of(), -1, -1);
+        h.assertTrue(((TranslatableContents) VillageService.stagedTitle(neutral).getContents()).getKey()
+                .equals("mythic_age.village.title.plain"), "中立村庄不带后缀");
+        cleanup(h, s);
         h.succeed();
     }
 

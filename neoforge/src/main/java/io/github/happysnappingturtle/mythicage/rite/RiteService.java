@@ -26,6 +26,7 @@ import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import io.github.happysnappingturtle.mythicage.trade.TradeTableLoader;
 import io.github.happysnappingturtle.mythicage.village.PantheonLoader;
+import io.github.happysnappingturtle.mythicage.village.VillagePopulation;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import io.github.happysnappingturtle.mythicage.village.VillageService;
 import net.minecraft.network.chat.Component;
@@ -184,7 +185,7 @@ public final class RiteService {
                     items(offers, c.id(), TradeOffer.Category.SUMMON), items(offers, c.id(), null)));
         }
         return new RitesView.Option(kind, p.target(), p.approved(), e.cost().favor(), cands, e.lines(), blocking,
-                preview(civ, v, p), current);
+                preview(player.serverLevel(), civ, v, p), current);
     }
 
     /** 某次神的商品图标：category 为空时取神力、召唤以外的类别。 */
@@ -199,7 +200,7 @@ public final class RiteService {
         return out;
     }
 
-    private static List<Component> preview(Civilization civ, VillageRegistry.Village v, RiteRules.Plan p) {
+    private static List<Component> preview(ServerLevel level, Civilization civ, VillageRegistry.Village v, RiteRules.Plan p) {
         List<Component> out = new ArrayList<>();
         if (p.target() == Age.NONE) {
             return out;
@@ -213,13 +214,21 @@ public final class RiteService {
         }
         if (p.kind() != RiteKind.REDEDICATION) {
             if (p.target().atLeast(v.stage()) && p.target() != v.stage()) {
-                VillageStageTable.Stage st = RiteTables.stages(civ).stage(p.target());
+                VillageStageTable table = RiteTables.stages(civ);
+                VillageStageTable.Stage st = table.stage(p.target());
                 out.add(Component.translatable("mythic_age.rite.preview.stage", age));
-                if (st.population() > 0) {
-                    out.add(Component.translatable("mythic_age.rite.preview.population", st.population()));
+                // 按本村现有成员算出前后的人口目标与卫兵上限（D9、D10；与 VillagePopulation 同一套公式）
+                int members = VillagePopulation.members(level, v.bell());
+                int base = v.baseline() >= 0 ? v.baseline() : members;
+                int popBefore = table.populationTarget(base, v.stage());
+                int popAfter = table.populationTarget(base, p.target());
+                if (popAfter > popBefore) {
+                    out.add(Component.translatable("mythic_age.rite.preview.population", popBefore, popAfter));
                 }
-                if (st.guards() > 0) {
-                    out.add(Component.translatable("mythic_age.rite.preview.guards", st.guards()));
+                int guardsBefore = table.guardCap(members, v.stage());
+                int guardsAfter = table.guardCap(members, p.target());
+                if (guardsAfter > guardsBefore) {
+                    out.add(Component.translatable("mythic_age.rite.preview.guards", guardsBefore, guardsAfter));
                 }
                 st.preview().forEach(k -> out.add(Component.translatable(k)));
             } else {
@@ -307,6 +316,7 @@ public final class RiteService {
         VillageRegistry reg = VillageRegistry.get(player.server);
         VillageRegistry.Village updated = v.withRite(change.stage(), change.shrineAge(), change.shrineGod());
         reg.update(updated);
+        updated = VillagePopulation.recordBaseline(player.serverLevel(), updated);
         if (updated.stage() != v.stage()) {
             announceStage(player, updated);
         }

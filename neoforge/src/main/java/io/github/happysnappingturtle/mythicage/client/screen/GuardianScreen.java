@@ -510,8 +510,11 @@ public class GuardianScreen extends Screen {
         int y = line(g, Component.translatable(key), left + 12, top + 52, W - 24, TEXT);
         if (!view.villagePatron().isEmpty()) {
             // 本村供奉的主神（T10a）；次神候选只在晋升页显示（18 号 §4）
-            line(g, Component.translatable("mythic_age.village.patron_line",
+            y = line(g, Component.translatable("mythic_age.village.patron_line",
                     Component.translatable("mythic_age.god." + view.villagePatron())), left + 12, y + 6, W - 24, PURPLE);
+        }
+        for (Component note : view.villageNotes()) {
+            y = line(g, note, left + 12, y + 6, W - 24, DIM);
         }
     }
 
