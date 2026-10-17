@@ -70,6 +70,7 @@ public final class MythicAge {
         ModEntities.init(modBus);
         ModRegistries.register(modBus);
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.register(modBus);
+        io.github.happysnappingturtle.mythicage.power.PowerItems.register(modBus);
         modBus.addListener(ModDataGen::gather);
         ModAttachments.register(modBus);
         modBus.addListener(MythNetwork::onRegisterPayloads);
@@ -127,6 +128,12 @@ public final class MythicAge {
 
         // 晋升、立祀、改奉与主神像（T11a）
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);
+        // 神力执行框架（T12）
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerSpecLoader::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onDamage);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedOut);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onRightClickItem);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
 

@@ -302,6 +302,26 @@ public final class LangKeys {
         add("mythic_age.rite.rededication", "改奉", "Rededication", "改宗");
         add("mythic_age.favor.greek", "希腊恩宠", "Greek Favor", "ギリシャの恩寵");
         add("mythic_age.faith.greek.hint", "到平原与草甸的希腊村庄，找神庙祭司", "Find the temple priest in a Greek village on the plains or meadows", "平原や草原のギリシャの村で神殿の神官を探そう");
+        // 神力执行框架（T12）
+        add("mythic_age.power.aiming", "瞄准：%s（再次右键确认，潜行 + 右键取消）", "Aiming: %s (right-click again to confirm, sneak + right-click to cancel)", "照準：%s（もう一度右クリックで確定、スニーク + 右クリックで中止）");
+        add("mythic_age.power.channeling", "吟唱：%s……", "Invoking: %s…", "詠唱：%s……");
+        add("mythic_age.power.reason.committed", "神力已降临", "The power descends", "神の力が降りた");
+        add("mythic_age.power.reason.not_registered", "这件神力还不能使用", "This power cannot be used yet", "この神の力はまだ使えません");
+        add("mythic_age.power.reason.on_cooldown", "神力冷却中，还要 %s 秒", "On cooldown: %s s left", "クールダウン中：あと %s 秒");
+        add("mythic_age.power.reason.no_item", "手里没有这件神力道具了", "You no longer hold this power", "この神の力をもう持っていません");
+        add("mythic_age.power.reason.no_target", "没有对准目标", "No target in sight", "対象が照準にありません");
+        add("mythic_age.power.reason.invalid_target", "这个目标不受这项神力影响", "This target is not affected by this power", "この対象には効きません");
+        add("mythic_age.power.reason.out_of_range", "太远了", "Too far away", "遠すぎます");
+        add("mythic_age.power.reason.no_line_of_sight", "看不到目标", "No line of sight", "対象が見えません");
+        add("mythic_age.power.reason.placement_invalid", "不能放在这里", "Cannot be placed here", "ここには置けません");
+        add("mythic_age.power.reason.shielded", "附近有神力护盾，还要 %s 秒", "A god power shield is active nearby: %s s left", "近くに神の力の護りがあります：あと %s 秒");
+        add("mythic_age.power.reason.interrupted_damage", "受到攻击，吟唱被打断", "Interrupted by damage", "攻撃を受けて詠唱が途切れた");
+        add("mythic_age.power.reason.interrupted_switch", "换了手持物品，施放已取消", "Cancelled: you switched items", "持ち替えたため中止しました");
+        add("mythic_age.power.reason.interrupted_screen", "打开了界面，施放已取消", "Cancelled: a screen was opened", "画面を開いたため中止しました");
+        add("mythic_age.power.reason.interrupted_death", "施放已取消", "Cancelled", "中止しました");
+        add("mythic_age.power.reason.target_lost", "目标丢失，施放已取消", "Target lost; cancelled", "対象を見失ったため中止しました");
+        add("mythic_age.power.reason.aim_timeout", "瞄准太久，已取消", "Aiming timed out", "照準の時間切れ");
+        add("mythic_age.power.reason.cancelled", "已取消", "Cancelled", "中止しました");
         // 信仰面板（T11a 阶段 ②）
         add("key.categories.mythic_age", "神话时代", "Mythic Age", "ミシックエイジ");
         add("key.mythic_age.faith", "打开信仰面板", "Open faith panel", "信仰パネルを開く");

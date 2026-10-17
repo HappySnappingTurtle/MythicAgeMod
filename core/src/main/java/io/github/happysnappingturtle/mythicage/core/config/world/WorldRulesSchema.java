@@ -22,7 +22,7 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
     private static final Pattern KIND = Pattern.compile("[a-z0-9_]+");
 
     private static final WorldRulesConfig DEFAULTS =
-            new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(false),
+            new WorldRulesConfig(true, true, true, WorldRulesConfig.GodPowers.DEFAULTS,
                     new WorldRulesConfig.Recipes(new WorldRulesConfig.AgeGated(true, false)),
                     Map.of("greek:altar", WorldRulesConfig.Shrine.GREEK_ALTAR),
                     WorldRulesConfig.Guardians.DEFAULTS, WorldRulesConfig.Greek.DEFAULTS);
@@ -78,12 +78,22 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
                 root.bool("beneficialConversions", base.beneficialConversions()),
                 root.bool("mobBlockDamage", base.mobBlockDamage()),
                 root.bool("blockEntityStall", base.blockEntityStall()),
-                new WorldRulesConfig.GodPowers(
-                        root.object("godPowers").bool("terrainEdits", base.godPowers().terrainEdits())),
+                readGodPowers(root.object("godPowers"), base.godPowers()),
                 readRecipes(root.object("recipes"), base.recipes()),
                 shrines,
                 readGuardians(root.object("guardians"), base.guardians()),
                 greek);
+    }
+
+    /** {@code godPowers}（T12）：旧文件只有 terrainEdits 时其余取默认。 */
+    private static WorldRulesConfig.GodPowers readGodPowers(ObjectReader g, WorldRulesConfig.GodPowers base) {
+        return new WorldRulesConfig.GodPowers(
+                g.bool("terrainEdits", base.terrainEdits()),
+                g.intIn("civSharedCooldownTicks", base.civSharedCooldownTicks(), 0, 24000),
+                g.intIn("transientEntityCap", base.transientEntityCap(), 0, 1024),
+                g.intIn("transientPerPlayer", base.transientPerPlayer(), 0, 64),
+                g.intIn("shieldRadius", base.shieldRadius(), 0, 256),
+                g.intIn("aimTimeoutTicks", base.aimTimeoutTicks(), 20, 1200));
     }
 
     /** {@code shrines.<文明>.<种类>}：按文明、按种类与已有值合并。 */
@@ -155,6 +165,11 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         root.addProperty("blockEntityStall", value.blockEntityStall());
         JsonObject godPowers = new JsonObject();
         godPowers.addProperty("terrainEdits", value.godPowers().terrainEdits());
+        godPowers.addProperty("civSharedCooldownTicks", value.godPowers().civSharedCooldownTicks());
+        godPowers.addProperty("transientEntityCap", value.godPowers().transientEntityCap());
+        godPowers.addProperty("transientPerPlayer", value.godPowers().transientPerPlayer());
+        godPowers.addProperty("shieldRadius", value.godPowers().shieldRadius());
+        godPowers.addProperty("aimTimeoutTicks", value.godPowers().aimTimeoutTicks());
         root.add("godPowers", godPowers);
         JsonObject gated = new JsonObject();
         gated.addProperty("enabled", value.recipes().ageGated().enabled());

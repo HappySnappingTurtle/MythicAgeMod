@@ -38,6 +38,8 @@ public final class PlayerMythData {
         private final Map<UUID, RiteMark> riteVillages = new LinkedHashMap<>();
         /** 已晋升、还没弹过成功界面的时代（按晋升顺序）。 */
         private final List<Age> pendingUnlocks = new java.util.ArrayList<>();
+        /** 本文明神力的共享短冷却到期时刻（世界时钟刻，T12）；0 = 无。 */
+        private long powerCooldownUntil;
 
         public long favor() {
             return favor;
@@ -124,13 +126,21 @@ public final class PlayerMythData {
             return pendingUnlocks;
         }
 
+        public long powerCooldownUntil() {
+            return powerCooldownUntil;
+        }
+
+        public void setPowerCooldownUntil(long tick) {
+            this.powerCooldownUntil = Math.max(0, tick);
+        }
+
         @Override
         public boolean equals(Object o) {
             return o instanceof CivState c && c.favor == favor && c.age == age
                     && List.copyOf(c.knownPatrons).equals(List.copyOf(knownPatrons)) && c.minorGods.equals(minorGods)
                     && c.approvals.equals(approvals) && c.trialVouchers.equals(trialVouchers)
                     && c.rededicatedDay == rededicatedDay && c.riteVillages.equals(riteVillages)
-                    && c.pendingUnlocks.equals(pendingUnlocks);
+                    && c.pendingUnlocks.equals(pendingUnlocks) && c.powerCooldownUntil == powerCooldownUntil;
         }
 
         @Override
@@ -148,6 +158,7 @@ public final class PlayerMythData {
             rededicatedDay = o.rededicatedDay;
             riteVillages.putAll(o.riteVillages);
             pendingUnlocks.addAll(o.pendingUnlocks);
+            powerCooldownUntil = o.powerCooldownUntil;
         }
     }
 
@@ -172,6 +183,8 @@ public final class PlayerMythData {
     private final Set<String> firstKills = new LinkedHashSet<>();
     /** 试炼 Boss 合法击败次数（T11a）：Boss 实体 id → 次数。 */
     private final Map<String, Integer> trialKills = new LinkedHashMap<>();
+    /** 各神力的长冷却到期时刻（世界时钟刻，T12）：神力 id → 刻。 */
+    private final Map<String, Long> powerCooldowns = new LinkedHashMap<>();
     private final Set<String> discoveries = new LinkedHashSet<>();
     private final Set<String> blueprints = new LinkedHashSet<>();
     private final Map<String, ForgeRecord> forgeRecords = new LinkedHashMap<>();
@@ -193,6 +206,10 @@ public final class PlayerMythData {
 
     public Set<String> firstKills() {
         return firstKills;
+    }
+
+    public Map<String, Long> powerCooldowns() {
+        return powerCooldowns;
     }
 
     public Map<String, Integer> trialKills() {
@@ -270,6 +287,7 @@ public final class PlayerMythData {
         }
         c.firstKills.addAll(firstKills);
         c.trialKills.putAll(trialKills);
+        c.powerCooldowns.putAll(powerCooldowns);
         c.discoveries.addAll(discoveries);
         c.blueprints.addAll(blueprints);
         c.forgeRecords.putAll(forgeRecords);
@@ -291,7 +309,7 @@ public final class PlayerMythData {
         return o instanceof PlayerMythData d
                 && civs.equals(d.civs)
                 && List.copyOf(firstKills).equals(List.copyOf(d.firstKills))
-                && trialKills.equals(d.trialKills)
+                && trialKills.equals(d.trialKills) && powerCooldowns.equals(d.powerCooldowns)
                 && List.copyOf(discoveries).equals(List.copyOf(d.discoveries))
                 && List.copyOf(blueprints).equals(List.copyOf(d.blueprints))
                 && forgeRecords.equals(d.forgeRecords)

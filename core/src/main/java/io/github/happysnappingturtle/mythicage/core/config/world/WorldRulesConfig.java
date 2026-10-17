@@ -51,7 +51,18 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
     }
 
     /** @param terrainEdits 神力的永久地形破坏，默认关闭（红线 1） */
-    public record GodPowers(boolean terrainEdits) {
+    /**
+     * 神力（T12 设计文档 §2.8）。
+     *
+     * @param civSharedCooldownTicks 同文明共享短冷却（05 号 §1.1，默认 600 刻 = 30 秒）
+     * @param transientEntityCap     全服临时实体上限（R-CAP，默认 96）
+     * @param transientPerPlayer     每名玩家临时实体上限（R-CAP，默认 16）
+     * @param shieldRadius           神力护盾半径（默认 32 格）
+     * @param aimTimeoutTicks        瞄准多久不确认自动取消（D2，默认 200 刻 = 10 秒）
+     */
+    public record GodPowers(boolean terrainEdits, int civSharedCooldownTicks, int transientEntityCap, int transientPerPlayer,
+                            int shieldRadius, int aimTimeoutTicks) {
+        public static final GodPowers DEFAULTS = new GodPowers(false, 600, 96, 16, 32, 200);
     }
 
     public record Recipes(AgeGated ageGated) {

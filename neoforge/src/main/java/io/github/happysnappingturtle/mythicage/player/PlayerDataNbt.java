@@ -18,9 +18,10 @@ import java.util.Optional;
  * 读取时遇到未知文明、非法时代或负数恩宠，只跳过或修正那一项并记录警告，不让整份数据作废。
  * 格式 2（T11a）：各文明加主神认可、Boss 凭证、改奉日、仪式村庄、待弹成功界面，根加试炼击败次数；
  * 格式 1 的存档缺这些字段，读作空。
+ * 格式 3（T12）：各文明加神力共享冷却到期刻，根加各神力长冷却到期刻；旧档缺省为 0。
  */
 public final class PlayerDataNbt {
-    public static final int FORMAT = 2;
+    public static final int FORMAT = 3;
 
     private PlayerDataNbt() {
     }
@@ -56,6 +57,7 @@ public final class PlayerDataNbt {
             ListTag pending = new ListTag();
             state.pendingUnlocks().forEach(a -> pending.add(StringTag.valueOf(a.id())));
             c.put("pendingUnlocks", pending);
+            c.putLong("powerCooldownUntil", state.powerCooldownUntil());
             civs.put(civ.id(), c);
         });
         root.put("civs", civs);
@@ -63,6 +65,9 @@ public final class PlayerDataNbt {
         CompoundTag trialKills = new CompoundTag();
         data.trialKills().forEach(trialKills::putInt);
         root.put("trialKills", trialKills);
+        CompoundTag cooldowns = new CompoundTag();
+        data.powerCooldowns().forEach(cooldowns::putLong);
+        root.put("powerCooldowns", cooldowns);
         root.put("discoveries", strings(data.discoveries()));
         root.put("blueprints", strings(data.blueprints()));
         CompoundTag forge = new CompoundTag();
@@ -128,8 +133,15 @@ public final class PlayerDataNbt {
                 Age.byId(a).ifPresent(godAge -> data.civ(civ.get()).minorGods().put(godAge, gods.getString(a)));
             }
             readRites(c, data.civ(civ.get()));
+            data.civ(civ.get()).setPowerCooldownUntil(c.getLong("powerCooldownUntil"));
         }
         readStrings(root, "firstKills", data.firstKills());
+        CompoundTag cooldowns = root.getCompound("powerCooldowns");
+        for (String id : cooldowns.getAllKeys()) {
+            if (cooldowns.getLong(id) > 0) {
+                data.powerCooldowns().put(id, cooldowns.getLong(id));
+            }
+        }
         CompoundTag trialKills = root.getCompound("trialKills");
         for (String boss : trialKills.getAllKeys()) {
             if (trialKills.getInt(boss) > 0) {

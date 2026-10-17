@@ -25,7 +25,7 @@ class WorldRulesSchemaTest {
     void tc_t3_41_onlyTerrainEditsChanges() {
         ConfigLoadResult<WorldRulesConfig> r = ConfigLoader.load(S, "{\"godPowers\":{\"terrainEdits\":true}}", null);
         WorldRulesConfig d = S.defaults();
-        assertEquals(new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(true), d.recipes(),
+        assertEquals(new WorldRulesConfig(true, true, true, new WorldRulesConfig.GodPowers(true, 600, 96, 16, 32, 200), d.recipes(),
                 d.shrines(), d.guardians(), d.greek()), r.value());
         assertTrue(r.issues().isEmpty());
     }
