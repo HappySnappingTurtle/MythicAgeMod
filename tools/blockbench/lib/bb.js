@@ -225,7 +225,8 @@
             }
             preview.controls.update();
             preview.render();
-            Screencam.screenshotPreview(preview, { crop: false }, (dataUrl) => {
+            // 等视图渲染完再截（立刻截会得到全透明的图，T11b 实测）
+            setTimeout(() => Screencam.screenshotPreview(preview, { crop: false }, (dataUrl) => {
                 try {
                     const p = MA.abs(rel);
                     fs.mkdirSync(path.dirname(p), { recursive: true });
@@ -234,7 +235,7 @@
                 } catch (e) {
                     reject(e);
                 }
-            });
+            }), 400);
         });
 
     MA.reset = () => {
