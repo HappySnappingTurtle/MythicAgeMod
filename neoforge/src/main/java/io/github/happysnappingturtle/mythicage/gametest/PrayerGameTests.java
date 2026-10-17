@@ -310,7 +310,8 @@ public final class PrayerGameTests {
 
     // ───────────── 离家太近（TC-T10-49） ─────────────
 
-    @GameTest(template = T, batch = "prayer_close", timeoutTicks = 800)
+    // 超时 800 → 1600：整套并行时神坛扫描与村民出发偶尔偏晚，走 20 格还没到就超时（2026-10-16，8 轮里 2 次）
+    @GameTest(template = T, batch = "prayer_close", timeoutTicks = 1600)
     public static void too_close_to_home_not_counted(GameTestHelper h) {
         ground(h);
         GlobalPos a = altar(h, ALTAR, owner(h, "pr_close"));
@@ -708,6 +709,17 @@ public final class PrayerGameTests {
             h.assertTrue(row.perDay() == st.estimate() && Integer.valueOf(st.believers()).equals(args[1])
                     && String.format(java.util.Locale.ROOT, "%.1f", st.today()).equals(args[2]),
                     "信仰面板与检视界面一致：" + java.util.Arrays.toString(args));
+            // TC-T11a-66：信仰面板的恩宠来源区就是这些行
+            io.github.happysnappingturtle.mythicage.core.player.Age before = MythData.get(p).civ(Civilization.GREEK).age();
+            MythData.get(p).civ(Civilization.GREEK).setAge(io.github.happysnappingturtle.mythicage.core.player.Age.CLASSICAL);
+            var page = io.github.happysnappingturtle.mythicage.faith.FaithService.build(p).pages().get(Civilization.GREEK.ordinal());
+            MythData.get(p).civ(Civilization.GREEK).setAge(before);
+            var panelRow = page.sources().stream().filter(r -> r.pos().equals(a.pos())).findFirst()
+                    .orElseThrow(() -> new GameTestAssertException("面板恩宠来源区没有这座神坛"));
+            h.assertTrue(page.sources().size() == GreekTempleSource.INSTANCE.rows(p).size()
+                    && panelRow.note().equals(row.status())
+                    && String.format(java.util.Locale.ROOT, "%.1f", row.perDay()).equals(
+                    ((TranslatableContents) panelRow.value().getContents()).getArgs()[0]), "面板行与来源一致：" + panelRow);
             PrayerService.resetForTest(a);
         });
     }

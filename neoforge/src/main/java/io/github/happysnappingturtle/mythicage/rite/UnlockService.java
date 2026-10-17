@@ -64,6 +64,13 @@ public final class UnlockService {
         return out;
     }
 
+    /** 信仰面板「重看」：再弹一次某个已到达时代的成功界面（不改数据）。 */
+    public static AgeUnlockedPayload replay(ServerPlayer player, Civilization civ, Age age) {
+        AgeUnlockedPayload p = payload(summary(player, civ, age));
+        TradeService.send(player, p);
+        return p;
+    }
+
     /** 某文明进入某时代的清单（上限按「上一时代 → 该时代」求差）。 */
     public static UnlockSummary summary(ServerPlayer player, Civilization civ, Age age) {
         PlayerMythData data = MythData.get(player);

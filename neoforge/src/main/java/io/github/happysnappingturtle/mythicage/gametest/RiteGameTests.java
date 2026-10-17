@@ -20,6 +20,10 @@ import io.github.happysnappingturtle.mythicage.core.trade.TradeTable;
 import io.github.happysnappingturtle.mythicage.core.village.Pantheon;
 import io.github.happysnappingturtle.mythicage.entity.ModEntities;
 import io.github.happysnappingturtle.mythicage.faith.FaithProfiles;
+import io.github.happysnappingturtle.mythicage.faith.FaithService;
+import io.github.happysnappingturtle.mythicage.faith.FaithView;
+import io.github.happysnappingturtle.mythicage.faith.GraceSource;
+import io.github.happysnappingturtle.mythicage.faith.GraceSources;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianEntity;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianTypes;
@@ -79,7 +83,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * T11a 阶段 ① 的集成测试：晋升、立祀、改奉、Boss 凭证、兑换地点、主神像（TC-T11a-40～62、90～99）。
+ * T11a 阶段 ①② 的集成测试：晋升、立祀、改奉、Boss 凭证、兑换地点、主神像、信仰面板（TC-T11a-40～68、90～99）。
  * 测试文明借用埃及的 id，主神表、晋升表、阶段表、交易表与两个可开关的建筑条件只在本批次注入、批次结束清除。
  * 主神 a、b；古典次神 x(a,b)、y(a)、z(b，未开放)；英雄次神 h(a,b)。
  */
@@ -176,6 +180,7 @@ public final class RiteGameTests {
         RiteTables.overridePromotionForTest(null);
         RiteTables.overrideStagesForTest(null);
         TradeTableLoader.overrideForTest(null);
+        GraceSources.overrideForTest(TC, null);
         PLAYER_SWITCH.set(true);
         VILLAGE_SWITCH.set(true);
     }
@@ -639,6 +644,119 @@ public final class RiteGameTests {
         legacy.remove("lastMigration");
         h.assertTrue(VillageRegistry.read(tag, h.getLevel().registryAccess()).byId(v.id()).orElseThrow().stage() == Age.ARCHAIC,
                 "旧登记：有文明 → 远古");
+        h.succeed();
+    }
+
+    // ───────────── 信仰面板（TC-T11a-63～68） ─────────────
+
+    private static FaithView.Page page(FaithView v, Civilization civ) {
+        return v.pages().get(civ.ordinal());
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void faith_panel_pages(GameTestHelper h) {
+        floor(h);
+        Site s = site(h, TC, "a", Age.ARCHAIC, 4, 4);
+        FakePlayer p = player(h, "rt_faith", TC, Age.ARCHAIC, 40);
+        p.getInventory().add(new ItemStack(Items.COBBLESTONE, 2));
+        // TC-T11a-64：远古时，下一次是古典——恩宠、供品、玩家范围的条件；村庄范围的只给一行提示
+        FaithView.Page before = page(FaithService.build(p), TC);
+        h.assertTrue(before.nextAge() == Age.CLASSICAL && before.next().size() == 4 && before.next().get(0).met()
+                && before.next().get(1).met() && before.next().get(2).label().getString().equals("test:switch"),
+                "远古 → 古典的条件行：" + before.next());
+        expect(h, rite(h, p, s, TC, RiteKind.PROMOTION, Age.NONE, "x"), RiteService.Reason.OK);
+        FaithView v = FaithService.build(p);
+        // TC-T11a-63：页签状态
+        FaithView.Page tc = page(v, TC);
+        h.assertTrue(tc.status() == FaithView.Status.CONTACTED, "测试文明已接触");
+        h.assertTrue(page(v, GR).status() == FaithView.Status.UNCONTACTED && !page(v, GR).hint().isEmpty(),
+                "希腊未接触，只有线索：" + page(v, GR));
+        h.assertTrue(page(v, Civilization.NORSE).status() == FaithView.Status.UNOPENED, "北欧没有档案：未开放");
+        // TC-T11a-64：通用区
+        h.assertTrue(tc.age() == Age.CLASSICAL && tc.favor() == 10 && tc.cap() == MythData.cap(p, TC)
+                && tc.minorGods().equals(List.of("x", "", "")), "时代、恩宠、次神：" + tc);
+        h.assertTrue(tc.approvals().equals(List.of(new FaithView.Approval("a", Age.CLASSICAL), new FaithView.Approval("b", Age.NONE))),
+                "主神认可按主神表逐位：" + tc.approvals());
+        h.assertTrue(tc.nextAge() == Age.HEROIC && tc.next().size() == 3 && tc.next().stream().noneMatch(FaithView.Line::met)
+                && tc.next().get(0).progress().getString().equals("10 / 60") && tc.next().get(1).icon().is(Items.GOLD_INGOT)
+                && tc.next().get(2).progress().getString().equals("0 / 1"), "古典 → 英雄：恩宠、金锭、凭证：" + tc.next());
+        // TC-T11a-67：顶栏按全部文明的最高时代
+        h.assertTrue(v.mythicUnits() == 3 && v.relicSlots() == 1, "古典：神话单位 3、圣物栏 1：" + v.mythicUnits() + " " + v.relicSlots());
+        data(p, GR).setAge(Age.HEROIC);
+        FaithView v2 = FaithService.build(p);
+        h.assertTrue(v2.mythicUnits() == 4 && v2.relicSlots() == 2, "希腊英雄：4、2");
+        h.assertTrue(page(v2, GR).status() == FaithView.Status.CONTACTED && page(v2, GR).nextAge() == Age.NONE
+                && page(v2, GR).next().isEmpty(), "晋升表没有神话：不显示下一次");
+        cleanup(h, s);
+        h.succeed();
+    }
+
+    @GameTest(template = T, batch = BATCH)
+    public static void faith_panel_villages_and_codec(GameTestHelper h) {
+        floor(h);
+        Site v1 = site(h, TC, "a", Age.ARCHAIC, 3, 3);
+        Site v2 = site(h, TC, "a", Age.ARCHAIC, 13, 3);
+        Site v3 = site(h, TC, "b", Age.ARCHAIC, 8, 20);
+        FakePlayer p = player(h, "rt_faith_v", TC, Age.ARCHAIC, 150);
+        p.getInventory().add(new ItemStack(Items.COBBLESTONE, 6));
+        expect(h, rite(h, p, v1, TC, RiteKind.PROMOTION, Age.NONE, "x"), RiteService.Reason.OK);
+        expect(h, rite(h, p, v2, TC, RiteKind.CONSECRATION, Age.NONE, "y"), RiteService.Reason.OK);
+        // 测试来源：v3 有神坛；另一行指向 v1（应去重）
+        GraceSource src = new GraceSource() {
+            @Override
+            public Civilization civ() {
+                return TC;
+            }
+
+            @Override
+            public String id() {
+                return TC.id() + ":test";
+            }
+
+            @Override
+            public List<Row> rows(net.minecraft.server.level.ServerPlayer viewer) {
+                return List.of(new Row(Component.literal("s3"), v3.village().bell(), Component.literal("ok"), 2.5,
+                                Optional.of(v3.village().id())),
+                        new Row(Component.literal("s1"), v1.village().bell(), Component.literal("ok"), 1.0,
+                                Optional.of(v1.village().id())));
+            }
+        };
+        GraceSources.overrideForTest(TC, List.of(src));
+        try {
+            // TC-T11a-65：你的村庄
+            FaithView v = FaithService.build(p);
+            FaithView.Page tc = page(v, TC);
+            h.assertTrue(tc.villages().stream().map(FaithView.Row::pos).toList().equals(List.of(
+                    v1.village().bell().pos(), v2.village().bell().pos(), v3.village().bell().pos())), "三个村庄、不重复：" + tc.villages());
+            List<String> notes = tc.villages().stream()
+                    .map(r -> ((net.minecraft.network.chat.contents.TranslatableContents) r.note().getContents()).getKey()).toList();
+            h.assertTrue(notes.equals(List.of("mythic_age.faith.village.promoted", "mythic_age.faith.village.rite",
+                    "mythic_age.faith.village.shrine")), "晋升 / 立祀 / 神坛：" + notes);
+            h.assertTrue(tc.sources().size() == 2 && tc.sources().get(0).pos().equals(v3.village().bell().pos()),
+                    "恩宠来源区按来源列出");
+            // TC-T11a-68：编解码往返
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), h.getLevel().registryAccess());
+            FaithView.STREAM_CODEC.encode(buf, v);
+            FaithView back = FaithView.STREAM_CODEC.decode(buf);
+            FaithView.Page b = page(back, TC);
+            h.assertTrue(back.mythicUnits() == v.mythicUnits() && back.relicSlots() == v.relicSlots()
+                    && back.pages().size() == v.pages().size()
+                    && back.pages().stream().map(FaithView.Page::status).toList()
+                    .equals(v.pages().stream().map(FaithView.Page::status).toList()), "顶栏与页签往返");
+            h.assertTrue(b.age() == tc.age() && b.favor() == tc.favor() && b.cap() == tc.cap() && b.favorKey().equals(tc.favorKey())
+                    && b.minorGods().equals(tc.minorGods()) && b.approvals().equals(tc.approvals()) && b.nextAge() == tc.nextAge()
+                    && b.next().size() == tc.next().size() && b.next().get(1).icon().is(Items.GOLD_INGOT)
+                    && b.villages().stream().map(FaithView.Row::pos).toList().equals(tc.villages().stream().map(FaithView.Row::pos).toList())
+                    && b.sources().size() == tc.sources().size(), "已接触页往返一致");
+            // 村庄注销后：「村庄已消失」
+            VillageRegistry.get(h.getLevel().getServer()).remove(v2.village().bell());
+            FaithView.Row gone = page(FaithService.build(p), TC).villages().get(1);
+            h.assertTrue(!gone.hasPos() && ((net.minecraft.network.chat.contents.TranslatableContents) gone.name().getContents())
+                    .getKey().equals("mythic_age.faith.village_gone"), "村庄已消失：" + gone);
+        } finally {
+            GraceSources.overrideForTest(TC, null);
+        }
+        cleanup(h, v1, v2, v3);
         h.succeed();
     }
 

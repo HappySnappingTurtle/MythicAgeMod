@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "6";
+    private static final String PROTOCOL_VERSION = "7";
 
     private MythNetwork() {
     }
@@ -32,6 +32,16 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.rite.RitePayloads.Perform.TYPE,
                         io.github.happysnappingturtle.mythicage.rite.RitePayloads.Perform.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.rite.RiteService::handlePerform)
+                // 信仰面板（T11a 阶段 ②）
+                .playToClient(io.github.happysnappingturtle.mythicage.faith.FaithPayloads.View.TYPE,
+                        io.github.happysnappingturtle.mythicage.faith.FaithPayloads.View.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.faithView(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.faith.FaithPayloads.Request.TYPE,
+                        io.github.happysnappingturtle.mythicage.faith.FaithPayloads.Request.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.faith.FaithService::handleRequest)
+                .playToServer(io.github.happysnappingturtle.mythicage.faith.FaithPayloads.Replay.TYPE,
+                        io.github.happysnappingturtle.mythicage.faith.FaithPayloads.Replay.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.faith.FaithService::handleReplay)
                 // 祭司与神庙兑换（T9；T10b 起按文明）
                 .playToClient(TradePayloads.Open.TYPE, TradePayloads.Open.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openTrade(payload))

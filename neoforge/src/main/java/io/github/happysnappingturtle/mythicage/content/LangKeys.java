@@ -283,6 +283,34 @@ public final class LangKeys {
         add("mythic_age.rite.rededication", "改奉", "Rededication", "改宗");
         add("mythic_age.favor.greek", "希腊恩宠", "Greek Favor", "ギリシャの恩寵");
         add("mythic_age.faith.greek.hint", "到平原与草甸的希腊村庄，找神庙祭司", "Find the temple priest in a Greek village on the plains or meadows", "平原や草原のギリシャの村で神殿の神官を探そう");
+        // 信仰面板（T11a 阶段 ②）
+        add("key.categories.mythic_age", "神话时代", "Mythic Age", "ミシックエイジ");
+        add("key.mythic_age.faith", "打开信仰面板", "Open faith panel", "信仰パネルを開く");
+        add("mythic_age.faith.title", "信仰", "Faith", "信仰");
+        add("mythic_age.faith.tab", "信仰", "Faith", "信仰");
+        add("mythic_age.faith.caps", "神话单位上限 %s · 圣物栏 %s", "Mythic units %s · Relic slots %s", "神話ユニット上限 %s・聖遺物枠 %s");
+        add("mythic_age.faith.unopened", "这个文明尚未开放", "This civilization is not available yet", "この文明はまだ開放されていません");
+        add("mythic_age.faith.uncontacted", "尚未接触", "Not contacted yet", "まだ接触していません");
+        add("mythic_age.faith.age", "时代：%s", "Age: %s", "時代：%s");
+        add("mythic_age.faith.minor_gods", "次神", "Minor gods", "従属神");
+        add("mythic_age.faith.approvals", "主神认可", "Patron approval", "主神の承認");
+        add("mythic_age.faith.not_approved", "未认可", "Not yet", "未承認");
+        add("mythic_age.faith.next", "晋升到%s需要", "To reach %s", "%sへの昇格に必要");
+        add("mythic_age.faith.no_next", "下一时代暂未开放", "The next age is not available yet", "次の時代はまだ開放されていません");
+        add("mythic_age.faith.village_rules", "举行地村庄的建筑：到村庄祭司处查看", "Village buildings: check with the village priest", "村の建物：村の神官のもとで確認");
+        add("mythic_age.faith.villages", "你的村庄", "Your villages", "あなたの村");
+        add("mythic_age.faith.no_villages", "还没有在村庄举行过仪式", "No rites held in any village yet", "まだどの村でも儀式を行っていません");
+        add("mythic_age.faith.village.promoted", "你在此晋升", "You ascended here", "ここで昇格した");
+        add("mythic_age.faith.village.rite", "你在此立祀", "You consecrated here", "ここで奉祀した");
+        add("mythic_age.faith.village.shrine", "你的神庙所在", "Your temple is here", "あなたの神殿がある");
+        add("mythic_age.faith.village_gone", "村庄已消失", "Village is gone", "村は消えました");
+        add("mythic_age.faith.sources", "恩宠来源", "Favor sources", "恩寵の源");
+        add("mythic_age.faith.no_sources", "还没有恩宠来源", "No favor sources yet", "恩寵の源はまだありません");
+        add("mythic_age.faith.per_day", "每日约 %s", "~%s / day", "1日 約 %s");
+        add("mythic_age.faith.more", "……还有 %s 项", "…and %s more", "…ほか %s 件");
+        add("mythic_age.faith.pos", "%s, %s, %s", "%s, %s, %s", "%s, %s, %s");
+        add("mythic_age.faith.row_sub", "%s · %s", "%s · %s", "%s・%s");
+        add("mythic_age.faith.replay", "重看晋升：", "Replay ascension:", "昇格を再表示：");
     }
 
     private LangKeys() {

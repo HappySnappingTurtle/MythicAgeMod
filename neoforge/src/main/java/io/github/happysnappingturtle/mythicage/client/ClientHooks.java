@@ -58,6 +58,16 @@ public final class ClientHooks {
         mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.AgeUnlockedScreen(payload, mc.screen));
     }
 
+    /** 信仰面板（T11a）：已开着就刷新，否则在当前界面之上打开，关闭后回到原界面。 */
+    public static void faithView(io.github.happysnappingturtle.mythicage.faith.FaithPayloads.View payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.FaithScreen open) {
+            open.update(payload.view());
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.FaithScreen(payload.view(), mc.screen));
+        }
+    }
+
     /** 界面关闭时的回调；目前没有需要清理的客户端状态，留作 T9b 的动画联动入口。 */
     public static void clearTradeScreen(GuardianScreen screen) {
     }

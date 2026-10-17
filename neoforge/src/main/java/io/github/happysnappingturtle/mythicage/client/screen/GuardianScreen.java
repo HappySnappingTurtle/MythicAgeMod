@@ -156,6 +156,10 @@ public class GuardianScreen extends Screen {
                     rebuildWidgets();
                 }).bounds(left + 132, top + 26, 60, 16).build());
             }
+            // 信仰面板（D12）：在祭司界面之上打开，关闭后回到这里；不结束兑换会话
+            addRenderableWidget(Button.builder(Component.translatable("mythic_age.faith.tab"),
+                    b -> PacketDistributor.sendToServer(new io.github.happysnappingturtle.mythicage.faith.FaithPayloads.Request()))
+                    .bounds(left + W - 68, top + 26, 60, 16).build());
         }
         if (tab == Tab.RITES && view.rites().isEmpty()) {
             tab = Tab.TRADE;
