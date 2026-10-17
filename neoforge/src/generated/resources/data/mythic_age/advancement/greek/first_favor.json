@@ -1,0 +1,30 @@
+{
+  "parent": "mythic_age:greek/blessed",
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "favor_gained"
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.mythic_age.greek.first_favor.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:greek_brazier"
+    },
+    "title": {
+      "translate": "advancements.mythic_age.greek.first_favor.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -69,6 +69,7 @@ public final class MythicAge {
         ModRecipes.init();
         ModEntities.init(modBus);
         ModRegistries.register(modBus);
+        io.github.happysnappingturtle.mythicage.advancement.MythEvents.register(modBus);
         modBus.addListener(ModDataGen::gather);
         ModAttachments.register(modBus);
         modBus.addListener(MythNetwork::onRegisterPayloads);
@@ -119,6 +120,7 @@ public final class MythicAge {
         // 聚落归属与主神（T10a）
         game.addListener(PantheonLoader::onAddReloadListeners);
         game.addListener(VillageService::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.advancement.MythEvents::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);

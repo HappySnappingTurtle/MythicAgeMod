@@ -134,6 +134,7 @@ public final class MythDataCommand {
         MythData.changed(player);
         io.github.happysnappingturtle.mythicage.rite.RiteService.refreshShrines(player, c);
         io.github.happysnappingturtle.mythicage.rite.UnlockService.flush(player);
+        io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, c, age.ordinal());
         ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.age.set",
                 "%s %s → %s", player.getDisplayName(), c.id(), age.id()), true);
         return 1;

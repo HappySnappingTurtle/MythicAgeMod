@@ -373,8 +373,9 @@ public class GuardianScreen extends Screen {
         for (Component b : o.blocking()) {
             ry = mark(g, false, b, rx, ry, rw);
         }
-        // 下：仪式后
-        int py = top + H - 84;
+        // 下：仪式后（条件行多时整体下移，不压住上面的条件；T11b 实机发现：希腊古典晋升有 6 行条件）
+        int leftBottom = y0 + 12 + o.candidates().size() * ROW + 20;
+        int py = Math.max(top + H - 84, Math.max(ry, leftBottom) + 8);
         g.fill(left + 6, py - 4, left + W - 6, py - 3, 0x60B89A5A);
         g.drawString(font, Component.translatable("mythic_age.rite.preview.title"), lx, py, BORDER, false);
         py += 11;

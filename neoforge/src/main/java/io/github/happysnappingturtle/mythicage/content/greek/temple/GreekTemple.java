@@ -101,6 +101,19 @@ public final class GreekTemple {
 
     public static void init() {
         GraceSources.register(GreekTempleSource.INSTANCE);
+        io.github.happysnappingturtle.mythicage.rite.PromotionRequirements.register(GreekTempleRequirement.INSTANCE);
+        // 登录时按登记补发神庙等级的进度事件（进度上线前就建好神庙的存档）
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e) -> {
+                    if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer p) {
+                        int level = GreekTempleRequirement.bestLevel(p, TempleService.rules());
+                        if (level > 0) {
+                            io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(p,
+                                    io.github.happysnappingturtle.mythicage.advancement.MythEvents.TEMPLE_LEVEL,
+                                    io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK, level);
+                        }
+                    }
+                });
     }
 
     /** 不由 Content 条目声明的标签成员（原版方块、其他标签、大理石族），由 datagen 写出。 */

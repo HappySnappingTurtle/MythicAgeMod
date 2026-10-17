@@ -4,6 +4,7 @@ import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
 import io.github.happysnappingturtle.mythicage.core.config.world.WorldRulesConfig;
 import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleRules;
+import io.github.happysnappingturtle.mythicage.core.greek.temple.TempleVerdict;
 import io.github.happysnappingturtle.mythicage.core.scan.ScanQueue;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineKind;
@@ -177,6 +178,7 @@ public final class TempleService {
             TempleRulesLoader.Loaded loaded = TempleRulesLoader.greek();
             int maxSlots = loaded.rules().tiers().stream().mapToInt(TempleRules.Tier::prayerSlots).max().orElse(0);
             be.applyScan(scan.finish(maxSlots), level.getGameTime(), loaded.hash());
+            recordLevel(s, key, be, loaded.rules());
         }
         PrayerService.refreshEstimate(be);
         Set<UUID> waiting = WAITING.remove(key);
@@ -188,6 +190,15 @@ public final class TempleService {
                 }
             }
         }
+    }
+
+    /** 认定结果写回神庙登记（晋升条件读它，T11b）；主人在线时发进度事件。 */
+    private static void recordLevel(MinecraftServer s, GlobalPos key, GreekAltarBlockEntity be, TempleRules rules) {
+        TempleVerdict v = be.verdict(rules);
+        ShrineRegistry.get(s).setLevel(key, v.structuralLevel());
+        be.owner().map(id -> s.getPlayerList().getPlayer(id)).ifPresent(p ->
+                io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(p, "temple_level",
+                        be.kind().civ(), v.grantedLevel()));
     }
 
     private static void refreshOwnerAge(MinecraftServer s, GreekAltarBlockEntity be) {

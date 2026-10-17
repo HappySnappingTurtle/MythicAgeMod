@@ -76,6 +76,17 @@ public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> 
 
     // ───────────── 判定 ─────────────
 
+    /** 该时代的主人最多能被认定到几级。 */
+    public int ageCap(Age ownerAge) {
+        int cap = 0;
+        for (Tier t : tiers) {
+            if (ownerAge.atLeast(t.age())) {
+                cap = Math.max(cap, t.level());
+            }
+        }
+        return cap;
+    }
+
     public TempleVerdict evaluate(TempleSurvey s, Age ownerAge) {
         int structural = 0;
         for (int i = 1; i < tiers.size(); i++) {
@@ -85,13 +96,7 @@ public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> 
                 break;
             }
         }
-        int ageCap = 0;
-        for (Tier t : tiers) {
-            if (ownerAge.atLeast(t.age())) {
-                ageCap = Math.max(ageCap, t.level());
-            }
-        }
-        int granted = Math.min(structural, ageCap);
+        int granted = Math.min(structural, ageCap(ownerAge));
         List<TempleVerdict.Missing> missing = structural < maxLevel()
                 ? missing(s, tiers.get(structural + 1).require()) : List.of();
         Optional<Age> ageRequired = structural > granted ? Optional.of(tiers.get(granted + 1).age()) : Optional.empty();

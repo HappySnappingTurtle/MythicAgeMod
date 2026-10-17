@@ -1,0 +1,31 @@
+{
+  "parent": "mythic_age:greek/first_favor",
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "temple_level",
+        "min": 1
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.mythic_age.greek.temple.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:marble_column"
+    },
+    "title": {
+      "translate": "advancements.mythic_age.greek.temple.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

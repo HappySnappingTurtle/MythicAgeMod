@@ -100,6 +100,7 @@ public final class RuntimeDriver {
             } else {
                 long bonus = CapBonusProvider.Holder.get().capBonus(owner, l.civ());
                 MythData.transact(owner, Transactions.Request.internal(TxSteps.addFavor(l.civ(), s.credited(), bonus)));
+                io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(owner, io.github.happysnappingturtle.mythicage.advancement.MythEvents.FAVOR_GAINED, l.civ(), (int) Math.min(Integer.MAX_VALUE, s.credited()));
             }
         }
         return s;

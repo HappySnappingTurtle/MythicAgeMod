@@ -1,0 +1,32 @@
+{
+  "parent": "mythic_age:greek/classical",
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "age_reached",
+        "min": 3
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.mythic_age.greek.heroic.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:corinthian_capital"
+    },
+    "title": {
+      "translate": "advancements.mythic_age.greek.heroic.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

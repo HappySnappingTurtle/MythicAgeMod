@@ -41,6 +41,8 @@ public final class ShrineRegistry extends SavedData {
     }
 
     private final Map<GlobalPos, Entry> shrines = new LinkedHashMap<>();
+    /** 各神庙最近一次认定的结构等级（不受主人时代封顶；T11b）。主人不在附近时晋升条件读它。 */
+    private final Map<GlobalPos, Integer> levels = new HashMap<>();
     /** 种类 → (维度, 区块) → 该种类中半径 indexRadius 内覆盖该区块的神庙。 */
     private final Map<String, Map<ResourceKey<Level>, Map<Long, List<BlockPos>>>> chunkIndex = new HashMap<>();
     private final Map<String, Integer> indexRadius = new HashMap<>();
@@ -51,18 +53,36 @@ public final class ShrineRegistry extends SavedData {
     }
 
     public void add(Entry e) {
+        // 新登记（或重新绑定）从 0 级算起，等下一次认定写回
+        levels.remove(e.pos());
         shrines.put(e.pos(), e);
         invalidateIndex();
         setDirty();
     }
 
     public boolean remove(GlobalPos pos) {
+        levels.remove(pos);
         boolean removed = shrines.remove(pos) != null;
         if (removed) {
             invalidateIndex();
             setDirty();
         }
         return removed;
+    }
+
+    /** 最近一次认定的结构等级；从未认定为 0。 */
+    public int level(GlobalPos pos) {
+        return levels.getOrDefault(pos, 0);
+    }
+
+    /** 记下认定的结构等级；没有该登记或数值未变时不做任何事。返回是否变化。 */
+    public boolean setLevel(GlobalPos pos, int level) {
+        if (!shrines.containsKey(pos) || level(pos) == level) {
+            return false;
+        }
+        levels.put(pos, level);
+        setDirty();
+        return true;
     }
 
     public Optional<Entry> get(GlobalPos pos) {
@@ -157,6 +177,9 @@ public final class ShrineRegistry extends SavedData {
                         .orElseThrow(() -> new IllegalArgumentException("未知文明的神庙种类 " + kind));
                 r.shrines.put(pos, new Entry(pos, c.getUUID("owner"), c.getString("ownerName"),
                         facing == null || facing.getAxis().isVertical() ? Direction.NORTH : facing, civ, kind));
+                if (c.getInt("level") > 0) {
+                    r.levels.put(pos, c.getInt("level"));
+                }
             } catch (RuntimeException e) {
                 MythicAge.LOGGER.warn("跳过损坏的神庙登记：{}（{}）", c, e.getMessage());
             }
@@ -175,6 +198,7 @@ public final class ShrineRegistry extends SavedData {
             c.putString("ownerName", e.ownerName());
             c.putString("facing", e.facing().getSerializedName());
             c.putString("kind", e.kind());
+            c.putInt("level", level(e.pos()));
             list.add(c);
         }
         tag.put("altars", list);

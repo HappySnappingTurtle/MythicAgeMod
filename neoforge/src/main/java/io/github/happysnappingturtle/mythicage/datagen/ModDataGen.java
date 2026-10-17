@@ -54,5 +54,7 @@ public final class ModDataGen {
         ModBlockTags blockTags = gen.addProvider(event.includeServer(), new ModBlockTags(out, lookup, files));
         gen.addProvider(event.includeServer(), new ModItemTags(out, lookup, blockTags.contentsGetter(), files));
         gen.addProvider(event.includeServer(), new ModBiomeTags(out, full, files));
+        gen.addProvider(event.includeServer(), new net.neoforged.neoforge.common.data.AdvancementProvider(out, lookup, files,
+                List.of(new ModAdvancements())));
     }
 }

@@ -219,7 +219,16 @@ public final class TempleGameTests {
         whenScanned(h, be -> {
             int level = be.verdict(TempleService.rules()).grantedLevel();
             h.assertTrue(level == expected, "认定等级应为 " + expected + "，实际 " + level + "，统计 " + be.survey());
+            assertRegistryLevel(h, be);
         });
+    }
+
+    /** TC-T11b-10：扫描完成后，登记里缓存的是结构等级（不受主人时代封顶）。 */
+    private static void assertRegistryLevel(GameTestHelper h, GreekAltarBlockEntity be) {
+        int cached = io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry.get(h.getLevel().getServer())
+                .level(net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), h.absolutePos(ALTAR)));
+        int structural = be.verdict(TempleService.rules()).structuralLevel();
+        h.assertTrue(cached == structural, "登记等级应为结构等级 " + structural + "，实际 " + cached);
     }
 
     // ───────────── 7 个规则算例（TC-T8a-60～66） ─────────────
@@ -262,6 +271,7 @@ public final class TempleGameTests {
             h.assertTrue(v.structuralLevel() == 3 && v.grantedLevel() == 1,
                     "结构 3 级、认定 1 级，实际 " + v.structuralLevel() + "/" + v.grantedLevel() + " " + be.survey());
             h.assertTrue(v.ageRequired().orElse(null) == Age.CLASSICAL, "应提示需要古典时代");
+            assertRegistryLevel(h, be);
         });
     }
 
@@ -336,6 +346,8 @@ public final class TempleGameTests {
                 throw new net.minecraft.gametest.framework.GameTestAssertException("等待重扫");
             }
             h.assertTrue(level == 1, "点燃后应为 1 级，实际 " + level + " " + be.survey());
+            // TC-T11b-11：重扫后登记跟着变
+            assertRegistryLevel(h, be);
         });
     }
 

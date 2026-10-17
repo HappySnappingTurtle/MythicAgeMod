@@ -1,0 +1,32 @@
+{
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "village_entered"
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "mythic_age:textures/block/marble.png",
+    "description": {
+      "translate": "advancements.mythic_age.greek.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:greek_altar"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.mythic_age.greek.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

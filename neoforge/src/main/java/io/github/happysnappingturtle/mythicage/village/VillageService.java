@@ -220,6 +220,8 @@ public final class VillageService {
             p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
             p.connection.send(new ClientboundSetTitleTextPacket(stagedTitle(v)));
             p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle(v)));
+            io.github.happysnappingturtle.mythicage.core.player.Civilization.byId(v.civ()).ifPresent(c ->
+                    io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(p, io.github.happysnappingturtle.mythicage.advancement.MythEvents.VILLAGE_ENTERED, c));
         });
     }
 

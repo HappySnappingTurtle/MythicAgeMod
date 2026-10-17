@@ -1,0 +1,30 @@
+{
+  "parent": "mythic_age:greek/root",
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "blessed"
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.mythic_age.greek.blessed.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:libation"
+    },
+    "title": {
+      "translate": "advancements.mythic_age.greek.blessed.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

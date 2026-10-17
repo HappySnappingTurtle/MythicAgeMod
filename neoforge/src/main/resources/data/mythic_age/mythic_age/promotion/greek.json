@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "civilization": "greek",
+  "ages": {
+    "classical": {
+      "favor": 50,
+      "offerings": [
+        {"item": "minecraft:cooked_beef", "count": 8},
+        {"item": "minecraft:wheat", "count": 32},
+        {"item": "mythic_age:libation", "count": 4},
+        {"item": "minecraft:copper_ingot", "count": 16}
+      ],
+      "requirements": [{"type": "greek:temple_level", "level": 1}],
+      "extraUnlocks": [{"icon": "mythic_age:greek_altar", "key": "mythic_age.unlock.greek.temple_prostylos"}]
+    },
+    "heroic": {
+      "favor": 100,
+      "offerings": [
+        {"item": "mythic_age:bronze_ingot", "count": 16},
+        {"item": "minecraft:gold_ingot", "count": 8},
+        {"item": "minecraft:cooked_mutton", "count": 16},
+        {"item": "minecraft:honey_bottle", "count": 4}
+      ],
+      "requirements": [{"type": "greek:temple_level", "level": 2}],
+      "trial": "classical",
+      "extraUnlocks": [{"icon": "mythic_age:greek_altar", "key": "mythic_age.unlock.greek.temple_peripteros"}]
+    }
+  },
+  "trials": {"classical": ["mythic_age:minotaur"]}
+}

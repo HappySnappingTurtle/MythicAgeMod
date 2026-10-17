@@ -26,4 +26,22 @@ public final class PriceCalculator {
         }
         return Math.max(1, (long) Math.ceil(price - EPSILON));
     }
+
+    /**
+     * 物品价的数量（T11b D1）：数量 × Π(1 − 折扣)，<b>向下取整</b>，下限 1；没有折扣时原数。
+     * 与恩宠价相反（恩宠价向上取整），这样小额物品价（3 个绿宝石）打九折也能少 1 个。
+     */
+    public static int items(int count, List<Double> discounts) {
+        if (count <= 0) {
+            throw new IllegalArgumentException("数量必须为正：" + count);
+        }
+        if (discounts.isEmpty()) {
+            return count;
+        }
+        double n = count;
+        for (double d : discounts) {
+            n *= 1 - Math.max(0, Math.min(0.95, d));
+        }
+        return (int) Math.max(1, Math.floor(n + EPSILON));
+    }
 }

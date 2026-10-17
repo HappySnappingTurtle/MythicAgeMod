@@ -46,7 +46,7 @@ class TradeTableTest {
     void tc01ParsesDefault() {
         TradeTable t = greek();
         assertEquals(Civilization.GREEK, t.civ());
-        assertEquals(1, t.offers().size());
+        assertEquals(22, t.offers().size(), "奠酒、主神像、20 件次神祠商品（T11b）");
         TradeOffer o = t.offer("libation").orElseThrow();
         assertEquals(new TradeOffer.ItemAmount("mythic_age:libation", 2), o.result());
         assertEquals(List.of(new TradeOffer.ItemAmount("minecraft:emerald", 1)), o.price().items());

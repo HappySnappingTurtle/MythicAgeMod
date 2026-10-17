@@ -276,9 +276,25 @@ public final class TradeService {
         if (!offer.price().isFavor()) {
             return 0;
         }
+        return PriceCalculator.favor(offer.price().favor(), allDiscounts(player, civ, offer, ctx));
+    }
+
+    /** 物品价折后的数量（T11b D1：向下取整，至少 1 个）。 */
+    static List<TradeOffer.ItemAmount> itemPriceOf(ServerPlayer player, Civilization civ, TradeOffer offer,
+                                                   TradeRules.VenueContext ctx) {
+        if (offer.price().isFavor()) {
+            return List.of();
+        }
+        List<Double> all = allDiscounts(player, civ, offer, ctx);
+        return offer.price().items().stream()
+                .map(a -> new TradeOffer.ItemAmount(a.item(), PriceCalculator.items(a.count(), all))).toList();
+    }
+
+    private static List<Double> allDiscounts(ServerPlayer player, Civilization civ, TradeOffer offer,
+                                             TradeRules.VenueContext ctx) {
         List<Double> all = new ArrayList<>(discounts.apply(player, offer));
         all.addAll(TradeRules.discounts(MythData.get(player), civ, offer, ctx));
-        return PriceCalculator.favor(offer.price().favor(), all);
+        return all;
     }
 
     /** 列在界面上但不能买的原因（时代、次神、阶段……）；可买时为 OK。 */
@@ -313,9 +329,10 @@ public final class TradeService {
                 continue;
             }
             long price = priceOf(player, civ, o, ctx);
+            List<TradeOffer.ItemAmount> items = itemPriceOf(player, civ, o, ctx);
             boolean affordable = o.price().isFavor() ? data.civ(civ).favor() >= price
-                    : o.price().items().stream().allMatch(a -> inv.count(a.item()) >= a.count());
-            List<ItemStack> itemPrice = o.price().items().stream().map(a -> stack(a.item(), a.count())).toList();
+                    : items.stream().allMatch(a -> inv.count(a.item()) >= a.count());
+            List<ItemStack> itemPrice = items.stream().map(a -> stack(a.item(), a.count())).toList();
             TradeReason r = TradeRules.check(data, civ, o, ctx, price, price, today);
             TradeReason lock = LOCKS.contains(r) ? r : TradeReason.OK;
             if (lock == TradeReason.OK && o.result().item().equals(STATUE_ITEM)) {
@@ -403,7 +420,8 @@ public final class TradeService {
         }
         // 2 预留：先在快照上扣物品价，再看产物放不放得下
         InventoryPlan plan = plan(player);
-        for (TradeOffer.ItemAmount a : offer.price().items()) {
+        List<TradeOffer.ItemAmount> items = itemPriceOf(player, civ, offer, ctx);
+        for (TradeOffer.ItemAmount a : items) {
             if (!plan.remove(a.item(), a.count())) {
                 return Outcome.of(TradeReason.NOT_ENOUGH_ITEMS);
             }
@@ -430,7 +448,7 @@ public final class TradeService {
             return Outcome.of(TradeReason.DAILY_LIMIT);
         }
         // 4 发货（同一刻内，背包已预留）
-        for (TradeOffer.ItemAmount a : offer.price().items()) {
+        for (TradeOffer.ItemAmount a : items) {
             removeItems(player, a.item(), a.count());
         }
         give(player, result.copy());
@@ -499,6 +517,10 @@ public final class TradeService {
         gifts.forEach(g -> give(player, g.copy()));
         if (!reissue && player.level().getEntity(s.guardianEntityId()) instanceof GuardianEntity g) {
             g.playGesture(GuardianGesture.ANNOUNCE);
+        }
+        if (!reissue) {
+            io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.BLESSED, civ);
+            io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, civ, Age.ARCHAIC.ordinal());
         }
         return new Outcome(TradeReason.OK, 0, gifts.isEmpty() ? ItemStack.EMPTY : gifts.getFirst());
     }

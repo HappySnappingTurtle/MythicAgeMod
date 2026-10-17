@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "civilization": "greek",
+  "stages": {
+    "classical": {"population": 4, "guards": 1, "migrationDays": 2},
+    "heroic": {"population": 6, "guards": 2, "migrationDays": 2},
+    "mythic": {"population": 8, "guards": 3, "migrationDays": 2}
+  }
+}
