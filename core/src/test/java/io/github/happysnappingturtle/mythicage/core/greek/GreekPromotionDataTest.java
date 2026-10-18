@@ -77,8 +77,17 @@ class GreekPromotionDataTest {
         TradeTable t = TradeTable.parse(read("trade/greek.json"), TradeTable.ItemLookup.ANY);
         Pantheon p = Pantheon.parse(read("pantheon/greek.json"));
         Map<String, Pantheon.MinorGod> gods = p.minorGods().stream().collect(Collectors.toMap(Pantheon.MinorGod::id, g -> g));
-        List<TradeOffer> shrine = t.offers().stream().filter(o -> !o.minorGod().isEmpty()).toList();
+        List<TradeOffer> shrine = t.offers().stream()
+                .filter(o -> !o.minorGod().isEmpty() && o.category() == TradeOffer.Category.SUPPLIES).toList();
         assertEquals(20, shrine.size());
+        // 次神神力（T13）：恩宠价，时代与次神一致
+        for (TradeOffer o : t.offers().stream()
+                .filter(o -> !o.minorGod().isEmpty() && o.category() == TradeOffer.Category.GOD_POWER).toList()) {
+            Pantheon.MinorGod g = gods.get(o.minorGod());
+            assertTrue(g != null && g.available(), o.id() + "：次神须存在且已开放");
+            assertEquals(g.age(), o.minAge(), o.id() + "：时代与次神一致");
+            assertTrue(o.price().isFavor(), o.id() + "：恩宠价");
+        }
         for (TradeOffer o : shrine) {
             Pantheon.MinorGod g = gods.get(o.minorGod());
             assertTrue(g != null && g.available(), o.id() + "：次神须存在且已开放");

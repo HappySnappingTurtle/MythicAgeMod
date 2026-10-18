@@ -45,4 +45,6 @@ tasks.named('test', Test) {
     // 架构测试扫描 core 主源集的编译产物；版本锁定测试读取根目录配置与设计文档。
     systemProperty 'mythicage.coreClassesDirs', sourceSets.main.output.classesDirs.asPath
     systemProperty 'mythicage.rootDir', rootProject.projectDir.absolutePath
+    // 数据测试直接读 neoforge 的数据包（兑换表、晋升表……）：改了数据也要重跑，不能当作「已是最新」跳过
+    inputs.dir(rootProject.file('neoforge/src/main/resources/data')).withPropertyName('modData')
 }

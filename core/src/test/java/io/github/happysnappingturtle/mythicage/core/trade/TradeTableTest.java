@@ -46,7 +46,10 @@ class TradeTableTest {
     void tc01ParsesDefault() {
         TradeTable t = greek();
         assertEquals(Civilization.GREEK, t.civ());
-        assertEquals(22, t.offers().size(), "奠酒、主神像、20 件次神祠商品（T11b）");
+        assertEquals(22, t.offers().stream().filter(x -> x.category() == TradeOffer.Category.SUPPLIES).count(),
+                "奠酒、主神像、20 件次神祠商品（T11b）");
+        assertTrue(t.offers().stream().filter(x -> x.category() == TradeOffer.Category.GOD_POWER)
+                .allMatch(x -> x.price().isFavor()), "神力一律恩宠价（T13）");
         TradeOffer o = t.offer("libation").orElseThrow();
         assertEquals(new TradeOffer.ItemAmount("mythic_age:libation", 2), o.result());
         assertEquals(List.of(new TradeOffer.ItemAmount("minecraft:emerald", 1)), o.price().items());
@@ -54,7 +57,8 @@ class TradeTableTest {
         assertEquals(Set.of(TradeOffer.Venue.GUARDIAN), o.venues());
         assertEquals(8, o.dailyLimit());
         assertEquals("greek:libation", o.key(Civilization.GREEK));
-        assertEquals(List.of(), t.offersAt(TradeOffer.Venue.STATUE));
+        assertTrue(t.offersAt(TradeOffer.Venue.STATUE).stream().allMatch(x -> x.category() == TradeOffer.Category.GOD_POWER
+                && !x.patron().isEmpty()), "神像前只有主神神力（T13）");
     }
 
     @Test
