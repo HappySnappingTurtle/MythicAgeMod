@@ -14,6 +14,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public interface PowerFxRenderer {
     void play(PowerFxPayload payload, ClientLevel level);
 
+    /** 瞄准时范围圈的样式（贴图 + 颜色）；为空时用通用的金色线圈。 */
+    @javax.annotation.Nullable
+    default AimStyle aimStyle() {
+        return null;
+    }
+
+    /** 范围圈样式：一张贴地的圈贴图（圈在贴图外缘）与调色。 */
+    record AimStyle(net.minecraft.resources.ResourceLocation ring, int rgb) {
+    }
+
     /** 专属表现注册表（按神力 id）。 */
     final class Registry {
         private static final Map<String, PowerFxRenderer> ALL = new ConcurrentHashMap<>();

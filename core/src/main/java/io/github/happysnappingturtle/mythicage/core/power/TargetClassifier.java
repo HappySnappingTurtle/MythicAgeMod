@@ -6,6 +6,7 @@ package io.github.happysnappingturtle.mythicage.core.power;
  * 框架只决定「这个实体落在哪一列」和「这一列对本神力的反应键」；反应键由各神力的效果代码解释。
  * 不论卡片怎么写，以下情形一律是 {@link #NONE}（不可选、不受影响），失控型神力除外（决策 G3）：
  * PvP 关时的玩家、队友、队友的召唤单位、非敌对玩家的召唤单位、驯服 / 拴绳 / 他人宠物（卡片写 {@code pets} 键时除外）。
+ * 友方入口（{@code ALLY_AREA}）例外：队友取「施法者」列、队友的召唤单位取「自己的常驻召唤单位」列（T13 §1.5）。
  */
 public final class TargetClassifier {
     public static final String NONE = "none";
@@ -53,6 +54,15 @@ public final class TargetClassifier {
         String key = spec.reaction(c);
         if (spec.profile() == TargetProfile.FREE_FOR_ALL) {
             return key;
+        }
+        if (spec.profile() == TargetProfile.ALLY_AREA) {
+            // 友方入口（T13 设计文档 §1.5）：队友按施法者、队友的召唤单位按自己的召唤单位
+            if (c == TargetCategory.ENEMY_PLAYER && f.teammate()) {
+                return spec.reaction(TargetCategory.CASTER);
+            }
+            if (c == TargetCategory.OTHER_SUMMON && f.summonOwnerTeammate()) {
+                return spec.reaction(TargetCategory.OWN_SUMMON);
+            }
         }
         switch (c) {
             case ENEMY_PLAYER -> {

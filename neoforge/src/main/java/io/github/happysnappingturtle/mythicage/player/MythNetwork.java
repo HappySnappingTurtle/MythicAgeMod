@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "9";
+    private static final String PROTOCOL_VERSION = "10";
 
     private MythNetwork() {
     }
@@ -49,6 +49,9 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.power.PowerAimPayload.TYPE,
                         io.github.happysnappingturtle.mythicage.power.PowerAimPayload.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.powerAim(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.power.AuraPayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.power.AuraPayload.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.aura(payload))
                 // 祭司与神庙兑换（T9；T10b 起按文明）
                 .playToClient(TradePayloads.Open.TYPE, TradePayloads.Open.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openTrade(payload))

@@ -47,9 +47,10 @@ public final class PowerFx {
     }
 
     static PowerFxPayload payload(ServerPlayer caster, String castId, String powerId, PowerFxPayload.Phase phase,
-                                  Vec3 origin, List<Entity> targets, long seed, int duration, String cancelReason) {
+                                  Vec3 origin, List<? extends Entity> targets, long seed, int duration, String cancelReason,
+                                  String tag) {
         return new PowerFxPayload(castId, powerId, phase, caster.getId(), caster.level().dimension().location(), origin,
-                targets.stream().map(Entity::getId).toList(), WorldClock.now(caster.server), seed, duration, cancelReason);
+                targets.stream().map(Entity::getId).toList(), WorldClock.now(caster.server), seed, duration, cancelReason, tag);
     }
 
     /** 发一份表现；{@code around} 决定按哪个位置找追踪的玩家（吟唱按施法者，提交按原点）。 */
@@ -65,9 +66,25 @@ public final class PowerFx {
     }
 
     /** 效果代码发表现（{@code WARNING} / {@code HIT} / {@code END}），按原点找接收者。 */
-    public static void emit(CastContext ctx, PowerFxPayload.Phase phase, List<Entity> targets) {
-        send(ctx.caster(), payload(ctx.caster(), ctx.castId(), ctx.spec().id(), phase, ctx.origin(), targets, ctx.seed(), 0, ""),
-                ctx.origin());
+    public static void emit(CastContext ctx, PowerFxPayload.Phase phase, List<? extends Entity> targets) {
+        emit(ctx, phase, targets, ctx.origin(), 0, "");
+    }
+
+    /** 带子事件、原点与时长的表现（T13 §1.3）：原点可以不是施放原点（如瘟疫里每个刷怪器各发一份）。 */
+    public static void emit(CastContext ctx, PowerFxPayload.Phase phase, List<? extends Entity> targets, Vec3 at, int duration,
+                            String tag) {
+        send(ctx.caster(), payload(ctx.caster(), ctx.castId(), ctx.spec().id(), phase, at, List.copyOf(targets), ctx.seed(),
+                duration, "", tag), at);
+    }
+
+    /** 目标多于 16 个时分成几份发（同一子事件），客户端逐份处理。 */
+    public static void emitAll(CastContext ctx, PowerFxPayload.Phase phase, List<? extends Entity> targets, String tag) {
+        if (targets.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < targets.size(); i += PowerFxPayload.MAX_TARGETS) {
+            emit(ctx, phase, targets.subList(i, Math.min(targets.size(), i + PowerFxPayload.MAX_TARGETS)), ctx.origin(), 0, tag);
+        }
     }
 
     static void sendTo(ServerPlayer to, CustomPacketPayload p) {

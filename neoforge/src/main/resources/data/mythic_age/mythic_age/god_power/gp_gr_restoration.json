@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_restoration",
+  "card": "GP-GR-04",
+  "civilization": "greek",
+  "form": "scroll",
+  "castTicks": 30,
+  "cooldownTicks": 3600,
+  "targetProfile": "ALLY_AREA",
+  "selfCentered": true,
+  "radius": 12,
+  "durationTicks": 100,
+  "matrix": {
+    "caster": "heal",
+    "own_villager": "heal",
+    "own_soldier": "heal",
+    "other_village": "heal",
+    "own_summon": "heal",
+    "guardian": "heal",
+    "neutral_animal": "pets"
+  }
+}

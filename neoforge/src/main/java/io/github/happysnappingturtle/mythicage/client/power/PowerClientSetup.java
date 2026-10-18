@@ -1,0 +1,78 @@
+package io.github.happysnappingturtle.mythicage.client.power;
+
+import io.github.happysnappingturtle.mythicage.client.power.greek.BoltFx;
+import io.github.happysnappingturtle.mythicage.client.power.greek.BronzeFx;
+import io.github.happysnappingturtle.mythicage.client.power.greek.RestorationFx;
+import io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers;
+import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
+import io.github.happysnappingturtle.mythicage.power.PowerRegistries;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.resources.PlayerSkin;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+
+/** 神力客户端的初始化（T13）：粒子工厂、外观叠层、各神力的专属表现。 */
+@EventBusSubscriber(modid = MythicAgeIds.MOD_ID, value = Dist.CLIENT)
+public final class PowerClientSetup {
+    private PowerClientSetup() {
+    }
+
+    @SubscribeEvent
+    static void onClientSetup(FMLClientSetupEvent event) {
+        PowerFxRenderer.Registry.register(GreekPowers.BOLT, new BoltFx());
+        PowerFxRenderer.Registry.register(GreekPowers.RESTORATION, new RestorationFx());
+        PowerFxRenderer.Registry.register(GreekPowers.BRONZE, new BronzeFx());
+    }
+
+    @SubscribeEvent
+    static void onParticles(RegisterParticleProvidersEvent event) {
+        // 寿命、大小、重力、上浮、阻力、自发光、淡入、淡出、旋转、逐帧、透明度
+        event.registerSpriteSet(PowerRegistries.SPARK.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(4, 7, 0.08f, 0.16f, 0, 0, 0.82f, true, 0, 0.5f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.STORM_CLOUD.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(22, 30, 0.9f, 1.6f, 0, 0, 0.9f, false, 0.2f, 0.35f, 0.01f, false, 0.92f)));
+        event.registerSpriteSet(PowerRegistries.HEAL_MOTE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(16, 24, 0.04f, 0.08f, 0, 0.015f, 0.96f, true, 0.1f, 0.5f, 0, false, 0.9f)));
+        event.registerSpriteSet(PowerRegistries.OLIVE_LEAF.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(36, 50, 0.08f, 0.12f, 0.012f, 0, 0.96f, false, 0, 0.3f, 0.12f, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.BRONZE_FLAKE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(12, 20, 0.04f, 0.07f, 0.04f, 0, 0.92f, true, 0, 0.4f, 0.3f, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.CLEANSE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(26, 26, 0.18f, 0.18f, 0, 0.012f, 1f, true, 0.1f, 0.35f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.REPAIR.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(26, 26, 0.16f, 0.16f, 0, 0.012f, 1f, true, 0.1f, 0.35f, 0, false, 1f)));
+    }
+
+    @SubscribeEvent
+    static void onLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(AuraLayer.SHELL_LAYER, AuraLayer::createShell);
+    }
+
+    /** 外观叠层加到所有活体渲染器与两种玩家皮肤上；人形的另给一个外扩的人形外壳模型。 */
+    @SubscribeEvent
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        for (var type : event.getEntityTypes()) {
+            EntityRenderer<?> r = event.getRenderer(type);
+            if (r instanceof LivingEntityRenderer lr) {
+                lr.addLayer(new AuraLayer(lr, shell(event, lr)));
+            }
+        }
+        for (PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof LivingEntityRenderer lr) {
+                lr.addLayer(new AuraLayer(lr, shell(event, lr)));
+            }
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static net.minecraft.client.model.HumanoidModel shell(EntityRenderersEvent.AddLayers event, LivingEntityRenderer lr) {
+        return lr.getModel() instanceof net.minecraft.client.model.HumanoidModel
+                ? new net.minecraft.client.model.HumanoidModel(event.getEntityModels().bakeLayer(AuraLayer.SHELL_LAYER)) : null;
+    }
+}

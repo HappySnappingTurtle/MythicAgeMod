@@ -1,0 +1,37 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_restoration",
+  "size": 16,
+  "palette": {
+    "o": "#3b2412",
+    "R": "#b9844a",
+    "r": "#87592c",
+    "p": "#ecdcb0",
+    "q": "#c9b07a",
+    "g": "#6b4f2a",
+    "l": "#9cc04f",
+    "L": "#5f8a2d",
+    "v": "#4a3550"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      "..oooooooooooo..",
+      "..oppppppllpqo..",
+      "..opppplgLlpqo..",
+      "..oppplLgpppqo..",
+      "..opppLgllppqo..",
+      "..oppvgLlpppqo..",
+      "..opplgppvppqo..",
+      "..opgLppppppqo..",
+      "..oooooooooooo..",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      ".oooooooooooooo."
+    ]
+  }
+}

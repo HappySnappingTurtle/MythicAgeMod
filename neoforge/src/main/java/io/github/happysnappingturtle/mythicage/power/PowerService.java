@@ -435,7 +435,7 @@ public final class PowerService {
 
     private static PowerFxPayload fx(Active a, PowerFxPayload.Phase phase, int duration, String cancelReason) {
         return PowerFx.payload(a.player, a.session.castId(), a.spec.id(), phase, a.origin,
-                a.target == null ? List.of() : List.of(a.target), a.session.castId().hashCode(), duration, cancelReason);
+                a.target == null ? List.of() : List.of(a.target), a.session.castId().hashCode(), duration, cancelReason, "");
     }
 
     private static void end(Active a, PowerReason reason) {

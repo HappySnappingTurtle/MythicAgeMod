@@ -20,9 +20,10 @@ import java.util.List;
  * @param startTick    该阶段开始的世界时钟刻（只作对照，客户端按收到的时刻播放）
  * @param duration     {@code CHANNEL_START} 为吟唱刻数，{@code COMMIT} 为（剩余）持续上界，其余为 0
  * @param cancelReason {@code CHANNEL_CANCEL} 的原因（{@code PowerReason} 名），其余为空串
+ * @param tag          同一阶段内由神力自己定义的子事件（如 {@code cleanse}、{@code immune}），没有为空串（T13 §1.3）
  */
 public record PowerFxPayload(String castId, String powerId, Phase phase, int caster, ResourceLocation dimension, Vec3 origin,
-                             List<Integer> targets, long startTick, long seed, int duration, String cancelReason)
+                             List<Integer> targets, long startTick, long seed, int duration, String cancelReason, String tag)
         implements CustomPacketPayload {
     public static final int MAX_TARGETS = 16;
     public static final Type<PowerFxPayload> TYPE =
@@ -36,7 +37,7 @@ public record PowerFxPayload(String castId, String powerId, Phase phase, int cas
 
     /** 同一份表现换一个持续时间（补播时给剩余时长）。 */
     public PowerFxPayload withDuration(int d) {
-        return new PowerFxPayload(castId, powerId, phase, caster, dimension, origin, targets, startTick, seed, d, cancelReason);
+        return new PowerFxPayload(castId, powerId, phase, caster, dimension, origin, targets, startTick, seed, d, cancelReason, tag);
     }
 
     public static final StreamCodec<FriendlyByteBuf, PowerFxPayload> STREAM_CODEC = StreamCodec.of(
@@ -55,6 +56,7 @@ public record PowerFxPayload(String castId, String powerId, Phase phase, int cas
                 buf.writeLong(p.seed);
                 buf.writeVarInt(p.duration);
                 buf.writeUtf(p.cancelReason, 64);
+                buf.writeUtf(p.tag, 32);
             },
             buf -> {
                 String castId = buf.readUtf(64);
@@ -72,7 +74,7 @@ public record PowerFxPayload(String castId, String powerId, Phase phase, int cas
                     targets.add(buf.readVarInt());
                 }
                 return new PowerFxPayload(castId, powerId, phase, caster, dim, origin, targets, buf.readVarLong(),
-                        buf.readLong(), buf.readVarInt(), buf.readUtf(64));
+                        buf.readLong(), buf.readVarInt(), buf.readUtf(64), buf.readUtf(32));
             });
 
     @Override

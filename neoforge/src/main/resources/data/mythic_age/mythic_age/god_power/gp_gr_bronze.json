@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_bronze",
+  "card": "GP-GR-08",
+  "civilization": "greek",
+  "form": "scroll",
+  "castTicks": 30,
+  "cooldownTicks": 6000,
+  "targetProfile": "ALLY_AREA",
+  "selfCentered": true,
+  "radius": 10,
+  "durationTicks": 40,
+  "matrix": {
+    "caster": "bronze",
+    "own_soldier": "bronze",
+    "own_summon": "bronze",
+    "guardian": "golem",
+    "neutral_animal": "pets"
+  }
+}

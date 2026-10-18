@@ -1,0 +1,39 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_bronze",
+  "size": 16,
+  "palette": {
+    "o": "#3b2412",
+    "R": "#b9844a",
+    "r": "#87592c",
+    "p": "#ecdcb0",
+    "q": "#c9b07a",
+    "b": "#4a2a12",
+    "h": "#f6c27a",
+    "H": "#d08a3c",
+    "m": "#9a5d26",
+    "w": "#ffe2a8",
+    "B": "#6b3d18"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      "..oooooooooooo..",
+      "..opppbbbpppqo..",
+      "..oppbhHHbppqo..",
+      "..opbhHwHmbpqo..",
+      "..opbHwBwmbpqo..",
+      "..opbHHwmmbpqo..",
+      "..oppbmmmbppqo..",
+      "..opppbbbpppqo..",
+      "..oooooooooooo..",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      ".oooooooooooooo."
+    ]
+  }
+}

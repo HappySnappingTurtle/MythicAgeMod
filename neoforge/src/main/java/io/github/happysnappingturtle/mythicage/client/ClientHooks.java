@@ -78,6 +78,11 @@ public final class ClientHooks {
         io.github.happysnappingturtle.mythicage.client.power.ClientPowerAim.accept(payload);
     }
 
+    /** 实体外观状态（T13）。 */
+    public static void aura(io.github.happysnappingturtle.mythicage.power.AuraPayload payload) {
+        io.github.happysnappingturtle.mythicage.client.power.ClientAuras.accept(payload);
+    }
+
     /** 界面关闭时的回调；目前没有需要清理的客户端状态，留作 T9b 的动画联动入口。 */
     public static void clearTradeScreen(GuardianScreen screen) {
     }

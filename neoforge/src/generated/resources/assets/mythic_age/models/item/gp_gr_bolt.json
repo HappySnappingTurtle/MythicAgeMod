@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mythic_age:item/gp_gr_bolt"
+  }
+}

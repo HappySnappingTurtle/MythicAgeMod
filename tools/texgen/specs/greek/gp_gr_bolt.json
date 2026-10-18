@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_bolt",
+  "size": 16,
+  "palette": {
+    "o": "#3b2412",
+    "R": "#b9844a",
+    "r": "#87592c",
+    "p": "#ecdcb0",
+    "q": "#c9b07a",
+    "y": "#f6c93a",
+    "w": "#fffbe0",
+    "k": "#c07a1c"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      "..oooooooooooo..",
+      "..opppppppwyqo..",
+      "..oppppppwykqo..",
+      "..opppppwykpqo..",
+      "..opppwyyyykqo..",
+      "..opppppwykpqo..",
+      "..oppppwykppqo..",
+      "..opppwkpppqqo..",
+      "..oooooooooooo..",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      ".oooooooooooooo."
+    ]
+  }
+}

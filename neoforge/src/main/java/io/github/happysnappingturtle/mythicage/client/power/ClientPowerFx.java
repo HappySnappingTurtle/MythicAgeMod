@@ -12,7 +12,15 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +59,17 @@ public final class ClientPowerFx {
         }
     };
     private static final Map<Integer, Channel> CHANNELS = new ConcurrentHashMap<>();
+    private static final List<ActiveFx> ACTIVE = new ArrayList<>();
+
+    /** 加入一段持续表现（只在客户端主线程调用）。 */
+    public static void add(ActiveFx fx) {
+        ACTIVE.add(fx);
+    }
+
+    /** 提前结束某些持续表现（如雷击预警在命中时结束）。 */
+    public static void removeIf(Predicate<ActiveFx> filter) {
+        ACTIVE.removeIf(filter);
+    }
 
     private ClientPowerFx() {
     }
@@ -87,10 +106,27 @@ public final class ClientPowerFx {
     static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
-        if (level == null || CHANNELS.isEmpty()) {
+        if (level == null) {
             return;
         }
         long now = level.getGameTime();
+        if (!ACTIVE.isEmpty() && !mc.isPaused()) {
+            for (ActiveFx fx : List.copyOf(ACTIVE)) {
+                boolean keep;
+                try {
+                    keep = fx.tick(level, now);
+                } catch (RuntimeException e) {
+                    io.github.happysnappingturtle.mythicage.MythicAge.LOGGER.error("神力表现出错，已移除", e);
+                    keep = false;
+                }
+                if (!keep) {
+                    ACTIVE.remove(fx);
+                }
+            }
+        }
+        if (CHANNELS.isEmpty()) {
+            return;
+        }
         for (Iterator<Channel> it = CHANNELS.values().iterator(); it.hasNext(); ) {
             Channel c = it.next();
             // 结束后留一会儿给吟唱条淡出；服务端没发结束（丢包、换维度）时，超出吟唱刻 2 秒后自行清掉
@@ -108,7 +144,28 @@ public final class ClientPowerFx {
     }
 
     @SubscribeEvent
+    static void onRender(RenderLevelStageEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || ACTIVE.isEmpty() || mc.level == null) {
+            return;
+        }
+        Vec3 cam = event.getCamera().getPosition();
+        PoseStack pose = event.getPoseStack();
+        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        pose.pushPose();
+        pose.translate(-cam.x, -cam.y, -cam.z);
+        float pt = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        long now = mc.level.getGameTime();
+        for (ActiveFx fx : ACTIVE) {
+            fx.render(pose, buffers, now, pt);
+        }
+        pose.popPose();
+        buffers.endBatch();
+    }
+
+    @SubscribeEvent
     static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        ACTIVE.clear();
         CHANNELS.clear();
         SEEN.clear();
         ClientPowerAim.clear();

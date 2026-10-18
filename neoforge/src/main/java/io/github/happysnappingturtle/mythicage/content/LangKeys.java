@@ -350,6 +350,43 @@ public final class LangKeys {
         add("mythic_age.faith.pos", "%s, %s, %s", "%s, %s, %s", "%s, %s, %s");
         add("mythic_age.faith.row_sub", "%s · %s", "%s · %s", "%s・%s");
         add("mythic_age.faith.replay", "重看晋升：", "Replay ascension:", "昇格を再表示：");
+
+        // 希腊神力（T13）
+        add("mythic_age.power.gp_gr_bolt", "雷击", "Bolt", "雷撃");
+        add("mythic_age.power.gp_gr_restoration", "复原", "Restoration", "復元");
+        add("mythic_age.power.gp_gr_bronze", "青铜", "Bronze", "青銅");
+        add("item.mythic_age.gp_gr_bolt.tip", "锁定一个敌人，雷云预警后落雷：普通怪（最大生命 ≤60）即死，其余 40 点", "Mark one enemy; after a storm-cloud warning, lightning strikes: common mobs (max health ≤60) die, others take 40", "敵1体を指定し、雷雲の予兆の後に落雷：通常の敵（最大体力60以下）は即死、それ以外は40ダメージ");
+        add("item.mythic_age.gp_gr_bolt.tip2", "宙斯 · 吟唱 1 秒 · 冷却 60 秒 · 32 格", "Zeus · 1 s cast · 60 s cooldown · 32 blocks", "ゼウス・詠唱1秒・クールダウン60秒・32ブロック");
+        add("item.mythic_age.gp_gr_restoration.tip", "半径 12 内友方 5 秒回满生命，清除中毒、凋零、缓慢，修复友方玩家装备 10% 耐久", "Allies within 12 blocks heal to full over 5 s, lose poison, wither and slowness; allied players' gear regains 10% durability", "半径12内の味方が5秒で全回復し、毒・衰弱・鈍化を解除。味方プレイヤーの装備耐久を10%回復");
+        add("item.mythic_age.gp_gr_restoration.tip2", "雅典娜 · 吟唱 1.5 秒 · 冷却 180 秒", "Athena · 1.5 s cast · 180 s cooldown", "アテナ・詠唱1.5秒・クールダウン180秒");
+        add("item.mythic_age.gp_gr_bronze.tip", "半径 10 内友方获得「青铜之躯」90 秒：护甲 +6、韧性 +2、击退抗性 +0.3", "Allies within 10 blocks gain Bronze Body for 90 s: +6 armor, +2 toughness, +0.3 knockback resistance", "半径10内の味方に「青銅の体」を90秒付与：防御+6、防具強度+2、ノックバック耐性+0.3");
+        add("item.mythic_age.gp_gr_bronze.tip2", "狄俄尼索斯 · 吟唱 1.5 秒 · 冷却 300 秒", "Dionysus · 1.5 s cast · 300 s cooldown", "ディオニュソス・詠唱1.5秒・クールダウン300秒");
+        add("effect.mythic_age.bronze_body", "青铜之躯", "Bronze Body", "青銅の体");
+        add("death.attack.mythic_age.divine_bolt", "%1$s被宙斯的雷霆击中", "%1$s was struck by the thunderbolt of Zeus", "%1$sはゼウスの雷霆に撃たれた");
+        add("death.attack.mythic_age.divine_bolt.player", "%1$s被%2$s召来的雷霆击中", "%1$s was struck by a thunderbolt called down by %2$s", "%1$sは%2$sが呼んだ雷霆に撃たれた");
+        add("subtitles.mythic_age.gp.gr.bolt.lock", "雷击锁定", "Bolt locks on", "雷撃が狙いを定める");
+        add("subtitles.mythic_age.gp.gr.bolt.charge", "雷云蓄力", "Storm cloud gathers", "雷雲が集まる");
+        add("subtitles.mythic_age.gp.gr.bolt.strike", "雷霆劈下", "Thunderbolt strikes", "雷霆が落ちる");
+        add("subtitles.mythic_age.gp.gr.lure.place", "诱兽石升起", "Lure stone rises", "誘獣石がせり上がる");
+        add("subtitles.mythic_age.gp.gr.lure.pulse", "诱兽石波动", "Lure stone pulses", "誘獣石が脈打つ");
+        add("subtitles.mythic_age.gp.gr.lure.chicken", "诱兽石引来一只鸡", "Lure stone brings a chicken", "誘獣石がニワトリを呼ぶ");
+        add("subtitles.mythic_age.gp.gr.lure.sink", "诱兽石沉没", "Lure stone sinks", "誘獣石が沈む");
+        add("subtitles.mythic_age.gp.gr.sentinel.rise", "哨兵石像升起", "Sentinel rises", "番兵像がせり上がる");
+        add("subtitles.mythic_age.gp.gr.sentinel.draw", "哨兵石像拉弓", "Sentinel draws", "番兵像が弓を引く");
+        add("subtitles.mythic_age.gp.gr.sentinel.shoot", "哨兵石像射箭", "Sentinel shoots", "番兵像が矢を放つ");
+        add("subtitles.mythic_age.gp.gr.sentinel.crumble", "哨兵石像崩碎", "Sentinel crumbles", "番兵像が崩れる");
+        add("subtitles.mythic_age.gp.gr.restoration.cast", "复原降临", "Restoration descends", "復元が降りる");
+        add("subtitles.mythic_age.gp.gr.restoration.pulse", "复原治疗", "Restoration heals", "復元が癒やす");
+        add("subtitles.mythic_age.gp.gr.restoration.repair", "装备被修复", "Gear mended", "装備が修復される");
+        add("subtitles.mythic_age.gp.gr.pestilence.shatter", "瘟疫陶瓮碎裂", "Pestilence urn shatters", "疫病の壺が割れる");
+        add("subtitles.mythic_age.gp.gr.pestilence.spawner_seal", "刷怪器被封停", "Spawner sealed", "スポナーが封じられる");
+        add("subtitles.mythic_age.gp.gr.pestilence.end", "瘟疫消散", "Pestilence fades", "疫病が消える");
+        add("subtitles.mythic_age.gp.gr.bronze.cast", "青铜降临", "Bronze descends", "青銅が降りる");
+        add("subtitles.mythic_age.gp.gr.bronze.harden", "身躯化为青铜", "Bodies turn to bronze", "体が青銅になる");
+        add("subtitles.mythic_age.gp.gr.bronze.fade", "青铜之躯褪去", "Bronze Body fades", "青銅の体が消える");
+        add("subtitles.mythic_age.gp.gr.curse.impact", "诅咒苹果落地", "Curse apple lands", "呪いの林檎が落ちる");
+        add("subtitles.mythic_age.gp.gr.curse.transform", "被变成猪", "Turned into a pig", "豚に変えられる");
+        add("subtitles.mythic_age.gp.gr.curse.immune", "诅咒被弹开", "Curse repelled", "呪いがはじかれる");
     }
 
     private LangKeys() {

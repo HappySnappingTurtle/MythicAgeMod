@@ -2,6 +2,9 @@
   "schemaVersion": 1,
   "civilization": "greek",
   "offers": [
+    {"id": "gp_gr_bolt", "category": "god_power", "result": {"item": "mythic_age:gp_gr_bolt", "count": 1}, "price": {"favor": 20}, "minAge": "archaic", "venues": ["statue"], "patron": "zeus"},
+    {"id": "gp_gr_restoration", "category": "god_power", "result": {"item": "mythic_age:gp_gr_restoration", "count": 1}, "price": {"favor": 42}, "minAge": "classical", "venues": ["guardian"], "minorGod": "athena"},
+    {"id": "gp_gr_bronze", "category": "god_power", "result": {"item": "mythic_age:gp_gr_bronze", "count": 1}, "price": {"favor": 70}, "minAge": "heroic", "venues": ["guardian"], "minorGod": "dionysus"},
     {"id": "libation", "category": "supplies", "result": {"item": "mythic_age:libation", "count": 2}, "price": {"items": [{"item": "minecraft:emerald", "count": 1}]}, "minAge": "archaic", "venues": ["guardian"], "dailyLimit": 8},
     {"id": "patron_statue", "category": "supplies", "result": {"item": "mythic_age:patron_statue", "count": 1}, "price": {"favor": 30}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "athena_olive_oil", "category": "supplies", "result": {"item": "mythic_age:olive_oil", "count": 4}, "price": {"items": [{"item": "minecraft:emerald", "count": 3}]}, "minAge": "classical", "venues": ["guardian"], "dailyLimit": 4, "minorGod": "athena", "minorGodDiscount": {"athena": 0.1}},

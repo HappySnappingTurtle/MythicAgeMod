@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_bolt",
+  "card": "GP-GR-01",
+  "civilization": "greek",
+  "form": "scroll",
+  "castTicks": 20,
+  "cooldownTicks": 1200,
+  "range": 32,
+  "targetProfile": "HOSTILE_1",
+  "durationTicks": 15,
+  "matrix": {
+    "hostile": "strike",
+    "elite": "strike",
+    "boss": "strike",
+    "enemy_player": "pvp",
+    "other_summon": "strike"
+  }
+}

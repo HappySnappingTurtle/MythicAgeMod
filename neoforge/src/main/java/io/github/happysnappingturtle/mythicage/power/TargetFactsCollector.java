@@ -38,7 +38,27 @@ public final class TargetFactsCollector {
     public static final TagKey<EntityType<?>> ELITE = TagKey.create(Registries.ENTITY_TYPE,
             ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "elite"));
 
+    /** 只供 GameTest：临时当作精英的实体类型（精英标签目前为空）。 */
+    private static final java.util.Set<EntityType<?>> TEST_ELITE = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     private TargetFactsCollector() {
+    }
+
+    public static boolean isBoss(Entity e) {
+        return e.getType().is(BOSS);
+    }
+
+    public static boolean isElite(Entity e) {
+        return e.getType().is(ELITE) || TEST_ELITE.contains(e.getType());
+    }
+
+    /** 只供 GameTest：传 null 清空。 */
+    public static void eliteForTest(@javax.annotation.Nullable EntityType<?> type) {
+        if (type == null) {
+            TEST_ELITE.clear();
+        } else {
+            TEST_ELITE.add(type);
+        }
     }
 
     /** 施法者的「本村」（D3）：举行过仪式的村庄 ∪ 自己建立的村庄。 */
@@ -60,10 +80,10 @@ public final class TargetFactsCollector {
         if (e == caster) {
             return b.caster().build();
         }
-        if (e.getType().is(BOSS)) {
+        if (isBoss(e)) {
             b.boss();
         }
-        if (e.getType().is(ELITE)) {
+        if (isElite(e)) {
             b.elite();
         }
         if (e instanceof Player p) {

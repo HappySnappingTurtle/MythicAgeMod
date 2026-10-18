@@ -67,6 +67,16 @@ final class RemoteCommands {
                 scroll(mc, delta);
                 return field("delta", Integer.toString(delta));
             });
+            // 视角：first 第一人称、back 第三人称背后、front 第三人称正面（看自己身上的效果用）
+            case "camera" -> simple(mc -> {
+                String mode = optString(a, "mode", "first");
+                mc.options.setCameraType(switch (mode) {
+                    case "back" -> net.minecraft.client.CameraType.THIRD_PERSON_BACK;
+                    case "front" -> net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
+                    default -> net.minecraft.client.CameraType.FIRST_PERSON;
+                });
+                return field("camera", mode);
+            });
             case "hud" -> simple(mc -> {
                 mc.options.hideGui = "hide".equals(optString(a, "action", "show"));
                 return field("hud", mc.options.hideGui ? "hide" : "show");

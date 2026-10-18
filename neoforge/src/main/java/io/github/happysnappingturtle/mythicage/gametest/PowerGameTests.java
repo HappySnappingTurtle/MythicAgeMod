@@ -564,7 +564,7 @@ public final class PowerGameTests {
         }
         PowerFxPayload fx = new PowerFxPayload("c1", "gp_gr_bolt", PowerFxPayload.Phase.CHANNEL_CANCEL, 42,
                 ResourceLocation.withDefaultNamespace("overworld"), new Vec3(1.5, -2, 3.25), many, 1234L, -99L, 30,
-                "INTERRUPTED_DAMAGE");
+                "INTERRUPTED_DAMAGE", "cleanse");
         h.assertTrue(fx.targets().size() == PowerFxPayload.MAX_TARGETS, "超过 16 个截断");
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         PowerFxPayload.STREAM_CODEC.encode(buf, fx);

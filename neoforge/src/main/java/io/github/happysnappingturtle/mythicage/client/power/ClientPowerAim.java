@@ -115,7 +115,17 @@ public final class ClientPowerAim {
                 Vec3 center = a.selfCentered() ? player.getPosition(pt) : miss ? end : block.getLocation();
                 float[] c = !a.selfCentered() && miss ? GRAY : GOLD;
                 if (a.radius() > 0) {
-                    circle(pose, lines, center.add(0, 0.05, 0), a.radius(), c);
+                    PowerFxRenderer.AimStyle style = PowerFxRenderer.Registry.get(a.powerId())
+                            .map(PowerFxRenderer::aimStyle).orElse(null);
+                    if (style != null && c != GRAY) {
+                        long t = mc.level.getGameTime();
+                        FxDraw.flat(pose, buffers, style.ring(), center.add(0, 0.06, 0), a.radius(), (t + pt) * 0.4f,
+                                FxDraw.argb(0.9f, 0xFFFFFF));
+                        float[] sc = {(style.rgb() >> 16 & 255) / 255f, (style.rgb() >> 8 & 255) / 255f, (style.rgb() & 255) / 255f};
+                        c = sc;
+                    }
+                    // 画过贴图后换了缓冲，线框缓冲要重新取
+                    circle(pose, buffers.getBuffer(RenderType.lines()), center.add(0, 0.05, 0), a.radius(), c);
                 } else {
                     LevelRenderer.renderLineBox(pose, lines, new AABB(center, center).inflate(0.25), c[0], c[1], c[2], 1f);
                 }
@@ -129,7 +139,7 @@ public final class ClientPowerAim {
             }
         }
         pose.popPose();
-        buffers.endBatch(RenderType.lines());
+        buffers.endBatch();
     }
 
     private static void circle(PoseStack pose, VertexConsumer lines, Vec3 c, float r, float[] color) {
