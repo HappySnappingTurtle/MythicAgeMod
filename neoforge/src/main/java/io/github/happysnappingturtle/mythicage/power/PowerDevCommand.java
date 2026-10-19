@@ -32,7 +32,7 @@ import java.util.UUID;
  * 神力的开发命令（T12 设计文档 §7），只在开发环境（非发布包）注册，权限等级 2：
  * <pre>
  * /mythicage dev power &lt;hit|area|place&gt;   登记开发神力，清掉自己的希腊神力冷却，给 16 张该神力的纸
- * /mythicage dev power reset                只清掉自己的希腊神力冷却（含物品冷却遮罩）
+ * /mythicage dev power reset                清掉自己的希腊神力冷却（含物品冷却遮罩）与自己施放的持续区域
  * </pre>
  * 开发神力与 GameTest 的测试神力同构：{@code dev_hit} 单体伤害 4、吟唱 20 刻；{@code dev_area} 选点半径 5 的敌方伤害 4、
  * 吟唱 30 刻；{@code dev_place} 放置一个 10 秒的临时菌光体、吟唱 10 刻。
@@ -80,7 +80,16 @@ public final class PowerDevCommand {
                     p.getCooldowns().removeCooldown(item);
                 }
             }
-            ctx.getSource().sendSuccess(() -> Component.literal("已清除神力冷却"), false);
+            // 自己施放的持续区域也一并结束（实机连续截图时不互相干扰）
+            for (PowerZones.Zone z : PowerZones.all(p.server)) {
+                if (z.owner().equals(p.getUUID())) {
+                    PowerZones.remove(p.server, z.castId());
+                    var end = new PowerFxPayload(z.castId(), z.powerId(), PowerFxPayload.Phase.END, -1,
+                            z.dim().location(), z.center(), List.of(), 0, 0, 0, "", "");
+                    p.server.getPlayerList().getPlayers().forEach(to -> PowerFx.sendRaw(to, end));
+                }
+            }
+            ctx.getSource().sendSuccess(() -> Component.literal("已清除神力冷却与自己的神力区域"), false);
             return 1;
         }
         String json = SPECS.get(kind);

@@ -66,6 +66,11 @@ public final class ClientPowerFx {
         ACTIVE.add(fx);
     }
 
+    /** 遍历当前的持续表现（只读）。 */
+    public static void forEach(java.util.function.Consumer<ActiveFx> action) {
+        ACTIVE.forEach(action);
+    }
+
     /** 提前结束某些持续表现（如雷击预警在命中时结束）。 */
     public static void removeIf(Predicate<ActiveFx> filter) {
         ACTIVE.removeIf(filter);

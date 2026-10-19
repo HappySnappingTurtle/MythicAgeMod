@@ -86,7 +86,7 @@ public final class PrayerGameTests {
                 h.setBlock(x, 2, z, Blocks.STONE);
             }
         }
-        h.getLevel().setDayTime(3000);
+        timeOfDay(h, 3000);
     }
 
     private static FakePlayer owner(GameTestHelper h, String name) {
@@ -131,6 +131,12 @@ public final class PrayerGameTests {
         v.getBrain().setMemory(MemoryModuleType.MEETING_POINT, village.bell());
         v.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(h.getLevel().dimension(), absHome));
         return v;
+    }
+
+    /** 只改当天的时刻，不把日数拨回第 0 天（同组并行的按日入账测试依赖日数）。 */
+    private static void timeOfDay(GameTestHelper h, long t) {
+        long now = h.getLevel().getDayTime();
+        h.getLevel().setDayTime(now - Math.floorMod(now, 24000L) + t);
     }
 
     private static long today(GameTestHelper h) {
@@ -268,13 +274,13 @@ public final class PrayerGameTests {
         Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 32)));
         h.startSequence()
                 .thenWaitUntil(() -> h.assertTrue(PrayAtAltar.record(v).praying(), "先到祈祷位：" + describe(h, v, a)))
-                .thenExecute(() -> h.getLevel().setDayTime(10000))
+                .thenExecute(() -> timeOfDay(h, 10000))
                 .thenWaitUntil(() -> h.assertTrue(!PrayAtAltar.record(v).praying()
                         && PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(), "时段外应离开并释放祈祷位"))
                 .thenIdle(60)
                 .thenExecute(() -> {
                     h.assertTrue(PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(), "时段外不再去祈祷");
-                    h.getLevel().setDayTime(3000);
+                    timeOfDay(h, 3000);
                     cleanup(h, List.of(village), a);
                 })
                 .thenSucceed();

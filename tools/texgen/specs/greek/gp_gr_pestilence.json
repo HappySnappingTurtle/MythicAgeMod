@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_pestilence",
+  "size": 16,
+  "palette": {
+    "o": "#2a0e0b",
+    "d": "#5e1a14",
+    "m": "#8a2a1d",
+    "l": "#b5482f",
+    "h": "#d9775a",
+    "k": "#1b1110",
+    "y": "#c9c95a",
+    "Y": "#8f9a35"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "......oooo......",
+      ".....ohmmdo.....",
+      "......oyyo......",
+      ".....ooYyoo.....",
+      "....olhmmmdo....",
+      "...olhmmmmmdo...",
+      "...okkkkkkkko...",
+      "...ohykykykyo...",
+      "...okkkkkkkko...",
+      "...olmmmmmmdo...",
+      "....olmmmmdo....",
+      ".....olmmdo.....",
+      "......oddo......",
+      ".....oooooo.....",
+      "................"
+    ]
+  }
+}

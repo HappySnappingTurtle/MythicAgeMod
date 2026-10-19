@@ -87,6 +87,11 @@ public final class PowerFx {
         }
     }
 
+    /** 直接发一份现成的负载（区域到期等没有施放上下文的场合）。 */
+    public static void sendRaw(ServerPlayer to, CustomPacketPayload p) {
+        sendTo(to, p);
+    }
+
     static void sendTo(ServerPlayer to, CustomPacketPayload p) {
         RECENT.addLast(p);
         while (RECENT.size() > 256) {

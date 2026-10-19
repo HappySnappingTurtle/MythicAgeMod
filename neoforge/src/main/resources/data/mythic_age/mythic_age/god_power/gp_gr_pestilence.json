@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_pestilence",
+  "card": "GP-GR-06",
+  "civilization": "greek",
+  "form": "throwable",
+  "castTicks": 40,
+  "cooldownTicks": 3600,
+  "range": 24,
+  "targetProfile": "HOSTILE_AREA",
+  "radius": 24,
+  "durationTicks": 6000,
+  "matrix": {
+    "hostile": "afflict",
+    "elite": "afflict",
+    "boss": "afflict",
+    "enemy_player": "pvp",
+    "other_summon": "afflict"
+  }
+}

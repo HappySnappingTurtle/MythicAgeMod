@@ -1,0 +1,37 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_curse",
+  "size": 16,
+  "palette": {
+    "o": "#4a2a05",
+    "y": "#f2c23a",
+    "w": "#fff2b0",
+    "d": "#c08a1c",
+    "b": "#5b3a1a",
+    "l": "#7fae3a",
+    "L": "#4f7a22",
+    "p": "#f4a2c6",
+    "P": "#ffd9ea"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "..P....ob.......",
+      ".PpP..ob.lL.....",
+      "..P..oobLLl.....",
+      "...ooyyyyyoo....",
+      "..oywwyyyyyyo...",
+      "..owwyyyyyyyo...",
+      ".oywyyyyyyyydo..",
+      ".oyyyyyyyyyydo..",
+      ".oyyyyyyyyyddo..",
+      "..oyyyyyyyddo.P.",
+      "..oyyyyyyddo.PpP",
+      "...oddyyddo...P.",
+      "....oo.ooo......",
+      "................",
+      "................"
+    ]
+  }
+}

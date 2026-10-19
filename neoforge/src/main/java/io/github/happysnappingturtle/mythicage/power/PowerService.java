@@ -411,7 +411,11 @@ public final class PowerService {
             PowerShields.add((ServerLevel) p.level(), a.origin, a.spec.durationTicks());
         }
         // 先发提交表现，效果代码随后发的 HIT 等排在它后面
-        PowerFx.send(p, fx(a, PowerFxPayload.Phase.COMMIT, a.spec.durationTicks(), ""), a.origin);
+        // 投掷型：提交表现只代表这一次投掷（持续 = 飞行刻数），落地后的区域另发；否则补播会让后来的人重看一次投掷
+        int fxDuration = a.spec.form() == PowerSpec.Form.THROWABLE
+                ? io.github.happysnappingturtle.mythicage.core.power.ThrowRules.flightTicks(p.getEyePosition().distanceTo(a.origin))
+                : a.spec.durationTicks();
+        PowerFx.send(p, fx(a, PowerFxPayload.Phase.COMMIT, fxDuration, ""), a.origin);
         power.get().execute(ctx);
         return PowerReason.COMMITTED;
     }

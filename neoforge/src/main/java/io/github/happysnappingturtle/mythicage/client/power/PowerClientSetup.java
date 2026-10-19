@@ -27,6 +27,8 @@ public final class PowerClientSetup {
         PowerFxRenderer.Registry.register(GreekPowers.BOLT, new BoltFx());
         PowerFxRenderer.Registry.register(GreekPowers.RESTORATION, new RestorationFx());
         PowerFxRenderer.Registry.register(GreekPowers.BRONZE, new BronzeFx());
+        PowerFxRenderer.Registry.register(GreekPowers.PESTILENCE, new io.github.happysnappingturtle.mythicage.client.power.greek.PestilenceFx());
+        PowerFxRenderer.Registry.register(GreekPowers.CURSE, new io.github.happysnappingturtle.mythicage.client.power.greek.CurseFx());
     }
 
     @SubscribeEvent
@@ -46,6 +48,21 @@ public final class PowerClientSetup {
                 new MythParticle.Style(26, 26, 0.18f, 0.18f, 0, 0.012f, 1f, true, 0.1f, 0.35f, 0, false, 1f)));
         event.registerSpriteSet(PowerRegistries.REPAIR.get(), s -> MythParticle.provider(s,
                 new MythParticle.Style(26, 26, 0.16f, 0.16f, 0, 0.012f, 1f, true, 0.1f, 0.35f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.PLAGUE_MIST.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(50, 80, 0.5f, 0.9f, 0, 0, 0.98f, false, 0.25f, 0.4f, 0.004f, false, 0.32f)));
+        event.registerSpriteSet(PowerRegistries.ROSE_PUFF.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(10, 16, 0.18f, 0.32f, 0, 0.01f, 0.9f, true, 0.1f, 0.5f, 0.05f, false, 0.85f)));
+        event.registerSpriteSet(PowerRegistries.PLAGUE_MARK.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(11, 11, 0.2f, 0.2f, 0, 0, 1f, true, 0.1f, 0.2f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.SEAL.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(21, 21, 0.5f, 0.5f, 0, 0, 1f, true, 0.1f, 0.1f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.IMMUNE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(30, 30, 0.24f, 0.24f, 0, 0.015f, 1f, true, 0.05f, 0.35f, 0, false, 1f)));
+    }
+
+    @SubscribeEvent
+    static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(GreekPowers.CURSED_PIG.get(), CursedPigRenderer::new);
     }
 
     @SubscribeEvent

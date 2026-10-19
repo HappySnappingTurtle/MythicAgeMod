@@ -222,3 +222,11 @@ idea {
         downloadJavadoc = true
     }
 }
+
+// GameTest 每次都在全新世界里跑：旧世界里上一轮留下的台账、村庄、神坛、神力区域会越积越多，
+// 拖慢逐刻结算、让依赖时序的用例偶发失败（2026-10-17 排查 driver_credits_snapshot 时发现台账已累积约 6000 份）
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    doFirst {
+        delete file('runs/gameTestServer/world')
+    }
+}

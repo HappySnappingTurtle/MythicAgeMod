@@ -285,6 +285,22 @@ public final class VillageGameTests {
         });
     }
 
+    /** 离本村钟 ≥100 格、且 128 格内没有任何已登记村庄的位置（按距离由近到远找）。 */
+    private static BlockPos farFromVillages(GameTestHelper h, BlockPos bell) {
+        var all = VillageRegistry.get(h.getLevel().getServer()).all();
+        for (int d = 100; d <= 2000; d += 100) {
+            for (int[] dir : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+                BlockPos c = bell.offset(dir[0] * d, 0, dir[1] * d);
+                boolean clear = all.stream().noneMatch(v -> v.bell().dimension() == h.getLevel().dimension()
+                        && v.bell().pos().distToCenterSqr(c.getX(), v.bell().pos().getY(), c.getZ()) < 128 * 128);
+                if (clear) {
+                    return c;
+                }
+            }
+        }
+        throw new IllegalStateException("找不到远离村庄的位置");
+    }
+
     @GameTest(template = GameTestTemplates.EMPTY_17X16X36, batch = "village_title")
     public static void title_shows_on_entering_only(GameTestHelper h) {
         BlockPos rel = new BlockPos(8, 1, 2);
@@ -292,13 +308,15 @@ public final class VillageGameTests {
         BlockPos bell = h.absolutePos(rel);
         village(h, bell, "zeus");
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_title"));
-        p.moveTo(bell.getX() + 100.5, bell.getY(), bell.getZ());
+        // 「村外」要真的没有村庄：并行的其它测试结构里也登记了村庄，固定偏移可能正好落进别人的村子
+        BlockPos outside = farFromVillages(h, bell);
+        p.moveTo(outside.getX() + 0.5, outside.getY(), outside.getZ() + 0.5);
         h.assertTrue(VillageService.titleFor(p).isEmpty(), "村外不显示");
         p.moveTo(bell.getX() + 10.5, bell.getY(), bell.getZ());
         h.assertTrue(VillageService.titleFor(p).isPresent(), "进入时显示");
         p.moveTo(bell.getX() + 20.5, bell.getY(), bell.getZ());
         h.assertTrue(VillageService.titleFor(p).isEmpty(), "村内移动不重复");
-        p.moveTo(bell.getX() + 70.5, bell.getY(), bell.getZ());
+        p.moveTo(outside.getX() + 0.5, outside.getY(), outside.getZ() + 0.5);
         VillageService.titleFor(p);
         p.moveTo(bell.getX() + 10.5, bell.getY(), bell.getZ());
         h.assertTrue(VillageService.titleFor(p).isPresent(), "离开 64 格后再进入，再次显示");

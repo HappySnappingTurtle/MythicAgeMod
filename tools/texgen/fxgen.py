@@ -380,6 +380,190 @@ BRONZE_ICON = [
 ]
 
 
+def plague_seal() -> Image.Image:
+    """瘟疫病印（128）：暗红的斑驳外环 + 一圈向内的尖刺纹 + 内圈细线，带病黄色斑点（自带颜色）。"""
+    rnd = random.Random(606)
+    c = Canvas(128)
+    blots = [(rnd.uniform(0, 2 * math.pi), rnd.uniform(0.86, 0.94), rnd.uniform(0.012, 0.022)) for _ in range(30)]
+
+    def fn(r, th):
+        a = 0.0
+        col = "#7a1a16"
+        a = max(a, 0.9 * band(r, 0.92, 0.018, 0.02))
+        for bt, br, bs in blots:
+            d = math.hypot(r * math.cos(th) - br * math.cos(bt), r * math.sin(th) - br * math.sin(bt))
+            if d < bs:
+                a = max(a, 0.95)
+                col = "#c9b44a" if bs > 0.019 else "#5a1210"
+        k = (th / (2 * math.pi) * 18) % 1.0
+        if 0.6 < r < 0.86 and abs(k - 0.5) < 0.18 * smooth(0.6, 0.86, r):
+            a = max(a, 0.7)
+        a = max(a, 0.6 * band(r, 0.58, 0.008, 0.012))
+        a = max(a, 0.18 * (1 - smooth(0.0, 0.9, r)))
+        return None if a <= 0.01 else with_alpha(col, a)
+
+    c.polar(fn)
+    return c.img
+
+
+def plague_band() -> Image.Image:
+    """瘟疫边界带（64×16，沿圆周平铺）：暗红主带 + 指向圈内的尖刺 + 病黄细线，上下边缘柔和。"""
+    w, h = 64, 16
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    px = img.load()
+    for y in range(h):
+        for x in range(w):
+            v = (y + 0.5) / h
+            a = band(v, 0.62, 0.12, 0.08) * 0.95
+            # 尖刺：每 16 像素一个三角，从主带指向内侧（v 小的一侧）
+            k = (x % 16 + 0.5) / 16
+            spike = 0.5 - abs(k - 0.5)
+            if 0.2 < v < 0.55 and (0.55 - v) < spike * 0.7:
+                a = max(a, 0.85)
+            col = "#7a1a16"
+            if abs(v - 0.62) < 0.03:
+                col = "#c9b44a"
+            if a > 0.01:
+                r, g, b, _ = hexc(col)
+                px[x, y] = (r, g, b, int(a * 255))
+    return img
+
+
+def curse_ring() -> Image.Image:
+    """诅咒符圈（128）：玫瑰粉双圈 + 12 朵五瓣小花 + 内圈心形连环（自带颜色）。"""
+    c = Canvas(128)
+
+    def fn(r, th):
+        a = max(0.95 * band(r, 0.95, 0.012, 0.014), 0.8 * band(r, 0.78, 0.008, 0.012))
+        # 心形连环：沿 r≈0.66 的波浪线
+        wave = 0.66 + 0.035 * math.sin(th * 24)
+        a = max(a, 0.75 * band(r, wave, 0.008, 0.01))
+        a = max(a, 0.15 * (1 - smooth(0.0, 0.8, r)))
+        return None if a <= 0.01 else with_alpha("#f39bc0", a)
+
+    c.polar(fn)
+    for i in range(12):
+        th = i / 12 * 2 * math.pi
+        cx = 64 + math.cos(th) * 0.865 * 60
+        cy = 64 + math.sin(th) * 0.865 * 60
+        for y in range(int(cy) - 6, int(cy) + 7):
+            for x in range(int(cx) - 6, int(cx) + 7):
+                dx = x + 0.5 - cx
+                dy = y + 0.5 - cy
+                rr = math.hypot(dx, dy)
+                ang = math.atan2(dy, dx)
+                petal = 3.2 + 1.8 * abs(math.cos(2.5 * ang))
+                if rr < 1.3:
+                    c.put(x, y, with_alpha("#ffe08a", 1))
+                elif rr < petal:
+                    c.put(x, y, with_alpha("#ff7fb0" if rr > petal - 1.2 else "#ffc2da", 0.95))
+    return c.img
+
+
+def soft_puff(seed: int, top: str, bottom: str, n: int = 16) -> Image.Image:
+    """软边烟团（疫雾、玫瑰烟）。"""
+    rnd = random.Random(seed)
+    c = Canvas(n)
+    blobs = [(n / 2 + rnd.uniform(-n * 0.18, n * 0.18), n / 2 + rnd.uniform(-n * 0.12, n * 0.12), rnd.uniform(n * 0.25, n * 0.38))
+             for _ in range(4)]
+    t0 = hexc(top)
+    t1 = hexc(bottom)
+    for y in range(n):
+        for x in range(n):
+            a = 0.0
+            for bx, by, br in blobs:
+                a = max(a, 1 - smooth(br * 0.3, br, math.hypot(x + 0.5 - bx, y + 0.5 - by)))
+            if a <= 0.02:
+                continue
+            t = (y + 0.5) / n
+            col = tuple(int(t0[i] + (t1[i] - t0[i]) * t) for i in range(3))
+            c.put(x, y, (col[0], col[1], col[2], int(a * 230)))
+    return c.img
+
+
+PMARK = {"o": hexc("#2a0a08"), "r": hexc("#a3241c"), "R": hexc("#d6463a"), "y": hexc("#d8cf5a")}
+PLAGUE_MARK = [
+    "........",
+    "...o....",
+    "..oRo...",
+    "..oro...",
+    ".orrro..",
+    ".oryro..",
+    "..ooo...",
+    "........",
+]
+SEAL_ICON = {"o": hexc("#20140f"), "g": hexc("#5c5f66"), "G": hexc("#8a8e96"), "r": hexc("#d23a2e"), "R": hexc("#ff6a55")}
+SEAL = [
+    "................",
+    "..oooooooooooo..",
+    "..oGgGgGgGgGgo..",
+    ".Rr..........rR.",
+    "..rR..g..g..Rr..",
+    "..oGrRg..gRrGo..",
+    "..og.rRggRr.go..",
+    "..oG..rRRr..Go..",
+    "..og..rRRr..go..",
+    "..oG.rRggRr.Go..",
+    "..ogrRg..gRrgo..",
+    "..rR..g..g..Rr..",
+    ".Rr..........rR.",
+    "..oGgGgGgGgGgo..",
+    "..oooooooooooo..",
+    "................",
+]
+IMMUNE_ICON = {"o": hexc("#2b2f3a"), "s": hexc("#c9d2e0"), "S": hexc("#ffffff"), "b": hexc("#6f8fbf"), "y": hexc("#f2d27a")}
+IMMUNE = [
+    "................",
+    "....oooooooo....",
+    "...osSSSSSSso...",
+    "...osSbbbbSso...",
+    "...osbbyybbso...",
+    "...osbyyyybso...",
+    "...osbbyybbso...",
+    "...osbbbbbbso...",
+    "....osbbbbso....",
+    "....osbbbbso....",
+    ".....osbbso.....",
+    "......osso......",
+    ".......oo.......",
+    "................",
+    "................",
+    "................",
+]
+
+
+def cursed_pig() -> Image.Image:
+    """被诅咒的猪（64×32，原版猪模型的贴图尺寸与方块 UV 排布）：玫瑰粉皮、稀疏金斑、深粉鼻、金色眼眸。"""
+    img = Image.new("RGBA", (64, 32), (0, 0, 0, 0))
+    px = img.load()
+    rnd = random.Random(707)
+    skin = [hexc("#e8899f"), hexc("#e8899f"), hexc("#e8899f"), hexc("#df7f96"), hexc("#ef94a9")]
+    spot = hexc("#e9c25c")
+
+    def box(u, v, w, h, d):
+        # 顶、底、四个侧面
+        for (x0, y0, ww, hh) in ((u + d, v, w, d), (u + d + w, v, w, d), (u, v + d, d, h), (u + d, v + d, w, h),
+                                 (u + d + w, v + d, d, h), (u + 2 * d + w, v + d, w, h)):
+            for y in range(y0, y0 + hh):
+                for x in range(x0, x0 + ww):
+                    px[x, y] = spot if rnd.random() < 0.035 else skin[rnd.randrange(len(skin))]
+
+    box(0, 0, 8, 8, 8)      # 头
+    box(16, 16, 4, 3, 1)    # 鼻
+    box(28, 8, 10, 16, 8)   # 身
+    box(0, 16, 4, 6, 4)     # 腿
+    # 脸（头的正面 8..15 × 8..15）：金色眼眸
+    for (x, y, c) in ((9, 11, "#ffffff"), (10, 11, "#c48a1a"), (13, 11, "#c48a1a"), (14, 11, "#ffffff")):
+        px[x, y] = hexc(c)
+    # 鼻子正面（17..20 × 17..19）：深粉 + 鼻孔
+    for y in range(17, 20):
+        for x in range(17, 21):
+            px[x, y] = hexc("#c45a78")
+    px[17, 18] = hexc("#6a2236")
+    px[20, 18] = hexc("#6a2236")
+    return img
+
+
 def all_textures() -> dict[str, Image.Image]:
     out: dict[str, Image.Image] = {
         "fx/bolt_ring": bolt_ring(),
@@ -389,6 +573,13 @@ def all_textures() -> dict[str, Image.Image]:
         "fx/bronze_swirl": bronze_swirl(),
         "fx/bronze_plate": bronze_plate(),
         "fx/athena_sigil": athena_sigil(),
+        "fx/plague_seal": plague_seal(),
+        "fx/plague_band": plague_band(),
+        "fx/curse_ring": curse_ring(),
+        "particle/plague_mark": pixels(PLAGUE_MARK, PMARK),
+        "particle/seal": pixels(SEAL, SEAL_ICON),
+        "particle/immune": pixels(IMMUNE, IMMUNE_ICON),
+        "entity/cursed_pig": cursed_pig(),
         "mob_effect/bronze_body": pixels(BRONZE_ICON, EFFECT),
         "particle/cleanse": pixels(CLEANSE, ICON),
         "particle/repair": pixels(REPAIR, ICON),
@@ -401,6 +592,9 @@ def all_textures() -> dict[str, Image.Image]:
         out[f"particle/heal_mote_{i}"] = pixels(rows, MOTE)
     for i, rows in enumerate(LEAVES):
         out[f"particle/olive_leaf_{i}"] = pixels(rows, LEAF)
+    for i in range(3):
+        out[f"particle/plague_mist_{i}"] = soft_puff(300 + i, "#7d6a3a", "#4a1c18")
+        out[f"particle/rose_puff_{i}"] = soft_puff(400 + i, "#ffd3e4", "#e97aa6")
     for i, rows in enumerate(FLAKES):
         out[f"particle/bronze_flake_{i}"] = pixels(rows, FLAKE)
     return out

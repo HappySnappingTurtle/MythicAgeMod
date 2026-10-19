@@ -76,10 +76,14 @@ public final class RuntimeGameTests {
     public static void time_set_keeps_game_time(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         long before = WorldClock.now(server);
+        // 同组并行的其它测试（祈祷时段、按日入账）依赖当天时间：改完立即还原
+        long dayTime = server.overworld().getDayTime();
         CommandSourceStack op = server.createCommandSourceStack().withPermission(4).withSuppressedOutput();
         server.getCommands().performPrefixedCommand(op, "time set night");
         server.overworld().setDayTime(server.overworld().getDayTime() + 10000);
-        helper.assertTrue(WorldClock.now(server) == before, "gameTime 不应因 /time set 或 setDayTime 改变");
+        boolean kept = WorldClock.now(server) == before;
+        server.overworld().setDayTime(dayTime);
+        helper.assertTrue(kept, "gameTime 不应因 /time set 或 setDayTime 改变");
         helper.succeed();
     }
 
@@ -89,12 +93,16 @@ public final class RuntimeGameTests {
         MinecraftServer server = helper.getLevel().getServer();
         FakePlayer p = owner(helper.getLevel(), "rt_snapshot");
         ProducerLedger l = ledger(server, "snapshot", p, 0);
-        helper.runAfterDelay(520, () -> {
-            PlayerActivity.markActive(p);
-            helper.assertTrue(greek(p) == 1, "推进 500 tick 后应恰好入账 1 点，实际 " + greek(p));
+        // 驱动器按队列分批结算，具体哪一刻轮到本台账取决于全服台账数；等到入账为止，并确认只入 1 点
+        long start = WorldClock.now(server);
+        helper.onEachTick(() -> PlayerActivity.markActive(p));
+        helper.succeedWhen(() -> {
+            long waited = WorldClock.now(server) - start;
+            helper.assertTrue(waited >= 500, "至少推进 500 tick");
+            helper.assertTrue(greek(p) >= 1, "等待入账：" + greek(p));
+            helper.assertTrue(greek(p) == 1, "48/日推进约 500 tick 应恰好入账 1 点，实际 " + greek(p) + "（已推进 " + waited + "）");
             helper.assertTrue(MythData.isDirty(p.getUUID()) || MythData.syncCount(p.getUUID()) > 0, "入账后应同步");
             cleanup(server, p, l);
-            helper.succeed();
         });
     }
 

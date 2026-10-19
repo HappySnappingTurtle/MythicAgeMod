@@ -36,6 +36,38 @@ public final class FxDraw {
         vertex(vc, last, x + (cos + sin), y, z + (sin - cos), 1, 0, argb);
     }
 
+    /**
+     * 一条贴地的圆环带：半径 {@code r}、宽 {@code width}，贴图沿圆周平铺（每 {@code tileLength} 格重复一次，u 方向沿圆周，
+     * v 从内缘 0 到外缘 1）。大半径的边界用它，比把一张圈贴图拉到几十格宽清晰得多。
+     */
+    public static void band(PoseStack pose, MultiBufferSource buffers, ResourceLocation tex, Vec3 c, float r, float width,
+                            float tileLength, int argb) {
+        if (r <= 0.05f) {
+            return;
+        }
+        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(tex));
+        PoseStack.Pose last = pose.last();
+        int segments = Mth.clamp((int) (r * 4), 24, 256);
+        float tiles = Math.max(1, Math.round((float) (2 * Math.PI * r / tileLength)));
+        float r0 = Math.max(0, r - width / 2);
+        float r1 = r + width / 2;
+        float y = (float) c.y;
+        for (int i = 0; i < segments; i++) {
+            float a0 = (float) (Math.PI * 2 * i / segments);
+            float a1 = (float) (Math.PI * 2 * (i + 1) / segments);
+            float u0 = tiles * i / segments;
+            float u1 = tiles * (i + 1) / segments;
+            float c0 = Mth.cos(a0);
+            float s0 = Mth.sin(a0);
+            float c1 = Mth.cos(a1);
+            float s1 = Mth.sin(a1);
+            vertex(vc, last, (float) c.x + c0 * r0, y, (float) c.z + s0 * r0, u0, 0, argb);
+            vertex(vc, last, (float) c.x + c0 * r1, y, (float) c.z + s0 * r1, u0, 1, argb);
+            vertex(vc, last, (float) c.x + c1 * r1, y, (float) c.z + s1 * r1, u1, 1, argb);
+            vertex(vc, last, (float) c.x + c1 * r0, y, (float) c.z + s1 * r0, u1, 0, argb);
+        }
+    }
+
     private static void vertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, float u, float v, int argb) {
         vc.addVertex(p, x, y, z).setColor(argb).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(LightTexture.FULL_BRIGHT).setNormal(p, 0, 1, 0);

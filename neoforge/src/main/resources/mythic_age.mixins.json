@@ -4,8 +4,11 @@
   "package": "io.github.happysnappingturtle.mythicage.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BaseSpawnerMixin",
     "CraftingMenuMixin",
     "ResultSlotMixin",
+    "TrialSpawnerDataAccessor",
+    "TrialSpawnerMixin",
     "VillagerGoalPackagesMixin",
     "VillagerRestockMixin"
   ],

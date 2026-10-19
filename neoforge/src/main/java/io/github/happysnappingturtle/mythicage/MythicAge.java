@@ -64,7 +64,7 @@ public final class MythicAge {
         GreekArchitecture.init();
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
-        io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(NeoForge.EVENT_BUS);
+        io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
         GreekAgricultureEvents.register(modBus);
         ModCreativeTabs.init();
         ModRecipes.init();
@@ -139,6 +139,8 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onChunkWatch);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerTasks::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerZones::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerZones::onChunkWatch);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerTasks::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.power.Auras::onAdded);
         game.addListener(io.github.happysnappingturtle.mythicage.power.Auras::onRemoved);

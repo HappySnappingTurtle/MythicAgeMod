@@ -52,6 +52,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -70,13 +71,22 @@ public final class GreekPowerGameTests {
     private GreekPowerGameTests() {
     }
 
+    /** 瘟疫区域在本批次只持续 200 刻（正式 6000），好在测试时间内看到到期。 */
+    static final int PESTILENCE_TEST_TICKS = 200;
+
     @BeforeBatch(batch = BATCH)
     public static void before(ServerLevel level) {
         TargetFactsCollector.eliteForTest(EntityType.VINDICATOR);
+        var s = PowerSpecLoader.get(GreekPowers.PESTILENCE).orElseThrow();
+        PowerSpecLoader.overrideForTest(new io.github.happysnappingturtle.mythicage.core.power.PowerSpec(s.id(), s.card(), s.civ(),
+                s.form(), s.castTicks(), s.cooldownTicks(), s.range(), s.profile(), s.selfCentered(), s.large(), s.matrix(),
+                PESTILENCE_TEST_TICKS, s.radius()));
     }
 
     @AfterBatch(batch = BATCH)
     public static void after(ServerLevel level) {
+        TestMobs.clear(level, e -> e instanceof io.github.happysnappingturtle.mythicage.content.greek.power.CursedPig);
+        PowerSpecLoader.overrideForTest(null);
         TargetFactsCollector.eliteForTest(null);
         PowerService.clearForTest();
         level.getServer().setPvpAllowed(true);
@@ -103,7 +113,7 @@ public final class GreekPowerGameTests {
     }
 
     private static <T extends Mob> T mob(GameTestHelper h, EntityType<T> type, int x, int z) {
-        T m = h.spawn(type, new BlockPos(x, 2, z));
+        T m = TestMobs.tag(h.spawn(type, new BlockPos(x, 2, z)));
         m.setNoAi(true);
         return m;
     }
@@ -337,6 +347,240 @@ public final class GreekPowerGameTests {
             MobEffectInstance e = p.getEffect(GreekPowers.BRONZE_BODY);
             h.assertTrue(e != null && e.getDuration() > 1790, "时长回到 90 秒：" + e);
             h.assertTrue(p.getAttributeValue(Attributes.ARMOR) == 6, "数值不叠加");
+            h.succeed();
+        });
+    }
+
+
+    // ───────────── 投掷（TC-T13-40） ─────────────
+
+    /** 让施法者看向结构里的某个地面格子（投掷型选点）。 */
+    private static void lookAtFloor(GameTestHelper h, Player p, int x, int z) {
+        BlockPos b = h.absolutePos(new BlockPos(x, 1, z));
+        p.lookAt(EntityAnchorArgument.Anchor.EYES, new net.minecraft.world.phys.Vec3(b.getX() + 0.5, b.getY() + 1.0, b.getZ() + 0.5));
+    }
+
+    private static List<io.github.happysnappingturtle.mythicage.power.PowerZones.Zone> zonesOf(GameTestHelper h, String castId) {
+        return io.github.happysnappingturtle.mythicage.power.PowerZones.all(h.getLevel().getServer()).stream()
+                .filter(z -> z.castId().equals(castId)).toList();
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 140)
+    public static void pestilence_throw_lands_after_flight(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gp_throw", GreekPowers.PESTILENCE_ITEM.get(), 2);
+        lookAtFloor(h, p, 8, 14);
+        String castId = cast(p);
+        int[] committedAt = {-1};
+        h.onEachTick(() -> {
+            if (committedAt[0] < 0 && committed(p)) {
+                committedAt[0] = (int) h.getTick();
+                h.assertTrue(p.getItemInHand(InteractionHand.MAIN_HAND).getCount() == 1, "吟唱满即消耗（D2）");
+                h.assertTrue(zonesOf(h, castId).isEmpty(), "飞行中还没有区域");
+            }
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(committedAt[0] > 0, "等待提交");
+            h.assertTrue(!zonesOf(h, castId).isEmpty(), "落地后登记区域");
+            long flew = h.getTick() - committedAt[0];
+            h.assertTrue(flew >= 6, "至少飞了 6 刻：" + flew);
+            var z = zonesOf(h, castId).getFirst();
+            h.assertTrue(Math.abs(z.center().z - (h.absolutePos(new BlockPos(8, 2, 14)).getZ() + 0.5)) < 1.5, "落在锁定点：" + z.center());
+        });
+    }
+
+    // ───────────── 瘟疫（TC-T13-41～48） ─────────────
+
+    /** 施放瘟疫并等它落地；落地后调用 {@code then}。 */
+    private static void plague(GameTestHelper h, PowerGameTests.Vulnerable p, int x, int z, java.util.function.Consumer<String> then) {
+        lookAtFloor(h, p, x, z);
+        String castId = cast(p);
+        boolean[] done = {false};
+        h.onEachTick(() -> {
+            if (!done[0] && !zonesOf(h, castId).isEmpty()) {
+                done[0] = true;
+                then.accept(castId);
+            }
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void pestilence_afflicts_enemies_only(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gp_afflict", GreekPowers.PESTILENCE_ITEM.get(), 1);
+        Mob pillager = mob(h, EntityType.PILLAGER, 6, 14);
+        pillager.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.CROSSBOW));
+        Mob husk = mob(h, EntityType.HUSK, 10, 14);
+        Mob villager = mob(h, EntityType.VILLAGER, 8, 18);
+        Wolf wolf = mob(h, EntityType.WOLF, 9, 16);
+        wolf.tame(p);
+        plague(h, p, 8, 14, castId -> h.runAfterDelay(2, () -> {
+            h.assertTrue(husk.hasEffect(MobEffects.WEAKNESS) && husk.getEffect(MobEffects.WEAKNESS).getAmplifier() == 1
+                    && husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "近战敌人：虚弱 II + 缓慢 I");
+            h.assertTrue(pillager.hasEffect(GreekPowers.PLAGUED), "远程敌人有瘟疫标记");
+            // 远程封禁：拉不开弩
+            pillager.startUsingItem(InteractionHand.MAIN_HAND);
+            h.assertTrue(!pillager.isUsingItem(), "带瘟疫标记：不能上弩");
+            // 远程封禁：它发出的箭不加入世界
+            var arrow = new net.minecraft.world.entity.projectile.Arrow(h.getLevel(), pillager, new ItemStack(Items.ARROW), null);
+            h.assertTrue(!h.getLevel().addFreshEntity(arrow), "带瘟疫标记的生物射出的箭不加入世界");
+            // TC-T13-44：友方不受影响
+            h.assertTrue(villager.getActiveEffects().isEmpty() && wolf.getActiveEffects().isEmpty(), "村民、驯服狼没有任何状态");
+            h.assertTrue(Auras.sentForTest(pillager.getId()).stream().anyMatch(a -> a.aura().equals("plagued")), "标记的外观已同步");
+            h.succeed();
+        }));
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void pestilence_boss_keeps_ranged(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gp_boss", GreekPowers.PESTILENCE_ITEM.get(), 1);
+        // 凋灵在原版里对一切药水效果免疫，用同在 Boss 标签里的远古守卫者
+        Mob boss = mob(h, EntityType.ELDER_GUARDIAN, 8, 17);
+        plague(h, p, 8, 14, castId -> h.runAfterDelay(2, () -> {
+            h.assertTrue(boss.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) && boss.hasEffect(MobEffects.WEAKNESS),
+                    "Boss 也受虚弱、缓慢：" + boss.getActiveEffects());
+            h.assertTrue(!boss.hasEffect(GreekPowers.PLAGUED), "Boss 没有远程封禁标记");
+            var arrow = new net.minecraft.world.entity.projectile.Arrow(h.getLevel(), boss, new ItemStack(Items.ARROW), null);
+            h.assertTrue(h.getLevel().addFreshEntity(arrow), "Boss 的弹射物照常加入世界");
+            arrow.discard();
+            boss.discard();
+            h.succeed();
+        }));
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void pestilence_stalls_spawners_and_spawns(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gp_spawner", GreekPowers.PESTILENCE_ITEM.get(), 1);
+        BlockPos spawner = h.absolutePos(new BlockPos(5, 2, 15));
+        BlockPos trial = h.absolutePos(new BlockPos(11, 2, 15));
+        h.getLevel().setBlockAndUpdate(spawner, Blocks.SPAWNER.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(trial, Blocks.TRIAL_SPAWNER.defaultBlockState());
+        plague(h, p, 8, 14, castId -> {
+            var level = h.getLevel();
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.SpawnerStall.stalled(level, spawner), "刷怪笼停摆");
+            var zone = zonesOf(h, castId).getFirst();
+            h.assertTrue(zone.marks().contains(spawner) && zone.marks().contains(trial), "两个刷怪器都被标记：" + zone.marks());
+            // TC-T13-43：试炼刷怪器的冷却随暂停后推
+            var be = (net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity) level.getBlockEntity(trial);
+            var data = (io.github.happysnappingturtle.mythicage.mixin.TrialSpawnerDataAccessor) be.getTrialSpawner().getData();
+            long end = level.getGameTime() + 100;
+            data.mythicAge$setCooldownEndsAt(end);
+            for (int i = 0; i < 5; i++) {
+                be.getTrialSpawner().tickServer(level, trial, false);
+            }
+            h.assertTrue(data.mythicAge$getCooldownEndsAt() == end + 5, "停 5 刻，冷却结束后推 5 刻：" + (data.mythicAge$getCooldownEndsAt() - end));
+            // TC-T13-48：自然生成判定
+            Mob zombie = EntityType.ZOMBIE.create(level);
+            zombie.moveTo(spawner.getX() + 2, spawner.getY(), spawner.getZ());
+            var check = new net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck(zombie, level,
+                    net.minecraft.world.entity.MobSpawnType.NATURAL, null);
+            io.github.happysnappingturtle.mythicage.content.greek.power.PestilencePower.onSpawnCheck(check);
+            h.assertTrue(check.getResult() == net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.Result.FAIL,
+                    "区域内怪物自然生成失败");
+            Mob cow = EntityType.COW.create(level);
+            cow.moveTo(spawner.getX() + 2, spawner.getY(), spawner.getZ());
+            var cowCheck = new net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck(cow, level,
+                    net.minecraft.world.entity.MobSpawnType.NATURAL, null);
+            io.github.happysnappingturtle.mythicage.content.greek.power.PestilencePower.onSpawnCheck(cowCheck);
+            h.assertTrue(cowCheck.getResult() == net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.Result.DEFAULT,
+                    "动物不受影响");
+            // TC-T13-42：到期后恢复（本批次持续 200 刻）
+            h.runAfterDelay(PESTILENCE_TEST_TICKS + 30, () -> {
+                h.assertTrue(zonesOf(h, castId).isEmpty(), "到期移除");
+                h.assertTrue(!io.github.happysnappingturtle.mythicage.power.SpawnerStall.stalled(level, spawner), "刷怪笼恢复");
+                h.succeed();
+            });
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void pestilence_zone_persists(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gp_save", GreekPowers.PESTILENCE_ITEM.get(), 1);
+        plague(h, p, 8, 14, castId -> {
+            var server = h.getLevel().getServer();
+            io.github.happysnappingturtle.mythicage.power.PowerZones.roundTripForTest(server);
+            h.assertTrue(zonesOf(h, castId).size() == 1, "存档往返后仍在");
+            BlockPos inside = h.absolutePos(new BlockPos(8, 2, 14));
+            h.assertTrue(io.github.happysnappingturtle.mythicage.power.PowerZones.covered(h.getLevel(), inside, "pestilence"),
+                    "往返后照常生效");
+            h.succeed();
+        });
+    }
+
+    // ───────────── 刷怪器停摆总开关（TC-T13-46） ─────────────
+
+    @GameTest(template = T, batch = BATCH)
+    public static void stall_switch_off(GameTestHelper h) {
+        BlockPos pos = h.absolutePos(new BlockPos(8, 2, 8));
+        var zone = new io.github.happysnappingturtle.mythicage.power.PowerZones.Zone("stall_off", "pestilence", GreekPowers.PESTILENCE,
+                h.getLevel().dimension(), net.minecraft.world.phys.Vec3.atCenterOf(pos), 24,
+                io.github.happysnappingturtle.mythicage.runtime.WorldClock.now(h.getLevel().getServer()) + 100, UUID.randomUUID(),
+                List.of());
+        io.github.happysnappingturtle.mythicage.power.PowerZones.add(h.getLevel().getServer(), zone);
+        h.assertTrue(io.github.happysnappingturtle.mythicage.power.SpawnerStall.stalled(h.getLevel(), pos, true), "总开关开：停摆");
+        h.assertTrue(!io.github.happysnappingturtle.mythicage.power.SpawnerStall.stalled(h.getLevel(), pos, false), "总开关关：不停摆");
+        io.github.happysnappingturtle.mythicage.power.PowerZones.remove(h.getLevel().getServer(), "stall_off");
+        h.succeed();
+    }
+
+    // ───────────── 诅咒（TC-T13-49～52） ─────────────
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
+    public static void curse_budget_and_immune(GameTestHelper h) {
+        floor(h);
+        PowerGameTests.Vulnerable p = caster(h, "gc_curse", GreekPowers.CURSE_ITEM.get(), 1);
+        List<Mob> mobs = new ArrayList<>();
+        int[][] at = {{6, 14}, {10, 14}, {8, 16}, {8, 12}};
+        int[] hp = {20, 20, 20, 24};
+        for (int i = 0; i < 4; i++) {
+            Mob m = mob(h, EntityType.HUSK, at[i][0], at[i][1]);
+            maxHealth(m, hp[i]);
+            mobs.add(m);
+        }
+        Mob elite = mob(h, EntityType.VINDICATOR, 11, 16);
+        lookAtFloor(h, p, 8, 14);
+        String castId = cast(p);
+        h.succeedWhen(() -> {
+            h.assertTrue(hasFx(castId, PowerFxPayload.Phase.END, ""), "等待变形结束");
+            h.assertTrue(mobs.subList(0, 3).stream().allMatch(Entity::isRemoved), "20、20、20 三只变猪（原实体移除）");
+            h.assertTrue(mobs.get(3).isAlive() && !mobs.get(3).isRemoved(), "第四只（24）超预算不变");
+            h.assertTrue(elite.isAlive() && !elite.isRemoved(), "精英免疫");
+            h.assertTrue(hasFx(castId, PowerFxPayload.Phase.HIT, "immune"), "免疫提示");
+            List<io.github.happysnappingturtle.mythicage.content.greek.power.CursedPig> pigs = h.getLevel().getEntitiesOfClass(
+                    io.github.happysnappingturtle.mythicage.content.greek.power.CursedPig.class,
+                    new AABB(h.absolutePos(BlockPos.ZERO)).inflate(20));
+            h.assertTrue(pigs.size() == 3, "三只诅咒猪：" + pigs.size());
+            h.assertTrue(fx(castId).stream().filter(f -> f.tag().equals("transform")).count() == 3, "三次变形表现");
+            h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.ExperienceOrb.class,
+                    new AABB(h.absolutePos(BlockPos.ZERO)).inflate(20)).isEmpty(), "变形不给经验");
+        });
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void cursed_pig_rules(GameTestHelper h) {
+        floor(h);
+        var pig = (io.github.happysnappingturtle.mythicage.content.greek.power.CursedPig) TestMobs.tag(h.spawn(
+                GreekPowers.CURSED_PIG.get(), new BlockPos(8, 2, 8)));
+        PowerGameTests.Vulnerable p = caster(h, "gc_pig", Items.STICK, 1);
+        h.assertTrue(pig.getType().is(GreekPowers.CURSED), "带 #mythic_age:cursed");
+        h.assertTrue(pig instanceof net.minecraft.world.entity.monster.Enemy, "实现 Enemy");
+        h.assertTrue(io.github.happysnappingturtle.mythicage.core.power.TargetClassifier.classify(
+                TargetFactsCollector.collect(p, pig, Set.of())) == io.github.happysnappingturtle.mythicage.core.power.TargetCategory.HOSTILE,
+                "目标矩阵：敌对生物");
+        h.assertTrue(!pig.isFood(new ItemStack(Items.CARROT)) && !pig.isSaddleable(), "不吃饲料、不能上鞍");
+        h.assertTrue(!pig.removeWhenFarAway(200), "不会自然消失");
+        pig.thunderHit(h.getLevel(), EntityType.LIGHTNING_BOLT.create(h.getLevel()));
+        h.assertTrue(pig.isAlive() && !pig.isRemoved(), "雷劈不转化");
+        BlockPos at = pig.blockPosition();
+        pig.kill();
+        h.runAfterDelay(2, () -> {
+            var drops = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(at).inflate(3));
+            h.assertTrue(!drops.isEmpty() && drops.stream().allMatch(i -> i.getItem().is(Items.PORKCHOP)
+                    || i.getItem().is(Items.COOKED_PORKCHOP)), "只掉猪肉：" + drops);
+            drops.forEach(Entity::discard);
             h.succeed();
         });
     }

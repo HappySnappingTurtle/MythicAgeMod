@@ -63,10 +63,26 @@ public final class ClientAuras {
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Post event) {
         ClientLevel level = Minecraft.getInstance().level;
-        if (level == null || ALL.isEmpty() || level.getGameTime() % 20 != 0) {
+        if (level == null || ALL.isEmpty()) {
             return;
         }
         long now = level.getGameTime();
+        // 瘟疫标记：头顶每 10 刻补一个暗红标记粒子
+        if (now % 10 == 0 && !Minecraft.getInstance().isPaused()) {
+            for (Map.Entry<Integer, Map<String, State>> e : ALL.entrySet()) {
+                State s = e.getValue().get("plagued");
+                if (s != null && s.end() > now) {
+                    net.minecraft.world.entity.Entity ent = level.getEntity(e.getKey());
+                    if (ent != null) {
+                        level.addParticle(io.github.happysnappingturtle.mythicage.power.PowerRegistries.PLAGUE_MARK.get(),
+                                ent.getX(), ent.getY() + ent.getBbHeight() + 0.35, ent.getZ(), 0, 0, 0);
+                    }
+                }
+            }
+        }
+        if (now % 20 != 0) {
+            return;
+        }
         ALL.entrySet().removeIf(e -> {
             e.getValue().values().removeIf(s -> s.end() < now);
             return e.getValue().isEmpty() || level.getEntity(e.getKey()) == null;

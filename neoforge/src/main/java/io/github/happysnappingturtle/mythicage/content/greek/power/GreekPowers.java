@@ -30,13 +30,34 @@ public final class GreekPowers {
     public static final String BOLT = "gp_gr_bolt";
     public static final String RESTORATION = "gp_gr_restoration";
     public static final String BRONZE = "gp_gr_bronze";
+    public static final String PESTILENCE = "gp_gr_pestilence";
+    public static final String CURSE = "gp_gr_curse";
 
     public static final DeferredItem<GodPowerItem> BOLT_ITEM = item(BOLT, "雷击", "Bolt", "雷撃");
     public static final DeferredItem<GodPowerItem> RESTORATION_ITEM = item(RESTORATION, "复原", "Restoration", "復元");
     public static final DeferredItem<GodPowerItem> BRONZE_ITEM = item(BRONZE, "青铜", "Bronze", "青銅");
+    public static final DeferredItem<GodPowerItem> PESTILENCE_ITEM = item(PESTILENCE, "瘟疫", "Pestilence", "疫病");
+    public static final DeferredItem<GodPowerItem> CURSE_ITEM = item(CURSE, "诅咒", "Curse", "呪い");
 
     public static final DeferredHolder<MobEffect, BronzeBodyEffect> BRONZE_BODY =
             PowerRegistries.EFFECTS.register("bronze_body", BronzeBodyEffect::new);
+    public static final DeferredHolder<MobEffect, PlaguedEffect> PLAGUED =
+            PowerRegistries.EFFECTS.register("plagued", PlaguedEffect::new);
+
+    /** 被诅咒的猪（D8）：尺寸同原版猪。 */
+    public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<CursedPig>> CURSED_PIG =
+            io.github.happysnappingturtle.mythicage.registry.ModRegistries.ENTITY_TYPES.register("cursed_pig",
+                    () -> net.minecraft.world.entity.EntityType.Builder.of(CursedPig::new, net.minecraft.world.entity.MobCategory.CREATURE)
+                            .sized(0.9F, 0.9F)
+                            .eyeHeight(0.765F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:cursed_pig"));
+    /** 瘟疫封禁的远程武器（拉弓、上弩、投三叉戟）。 */
+    public static final TagKey<net.minecraft.world.item.Item> RANGED_WEAPONS = TagKey.create(Registries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "ranged_weapons"));
+    /** 被诅咒的生物（以后善恶系统据此不按「杀动物」计）。 */
+    public static final TagKey<net.minecraft.world.entity.EntityType<?>> CURSED = TagKey.create(Registries.ENTITY_TYPE,
+            ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "cursed"));
 
     public static final ResourceKey<DamageType> DIVINE_BOLT =
             ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "divine_bolt"));
@@ -55,8 +76,19 @@ public final class GreekPowers {
     }
 
     /** 触发类加载（物品、效果注册项）并登记效果代码与事件。 */
-    public static void init(net.neoforged.bus.api.IEventBus game) {
+    public static void init(net.neoforged.bus.api.IEventBus modBus, net.neoforged.bus.api.IEventBus game) {
+        modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
+                e.put(CURSED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build()));
         game.addListener(BronzePower::onExpired);
+        game.addListener(PestilencePower::onUseItemStart);
+        game.addListener(PestilencePower::onEntityJoin);
+        game.addListener(PestilencePower::onSpawnCheck);
+        io.github.happysnappingturtle.mythicage.power.PowerZones.registerKind(PestilencePower.KIND, PestilencePower.ZONE);
+        io.github.happysnappingturtle.mythicage.power.SpawnerStall.register((level, pos) ->
+                io.github.happysnappingturtle.mythicage.power.PowerZones.covered(level, pos, PestilencePower.KIND));
+        GodPowers.register(new PestilencePower());
+        GodPowers.register(new CursePower());
+        Auras.register(PLAGUED.getKey(), "plagued");
         GodPowers.register(new BoltPower());
         GodPowers.register(new RestorationPower());
         GodPowers.register(new BronzePower());

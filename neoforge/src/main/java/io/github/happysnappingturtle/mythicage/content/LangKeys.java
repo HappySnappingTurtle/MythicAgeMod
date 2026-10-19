@@ -362,6 +362,14 @@ public final class LangKeys {
         add("item.mythic_age.gp_gr_bronze.tip", "半径 10 内友方获得「青铜之躯」90 秒：护甲 +6、韧性 +2、击退抗性 +0.3", "Allies within 10 blocks gain Bronze Body for 90 s: +6 armor, +2 toughness, +0.3 knockback resistance", "半径10内の味方に「青銅の体」を90秒付与：防御+6、防具強度+2、ノックバック耐性+0.3");
         add("item.mythic_age.gp_gr_bronze.tip2", "狄俄尼索斯 · 吟唱 1.5 秒 · 冷却 300 秒", "Dionysus · 1.5 s cast · 300 s cooldown", "ディオニュソス・詠唱1.5秒・クールダウン300秒");
         add("effect.mythic_age.bronze_body", "青铜之躯", "Bronze Body", "青銅の体");
+        add("mythic_age.power.gp_gr_pestilence", "瘟疫", "Pestilence", "疫病");
+        add("mythic_age.power.gp_gr_curse", "诅咒", "Curse", "呪い");
+        add("item.mythic_age.gp_gr_pestilence.tip", "掷出陶瓮，落点半径 24 内 5 分钟：敌人虚弱、缓慢，远程敌人无法开弓或施法，刷怪器停摆、不自然生成怪物", "Throw the urn: for 5 minutes within 24 blocks, enemies are weakened and slowed, ranged enemies cannot shoot or cast, spawners stall and no monsters spawn naturally", "壺を投げ、落下点の半径24で5分間：敵は弱体化・鈍化し、遠距離の敵は弓も魔法も使えず、スポナーは停止し、モンスターは自然湧きしない");
+        add("item.mythic_age.gp_gr_pestilence.tip2", "阿瑞斯 · 吟唱 2 秒 · 冷却 180 秒 · 投掷 24 格", "Ares · 2 s cast · 180 s cooldown · throw 24 blocks", "アレス・詠唱2秒・クールダウン180秒・投擲24ブロック");
+        add("item.mythic_age.gp_gr_curse.tip", "掷出金苹果，落点半径 8 内的敌人按生命从低到高变成猪（生命总预算 60）；精英与 Boss 免疫", "Throw the golden apple: enemies within 8 blocks turn into pigs from weakest up (60 total max health); elites and bosses are immune", "金の林檎を投げ、半径8内の敵を体力の低い順に豚へ変える（最大体力の合計60まで）。エリートとボスは無効");
+        add("item.mythic_age.gp_gr_curse.tip2", "阿佛洛狄忒 · 吟唱 2 秒 · 冷却 300 秒 · 投掷 24 格", "Aphrodite · 2 s cast · 300 s cooldown · throw 24 blocks", "アフロディーテ・詠唱2秒・クールダウン300秒・投擲24ブロック");
+        add("effect.mythic_age.plagued", "瘟疫", "Plagued", "疫病");
+        add("entity.mythic_age.cursed_pig", "被诅咒的猪", "Cursed Pig", "呪われた豚");
         add("death.attack.mythic_age.divine_bolt", "%1$s被宙斯的雷霆击中", "%1$s was struck by the thunderbolt of Zeus", "%1$sはゼウスの雷霆に撃たれた");
         add("death.attack.mythic_age.divine_bolt.player", "%1$s被%2$s召来的雷霆击中", "%1$s was struck by a thunderbolt called down by %2$s", "%1$sは%2$sが呼んだ雷霆に撃たれた");
         add("subtitles.mythic_age.gp.gr.bolt.lock", "雷击锁定", "Bolt locks on", "雷撃が狙いを定める");

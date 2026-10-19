@@ -25,6 +25,48 @@ class GreekPowerRulesTest {
         assertEquals(new BoltRules.Outcome(false, 12), BoltRules.resolve(20, false, false, true), "玩家 12");
     }
 
+    // ───────────── 诅咒（TC-T13-02～04） ─────────────
+
+    static java.util.List<CurseBudget.Candidate<String>> c(Object... idAndHealth) {
+        java.util.List<CurseBudget.Candidate<String>> out = new ArrayList<>();
+        for (int i = 0; i < idAndHealth.length; i += 2) {
+            out.add(new CurseBudget.Candidate<>((String) idAndHealth[i], ((Number) idAndHealth[i + 1]).doubleValue()));
+        }
+        return out;
+    }
+
+    @Test
+    void tc02_curseBudget() {
+        assertEquals(java.util.List.of("a", "b", "c"),
+                CurseBudget.select(c("a", 20, "b", 20, "c", 20, "d", 24), 60), "20、20、20、24 → 前三只");
+    }
+
+    @Test
+    void tc03_curseStopsAtFirstOverflow() {
+        assertEquals(java.util.List.of("s", "m"), CurseBudget.select(c("m", 10, "l", 55, "s", 5), 60),
+                "5、10 选中；55 超预算即停");
+        assertEquals(java.util.List.of("c", "b"), CurseBudget.select(c("a", 50, "b", 20, "c", 5), 60),
+                "5、20 选中；50 会超（75）即停");
+    }
+
+    @Test
+    void tc04_curseNothing() {
+        assertTrue(CurseBudget.select(c(), 60).isEmpty(), "空候选");
+        assertTrue(CurseBudget.select(c("big", 61), 60).isEmpty(), "单个 61");
+    }
+
+    // ───────────── 投掷（TC-T13-40 的计算部分） ─────────────
+
+    @Test
+    void throwFlight() {
+        assertEquals(6, ThrowRules.flightTicks(2), "下限 6 刻");
+        assertEquals(15, ThrowRules.flightTicks(24), "24 格 15 刻");
+        assertEquals(20, ThrowRules.flightTicks(100), "上限 20 刻");
+        assertEquals(0, ThrowRules.arc(10, 0), 1e-9);
+        assertEquals(0, ThrowRules.arc(10, 1), 1e-9);
+        assertEquals(ThrowRules.apex(10), ThrowRules.arc(10, 0.5), 1e-9, "中点最高");
+    }
+
     // ───────────── 复原（TC-T13-09） ─────────────
 
     @Test

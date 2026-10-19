@@ -49,6 +49,11 @@ public final class PowerRegistries {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BRONZE_FLAKE = particle("bronze_flake");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CLEANSE = particle("cleanse");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> REPAIR = particle("repair");
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> PLAGUE_MIST = particle("plague_mist");
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> ROSE_PUFF = particle("rose_puff");
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> PLAGUE_MARK = particle("plague_mark");
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SEAL = particle("seal");
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> IMMUNE = particle("immune");
 
     private PowerRegistries() {
     }

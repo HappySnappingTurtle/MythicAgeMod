@@ -183,6 +183,8 @@ public final class PowerGameTests {
 
     @AfterBatch(batch = BATCH)
     public static void after(ServerLevel level) {
+        TestMobs.clear(level, e -> e instanceof net.minecraft.world.entity.animal.Chicken
+                || e instanceof net.minecraft.world.entity.decoration.ArmorStand);
         PowerSpecLoader.overrideForTest(null);
         GodPowers.overrideForTest(null);
         PowerService.clearForTest();
@@ -232,7 +234,7 @@ public final class PowerGameTests {
     }
 
     private static <T extends Mob> T mob(GameTestHelper h, EntityType<T> type, int x, int z) {
-        T m = h.spawn(type, new BlockPos(x, 2, z));
+        T m = TestMobs.tag(h.spawn(type, new BlockPos(x, 2, z)));
         m.setNoAi(true);
         return m;
     }

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_curse",
+  "card": "GP-GR-09",
+  "civilization": "greek",
+  "form": "throwable",
+  "castTicks": 40,
+  "cooldownTicks": 6000,
+  "range": 24,
+  "targetProfile": "HOSTILE_AREA",
+  "radius": 8,
+  "durationTicks": 40,
+  "matrix": {
+    "hostile": "curse",
+    "other_summon": "curse",
+    "elite": "immune",
+    "boss": "immune",
+    "enemy_player": "pvp"
+  }
+}
