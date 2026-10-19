@@ -32,11 +32,13 @@ import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeLedgers;
 import io.github.happysnappingturtle.mythicage.runtime.WorldClock;
+import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineService;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -65,6 +67,10 @@ import java.util.UUID;
  * <p>
  * 走路的用例（真实村民 AI）各自单独成批，避免一个测试的信徒被相邻测试的神坛吸走；
  * 产出用例直接放预留（{@link PrayerService#putClaimForTest}）并手动采样，在同一刻里读结果。
+ * <p>
+ * 前面批次留下的神坛也会吸走信徒：自家神坛扫描完成前，信徒按「村外 48 格内」兜底去找已有结果的神坛，
+ * 若旁边恰好剩着别的批次的神坛，就会去占那边的祈祷位、走不到、放弃并冷却 600 刻而超时（2026-10-19，
+ * 网格布局一变就复现）。所以每个用例清理时拆掉自己的神坛，每批开始前再拆掉其他批次（含失败用例）残留的希腊神坛。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -76,6 +82,69 @@ public final class PrayerGameTests {
     private static final double EPS = 1e-9;
 
     private PrayerGameTests() {
+    }
+
+    // ───────────── 批次前：拆掉之前批次残留的神坛 ─────────────
+
+    /** 拆掉登记里所有希腊神坛（拆方块即注销登记）。只在批次开始前调用：此时之前的批次都已结束。 */
+    private static void clearStrayAltars(ServerLevel level) {
+        for (ShrineRegistry.Entry e : ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id())) {
+            ServerLevel l = level.getServer().getLevel(e.pos().dimension());
+            if (l != null) {
+                l.removeBlock(e.pos().pos(), false);
+            }
+            ShrineRegistry.get(level.getServer()).remove(e.pos());
+        }
+    }
+
+    @BeforeBatch(batch = "prayer")
+    public static void beforePrayer(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_choose")
+    public static void beforeChoose(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_close")
+    public static void beforeClose(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_full")
+    public static void beforeFull(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_leash")
+    public static void beforeLeash(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_loner")
+    public static void beforeLoner(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_night")
+    public static void beforeNight(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_rain")
+    public static void beforeRain(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_restock")
+    public static void beforeRestock(ServerLevel level) {
+        clearStrayAltars(level);
+    }
+
+    @BeforeBatch(batch = "prayer_walk")
+    public static void beforeWalk(ServerLevel level) {
+        clearStrayAltars(level);
     }
 
     // ───────────── 搭建 ─────────────
@@ -151,6 +220,8 @@ public final class PrayerGameTests {
         }
         for (GlobalPos a : altars) {
             PrayerService.resetForTest(a);
+            // 拆掉神坛（同时注销登记）：留着会被之后批次里的信徒当成「村外 48 格内」的神坛
+            h.getLevel().removeBlock(a.pos(), false);
         }
     }
 

@@ -1,0 +1,53 @@
+{
+  "template": "pixels",
+  "out": "block/power/lure_stone_moss",
+  "size": 32,
+  "palette": {
+    "d": "#545f68",
+    "m": "#6a767f",
+    "s": "#818d95",
+    "S": "#97a2a9",
+    "h": "#adb7bc",
+    "o": "#36481f",
+    "g": "#4f6a2c",
+    "G": "#6c8a38",
+    "Y": "#8fa84a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "GYGYYYYYYGGGGGYYGYGGYGGGgoooggGG",
+      "YGYGGYYYGGGYYYYYGYYYYYGGggggggGg",
+      "GGGYGGGGGGGGGGggGYgGGYgGgGggggGg",
+      "YYGsSsmmmsggggGggGgGYggGGgGGGgGg",
+      "YYYSsssmmmggGoGsmGGgGGGgGGGGgoGs",
+      "GGGsmssmmsgoggomsoGGGGgGgGGggGgg",
+      "GGgsmssGgGGggomddsgGGGgGGgGGgggg",
+      "ssSssmgGgGgggodsmsggGGGsSSGGggGg",
+      "sssssGgGgGGGGmssmsGGYYGSssSgggGG",
+      "ssSgGGGGGGYYGSsmmsgYGGGSssGGgggg",
+      "SGGgGgGGGYYSsmGgGGGGGYYGGGGgGgGg",
+      "GYGgGGGGSSShsggGgGGGYGGGGGgsssGg",
+      "GGGggggmSSSSSGgGgGGGGYYGgGGSssGG",
+      "GGGGgggsssSsGggggGGYYGGYGYYsmmoo",
+      "GgggGgGsssGGGgogGGYGGGYYYGGSsmoo",
+      "ggGggggSsGggGGgoGGGGYYYYYGGsmdog",
+      "gGGGgggmsggggGGggGGYYYYGYGGssmmo",
+      "ggGGgggSsGGGgGGggGGYYGGYGgYsmmgo",
+      "GgGgGgGmmGGgGggggGGYGYYGggGgGgGG",
+      "GGgGGsSSSGGGgGgGGGGYGGGGGggGGGGG",
+      "YYgGssssSYYgggGGYGYGGYYgGGgGGgGY",
+      "GGgGGGssssGGYGGgGgGYGYYGggGGGGgg",
+      "GgGGGgssssSgGGsssgGGGgGGgGggGGgG",
+      "GYgggGgssssssssSSsGGGgGGGYgGGgGG",
+      "YGGgGggssssmssSSssGGGGgGGGYGgggg",
+      "YGGgGggssmmssSSSssggggGGGGGGGgog",
+      "YGgGgggGggssmsSGGGGggGgGGYYGGggg",
+      "GGgGGGgGGggsSSGYGgGGGgggGGGgGgGG",
+      "GgGYgGGGGggGSSYGGGGGGGssmmmGGggG",
+      "GgYGYGYGGgGgsGYYYYYGYYgsmmsssgGG",
+      "GGGGGYYGGgGGgGYGYGYGGGGggossssgg",
+      "GGGSsSGYYGGGGGGYYGGGGgggggmmssmS"
+    ]
+  }
+}

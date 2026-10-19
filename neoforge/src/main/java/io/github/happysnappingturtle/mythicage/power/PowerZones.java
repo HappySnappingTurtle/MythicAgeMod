@@ -101,6 +101,16 @@ public final class PowerZones extends SavedData {
         }
     }
 
+    /** 立即结束一个区域：移除登记并执行该类区域的收尾（复原方块、撤销效果、发结束表现）。 */
+    public static void end(MinecraftServer server, Zone zone) {
+        remove(server, zone.castId());
+        ServerLevel level = server.getLevel(zone.dim());
+        Kind k = KINDS.get(zone.kind());
+        if (level != null && k != null) {
+            k.end(level, zone);
+        }
+    }
+
     public static List<Zone> all(MinecraftServer server) {
         return List.copyOf(get(server).zones.values());
     }

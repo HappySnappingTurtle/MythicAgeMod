@@ -1,0 +1,38 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_sentinel",
+  "size": 16,
+  "palette": {
+    "o": "#120d0a",
+    "k": "#4a3013",
+    "b": "#a8722f",
+    "B": "#e3ae5d",
+    "n": "#26282e",
+    "N": "#454952",
+    "e": "#5fe08c",
+    "w": "#6b4421",
+    "W": "#9a6a35",
+    "t": "#d8d0c0"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "......oBo.......",
+      ".....oBbBo....w.",
+      "....okBbbko..wW.",
+      "...okBBbbbko.Wt.",
+      "...okbbbbbbkoWt.",
+      "...onneNNeno.Wt.",
+      "...onnnNNnno.Wt.",
+      "....onnnnno..Wt.",
+      "...okbbbbbbkoWt.",
+      "..okBbbbbbbbkWt.",
+      "..onkbbbbbbkWWt.",
+      "..onnkkkkkknWw..",
+      "...onnnnnnnow...",
+      "...oNNNNNNNNo...",
+      "....oooooooo...."
+    ]
+  }
+}

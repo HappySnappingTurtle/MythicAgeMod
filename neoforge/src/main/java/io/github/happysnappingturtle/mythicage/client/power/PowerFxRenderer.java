@@ -20,6 +20,15 @@ public interface PowerFxRenderer {
         return null;
     }
 
+    /**
+     * 放置型神力瞄准时的专属预览（放置格 {@code place} 已确定）：画了就返回 true，框架不再画默认的单格框。
+     * 坐标为世界坐标（已减去相机位置的 PoseStack）。
+     */
+    default boolean renderPlacement(com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers,
+                                    ClientLevel level, net.minecraft.core.BlockPos place, long gameTime, float partialTick) {
+        return false;
+    }
+
     /** 范围圈样式：一张贴地的圈贴图（圈在贴图外缘）与调色。 */
     record AimStyle(net.minecraft.resources.ResourceLocation ring, int rgb) {
     }

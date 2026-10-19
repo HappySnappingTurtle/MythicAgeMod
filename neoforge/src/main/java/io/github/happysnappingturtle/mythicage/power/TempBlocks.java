@@ -88,6 +88,20 @@ public final class TempBlocks extends SavedData {
         return Result.PLACED;
     }
 
+    /** 立即复原一个临时方块（同一玩家新放的诱兽石替换旧石等）。返回是否复原了登记里的方块。 */
+    public static boolean restoreNow(ServerLevel level, BlockPos pos) {
+        TempBlocks data = get(level.getServer());
+        Entry e = data.entries.get(GlobalPos.of(level.dimension(), pos));
+        if (e == null) {
+            return false;
+        }
+        if (level.isLoaded(pos) && level.getBlockState(pos) == e.placed()) {
+            level.setBlock(pos, e.original(), 3);
+        }
+        data.drop(e);
+        return true;
+    }
+
     public static void onServerTickPost(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
         if (server.getTickCount() % CHECK_INTERVAL != 0) {

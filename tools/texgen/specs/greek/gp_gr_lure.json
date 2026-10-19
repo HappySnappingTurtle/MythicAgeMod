@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_lure",
+  "size": 16,
+  "palette": {
+    "o": "#1c2a33",
+    "s": "#6d7f89",
+    "S": "#93a6af",
+    "d": "#4a5a63",
+    "c": "#efe2c4",
+    "C": "#c4ab82",
+    "g": "#3fa9b6",
+    "G": "#9de3e6"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      ".....oooooo.....",
+      "...ooGgGgGgoo...",
+      "..oGgggggggggo..",
+      "..oSsssssssddo..",
+      ".oSssCcCcCcsddo.",
+      ".oSscCcCcCcCddo.",
+      ".oSssCcCcCcsddo.",
+      ".oSssCcCcCcsddo.",
+      ".oSssscCcCssddo.",
+      ".oSsssCCcCssddo.",
+      "..oSsssssssddo..",
+      "..oddddddddddo..",
+      "...oooooooooo...",
+      "................"
+    ]
+  }
+}

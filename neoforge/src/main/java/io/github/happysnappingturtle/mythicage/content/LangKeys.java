@@ -362,6 +362,13 @@ public final class LangKeys {
         add("item.mythic_age.gp_gr_bronze.tip", "半径 10 内友方获得「青铜之躯」90 秒：护甲 +6、韧性 +2、击退抗性 +0.3", "Allies within 10 blocks gain Bronze Body for 90 s: +6 armor, +2 toughness, +0.3 knockback resistance", "半径10内の味方に「青銅の体」を90秒付与：防御+6、防具強度+2、ノックバック耐性+0.3");
         add("item.mythic_age.gp_gr_bronze.tip2", "狄俄尼索斯 · 吟唱 1.5 秒 · 冷却 300 秒", "Dionysus · 1.5 s cast · 300 s cooldown", "ディオニュソス・詠唱1.5秒・クールダウン300秒");
         add("effect.mythic_age.bronze_body", "青铜之躯", "Bronze Body", "青銅の体");
+        add("mythic_age.power.gp_gr_lure", "诱兽石", "Lure", "誘獣石");
+        add("mythic_age.power.gp_gr_sentinel", "哨兵石像", "Sentinel", "番人の石像");
+        add("item.mythic_age.gp_gr_lure.tip", "放下诱兽石，3 分钟内把 48 格内的被动动物引过来（马驴优先，最多 24 只），每 30 秒引来 1 只鸡；靠水放时改引鱼与鱿鱼", "Place a lure stone: for 3 minutes, passive animals within 48 blocks come to it (horses and donkeys first, up to 24) and a chicken arrives every 30 s; next to water it draws fish and squid instead", "誘獣石を置く：3分間、48ブロック内の受動的な動物を引き寄せる（馬・ロバ優先、最大24匹）。30秒ごとにニワトリが来る。水辺では魚とイカを引き寄せる");
+        add("item.mythic_age.gp_gr_lure.tip2", "波塞冬 · 吟唱 1 秒 · 冷却 60 秒 · 同时只保留 1 块", "Poseidon · 1 s cast · 60 s cooldown · one stone at a time", "ポセイドン・詠唱1秒・クールダウン60秒・同時に1つまで");
+        add("item.mythic_age.gp_gr_sentinel.tip", "在落点四角召唤 4 尊哨兵石像，自动射击 16 格内的敌人（每箭 4 点），持续 1 个 MC 日；在自己的神坛 32 格内持续 3 日", "Raise 4 sentinels at the corners of the target point; they shoot enemies within 16 blocks (4 per arrow) for one Minecraft day, or three near your own altar (32 blocks)", "着弾点の四隅に番人の石像を4体呼び出し、16ブロック内の敵を自動で射る（1本4ダメージ）。1日持続、自分の祭壇の32ブロック内なら3日");
+        add("item.mythic_age.gp_gr_sentinel.tip2", "哈迪斯 · 吟唱 2 秒 · 冷却 60 秒 · 16 格 · 同时只保留 1 组", "Hades · 2 s cast · 60 s cooldown · 16 blocks · one group at a time", "ハデス・詠唱2秒・クールダウン60秒・16ブロック・同時に1組まで");
+        add("entity.mythic_age.sentinel", "哨兵石像", "Sentinel", "番人の石像");
         add("mythic_age.power.gp_gr_pestilence", "瘟疫", "Pestilence", "疫病");
         add("mythic_age.power.gp_gr_curse", "诅咒", "Curse", "呪い");
         add("item.mythic_age.gp_gr_pestilence.tip", "掷出陶瓮，落点半径 24 内 5 分钟：敌人虚弱、缓慢，远程敌人无法开弓或施法，刷怪器停摆、不自然生成怪物", "Throw the urn: for 5 minutes within 24 blocks, enemies are weakened and slowed, ranged enemies cannot shoot or cast, spawners stall and no monsters spawn naturally", "壺を投げ、落下点の半径24で5分間：敵は弱体化・鈍化し、遠距離の敵は弓も魔法も使えず、スポナーは停止し、モンスターは自然湧きしない");

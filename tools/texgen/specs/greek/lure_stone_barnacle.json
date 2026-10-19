@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/power/lure_stone_barnacle",
+  "size": 32,
+  "palette": {
+    "w": "#e6e3d6",
+    "W": "#bdb9aa",
+    "q": "#8a877b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wWWwwwwWwWWWWWwwWwqwwWWwWwwWwwwW",
+      "WwwwwWWwwWWWwWwWWwWwwwWWWwwwwwWw",
+      "WwWwwWwwwWwwwwwwqwWwWwWwwWWwqwWw",
+      "qwwwwwwwqWwwwwWwwwwWWwWwWwwwWwwW",
+      "wwWwwqwWWwwwwwwwWWwWWwwWWwWwWwqw",
+      "WWwwWwWwwwwqwwwwWwwWWWwwWWWWwqqw",
+      "WwwwwwwwWwwWWwwwwwwwwwWWwwwWWwwW",
+      "WWwwwWwWWwwwWWwWwWwqWWwwwWwwwwWw",
+      "wWwWWwWWwwWWwWwwwwwwwWWwqwWwwWqW",
+      "wWwWWwwqwwwwWqWWWwwWWqwWwwwwwwWw",
+      "wWWWwwWwwwWWWqWwwWwWWwqwWwwwwwwW",
+      "wwWwwwwwwWwwwWWwwwWwwWWwqwwwwWww",
+      "WqWWwqwqWwWwwWwWWwwWwqwwWwwwwwww",
+      "wWqwwWwwqwwwWWwqWWwWwwWwwwqwwwWw",
+      "wwwwwwwwwwwwWwwwWWWWqWqWWwWWWWWw",
+      "WwWwwwwqwwwWWwWwwqWWwqwwwqWWWwww",
+      "WwqwwwwwwwwwwwwwWwwwWwwwwWwWWWww",
+      "qwWWwwwWwwWwWwwWwwWqWwqwWwwWwqww",
+      "wWwwwWwWwwwWwqWwwqwwwwWWwwwwWwWw",
+      "wwqwWwwWwwwwwwWqwwwqwWwWWWwwwwww",
+      "WWwWWwWwwwwwWWqwwWWWwwWwwWWWWwwW",
+      "wWwWwWwwwWWwwwWwWqwwWwwwWqWWwwWw",
+      "wwqWqwwwwwwwqWwwWWwwwwWwqwwwwWwW",
+      "WWqwWWwWwwWwwwwWwwwwwwwWwwWWwWww",
+      "WwwWwwwwwWwWqwWWWWwwwWwwwwwwwwWW",
+      "wWwWwwwqwWwWwwwwwwWqwwqwwwWWwwww",
+      "wwwwWwWwWWqWwWwwwWwwWwwwWwwwqwqw",
+      "wWwwwwwWwqWwwwwWwwWWWwwWWwwwqwwW",
+      "wwwwwwWwWwWWWwwwwwWWwWWwwWWwwWWw",
+      "wWWWwwwWwWwWwwwqwWWWwWWWWwWWWqww",
+      "wwwWwWwqWwWwwwWwWwWwwWwWWWWwqwww",
+      "wwWqwwWwWWwwwWwwwWWWwwwqWwwwwWwW"
+    ]
+  }
+}

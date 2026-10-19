@@ -9,6 +9,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
@@ -131,8 +132,11 @@ public final class ClientPowerAim {
                 }
             }
             case BLOCK -> {
-                if (!miss) {
-                    AABB cell = new AABB(block.getBlockPos().relative(block.getDirection())).inflate(0.002);
+                BlockPos place = block.getBlockPos().relative(block.getDirection());
+                boolean custom = !miss && PowerFxRenderer.Registry.get(a.powerId())
+                        .map(r -> r.renderPlacement(pose, buffers, mc.level, place, mc.level.getGameTime(), pt)).orElse(false);
+                if (!miss && !custom) {
+                    AABB cell = new AABB(place).inflate(0.002);
                     LevelRenderer.renderLineBox(pose, lines, cell, GOLD[0], GOLD[1], GOLD[2], 0.9f);
                     LevelRenderer.renderLineBox(pose, lines, cell.deflate(0.15), GOLD[0], GOLD[1], GOLD[2], 0.35f);
                 }

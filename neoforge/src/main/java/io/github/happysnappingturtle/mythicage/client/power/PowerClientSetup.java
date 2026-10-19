@@ -1,8 +1,12 @@
 package io.github.happysnappingturtle.mythicage.client.power;
 
+import io.github.happysnappingturtle.mythicage.client.geo.MythGeoModel;
+import io.github.happysnappingturtle.mythicage.client.geo.MythGeoRenderer;
 import io.github.happysnappingturtle.mythicage.client.power.greek.BoltFx;
 import io.github.happysnappingturtle.mythicage.client.power.greek.BronzeFx;
+import io.github.happysnappingturtle.mythicage.client.power.greek.LureFx;
 import io.github.happysnappingturtle.mythicage.client.power.greek.RestorationFx;
+import io.github.happysnappingturtle.mythicage.client.power.greek.SentinelFx;
 import io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.power.PowerRegistries;
@@ -15,6 +19,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+
+import java.util.Set;
 
 /** 神力客户端的初始化（T13）：粒子工厂、外观叠层、各神力的专属表现。 */
 @EventBusSubscriber(modid = MythicAgeIds.MOD_ID, value = Dist.CLIENT)
@@ -29,6 +35,8 @@ public final class PowerClientSetup {
         PowerFxRenderer.Registry.register(GreekPowers.BRONZE, new BronzeFx());
         PowerFxRenderer.Registry.register(GreekPowers.PESTILENCE, new io.github.happysnappingturtle.mythicage.client.power.greek.PestilenceFx());
         PowerFxRenderer.Registry.register(GreekPowers.CURSE, new io.github.happysnappingturtle.mythicage.client.power.greek.CurseFx());
+        PowerFxRenderer.Registry.register(GreekPowers.LURE, new LureFx());
+        PowerFxRenderer.Registry.register(GreekPowers.SENTINEL, new SentinelFx());
     }
 
     @SubscribeEvent
@@ -56,6 +64,10 @@ public final class PowerClientSetup {
                 new MythParticle.Style(11, 11, 0.2f, 0.2f, 0, 0, 1f, true, 0.1f, 0.2f, 0, false, 1f)));
         event.registerSpriteSet(PowerRegistries.SEAL.get(), s -> MythParticle.provider(s,
                 new MythParticle.Style(21, 21, 0.5f, 0.5f, 0, 0, 1f, true, 0.1f, 0.1f, 0, false, 1f)));
+        event.registerSpriteSet(PowerRegistries.SEA_MOTE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(24, 36, 0.05f, 0.09f, 0, 0.012f, 0.96f, true, 0.15f, 0.45f, 0, false, 0.9f)));
+        event.registerSpriteSet(PowerRegistries.RUNE_MOTE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(8, 14, 0.04f, 0.07f, 0, 0.004f, 0.9f, true, 0, 0.5f, 0, false, 1f)));
         event.registerSpriteSet(PowerRegistries.IMMUNE.get(), s -> MythParticle.provider(s,
                 new MythParticle.Style(30, 30, 0.24f, 0.24f, 0, 0.015f, 1f, true, 0.05f, 0.35f, 0, false, 1f)));
     }
@@ -63,6 +75,9 @@ public final class PowerClientSetup {
     @SubscribeEvent
     static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(GreekPowers.CURSED_PIG.get(), CursedPigRenderer::new);
+        // 哨兵石像：GeckoLib 模型 + 眼睛发光层；视线只叠加在头上（升起、碎化期间不叠加）
+        event.registerEntityRenderer(GreekPowers.SENTINEL_ENTITY.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("sentinel", Set.of()), 0.8F).glowing());
     }
 
     @SubscribeEvent

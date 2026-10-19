@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "mythic_age:block/lure_stone_lower"
+    },
+    "half=upper": {
+      "model": "mythic_age:block/lure_stone_upper"
+    }
+  }
+}

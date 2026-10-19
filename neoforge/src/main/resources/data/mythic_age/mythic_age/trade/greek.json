@@ -3,6 +3,8 @@
   "civilization": "greek",
   "offers": [
     {"id": "gp_gr_bolt", "category": "god_power", "result": {"item": "mythic_age:gp_gr_bolt", "count": 1}, "price": {"favor": 20}, "minAge": "archaic", "venues": ["statue"], "patron": "zeus"},
+    {"id": "gp_gr_lure", "category": "god_power", "result": {"item": "mythic_age:gp_gr_lure", "count": 1}, "price": {"favor": 12}, "minAge": "archaic", "venues": ["statue"], "patron": "poseidon"},
+    {"id": "gp_gr_sentinel", "category": "god_power", "result": {"item": "mythic_age:gp_gr_sentinel", "count": 1}, "price": {"favor": 16}, "minAge": "archaic", "venues": ["statue"], "patron": "hades"},
     {"id": "gp_gr_restoration", "category": "god_power", "result": {"item": "mythic_age:gp_gr_restoration", "count": 1}, "price": {"favor": 42}, "minAge": "classical", "venues": ["guardian"], "minorGod": "athena"},
     {"id": "gp_gr_bronze", "category": "god_power", "result": {"item": "mythic_age:gp_gr_bronze", "count": 1}, "price": {"favor": 70}, "minAge": "heroic", "venues": ["guardian"], "minorGod": "dionysus"},
     {"id": "gp_gr_pestilence", "category": "god_power", "result": {"item": "mythic_age:gp_gr_pestilence", "count": 1}, "price": {"favor": 30}, "minAge": "classical", "venues": ["guardian"], "minorGod": "ares"},

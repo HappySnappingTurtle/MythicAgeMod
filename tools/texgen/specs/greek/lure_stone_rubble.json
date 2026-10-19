@@ -1,0 +1,51 @@
+{
+  "template": "pixels",
+  "out": "block/power/lure_stone_rubble",
+  "size": 32,
+  "palette": {
+    "K": "#2b3238",
+    "m": "#6a767f",
+    "s": "#818d95",
+    "S": "#97a2a9",
+    "h": "#adb7bc",
+    "o": "#36481f",
+    "g": "#4f6a2c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hggogghggSSggoggSogoghSggSohgogg",
+      "gSoggSoKgggggogKSooogggggggggsgg",
+      "gggggggoooogsogKooooogoooggggoog",
+      "hSsssssKSmssSSsKhssssssKSsSSSsmK",
+      "SssssssKSssssssKSssssssKSsssssmK",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+      "SSSKSSSSSSSKSSSsSSSKhShhhSSKSSSS",
+      "sssKSssssssKSssssssKSssSSssKSsss",
+      "sssKSssssssKSssssssKSssssssKSsss",
+      "sssKSssssssKhSsssssKSssssssKSsss",
+      "sssKSssssssKSsssssmKSssssssKSsss",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+      "SSSSSSSKSSSSSSSKSSSSSSSKhSSsSSSK",
+      "SssssssKSssssssKSssssssKhssmsssK",
+      "SsssssmKSssssssKhSSssssKSssmsssK",
+      "hssssmmKSSSSsssKhSSSsssKSssmsssK",
+      "SsssssmKSSsssssKhSSssssKSssssssK",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+      "hSSKhhSSSSSKSSSSSSSKhhhhhSSKhSSS",
+      "SSSKhSsssssKSssssssKSssssssKhsss",
+      "SSsKhSssssmKSssssssKSssssssKhsss",
+      "SSsKSSsssmmKsssssssKSmsssssKhsss",
+      "SssKSssssmmKSssssssKSssssssKSsss",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+      "SSSSSssKSSSShhSKhhhhSSSKhhhSSSSK",
+      "SssssssKSsssSssKhSSSsssKhSSssssK",
+      "SssssssKSssssssKSSSSSssKhSsssssK",
+      "SssmssSKhssssssKSSSSSSsKSssssmmK",
+      "SssssssKSssssssKSSSSSssKSsssssmK",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+      "SSSKhSSSSSsKSSShhhhKhhhSsSSKShhS",
+      "sssKhssssssKSssSSSSKhSSssssKSSSS"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "template": "pixels",
+  "out": "block/power/lure_stone_top",
+  "size": 32,
+  "palette": {
+    "m": "#6a767f",
+    "s": "#818d95",
+    "S": "#97a2a9",
+    "h": "#adb7bc",
+    "H": "#c4ccd0",
+    "l": "#a9a874",
+    "L": "#cbc690"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hHhHHHHhHhShhhHHhHLhHhhSSsssSSSh",
+      "HSHhhHhHhhSHHHhHhHHhHHhSsSSSssSs",
+      "hhhHShSShSShhhSShhShhHShSSsSsshs",
+      "HhShhLlllhsllsSsShShhSSSLshhSsSs",
+      "HHhhhhlsssSSSsSSsSSShhSShhShSshS",
+      "hhhSSShSSSSmSsssSsShShShSShSshsS",
+      "hSSLsShSsSSsSmsmsSSShhSShShhsSSs",
+      "SSHhSsshsSsSsssSSSSShhhSHhhSssSs",
+      "SSShhSsSShhSSSSSsShhhHSHShHsSsSh",
+      "hhhShhLhhhHHhhhsSSSHhShHShShSsSS",
+      "hhhSSshhhHHHSShSShSShHHhShhShsSS",
+      "hHSShhShHHHHSSshShhSHLLhShSShSSS",
+      "hShSSsSShhHhhSSSShhhLLLLShhhShSh",
+      "hShhsSSSShhSSSSSshhHHLhhhHhhSsss",
+      "SSSshSSShShhhSssShhhhhHHHhhhhSss",
+      "SshSSsshShSshhslShhhHHhHHhhSSsms",
+      "SShSsSSSSssSshSlsShHHHHhHShSSSss",
+      "ssShSsShShhSshSlshShhhhHhShSsSSs",
+      "hShSSShSShhShSSllhhHhHHSSSSSSShh",
+      "SSShhhHhhShhSSSlLShHhhhShSshhhhh",
+      "hhSShhShhHHSSSSLLlHhhHHShhshhShH",
+      "ShShShhSSSSShhhlLlLHhHHhSSSLhhSS",
+      "hShhSSSShhhSSShhhSShhSShShsSShsh",
+      "hhSsshShSSSSShhhHhShSSShhHShhShS",
+      "HhSlSSsSSSSShhHHhhhShLlhShHhsSss",
+      "hhhSSSsShssSSHHhSSSsssSSShhSSssS",
+      "HhSSsSSSSsSSSSHhhhhSShshhHHhSssS",
+      "hhShShShhSSShhSHSSSShSSShhhShsSS",
+      "hSSHShhhhsSShhHhhSSShhShsssSSsSh",
+      "hSHhHSHSSSSShhHHHHHhHHSSssSShShS",
+      "hShShHHhhlSSShHhHhHhSLLSsmllSSSS",
+      "hhShhHhHhLShhhhHHhhhhSSssssShSSh"
+    ]
+  }
+}

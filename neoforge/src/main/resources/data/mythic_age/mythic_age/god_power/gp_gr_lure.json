@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_lure",
+  "card": "GP-GR-02",
+  "civilization": "greek",
+  "form": "placeable",
+  "castTicks": 20,
+  "cooldownTicks": 1200,
+  "targetProfile": "PLACEMENT",
+  "radius": 48,
+  "durationTicks": 3600,
+  "matrix": {
+    "neutral_animal": "lure"
+  }
+}

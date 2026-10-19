@@ -83,7 +83,7 @@ public final class PowerDevCommand {
             // 自己施放的持续区域也一并结束（实机连续截图时不互相干扰）
             for (PowerZones.Zone z : PowerZones.all(p.server)) {
                 if (z.owner().equals(p.getUUID())) {
-                    PowerZones.remove(p.server, z.castId());
+                    PowerZones.end(p.server, z);
                     var end = new PowerFxPayload(z.castId(), z.powerId(), PowerFxPayload.Phase.END, -1,
                             z.dim().location(), z.center(), List.of(), 0, 0, 0, "", "");
                     p.server.getPlayerList().getPlayers().forEach(to -> PowerFx.sendRaw(to, end));

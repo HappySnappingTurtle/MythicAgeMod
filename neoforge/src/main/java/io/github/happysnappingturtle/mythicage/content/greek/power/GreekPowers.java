@@ -28,12 +28,16 @@ import static io.github.happysnappingturtle.mythicage.core.player.Civilization.G
  */
 public final class GreekPowers {
     public static final String BOLT = "gp_gr_bolt";
+    public static final String LURE = "gp_gr_lure";
+    public static final String SENTINEL = "gp_gr_sentinel";
     public static final String RESTORATION = "gp_gr_restoration";
     public static final String BRONZE = "gp_gr_bronze";
     public static final String PESTILENCE = "gp_gr_pestilence";
     public static final String CURSE = "gp_gr_curse";
 
     public static final DeferredItem<GodPowerItem> BOLT_ITEM = item(BOLT, "雷击", "Bolt", "雷撃");
+    public static final DeferredItem<GodPowerItem> LURE_ITEM = item(LURE, "诱兽石", "Lure", "誘獣石");
+    public static final DeferredItem<GodPowerItem> SENTINEL_ITEM = item(SENTINEL, "哨兵石像", "Sentinel", "番人の石像");
     public static final DeferredItem<GodPowerItem> RESTORATION_ITEM = item(RESTORATION, "复原", "Restoration", "復元");
     public static final DeferredItem<GodPowerItem> BRONZE_ITEM = item(BRONZE, "青铜", "Bronze", "青銅");
     public static final DeferredItem<GodPowerItem> PESTILENCE_ITEM = item(PESTILENCE, "瘟疫", "Pestilence", "疫病");
@@ -52,6 +56,31 @@ public final class GreekPowers {
                             .eyeHeight(0.765F)
                             .clientTrackingRange(10)
                             .build("mythic_age:cursed_pig"));
+    /** 诱兽石方块（只由神力作为临时方块放下）。 */
+    public static final net.neoforged.neoforge.registries.DeferredBlock<LureStoneBlock> LURE_STONE =
+            Content.block("lure_stone", GREEK, LureStoneBlock::new)
+                    .properties(() -> net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()
+                            .mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_BLUE)
+                            .strength(-1.0f, 3_600_000.0f).noOcclusion()
+                            .sound(net.minecraft.world.level.block.SoundType.STONE)
+                            .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK))
+                    .model(new io.github.happysnappingturtle.mythicage.content.BlockModelSpec.StateModels(
+                            s -> s.getValue(LureStoneBlock.HALF)
+                                    == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER
+                                    ? "_lower" : "_upper", false, "_lower"))
+                    .noItem()
+                    .loot(io.github.happysnappingturtle.mythicage.content.LootSpec.none())
+                    .lang("诱兽石", "Lure Stone", "誘獣石")
+                    .register();
+    /** 哨兵石像：人形碰撞 0.8 × 2.0。 */
+    public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<SentinelEntity>> SENTINEL_ENTITY =
+            io.github.happysnappingturtle.mythicage.registry.ModRegistries.ENTITY_TYPES.register("sentinel",
+                    () -> net.minecraft.world.entity.EntityType.Builder.of(SentinelEntity::new, net.minecraft.world.entity.MobCategory.MISC)
+                            .sized(0.8F, 2.0F)
+                            .eyeHeight(1.7F)
+                            .fireImmune()
+                            .clientTrackingRange(10)
+                            .build("mythic_age:sentinel"));
     /** 瘟疫封禁的远程武器（拉弓、上弩、投三叉戟）。 */
     public static final TagKey<net.minecraft.world.item.Item> RANGED_WEAPONS = TagKey.create(Registries.ITEM,
             ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "ranged_weapons"));
@@ -79,6 +108,13 @@ public final class GreekPowers {
     public static void init(net.neoforged.bus.api.IEventBus modBus, net.neoforged.bus.api.IEventBus game) {
         modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
                 e.put(CURSED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build()));
+        modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
+                e.put(SENTINEL_ENTITY.get(), SentinelEntity.createAttributes().build()));
+        game.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, SentinelPower::onEntityJoin);
+        game.addListener(LurePower::onServerStopped);
+        io.github.happysnappingturtle.mythicage.power.PowerZones.registerKind(LurePower.KIND, LurePower.ZONE);
+        GodPowers.register(new LurePower());
+        GodPowers.register(new SentinelPower());
         game.addListener(BronzePower::onExpired);
         game.addListener(PestilencePower::onUseItemStart);
         game.addListener(PestilencePower::onEntityJoin);

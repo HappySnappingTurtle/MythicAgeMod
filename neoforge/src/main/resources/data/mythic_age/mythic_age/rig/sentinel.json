@@ -1,0 +1,35 @@
+{
+  "model": "mythic_age:sentinel",
+  "collision": {
+    "width": 0.8,
+    "height": 2
+  },
+  "locators": {
+    "bow_grip": [
+      5.4,
+      19.6,
+      6
+    ],
+    "nock": [
+      5.4,
+      19.6,
+      4.7
+    ],
+    "nock_drawn": [
+      5.4,
+      19.6,
+      -0.7999999999999998
+    ],
+    "draw_hand": [
+      -5.4,
+      12.9,
+      1
+    ],
+    "muzzle": [
+      5.4,
+      20.200000000000003,
+      6.8
+    ]
+  },
+  "variants": {}
+}

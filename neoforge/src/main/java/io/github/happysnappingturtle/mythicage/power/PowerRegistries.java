@@ -54,6 +54,10 @@ public final class PowerRegistries {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> PLAGUE_MARK = particle("plague_mark");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SEAL = particle("seal");
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> IMMUNE = particle("immune");
+    /** 诱兽石的海蓝光点（石旁上浮、动物被吸引时的引路光点）。 */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SEA_MOTE = particle("sea_mote");
+    /** 哨兵的暗绿符光（站位符、拉弓时的弓臂微光、箭的拖尾）。 */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> RUNE_MOTE = particle("rune_mote");
 
     private PowerRegistries() {
     }

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_sentinel",
+  "card": "GP-GR-03",
+  "civilization": "greek",
+  "form": "scroll",
+  "castTicks": 40,
+  "cooldownTicks": 1200,
+  "range": 16,
+  "targetProfile": "PLACEMENT",
+  "radius": 3,
+  "durationTicks": 24000,
+  "matrix": {
+    "hostile": "shoot",
+    "elite": "shoot",
+    "boss": "shoot",
+    "enemy_player": "pvp",
+    "other_summon": "shoot"
+  }
+}

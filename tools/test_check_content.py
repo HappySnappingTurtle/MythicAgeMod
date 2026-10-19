@@ -31,9 +31,14 @@ def write(path: Path, data):
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
-def fixture(root: Path, *, bronze_count=4, drop_ja_key=None, missing_texture=False, bad_size=False):
+def fixture(root: Path, *, bronze_count=4, drop_ja_key=None, missing_texture=False, bad_size=False,
+            power_size=None):
     gen = root / "neoforge/src/generated/resources"
     main = root / "neoforge/src/main/resources"
+    if power_size:
+        p = main / "assets/mythic_age/textures/block/power/lure_stone_side.png"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGBA", power_size).save(p)
     items = ["raw_tin", "tin_ingot", "bronze_mix", "libation"]
     for it in items:
         write(gen / f"assets/mythic_age/models/item/{it}.json",
@@ -98,6 +103,14 @@ class CheckContentTest(unittest.TestCase):
     def test_tc_t6_14_bad_texture_size(self):
         r = self.run_fixture(bad_size=True)
         self.assertTrue(any("raw_tin.png" in e and "24×24" in e for e in r.errors), r.errors)
+
+    def test_power_block_texture_may_be_32(self):
+        """神力展示方块（block/power/）允许 32×32；其他尺寸、非正方形仍报错。"""
+        self.assertEqual([], self.run_fixture(power_size=(32, 32)).errors)
+        self.assertEqual([], self.run_fixture(power_size=(16, 16)).errors)
+        for size in ((24, 24), (32, 16)):
+            r = self.run_fixture(power_size=size)
+            self.assertTrue(any("lure_stone_side.png" in e and "神力展示方块" in e for e in r.errors), r.errors)
 
     def test_tc_t6_15_missing_design_is_skipped(self):
         with tempfile.TemporaryDirectory() as d:

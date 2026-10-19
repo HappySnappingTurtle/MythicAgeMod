@@ -62,16 +62,35 @@ public final class TransientEntities {
             t.putString("kind", "product");
             e.getPersistentData().put(TAG, t);
         }
-        PRODUCTS.replace(owner.getUUID(), powerId, entities.stream().map(e -> e.getUUID().toString()).toList())
-                .forEach(id -> remove(owner.server, id));
+        List<String> old = PRODUCTS.replace(owner.getUUID(), powerId, entities.stream().map(e -> e.getUUID().toString()).toList());
+        for (int i = 0; i < old.size(); i++) {
+            remove(owner.server, old.get(i), i * RETIRE_STAGGER);
+        }
+    }
+
+    /** 同一组产物逐个退场的间隔（刻）。 */
+    static final int RETIRE_STAGGER = 5;
+
+    /** 退场中的产物摘掉账上的标记：表现期间若服务器重启，载入时不会被补回现在的组。 */
+    public static void untag(Entity e) {
+        e.getPersistentData().remove(TAG);
     }
 
     static void remove(MinecraftServer server, String id) {
+        remove(server, id, 0);
+    }
+
+    /** 退场：有退场表现的产物交给它自己（{@link PowerProduct}），其余直接移除。 */
+    static void remove(MinecraftServer server, String id, int delayTicks) {
         UUID uuid = UUID.fromString(id);
         for (ServerLevel level : server.getAllLevels()) {
             Entity e = level.getEntity(uuid);
             if (e != null) {
-                e.discard();
+                if (e instanceof PowerProduct p) {
+                    p.retire(delayTicks);
+                } else {
+                    e.discard();
+                }
                 return;
             }
         }

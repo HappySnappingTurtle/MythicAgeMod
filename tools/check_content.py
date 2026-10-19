@@ -5,7 +5,8 @@
   1. 已实现条目的配方与 08 号设计 json（recipe_contract_examples）一致：类型、输入、数量、产物、时代解锁；
   2. 模型引用的本模组贴图都存在；
   3. zh_cn / en_us / ja_jp 三个语言文件的键完全一致，且每个物品模型都有名称；
-  4. 物品与方块贴图是 16×16（带 .mcmeta 的动画贴图允许高度为宽度的整数倍；实体、主神像、神力表现、粒子、药水效果图标另行规定）；
+  4. 物品与方块贴图是 16×16（带 .mcmeta 的动画贴图允许高度为宽度的整数倍；神力展示方块 block/power/ 允许 32×32；
+     实体、主神像、神力表现、粒子、药水效果图标另行规定）；
   5. 原版造型换色：模型引用的换色贴图都在 assets/minecraft/atlases/blocks.json 中登记；
      调色板键与色阶长度一致；换色结果与原版底图、以及同一底图的其他换色之间色差（CIE76 ΔE）≥ 15。
 
@@ -374,6 +375,11 @@ def check_textures(paths: Paths, report: Report) -> None:
             continue  # 调色板是 N×1；实体、主神像（GeckoLib 模型）与界面贴图的尺寸由模型 UV / 界面布局决定
         with Image.open(f) as img:
             w, h = img.size
+        if rel.parts[:2] == ("block", "power"):
+            # 神力展示方块（诱兽石等，2026-10-19）：与主神像一样是展示物件，允许每格 32×32 的细节密度
+            if not (w in (16, 32) and h == w):
+                report.error(f"贴图 {f.relative_to(paths.root)} 尺寸为 {w}×{h}，神力展示方块应为 16×16 或 32×32")
+            continue
         animated = Path(str(f) + ".mcmeta").exists()
         ok = w == 16 and (h == w or (animated and h % w == 0))
         if not ok:

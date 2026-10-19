@@ -1,0 +1,1362 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/power/lure_stone_upper_side",
+    "side_lower": "mythic_age:block/power/lure_stone_lower_side",
+    "side_upper": "mythic_age:block/power/lure_stone_upper_side",
+    "front_lower": "mythic_age:block/power/lure_stone_lower_front",
+    "front_upper": "mythic_age:block/power/lure_stone_upper_front",
+    "top": "mythic_age:block/power/lure_stone_top",
+    "moss": "mythic_age:block/power/lure_stone_moss",
+    "rubble": "mythic_age:block/power/lure_stone_rubble",
+    "kelp": "mythic_age:block/power/lure_stone_kelp",
+    "barnacle": "mythic_age:block/power/lure_stone_barnacle"
+  },
+  "elements": [
+    {
+      "__comment": "石体东西长块 y15.0–18.0",
+      "from": [
+        3.0,
+        0,
+        5.0
+      ],
+      "to": [
+        14.0,
+        2.0,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            3.0,
+            14.0,
+            14.0,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            3.0,
+            14.0,
+            14.0,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.5,
+            14.0,
+            11.0,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.0,
+            14.0,
+            10.5,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            3.0,
+            5.0,
+            14.0,
+            10.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体东西长块 y18.0–21.0",
+      "from": [
+        3.5,
+        2.0,
+        5.0
+      ],
+      "to": [
+        13.5,
+        5.0,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            3.5,
+            11.0,
+            13.5,
+            14.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            3.5,
+            11.0,
+            13.5,
+            14.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.0,
+            11.0,
+            11.0,
+            14.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.0,
+            11.0,
+            11.0,
+            14.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            3.5,
+            5.0,
+            13.5,
+            11.0
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            3.5,
+            5.0,
+            13.5,
+            11.0
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体东西长块 y21.0–24.0",
+      "from": [
+        4.0,
+        5.0,
+        5.0
+      ],
+      "to": [
+        13.5,
+        8.0,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            8.0,
+            13.5,
+            11.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            8.0,
+            13.5,
+            11.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.0,
+            8.0,
+            11.0,
+            11.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.0,
+            8.0,
+            11.0,
+            11.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.0,
+            5.0,
+            13.5,
+            11.0
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.0,
+            5.0,
+            13.5,
+            11.0
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体东西长块 y24.0–27.0",
+      "from": [
+        4.0,
+        8.0,
+        5.5
+      ],
+      "to": [
+        13.0,
+        11.0,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            5.0,
+            13.0,
+            8.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            5.0,
+            13.0,
+            8.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.5,
+            5.0,
+            10.5,
+            8.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.5,
+            5.0,
+            10.5,
+            8.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.0,
+            5.5,
+            13.0,
+            10.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.0,
+            5.5,
+            13.0,
+            10.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体东西长块 y27.0–30.5",
+      "from": [
+        5.0,
+        11.0,
+        6.0
+      ],
+      "to": [
+        13.0,
+        14.5,
+        10.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            5.0,
+            1.5,
+            13.0,
+            5.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            5.0,
+            1.5,
+            13.0,
+            5.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            6.0,
+            1.5,
+            10.0,
+            5.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            6.0,
+            1.5,
+            10.0,
+            5.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            5.0,
+            6.0,
+            13.0,
+            10.0
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            5.0,
+            6.0,
+            13.0,
+            10.0
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y13.5–16.5",
+      "from": [
+        4.5,
+        0,
+        3.0
+      ],
+      "to": [
+        12.0,
+        0.5,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            15.5,
+            12.0,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            15.5,
+            12.0,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            3.5,
+            15.5,
+            13.0,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            3.0,
+            15.5,
+            12.5,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.5,
+            3.0,
+            12.0,
+            12.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y16.5–19.5",
+      "from": [
+        4.0,
+        0.5,
+        3.0
+      ],
+      "to": [
+        12.5,
+        3.5,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            12.5,
+            12.5,
+            15.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.0,
+            12.5,
+            12.5,
+            15.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            3.5,
+            12.5,
+            13.0,
+            15.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            3.0,
+            12.5,
+            12.5,
+            15.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.0,
+            3.0,
+            12.5,
+            12.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.0,
+            3.5,
+            12.5,
+            13.0
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y19.5–22.5",
+      "from": [
+        4.5,
+        3.5,
+        3.5
+      ],
+      "to": [
+        12.5,
+        6.5,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            9.5,
+            12.5,
+            12.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            9.5,
+            12.5,
+            12.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            3.5,
+            9.5,
+            12.5,
+            12.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            3.5,
+            9.5,
+            12.5,
+            12.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.5,
+            3.5,
+            12.5,
+            12.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.5,
+            3.5,
+            12.5,
+            12.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y22.5–25.5",
+      "from": [
+        5.0,
+        6.5,
+        4.0
+      ],
+      "to": [
+        12.0,
+        9.5,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            5.0,
+            6.5,
+            12.0,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            5.0,
+            6.5,
+            12.0,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            5.0,
+            4.0,
+            12.0,
+            12.0
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            5.0,
+            4.0,
+            12.0,
+            12.0
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y25.5–28.5",
+      "from": [
+        6.0,
+        9.5,
+        4.5
+      ],
+      "to": [
+        12.0,
+        12.5,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            6.0,
+            3.5,
+            12.0,
+            6.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            6.0,
+            3.5,
+            12.0,
+            6.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            3.5,
+            11.5,
+            6.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            3.5,
+            11.5,
+            6.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            6.0,
+            4.5,
+            12.0,
+            11.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            6.0,
+            4.5,
+            12.0,
+            11.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体南北长块 y28.5–31.5",
+      "from": [
+        7.0,
+        12.5,
+        5.5
+      ],
+      "to": [
+        11.0,
+        15.5,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            7.0,
+            0.5,
+            11.0,
+            3.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            7.0,
+            0.5,
+            11.0,
+            3.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.5,
+            0.5,
+            10.5,
+            3.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.5,
+            0.5,
+            10.5,
+            3.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            7.0,
+            5.5,
+            11.0,
+            10.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            7.0,
+            5.5,
+            11.0,
+            10.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y15.5–18.0",
+      "from": [
+        3.75,
+        0,
+        4.25
+      ],
+      "to": [
+        12.75,
+        1.98,
+        11.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            3.75,
+            14.02,
+            12.75,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            3.75,
+            14.02,
+            12.75,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            4.75,
+            14.02,
+            11.75,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4.25,
+            14.02,
+            11.25,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            3.75,
+            4.25,
+            12.75,
+            11.25
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y18.0–20.5",
+      "from": [
+        4.02,
+        2.0,
+        4.5
+      ],
+      "to": [
+        13.0,
+        4.5,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.02,
+            11.5,
+            13.0,
+            14.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.02,
+            11.5,
+            13.0,
+            14.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            11.5,
+            11.5,
+            14.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            11.5,
+            11.5,
+            14.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.02,
+            4.5,
+            13.0,
+            11.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.02,
+            4.5,
+            13.0,
+            11.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y20.5–23.0",
+      "from": [
+        4.02,
+        4.5,
+        4.5
+      ],
+      "to": [
+        13.0,
+        7.0,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.02,
+            9.0,
+            13.0,
+            11.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.02,
+            9.0,
+            13.0,
+            11.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            9.0,
+            11.5,
+            11.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4.5,
+            9.0,
+            11.5,
+            11.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.02,
+            4.5,
+            13.0,
+            11.5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.02,
+            4.5,
+            13.0,
+            11.5
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y23.0–25.5",
+      "from": [
+        4.5,
+        7.0,
+        5.02
+      ],
+      "to": [
+        12.5,
+        9.48,
+        10.98
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            6.52,
+            12.5,
+            9.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            4.5,
+            6.52,
+            12.5,
+            9.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.02,
+            6.52,
+            10.98,
+            9.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.02,
+            6.52,
+            10.98,
+            9.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            4.5,
+            5.02,
+            12.5,
+            10.98
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            4.5,
+            5.02,
+            12.5,
+            10.98
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y25.5–28.0",
+      "from": [
+        5.5,
+        9.5,
+        5.52
+      ],
+      "to": [
+        12.5,
+        12.0,
+        10.48
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            5.5,
+            4.0,
+            12.5,
+            6.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            5.5,
+            4.0,
+            12.5,
+            6.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.52,
+            4.0,
+            10.48,
+            6.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.52,
+            4.0,
+            10.48,
+            6.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            5.5,
+            5.52,
+            12.5,
+            10.48
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            5.5,
+            5.52,
+            12.5,
+            10.48
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "石体中心块 y28.0–31.0",
+      "from": [
+        6.02,
+        12.0,
+        5.52
+      ],
+      "to": [
+        11.5,
+        15.0,
+        10.48
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            6.02,
+            1.0,
+            11.5,
+            4.0
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            6.02,
+            1.0,
+            11.5,
+            4.0
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            5.52,
+            1.0,
+            10.48,
+            4.0
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            5.52,
+            1.0,
+            10.48,
+            4.0
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            6.02,
+            5.52,
+            11.5,
+            10.48
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            6.02,
+            5.52,
+            11.5,
+            10.48
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "凸起",
+      "from": [
+        10,
+        0,
+        3.02
+      ],
+      "to": [
+        12.48,
+        1,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            10,
+            15,
+            12.48,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            10,
+            15,
+            12.48,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            12,
+            15,
+            12.98,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            3.02,
+            15,
+            4,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            10,
+            3.02,
+            12.48,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "凸起",
+      "from": [
+        13,
+        3.5,
+        7
+      ],
+      "to": [
+        14,
+        7.5,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            13,
+            8.5,
+            14,
+            12.5
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            13,
+            8.5,
+            14,
+            12.5
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            6,
+            8.5,
+            9,
+            12.5
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            7,
+            8.5,
+            10,
+            12.5
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            13,
+            7,
+            14,
+            10
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            13,
+            6,
+            14,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "__comment": "凸起",
+      "from": [
+        3.5,
+        5,
+        4
+      ],
+      "to": [
+        5.5,
+        6.48,
+        5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            3.5,
+            9.52,
+            5.5,
+            11
+          ]
+        },
+        "south": {
+          "texture": "#front_upper",
+          "uv": [
+            3.5,
+            9.52,
+            5.5,
+            11
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            11,
+            9.52,
+            12,
+            11
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            4,
+            9.52,
+            5,
+            11
+          ]
+        },
+        "up": {
+          "texture": "#top",
+          "uv": [
+            3.5,
+            4,
+            5.5,
+            5
+          ]
+        },
+        "down": {
+          "texture": "#rubble",
+          "uv": [
+            3.5,
+            11,
+            5.5,
+            12
+          ]
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

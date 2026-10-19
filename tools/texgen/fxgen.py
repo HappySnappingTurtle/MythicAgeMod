@@ -311,6 +311,12 @@ LEAVES = [
     ["........", "........", "..llll..", ".lhhhdl.", "slldddl.", "..llll..", "........", "........"],
     ["........", "...l....", "..lhl...", "..ldl...", "..ldl...", "...d....", "...s....", "........"],
 ]
+SEA_MOTE = {"w": hexc("#eafcff"), "g": hexc("#7fe0e6", 200), "d": hexc("#3aa6b8", 110)}
+RUNE_MOTE = {"w": hexc("#d6ffe6"), "g": hexc("#3fd08a", 210), "d": hexc("#1d7a48", 130)}
+RUNE_MOTES = [
+    ["........", "........", "...d....", "..dgd...", "...d....", "........", "........", "........"],
+    ["........", "...d....", "...g....", ".dgwgd..", "...g....", "...d....", "........", "........"],
+]
 FLAKE = {"h": hexc("#ffd9a0"), "b": hexc("#e0913f"), "d": hexc("#9a5a22")}
 FLAKES = [
     ["........", "........", "...hb...", "..hbbd..", "...bd...", "........", "........", "........"],
@@ -460,6 +466,64 @@ def curse_ring() -> Image.Image:
     return c.img
 
 
+def lure_band() -> Image.Image:
+    """诱兽石的贝纹海浪带（64×16，沿圆周平铺）：一道卷浪线（浪峰朝外）+ 浪峰下的白沫点 + 内侧淡海蓝的余波，
+    上下边缘柔和（自带颜色）。v 小的一侧在圈内。"""
+    w, h = 64, 16
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    px = img.load()
+    for y in range(h):
+        for x in range(w):
+            v = (y + 0.5) / h
+            k = (x + 0.5) / 16 * 2 * math.pi
+            crest = 0.62 + 0.13 * math.sin(k)  # 浪线
+            a = 0.95 * band(v, crest, 0.045, 0.06)
+            col = "#58b9c2"
+            if band(v, crest + 0.05, 0.02, 0.02) > 0.5 and math.sin(k) > 0.55:
+                col = "#e8fbff"  # 浪峰白沫
+                a = max(a, 0.9)
+            a = max(a, 0.35 * band(v, 0.35, 0.12, 0.14))  # 内侧余波
+            if a > 0.01:
+                r, g, b, _ = hexc(col)
+                px[x, y] = (r, g, b, int(a * 255))
+    return img
+
+
+def sentinel_rune() -> Image.Image:
+    """哨兵站位符（64）：方形双框 + 框间回纹 + 中央冥府双叉戟，暗绿发光（自带颜色）。"""
+    n = 64
+    c = Canvas(n)
+    core = with_alpha("#9dffc8", 1)
+    line = with_alpha("#3fd08a", 0.95)
+    glow = with_alpha("#2e8a58", 0.45)
+
+    def rect(x0, y0, x1, y1, col):
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c.put(x, y, col)
+
+    # 外框、内框（各 2 像素）与一圈柔光
+    for inset, col in ((3, glow), (4, line), (13, line)):
+        t = 2 if col is line else 4
+        rect(inset, inset, n - inset, inset + t, col)
+        rect(inset, n - inset - t, n - inset, n - inset, col)
+        rect(inset, inset, inset + t, n - inset, col)
+        rect(n - inset - t, inset, n - inset, n - inset, col)
+    # 框间回纹：每 8 像素一个「卍」形小钩，沿四边排布
+    for i in range(8, n - 8, 8):
+        for (x, y) in ((i, 8), (i, n - 10), (8, i), (n - 10, i)):
+            rect(x, y, x + 3, y + 1, line)
+            rect(x + 2, y, x + 3, y + 3, line)
+    # 中央双叉戟：杆、横档、两齿
+    rect(31, 26, 33, 46, core)
+    rect(25, 26, 39, 28, core)
+    rect(25, 18, 27, 28, core)
+    rect(37, 18, 39, 28, core)
+    for (x, y) in ((24, 20), (39, 20)):
+        rect(x, y, x + 1, y + 2, line)
+    return c.img
+
+
 def soft_puff(seed: int, top: str, bottom: str, n: int = 16) -> Image.Image:
     """软边烟团（疫雾、玫瑰烟）。"""
     rnd = random.Random(seed)
@@ -576,6 +640,8 @@ def all_textures() -> dict[str, Image.Image]:
         "fx/plague_seal": plague_seal(),
         "fx/plague_band": plague_band(),
         "fx/curse_ring": curse_ring(),
+        "fx/lure_band": lure_band(),
+        "fx/sentinel_rune": sentinel_rune(),
         "particle/plague_mark": pixels(PLAGUE_MARK, PMARK),
         "particle/seal": pixels(SEAL, SEAL_ICON),
         "particle/immune": pixels(IMMUNE, IMMUNE_ICON),
@@ -597,6 +663,10 @@ def all_textures() -> dict[str, Image.Image]:
         out[f"particle/rose_puff_{i}"] = soft_puff(400 + i, "#ffd3e4", "#e97aa6")
     for i, rows in enumerate(FLAKES):
         out[f"particle/bronze_flake_{i}"] = pixels(rows, FLAKE)
+    for i, rows in enumerate(MOTES):
+        out[f"particle/sea_mote_{i}"] = pixels(rows, SEA_MOTE)
+    for i, rows in enumerate(RUNE_MOTES):
+        out[f"particle/rune_mote_{i}"] = pixels(rows, RUNE_MOTE)
     return out
 
 

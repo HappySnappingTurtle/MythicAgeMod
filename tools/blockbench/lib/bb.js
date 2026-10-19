@@ -215,28 +215,23 @@
      * 用主视图截图并写入文件（异步；返回 Promise<路径>）。camera: {position, target, fov}，Blockbench 坐标。
      * 截图用于审阅记录，写到 docs/ 下（不入 git）。
      */
-    MA.shot = (rel, camera) =>
-        new Promise((resolve, reject) => {
-            const preview = Preview.selected;
-            preview.camera.position.set(...camera.position);
-            preview.controls.target.set(...camera.target);
-            if (camera.fov) {
-                preview.setFOV(camera.fov);
-            }
-            preview.controls.update();
-            preview.render();
-            // 等视图渲染完再截（立刻截会得到全透明的图，T11b 实测）
-            setTimeout(() => Screencam.screenshotPreview(preview, { crop: false }, (dataUrl) => {
-                try {
-                    const p = MA.abs(rel);
-                    fs.mkdirSync(path.dirname(p), { recursive: true });
-                    fs.writeFileSync(p, Buffer.from(dataUrl.split(',')[1], 'base64'));
-                    resolve(p);
-                } catch (e) {
-                    reject(e);
-                }
-            }), 400);
-        });
+    MA.shot = (rel, camera) => {
+        const preview = Preview.selected;
+        preview.camera.position.set(...camera.position);
+        preview.controls.target.set(...camera.target);
+        if (camera.fov) {
+            preview.setFOV(camera.fov);
+        }
+        preview.controls.update();
+        // 直接渲染后取画布：Blockbench 窗口在后台时 setTimeout 与 Screencam 回调不会触发（2026-10-18 实测），
+        // 同步渲染再读画布不受影响
+        preview.render();
+        const dataUrl = preview.canvas.toDataURL('image/png');
+        const p = MA.abs(rel);
+        fs.mkdirSync(path.dirname(p), { recursive: true });
+        fs.writeFileSync(p, Buffer.from(dataUrl.split(',')[1], 'base64'));
+        return Promise.resolve(p);
+    };
 
     MA.reset = () => {
         MA.bones = {};

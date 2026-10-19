@@ -17,13 +17,13 @@ def tex(name: str) -> str:
     return "mythic_age:block/" + name
 
 
-def spec(name: str, grid: list[str], palette: dict[str, str]) -> None:
-    """16×16 像素贴图规格；'.' 为透明。"""
-    assert len(grid) == 16 and all(len(r) == 16 for r in grid), name
+def spec(name: str, grid: list[str], palette: dict[str, str], size: int = 16, folder: str = "block/") -> None:
+    """size×size（16 或 32）像素贴图规格，输出到 textures/<folder><name>.png；'.' 为透明。"""
+    assert len(grid) == size and all(len(r) == size for r in grid), name
     used = {c for r in grid for c in r} - {"."}
     missing = used - set(palette)
     assert not missing, f"{name}: 调色板缺少 {missing}"
-    data = {"template": "pixels", "out": "block/" + name, "size": 16,
+    data = {"template": "pixels", "out": folder + name, "size": size,
             "palette": {k: v for k, v in palette.items() if k in used},
             "params": {"kind": "block", "rows": grid}}
     (SPECS / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
