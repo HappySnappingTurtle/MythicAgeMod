@@ -1,0 +1,48 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_pithos_mouth_half",
+  "size": 32,
+  "palette": {
+    "d": "#6b3622",
+    "g": "#c9a24f",
+    "G": "#e0bf6a",
+    "y": "#a8822f"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddddddddddddggggggGGdddddddddddd",
+      "ddddddddddyyGGGGGGyyyydddddddddd",
+      "ddddddddggyyGGGGGGyyyyGGdddddddd",
+      "dddddddGGGggggggyyggggyygddddddd",
+      "ddddddGGGGggggggyyggggyyggdddddd",
+      "dddddgyyggggyyggGGyyggGGggGddddd",
+      "dddddgyyggggyyggGGyyggGGggGddddd",
+      "ddddyyGGGGGGGGggggyyGGGGggGGdddd",
+      "ddddyyGGGGGGGGggggyyGGGGggGGdddd",
+      "dddGggggggggGGGGGGGGggyyggggGddd",
+      "dddGggggggggGGGGGGGGggyyggggGddd",
+      "dddGGGyyyyggggyyggGGgggggggggddd",
+      "dddGGGyyyyggggyyggGGgggggggggddd",
+      "dddgyyyyGGGGGGggGGggGGGGyyyyyddd",
+      "dddgyyyyGGGGGGggGGggGGGGyyyyyddd",
+      "dddyGGGGggggGGGGGGGGyyggGGyyGddd",
+      "dddyGGGGggggGGGGGGGGyyggGGyyGddd",
+      "ddddggggyyGGGGGGyyggGGggGGyydddd",
+      "ddddggggyyGGGGGGyyggGGggGGyydddd",
+      "dddddgggggGGGGGGGGggGGyyggGddddd",
+      "dddddgggggGGGGGGGGggGGyyggGddddd",
+      "ddddddyyyyyyggyyggggGGGGggdddddd",
+      "dddddddyyyyyggyyggggGGGGgddddddd",
+      "ddddddddyyyyggyyyyGGggyydddddddd",
+      "ddddddddddyyggyyyyGGggdddddddddd",
+      "ddddddddddddGGyyyyGGdddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd"
+    ]
+  }
+}

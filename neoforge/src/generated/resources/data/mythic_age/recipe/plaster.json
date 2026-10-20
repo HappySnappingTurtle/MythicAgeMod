@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": {
+      "item": "minecraft:calcite"
+    },
+    "L": {
+      "item": "minecraft:clay_ball"
+    },
+    "S": {
+      "tag": "minecraft:sand"
+    }
+  },
+  "pattern": [
+    "CS",
+    "CL"
+  ],
+  "result": {
+    "count": 4,
+    "id": "mythic_age:plaster"
+  }
+}

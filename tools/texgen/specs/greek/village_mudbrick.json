@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_mudbrick",
+  "size": 16,
+  "palette": {
+    "a": "#a77b50",
+    "b": "#9a6f47",
+    "e": "#b58a5c",
+    "q": "#8a6140",
+    "j": "#6b4e34",
+    "J": "#7d5d40",
+    "t": "#d2bb7c",
+    "T": "#c1a866"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "eeqtTqejqbbqbbbJ",
+      "eeeqeeeJbqbbqbbj",
+      "eeqeeeejqqqqqqbj",
+      "JjjjjjjjjJjJjjjj",
+      "eqejaaqaaqajeqee",
+      "qeejaaaaaqajtTee",
+      "qqejaqqqqqqjqqeq",
+      "jjjJjJjJjjjJjJJJ",
+      "aaqaaaqjtTbbqqqj",
+      "aqaaaqajbbqbbbqJ",
+      "aqqaqqqjbqbqqqqj",
+      "jjJjjjjjJJjJjjJj",
+      "etTJeqeeqeejeeee",
+      "eeejeqeeeeeJqeee",
+      "eeqJqqeqqqqjeqee",
+      "jjJJjjjJjjjjjjJj"
+    ]
+  }
+}

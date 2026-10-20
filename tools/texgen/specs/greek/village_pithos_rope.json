@@ -1,0 +1,51 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_pithos_rope",
+  "size": 32,
+  "palette": {
+    "k": "#4a2416",
+    "d": "#6b3622",
+    "m": "#8a4a2e",
+    "s": "#a3603d",
+    "S": "#b8744c",
+    "h": "#ca8a5f",
+    "H": "#dba276"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "HhhSsmdkHhhSsmdkHhhSsmdkHhhSsmdk",
+      "hhSsmdkHhhSsmdkHhhSsmdkHhhSsmdkH",
+      "hSsmdkHhhSsmdkHhhSsmdkHhhSsmdkHh",
+      "SsmdkHhhSsmdkHhhSsmdkHhhSsmdkHhh",
+      "smdkHhhSsmdkHhhSsmdkHhhSsmdkHhhS",
+      "mdkHhhSsmdkHhhSsmdkHhhSsmdkHhhSs",
+      "dkHhhSsmdkHhhSsmdkHhhSsmdkHhhSsm",
+      "kHhhSsmdkHhhSsmdkHhhSsmdkHhhSsmd",
+      "HhhSsmdkHhhSsmdkHhhSsmdkHhhSsmdk",
+      "hhSsmdkHhhSsmdkHhhSsmdkHhhSsmdkH",
+      "hSsmdkHhhSsmdkHhhSsmdkHhhSsmdkHh",
+      "SsmdkHhhSsmdkHhhSsmdkHhhSsmdkHhh",
+      "smdkHhhSsmdkHhhSsmdkHhhSsmdkHhhS",
+      "mdkHhhSsmdkHhhSsmdkHhhSsmdkHhhSs",
+      "dkHhhSsmdkHhhSsmdkHhhSsmdkHhhSsm",
+      "kHhhSsmdkHhhSsmdkHhhSsmdkHhhSsmd",
+      "HhhSsmdkHhhSsmdkHhhSsmdkHhhSsmdk",
+      "hhSsmdkHhhSsmdkHhhSsmdkHhhSsmdkH",
+      "hSsmdkHhhSsmdkHhhSsmdkHhhSsmdkHh",
+      "SsmdkHhhSsmdkHhhSsmdkHhhSsmdkHhh",
+      "smdkHhhSsmdkHhhSsmdkHhhSsmdkHhhS",
+      "mdkHhhSsmdkHhhSsmdkHhhSsmdkHhhSs",
+      "dkHhhSsmdkHhhSsmdkHhhSsmdkHhhSsm",
+      "kHhhSsmdkHhhSsmdkHhhSsmdkHhhSsmd",
+      "HhhSsmdkHhhSsmdkHhhSsmdkHhhSsmdk",
+      "hhSsmdkHhhSsmdkHhhSsmdkHhhSsmdkH",
+      "hSsmdkHhhSsmdkHhhSsmdkHhhSsmdkHh",
+      "SsmdkHhhSsmdkHhhSsmdkHhhSsmdkHhh",
+      "smdkHhhSsmdkHhhSsmdkHhhSsmdkHhhS",
+      "mdkHhhSsmdkHhhSsmdkHhhSsmdkHhhSs",
+      "dkHhhSsmdkHhhSsmdkHhhSsmdkHhhSsm",
+      "kHhhSsmdkHhhSsmdkHhhSsmdkHhhSsmd"
+    ]
+  }
+}

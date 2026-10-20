@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_plaster",
+  "size": 16,
+  "palette": {
+    "n": "#e3dccb",
+    "h": "#ece6d7",
+    "H": "#f4efe3",
+    "s": "#b6ab93"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhhhnnnhhhnnnnnh",
+      "hhhnnhhhhhnnnnnh",
+      "hhnhhhhhhhhnnnhh",
+      "hhhhhhhhhhhhshhh",
+      "hhhhhhhhnnnnnnhh",
+      "hhhhhhnnhnhhnhhh",
+      "hnnnhhhhnhhhhhhh",
+      "nnnnhhhnnnhhhhnn",
+      "nnnnhnnnnnhhhhns",
+      "nnnhshnnnnhhhhnn",
+      "nnnhhhnnnnhhhhhn",
+      "hhhhhhnnnhhhhhhh",
+      "HHhHHhhnnnnhnhhh",
+      "HHhhhhhnnnnnnhhh",
+      "hhnhhnhnnnnnnnhh",
+      "hhhnhnhhhnnnnnhh"
+    ]
+  }
+}

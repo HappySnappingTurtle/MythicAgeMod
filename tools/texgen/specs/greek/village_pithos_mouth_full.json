@@ -1,0 +1,50 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_pithos_mouth_full",
+  "size": 32,
+  "palette": {
+    "m": "#8a4a2e",
+    "S": "#b8744c",
+    "h": "#ca8a5f",
+    "c": "#8a7258",
+    "C": "#b19a7c",
+    "w": "#d6c7a8"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmhhhcchhhmmmmmmmmmmmm",
+      "mmmmmmmmmmhShhhCChhhShmmmmmmmmmm",
+      "mmmmmmmmhhShhhhCChhhhhShmmmmmmmm",
+      "mmmmmmmhShhhhhScchhShhhhhmmmmmmm",
+      "mmmmmmhhhhhhShSCChhhhSShhhmmmmmm",
+      "mmmmmhShhShSShhCChhhhShhhhhmmmmm",
+      "mmmmmhShhhhhhhSccShhhhhhhhhmmmmm",
+      "mmmmShShhhhhhhSCChSShhShShhhmmmm",
+      "mmmmhhShhhhhhhhCChhhhhhhhhhSmmmm",
+      "mmmhhhhhShhhhhScchShhhhhhShhhmmm",
+      "mmmShShhhhhhhhhCChhhShhSShhhhmmm",
+      "mmmShhhhhhhhhShCCShhhhhhhhhShmmm",
+      "mmmcCCcCCcCCcCCwCCcCCcCCcCCcCmmm",
+      "mmmcCCcCCcCCcCCCwCcCCcCCcCCcCmmm",
+      "mmmSShhhhShhhhhCChShhhhhhhShSmmm",
+      "mmmhhhhhhShSShhcchhhhhhhhhShhmmm",
+      "mmmhShhhhShhhhSCChhhhShShhhhhmmm",
+      "mmmmhhhShShShhhCCShhhhhhhShhmmmm",
+      "mmmmhhhhhhhhhhhcchhhhhhShhhhmmmm",
+      "mmmmmSShhhhhhhhCCShhhhhShhhmmmmm",
+      "mmmmmhhhhShhhhhCCSShhSShhhhmmmmm",
+      "mmmmmmhhShShhhScchhhhhShhhmmmmmm",
+      "mmmmmmmhSShhhhSCChShShhhhmmmmmmm",
+      "mmmmmmmmhhhhhhhCChSShhhSmmmmmmmm",
+      "mmmmmmmmmmhhhhhcchhhShmmmmmmmmmm",
+      "mmmmmmmmmmmmShhCCShhmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
+  }
+}

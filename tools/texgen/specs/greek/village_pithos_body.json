@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_pithos_body",
+  "size": 32,
+  "palette": {
+    "s": "#a3603d",
+    "S": "#b8744c",
+    "h": "#ca8a5f"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SSSSShhhhhhhhhhhhhhhhhhhhhhhSSSS",
+      "SSSSSShhhhhhhhhhhhhhhhhhhhhSSSSS",
+      "SSSSSSShhhhhhhhhhhhhhhhhhhSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSShhhhhhhhhhhhhhhSSSSSSSS",
+      "SSSSSSSSSSShhhhhhhhhhhSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSsssssssssssssssssssSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "ssssssssssssssssssssssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "sssSSSSSSSSSSSSSSSSSSSSSSSSSSSss",
+      "ssssssssSSSSSSSSSSSSSSSSSsssssss",
+      "ssssssssssssssssssssssssssssssss",
+      "ssssssssssSSSSSSSSSSSSSsssssssss",
+      "ssssssssssSSSSSSSSSSSSSsssssssss",
+      "sssssssssssSSSSSSSSSSSssssssssss",
+      "ssssssssssssSSSSSSSSSsssssssssss"
+    ]
+  }
+}

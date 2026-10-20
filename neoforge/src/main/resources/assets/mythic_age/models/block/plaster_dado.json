@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "mythic_age:block/village/village_plaster_dado",
+    "top": "mythic_age:block/village/village_plaster",
+    "bottom": "mythic_age:block/village/village_plaster"
+  }
+}

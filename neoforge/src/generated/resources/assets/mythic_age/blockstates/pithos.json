@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "fill=empty": {
+      "model": "mythic_age:block/pithos_empty"
+    },
+    "fill=full": {
+      "model": "mythic_age:block/pithos_full"
+    },
+    "fill=half": {
+      "model": "mythic_age:block/pithos_half"
+    }
+  }
+}

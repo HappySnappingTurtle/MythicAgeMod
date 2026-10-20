@@ -1,0 +1,39 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_plaster_dado",
+  "size": 16,
+  "palette": {
+    "m": "#d8d0bc",
+    "n": "#e3dccb",
+    "h": "#ece6d7",
+    "H": "#f4efe3",
+    "s": "#b6ab93",
+    "R": "#c46a47",
+    "r": "#a8492e",
+    "o": "#8f3b25",
+    "O": "#d4805b",
+    "l": "#7a3a28",
+    "w": "#e3dccb"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "nnnnnnnnnnnnnnsn",
+      "nnnnmmnnnnnnnnnn",
+      "nnhnnnnhhhnhnnns",
+      "nnnhnhhhhhhhnnhn",
+      "nnhhhhHHHhhhnhhn",
+      "nnhhhhhhhhhhhhhn",
+      "nnhhhhhhhhhhhhnn",
+      "hhhhHhhhnnnhnnnh",
+      "hhhhhHhnnnnnnnnh",
+      "hhhHhhhhnnnnnnnn",
+      "nhhhhhhhhnmmmnnh",
+      "llllllllllllllll",
+      "rroRRRRwrrrRrRrr",
+      "rrrRROrrRwrRrrRr",
+      "rrRRrOrRrRRRRrrr",
+      "rroRRwRoORRRrRoo"
+    ]
+  }
+}

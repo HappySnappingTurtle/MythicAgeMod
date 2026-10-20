@@ -59,6 +59,7 @@ public final class GreekRecipes {
 
         pottery(out);
         marble(out);
+        village(out);
         agriculture(out);
         woodShapes(out);
         foods(out);
@@ -410,6 +411,45 @@ public final class GreekRecipes {
 
     public static String name(ItemLike item) {
         return BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
+    }
+
+    /** 村庄新方块（T13b 阶段 ③）：墙面与货堆，玩家也能做来盖房子。 */
+    private static void village(RecipeOutput out) {
+        // 方解石 2 + 沙 1 + 黏土球 1 → 白灰墙 4（石灰、砂、泥抹面）
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PLASTER, 4)
+                .pattern("CS").pattern("CL")
+                .define('C', Items.CALCITE).define('S', net.minecraft.tags.ItemTags.SAND).define('L', Items.CLAY_BALL)
+                .unlockedBy("has_calcite", has(Items.CALCITE))
+                .save(out, id("plaster"));
+        // 白灰墙 1 + 红色染料 1 → 赭红墙裙白灰墙 1
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PLASTER_DADO)
+                .requires(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PLASTER)
+                .requires(net.neoforged.neoforge.common.Tags.Items.DYES_RED)
+                .unlockedBy("has_plaster", has(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PLASTER))
+                .save(out, id("plaster_dado"));
+        // 压实的泥 2 + 小麦 1 → 日晒泥砖 2（泥、麦秸、日晒）
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MUDBRICK, 2)
+                .requires(Items.PACKED_MUD).requires(Items.PACKED_MUD).requires(Items.WHEAT)
+                .unlockedBy("has_packed_mud", has(Items.PACKED_MUD))
+                .save(out, id("mudbrick"));
+        // 陶制构件 7（U 形）→ 陶瓮 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PITHOS)
+                .pattern("C C").pattern("C C").pattern("CCC")
+                .define('C', CERAMIC_COMPONENT)
+                .unlockedBy("has_ceramic_component", has(CERAMIC_COMPONENT))
+                .save(out, id("pithos"));
+        // 陶制构件 6 + 橄榄木台阶 2 → 双耳瓶堆 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.AMPHORA_STACK)
+                .pattern("CCC").pattern("CCC").pattern("S S")
+                .define('C', CERAMIC_COMPONENT)
+                .define('S', io.github.happysnappingturtle.mythicage.content.greek.GreekWood.OLIVE_SLAB)
+                .unlockedBy("has_ceramic_component", has(CERAMIC_COMPONENT))
+                .save(out, id("amphora_stack"));
     }
 
     public static ResourceLocation id(String path) {

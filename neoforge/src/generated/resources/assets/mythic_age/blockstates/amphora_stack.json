@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "alt=false,facing=east": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 90
+    },
+    "alt=false,facing=north": {
+      "model": "mythic_age:block/amphora_stack"
+    },
+    "alt=false,facing=south": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 180
+    },
+    "alt=false,facing=west": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 270
+    },
+    "alt=true,facing=east": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 90
+    },
+    "alt=true,facing=north": {
+      "model": "mythic_age:block/amphora_stack"
+    },
+    "alt=true,facing=south": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 180
+    },
+    "alt=true,facing=west": {
+      "model": "mythic_age:block/amphora_stack",
+      "y": 270
+    }
+  }
+}

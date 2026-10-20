@@ -62,6 +62,7 @@ public final class MythicAge {
         GreekFoods.init();
         GreekTemple.init();
         GreekArchitecture.init();
+        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.init();
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);

@@ -375,8 +375,8 @@ def check_textures(paths: Paths, report: Report) -> None:
             continue  # 调色板是 N×1；实体、主神像（GeckoLib 模型）与界面贴图的尺寸由模型 UV / 界面布局决定
         with Image.open(f) as img:
             w, h = img.size
-        if rel.parts[:2] == ("block", "power"):
-            # 神力展示方块（诱兽石等，2026-10-19）：与主神像一样是展示物件，允许每格 32×32 的细节密度
+        if rel.parts[:2] in (("block", "power"), ("block", "village")):
+            # 神力展示方块（诱兽石等，2026-10-19）与村庄展示方块（陶瓮、瓶堆等，T13b）：展示物件，允许每格 32×32 的细节密度
             if not (w in (16, 32) and h == w):
                 report.error(f"贴图 {f.relative_to(paths.root)} 尺寸为 {w}×{h}，神力展示方块应为 16×16 或 32×32")
             continue
