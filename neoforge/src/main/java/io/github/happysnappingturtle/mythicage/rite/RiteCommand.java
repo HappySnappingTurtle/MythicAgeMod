@@ -83,8 +83,8 @@ public final class RiteCommand {
         s.setAge(target);
         s.minorGods().put(target, god);
         s.pendingUnlocks().add(target);
-        Optional<VillageRegistry.Village> v = VillageService.villageAt(player.serverLevel(), player.blockPosition(),
-                VillageService.RANGE).filter(x -> x.civ().equals(civ.id()));
+        Optional<VillageRegistry.Village> v = io.github.happysnappingturtle.mythicage.village.VillageSpace.villageAt(player.serverLevel(),
+                player.blockPosition()).filter(x -> x.civ().equals(civ.id()));
         v.ifPresent(village -> {
             s.approve(village.patron(), target);
             s.markRiteVillage(village.id(), target, true);

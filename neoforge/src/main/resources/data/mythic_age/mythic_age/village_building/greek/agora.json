@@ -1,0 +1,58 @@
+{
+  "id": "greek:agora",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/agora",
+  "size": [
+    15,
+    6,
+    15
+  ],
+  "floor_y": 0,
+  "category": "core",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "center"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "meeting": 1
+  },
+  "anchors": {
+    "center": [
+      [
+        7,
+        2,
+        7
+      ]
+    ],
+    "entrance": [
+      [
+        7,
+        0,
+        14
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:pebble_mosaic": 160,
+    "mythic_age:marble_ashlar": 57,
+    "mythic_age:olive_leaves": 34,
+    "mythic_age:marble_stairs": 16,
+    "mythic_age:polished_marble": 13,
+    "mythic_age:marble_wall": 12,
+    "mythic_age:greek_oil_lamp": 4,
+    "mythic_age:olive_log": 3,
+    "minecraft:bell": 1
+  },
+  "door": {
+    "pos": [
+      7,
+      0,
+      14
+    ],
+    "facing": "south"
+  }
+}

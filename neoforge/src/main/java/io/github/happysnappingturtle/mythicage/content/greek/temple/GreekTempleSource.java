@@ -51,7 +51,7 @@ public final class GreekTempleSource implements GraceSource {
             }
             ServerLevel level = viewer.server.getLevel(e.pos().dimension());
             Optional<UUID> village = level == null ? Optional.empty()
-                    : VillageService.villageAt(level, e.pos().pos(), VillageService.RANGE).map(VillageRegistry.Village::id);
+                    : io.github.happysnappingturtle.mythicage.village.VillageSpace.villageAt(level, e.pos().pos()).map(VillageRegistry.Village::id);
             Component name = GreekTemple.GREEK_ALTAR.get().getName();
             if (level != null && level.isLoaded(e.pos().pos())
                     && level.getBlockEntity(e.pos().pos()) instanceof GreekAltarBlockEntity be && be.hasResult()) {

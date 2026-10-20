@@ -1,0 +1,17 @@
+package io.github.happysnappingturtle.mythicage.core.village.gen;
+
+/**
+ * 世界生成时的地形采样（T13b §2.3）：neoforge 用 {@code ChunkGenerator.getBaseHeight} 实现，测试用公式实现。
+ * 两种高度都是「该列最上面一个方块之上的第一格」。
+ */
+public interface TerrainSampler {
+    /** 含水面的地表（WORLD_SURFACE_WG）。 */
+    int surface(int x, int z);
+
+    /** 固体地面（OCEAN_FLOOR_WG）；与 {@link #surface} 不同说明这里是水面。 */
+    int floor(int x, int z);
+
+    default boolean water(int x, int z) {
+        return surface(x, z) > floor(x, z);
+    }
+}

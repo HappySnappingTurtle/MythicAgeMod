@@ -147,6 +147,9 @@ public final class GuardianSpawner {
             if (civ.isEmpty() || !hasGuardian(civ.get()) || reg.byBell(level.dimension(), bell).isPresent()) {
                 continue;
             }
+            if (io.github.happysnappingturtle.mythicage.village.VillagePlans.get(level.getServer()).has(v.get().id())) {
+                continue; // 文明村庄：祭司在神庙锚点由登记流程生成（T13b §3.1）
+            }
             Optional<BlockPos> spot = standableNear(level, bell, BELL_RADIUS);
             if (spot.isPresent() && spawnNew(level, spot.get(), Optional.of(bell), civ.get()) != null) {
                 spawned++;

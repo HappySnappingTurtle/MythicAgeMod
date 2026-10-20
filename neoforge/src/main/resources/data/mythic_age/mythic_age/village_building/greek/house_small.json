@@ -1,0 +1,69 @@
+{
+  "id": "greek:house_small",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/house_small",
+  "size": [
+    9,
+    7,
+    10
+  ],
+  "floor_y": 1,
+  "category": "basic",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "house"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {
+    "beds": 2
+  },
+  "anchors": {
+    "entrance": [
+      [
+        4,
+        1,
+        9
+      ]
+    ],
+    "home": [
+      [
+        2,
+        1,
+        3
+      ],
+      [
+        3,
+        1,
+        3
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:terracotta_roof_slab": 66,
+    "minecraft:calcite": 61,
+    "mythic_age:marble_ashlar": 43,
+    "minecraft:terracotta": 31,
+    "mythic_age:olive_log": 22,
+    "mythic_age:polygonal_marble": 20,
+    "mythic_age:olive_slab": 20,
+    "mythic_age:terracotta_ridge": 6,
+    "minecraft:white_bed": 4,
+    "minecraft:decorated_pot": 3,
+    "mythic_age:olive_door": 2,
+    "mythic_age:olive_trapdoor": 2,
+    "minecraft:campfire": 1,
+    "mythic_age:greek_oil_lamp": 1
+  },
+  "door": {
+    "pos": [
+      4,
+      1,
+      9
+    ],
+    "facing": "south"
+  }
+}

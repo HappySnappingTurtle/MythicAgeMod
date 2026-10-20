@@ -1,0 +1,13 @@
+{
+  "type": "mythic_age:civ_village",
+  "biomes": "#mythic_age:region/greek",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin",
+  "civ_rules": [
+    {"civ": "greek", "region": "#mythic_age:region/greek"}
+  ],
+  "site": {"flatness": 1.0, "high_ground": 0.3, "min": 0.35, "max_relief": 12},
+  "layout": "fixed",
+  "template_set": "v1"
+}

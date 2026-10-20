@@ -31,7 +31,7 @@ public final class VillageCommand {
     static Component describe(VillageRegistry.Village v) {
         BlockPos b = v.bell().pos();
         return Component.translatable("commands.mythic_age.village.entry",
-                VillageService.title(v), VillageService.subtitle(v), v.vanillaType(), v.origin().id(),
+                VillageService.title(v), VillageService.subtitle(v), v.vanillaType().isEmpty() ? "-" : v.vanillaType(), v.origin().id(),
                 v.bell().dimension().location().toString(), b.getX(), b.getY(), b.getZ());
     }
 
@@ -49,8 +49,8 @@ public final class VillageCommand {
                 .then(Commands.literal("village")
                         .requires(src -> src.hasPermission(2))
                         .then(Commands.literal("info").executes(c -> {
-                            Optional<VillageRegistry.Village> v = VillageService.villageAt(c.getSource().getLevel(),
-                                    BlockPos.containing(c.getSource().getPosition()), VillageService.LEAVE_RANGE);
+                            Optional<VillageRegistry.Village> v = VillageSpace.villageAt(c.getSource().getLevel(),
+                                    BlockPos.containing(c.getSource().getPosition()));
                             if (v.isEmpty()) {
                                 c.getSource().sendFailure(Component.translatable("commands.mythic_age.village.none"));
                                 return 0;

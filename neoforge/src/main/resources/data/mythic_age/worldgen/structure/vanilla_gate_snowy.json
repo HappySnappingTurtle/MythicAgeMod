@@ -1,0 +1,8 @@
+{
+  "type": "mythic_age:vanilla_gate",
+  "structure": "minecraft:village_snowy",
+  "biomes": "#minecraft:has_structure/village_snowy",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

@@ -100,7 +100,7 @@ class VillageTest {
 
     @Test
     void tc_t10b_10_patronWeightsMergeByCiv() {
-        VillagesConfig base = new VillagesConfig(VillagesConfig.Mode.AFFILIATE, Map.of(), true,
+        VillagesConfig base = new VillagesConfig(VillagesConfig.Mode.AFFILIATE, Map.of(), false, 0.30,
                 Map.of("greek", GREEK, "egyptian", Map.of("ra", 40, "isis", 35, "set", 25)), Map.of(), true);
         List<io.github.happysnappingturtle.mythicage.core.config.ConfigIssue> issues = new java.util.ArrayList<>();
         VillagesConfig v = VillagesSchema.INSTANCE.read(io.github.happysnappingturtle.mythicage.core.config.ObjectReader.root(

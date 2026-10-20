@@ -1,0 +1,55 @@
+{
+  "id": "greek:krene",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/krene",
+  "size": [
+    7,
+    9,
+    6
+  ],
+  "floor_y": 1,
+  "category": "core",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "center_side"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "water": 1
+  },
+  "anchors": {
+    "water": [
+      [
+        4,
+        1,
+        2
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:smooth_marble": 46,
+    "mythic_age:marble_ashlar": 38,
+    "mythic_age:terracotta_roof_slab": 30,
+    "mythic_age:polished_marble": 20,
+    "mythic_age:marble_architrave": 16,
+    "mythic_age:greek_pediment": 16,
+    "minecraft:water": 12,
+    "mythic_age:smooth_marble_slab": 4,
+    "mythic_age:marble_column": 4,
+    "mythic_age:marble_column_base": 2,
+    "mythic_age:blue_meander_marble": 2,
+    "mythic_age:marble_wall": 2,
+    "mythic_age:doric_capital": 2
+  },
+  "door": {
+    "pos": [
+      6,
+      1,
+      2
+    ],
+    "facing": "east"
+  }
+}

@@ -109,6 +109,12 @@ public final class VillageService {
         }
         Optional<String> type = VillageResolver.vanillaType(level, bell);
         if (type.isEmpty()) {
+            // 文明村庄的钟：按结构片段立即登记（V0 §4.2 兜底；正常情况下起点区块载入时已登记）
+            Optional<VillageRegistry.Village> generated =
+                    io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration.registerAt(level, bell);
+            if (generated.isPresent()) {
+                return generated;
+            }
             NON_VILLAGE.add(key);
             return Optional.empty();
         }
@@ -184,12 +190,23 @@ public final class VillageService {
         }
     }
 
-    /** pos 所在（48 格内最近）的已登记村庄。 */
+    /**
+     * pos 周围 range 格内最近的已登记村庄（按钟的水平距离）。判断「在不在村里」请用 {@link VillageSpace#villageAt}：
+     * 有规划数据的村庄按已建范围判断（T13b）。
+     */
     public static Optional<VillageRegistry.Village> villageAt(ServerLevel level, BlockPos pos, int range) {
+        return villageAt(level, pos, range, v -> true);
+    }
+
+    static Optional<VillageRegistry.Village> villageAt(ServerLevel level, BlockPos pos, int range,
+                                                       java.util.function.Predicate<VillageRegistry.Village> filter) {
         VillageRegistry reg = VillageRegistry.get(level.getServer());
         VillageRegistry.Village best = null;
         double bestD = Double.MAX_VALUE;
         for (VillageRegistry.Village v : reg.in(level.dimension())) {
+            if (!filter.test(v)) {
+                continue;
+            }
             BlockPos b = v.bell().pos();
             double dx = b.getX() - pos.getX();
             double dz = b.getZ() - pos.getZ();
@@ -210,12 +227,12 @@ public final class VillageService {
         if (inside != null) {
             Optional<VillageRegistry.Village> cur = VillageRegistry.get(p.server).byId(inside);
             if (cur.isPresent() && cur.get().bell().dimension().equals(p.level().dimension())
-                    && horizontal(cur.get().bell().pos(), p.blockPosition()) <= LEAVE_RANGE) {
+                    && VillageSpace.stillInside(p.serverLevel(), cur.get(), p.blockPosition())) {
                 return;
             }
             INSIDE.remove(p.getUUID());
         }
-        villageAt(p.serverLevel(), p.blockPosition(), RANGE).ifPresent(v -> {
+        VillageSpace.villageAt(p.serverLevel(), p.blockPosition()).ifPresent(v -> {
             INSIDE.put(p.getUUID(), v.id());
             p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
             p.connection.send(new ClientboundSetTitleTextPacket(stagedTitle(v)));
@@ -230,12 +247,12 @@ public final class VillageService {
         UUID inside = INSIDE.get(p.getUUID());
         if (inside != null) {
             Optional<VillageRegistry.Village> cur = VillageRegistry.get(p.server).byId(inside);
-            if (cur.isPresent() && horizontal(cur.get().bell().pos(), p.blockPosition()) <= LEAVE_RANGE) {
+            if (cur.isPresent() && VillageSpace.stillInside(p.serverLevel(), cur.get(), p.blockPosition())) {
                 return Optional.empty();
             }
             INSIDE.remove(p.getUUID());
         }
-        Optional<VillageRegistry.Village> v = villageAt(p.serverLevel(), p.blockPosition(), RANGE);
+        Optional<VillageRegistry.Village> v = VillageSpace.villageAt(p.serverLevel(), p.blockPosition());
         v.ifPresent(x -> INSIDE.put(p.getUUID(), x.id()));
         return v;
     }

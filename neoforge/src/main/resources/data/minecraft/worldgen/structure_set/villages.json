@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 10387312,
+    "separation": 8,
+    "spacing": 34
+  },
+  "structures": [
+    {"structure": "mythic_age:vanilla_gate_plains", "weight": 1},
+    {"structure": "mythic_age:vanilla_gate_desert", "weight": 1},
+    {"structure": "mythic_age:vanilla_gate_savanna", "weight": 1},
+    {"structure": "mythic_age:vanilla_gate_snowy", "weight": 1},
+    {"structure": "mythic_age:vanilla_gate_taiga", "weight": 1},
+    {"structure": "mythic_age:greek_village", "weight": 1}
+  ]
+}

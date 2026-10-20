@@ -1,0 +1,125 @@
+{
+  "id": "greek:granary",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/granary",
+  "size": [
+    11,
+    9,
+    9
+  ],
+  "floor_y": 1,
+  "category": "basic",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "storage"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "storage": 1
+  },
+  "anchors": {
+    "goods": [
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        2,
+        1,
+        6
+      ],
+      [
+        3,
+        1,
+        2
+      ],
+      [
+        3,
+        1,
+        6
+      ],
+      [
+        4,
+        1,
+        2
+      ],
+      [
+        4,
+        1,
+        6
+      ],
+      [
+        5,
+        1,
+        2
+      ],
+      [
+        5,
+        1,
+        6
+      ],
+      [
+        6,
+        1,
+        2
+      ],
+      [
+        6,
+        1,
+        6
+      ],
+      [
+        7,
+        1,
+        2
+      ],
+      [
+        7,
+        1,
+        6
+      ],
+      [
+        8,
+        1,
+        2
+      ],
+      [
+        8,
+        1,
+        6
+      ]
+    ],
+    "storage_keeper": [
+      [
+        7,
+        1,
+        4
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:terracotta_roof_slab": 96,
+    "minecraft:mud_bricks": 76,
+    "mythic_age:marble_ashlar": 63,
+    "mythic_age:olive_slab": 35,
+    "mythic_age:olive_log": 28,
+    "minecraft:terracotta": 26,
+    "minecraft:decorated_pot": 16,
+    "mythic_age:olive_door": 4,
+    "mythic_age:olive_trapdoor": 4,
+    "mythic_age:terracotta_ridge": 3,
+    "mythic_age:greek_oil_lamp": 1
+  },
+  "door": {
+    "pos": [
+      9,
+      1,
+      4
+    ],
+    "facing": "east"
+  }
+}

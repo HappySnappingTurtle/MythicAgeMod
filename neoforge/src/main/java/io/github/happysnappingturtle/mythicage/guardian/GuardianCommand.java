@@ -38,8 +38,8 @@ public final class GuardianCommand {
                         .then(Commands.literal("spawn")
                                 .executes(c -> {
                                     // 不写文明：取执行者所在村庄的文明
-                                    Optional<Civilization> civ = VillageService.villageAt(c.getSource().getLevel(),
-                                                    BlockPos.containing(c.getSource().getPosition()), VillageService.RANGE)
+                                    Optional<Civilization> civ = io.github.happysnappingturtle.mythicage.village.VillageSpace.villageAt(c.getSource().getLevel(),
+                                                    BlockPos.containing(c.getSource().getPosition()))
                                             .flatMap(v -> Civilization.byId(v.civ()));
                                     if (civ.isEmpty()) {
                                         c.getSource().sendFailure(Component.translatable("commands.mythic_age.guardian.need_civ"));

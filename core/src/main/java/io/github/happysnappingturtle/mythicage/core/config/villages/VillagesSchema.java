@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * {@code villages.json} 的 schema（T10a 设计文档 §8；T10b 设计文档 §7 升为第 2 版）。不合法的条目告警并回退到默认值。
+ * {@code villages.json} 的 schema（T10a 设计文档 §8；T10b 设计文档 §7 升为第 2 版；T13b 升为第 3 版）。不合法的条目告警并回退到默认值。
  * <p>
  * 主神权重与群系加成都按文明与默认值合并：文件里只写了希腊时，默认里其他文明的条目保留（新版本加的文明不会丢）。
- * 第 1 版的 {@code coastalPoseidonBonus} 读作 {@code patronBiomeBonus.greek.poseidon.multiplier}；按 T3 规则不改写文件。
+ * 第 1 版的 {@code coastalPoseidonBonus} 读作 {@code patronBiomeBonus.greek.poseidon.multiplier}；
+ * 第 2 版的 {@code replaceVanillaInRegion} 由 {@code generateVanillaVillages} 取代：写过 {@code false}（明确要保留原版村庄）
+ * 读作 {@code generateVanillaVillages: true}，其余读作默认 {@code false}（V0 §3.2）。按 T3 规则不改写文件。
  */
 public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
     public static final VillagesSchema INSTANCE = new VillagesSchema();
@@ -22,7 +24,7 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
     private static final VillagesConfig DEFAULTS = new VillagesConfig(VillagesConfig.Mode.AFFILIATE,
             Map.of("plains", Map.of("greek", 1), "desert", Map.of("egyptian", 1), "savanna", Map.of("egyptian", 1),
                     "taiga", Map.of("norse", 1), "snowy", Map.of("norse", 1)),
-            true,
+            false, 0.30,
             Map.of("greek", orderedOf("zeus", 40, "poseidon", 35, "hades", 25)),
             Map.of("greek", Map.of("poseidon", new VillagesConfig.BiomeBonus(
                     List.of("#minecraft:is_ocean", "#minecraft:is_beach"), 32, 2.0))),
@@ -49,7 +51,7 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
 
     @Override
     public int currentVersion() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -62,7 +64,14 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         VillagesConfig.Mode mode = root.choice("vanillaVillages", base.vanillaVillages(),
                 Map.of("affiliate", VillagesConfig.Mode.AFFILIATE, "neutral", VillagesConfig.Mode.NEUTRAL));
         Map<String, Map<String, Integer>> typeToCiv = readTypeToCiv(root, base.vanillaTypeToCiv());
-        boolean replace = root.bool("replaceVanillaInRegion", base.replaceVanillaInRegion());
+        boolean generateVanilla = base.generateVanillaVillages();
+        if (root.isPresent("replaceVanillaInRegion")) {
+            generateVanilla = !root.bool("replaceVanillaInRegion", true);
+            root.warn("replaceVanillaInRegion", "第 2 版字段：已由 generateVanillaVillages 取代，本次读作 generateVanillaVillages: "
+                    + generateVanilla);
+        }
+        generateVanilla = root.bool("generateVanillaVillages", generateVanilla);
+        double chinese = root.doubleIn("chineseRiverChance", base.chineseRiverChance(), 0.0, 1.0);
         Map<String, Map<String, Integer>> patrons = readPatrons(root.object("patronWeights"), base.patronWeights());
         Map<String, Map<String, VillagesConfig.BiomeBonus>> bonus = new LinkedHashMap<>(base.patronBiomeBonus());
         if (root.isPresent("coastalPoseidonBonus")) {
@@ -75,7 +84,7 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         }
         readBiomeBonus(root.object("patronBiomeBonus"), bonus);
         boolean title = root.bool("titleOnEnter", base.titleOnEnter());
-        return new VillagesConfig(mode, typeToCiv, replace, patrons, bonus, title);
+        return new VillagesConfig(mode, typeToCiv, generateVanilla, chinese, patrons, bonus, title);
     }
 
     private static Map<String, Map<String, Integer>> readTypeToCiv(ObjectReader root, Map<String, Map<String, Integer>> base) {
@@ -187,7 +196,8 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
             }
         }
         root.add("vanillaTypeToCiv", types);
-        root.addProperty("replaceVanillaInRegion", value.replaceVanillaInRegion());
+        root.addProperty("generateVanillaVillages", value.generateVanillaVillages());
+        root.addProperty("chineseRiverChance", value.chineseRiverChance());
         JsonObject patrons = new JsonObject();
         value.patronWeights().forEach((civ, w) -> {
             JsonObject o = new JsonObject();

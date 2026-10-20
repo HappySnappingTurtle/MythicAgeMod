@@ -70,6 +70,7 @@ public final class MythicAge {
         ModRecipes.init();
         ModEntities.init(modBus);
         ModRegistries.register(modBus);
+        io.github.happysnappingturtle.mythicage.village.gen.ModStructures.register(modBus);
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.register(modBus);
         io.github.happysnappingturtle.mythicage.power.PowerItems.register(modBus);
         io.github.happysnappingturtle.mythicage.power.PowerRegistries.register(modBus);
@@ -127,6 +128,11 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);
+        // 文明村庄生成与登记（T13b）
+        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onChunkLoad);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerStopped);
 
         // 晋升、立祀、改奉与主神像（T11a）
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);

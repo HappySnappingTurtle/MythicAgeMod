@@ -41,6 +41,9 @@ public final class VillagePopulation {
     public static final int BED_RANGE = 48;
     public static final int SPAWN_MIN = 32;
     public static final int SPAWN_MAX = 40;
+    /** 有村口锚点时，移民在村口外这个距离范围内出现。 */
+    public static final int ENTRANCE_MIN = 4;
+    public static final int ENTRANCE_MAX = 10;
     private static final int SPOT_TRIES = 24;
     private static final float WALK_SPEED = 0.5F;
     /** 新移民走进村：每秒重设一次走路目标，直到离钟 ARRIVED 格内或超过 GUIDE_TICKS（原版闲逛会改掉走路目标）。 */
@@ -180,11 +183,18 @@ public final class VillagePopulation {
     public static Optional<Villager> spawnMigrant(ServerLevel level, VillageRegistry.Village v, RandomSource random,
                                                   int minR, int maxR) {
         BlockPos bell = v.bell().pos();
+        // 文明村庄有村口锚点：在村口外 4–10 格生成（T13b §3.5）
+        Optional<BlockPos> entrance = VillagePlans.get(level.getServer()).byVillage(v.id())
+                .flatMap(p -> p.anchors("entrance").stream().findFirst())
+                .map(io.github.happysnappingturtle.mythicage.village.gen.VillageInfoPiece::block);
+        BlockPos base = entrance.orElse(bell);
+        int lo = entrance.isPresent() ? ENTRANCE_MIN : minR;
+        int hi = entrance.isPresent() ? ENTRANCE_MAX : maxR;
         for (int i = 0; i < SPOT_TRIES; i++) {
             double angle = random.nextDouble() * Math.PI * 2;
-            double r = minR + random.nextDouble() * (maxR - minR);
-            int x = bell.getX() + Mth.floor(Math.cos(angle) * r);
-            int z = bell.getZ() + Mth.floor(Math.sin(angle) * r);
+            double r = lo + random.nextDouble() * (hi - lo);
+            int x = base.getX() + Mth.floor(Math.cos(angle) * r);
+            int z = base.getZ() + Mth.floor(Math.sin(angle) * r);
             if (!level.isLoaded(new BlockPos(x, bell.getY(), z))) {
                 continue;
             }
