@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 选址评分（V0 §3.4）：在候选区块中心周围取 9 个候选中心（中心 + 8 方向 32 格），每个候选取 3 × 3 个
+ * 选址评分（V0 §3.4）：在候选区块中心周围取 17 个候选中心（中心 + 8 方向 32 格 + 8 方向 64 格），每个候选取 3 × 3 个
  * 地表采样（间距 8），按配置打分取最高；有水或全部低于下限就放弃。每个候选点共 81 × 2 次高度采样（D5 预算内）。
  */
 public final class SiteScorer {
     public static final int RING = 32;
     public static final int STEP = 8;
+    public static final int MAX_WET = 2;
 
     /**
      * @param flatness   平坦度权重
@@ -33,10 +34,12 @@ public final class SiteScorer {
     public static Optional<Site> best(int cx, int cz, TerrainSampler t, Config cfg) {
         List<int[]> cands = new ArrayList<>();
         cands.add(new int[]{cx, cz});
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (dx != 0 || dz != 0) {
-                    cands.add(new int[]{cx + dx * RING, cz + dz * RING});
+        for (int ring = 1; ring <= 2; ring++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx != 0 || dz != 0) {
+                        cands.add(new int[]{cx + dx * RING * ring, cz + dz * RING * ring});
+                    }
                 }
             }
         }
@@ -45,17 +48,22 @@ public final class SiteScorer {
         int okCount = 0;
         for (int[] c : cands) {
             int[] hs = new int[9];
-            boolean wet = false;
+            int wetCount = 0;
+            boolean wetCenter = false;
             int i = 0;
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dz = -1; dz <= 1; dz++) {
                     int x = c[0] + dx * STEP;
                     int z = c[1] + dz * STEP;
                     int s = t.surface(x, z);
-                    wet |= s > t.floor(x, z);
+                    boolean w = s > t.floor(x, z);
+                    wetCount += w ? 1 : 0;
+                    wetCenter |= w && dx == 0 && dz == 0;
                     hs[i++] = s;
                 }
             }
+            // 中心干燥、9 个采样里最多 2 个是水（海边、河边的候选也要能入选）
+            boolean wet = wetCenter || wetCount > MAX_WET;
             java.util.Arrays.sort(hs);
             double mean = java.util.Arrays.stream(hs).average().orElse(0);
             stats.add(new double[]{c[0], c[1], mean, hs[8] - hs[0], hs[4], wet ? 0 : 1});

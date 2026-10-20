@@ -1,0 +1,47 @@
+{
+  "id": "greek:pen",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/pen",
+  "size": [
+    9,
+    4,
+    9
+  ],
+  "floor_y": 0,
+  "category": "basic",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "pen"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "anchors": {
+    "pen": [
+      [
+        4,
+        0,
+        5
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:polygonal_marble_wall": 31,
+    "mythic_age:olive_slab": 28,
+    "mythic_age:olive_fence": 6,
+    "minecraft:hay_block": 2,
+    "mythic_age:olive_fence_gate": 1,
+    "minecraft:water_cauldron": 1
+  },
+  "door": {
+    "pos": [
+      4,
+      0,
+      8
+    ],
+    "facing": "south"
+  }
+}

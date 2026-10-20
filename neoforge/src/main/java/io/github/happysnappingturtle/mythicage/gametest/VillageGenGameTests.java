@@ -142,7 +142,7 @@ public final class VillageGenGameTests {
             h.assertTrue(h.getLevel().getBlockState(v.bell().pos()).is(net.minecraft.world.level.block.Blocks.BELL),
                     "钟坐标上是钟");
             List<Pos> homes = p.plan().anchors("home");
-            h.assertTrue(homes.size() == 8, "8 个床位锚点：" + homes.size());
+            h.assertTrue(homes.size() >= 8 && homes.size() % 2 == 0, "≥ 4 座小屋 × 2 床：" + homes.size());
             VillageRegistration.populateDue(h.getLevel());
             h.assertTrue(VillagePlans.get(h.getLevel().getServer()).byVillage(v.id()).orElseThrow().populated(), "已生成居民");
             BlockPos g = block(p.plan().anchors("guardian").get(0));
@@ -201,8 +201,8 @@ public final class VillageGenGameTests {
         VillageInfoPiece.Info info = start.getPieces().stream().filter(x -> x instanceof VillageInfoPiece)
                 .map(x -> ((VillageInfoPiece) x).info()).findFirst().orElseThrow();
         BlockPos bell = block(info.center());
-        h.assertTrue(bell.getX() >> 4 == start.getChunkPos().x && bell.getZ() >> 4 == start.getChunkPos().z,
-                "钟在起点区块里");
+        // 自然生成时，结构覆盖到的每个区块都有引用；这里补上钟所在区块的
+        level.getChunkAt(bell).addReferenceForStructure(start.getStructure(), start.getChunkPos().toLong());
         Optional<VillageRegistry.Village> v = VillageService.register(level, bell);
         h.assertTrue(v.isPresent() && v.get().origin() == VillageRegistry.Origin.GENERATED, "兜底登记为生成村庄");
         int count = VillageRegistry.get(level.getServer()).all().size();
@@ -304,6 +304,111 @@ public final class VillageGenGameTests {
                     "开：希腊地域里让给文明村庄，其余交给原版");
         } finally {
             holder.reload(ConfigLoader.toPrettyJson(holder.schema(), original));
+        }
+        h.succeed();
+    }
+
+    // ───────────── 3.2 阶段 ② ─────────────
+
+    /** TC-T13b-60：建筑底下不悬空（广场、卫城、小屋占地四角往下到地面没有空气）。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void buildings_have_no_gap_below(GameTestHelper h) {
+        Placed p = placeAndRegister(h);
+        ServerLevel level = h.getLevel();
+        try {
+            for (Box b : p.plan().info().built()) {
+                for (int[] c : new int[][]{{b.minX(), b.minZ()}, {b.maxX(), b.maxZ()}, {b.centerX(), b.centerZ()}}) {
+                    int y = b.minY() - 1;
+                    BlockPos at = new BlockPos(c[0], y, c[1]);
+                    h.assertTrue(!level.getBlockState(at).isAir(), "建筑底下有空气：" + at);
+                }
+            }
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T13b-62：各阶段的预留地块都在；四角有界桩；地块内地面已整平。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void plots_reserved_and_levelled(GameTestHelper h) {
+        Placed p = placeAndRegister(h);
+        ServerLevel level = h.getLevel();
+        try {
+            List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Plot> plots = p.plan().info().plots();
+            java.util.Set<String> kinds = new java.util.HashSet<>();
+            plots.forEach(x -> kinds.add(x.stage() + ":" + x.kind()));
+            for (io.github.happysnappingturtle.mythicage.core.village.gen.HillsidePlanner.PlotSpec ps
+                    : io.github.happysnappingturtle.mythicage.core.village.gen.HillsidePlanner.PLOTS) {
+                h.assertTrue(ps.optional() || kinds.contains(ps.stage() + ":" + ps.kind()), "缺地块 " + ps.stage() + ":" + ps.kind());
+            }
+            for (var plot : plots) {
+                Box b = plot.box();
+                h.assertTrue(level.getBlockState(new BlockPos(b.minX(), b.minY(), b.minZ())).is(
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_WALL.get()), "界桩：" + plot.id());
+                for (int[] c : new int[][]{{b.minX() + 1, b.minZ() + 1}, {b.maxX() - 1, b.maxZ() - 1}, {b.centerX(), b.centerZ()}}) {
+                    BlockPos ground = new BlockPos(c[0], b.minY() - 1, c[1]);
+                    h.assertTrue(!level.getBlockState(ground).isAir() && level.getBlockState(ground.above()).isAir(),
+                            "地块已整平：" + plot.id() + " " + ground);
+                }
+            }
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T13b-63：地块被玩家占用 → blocked 并记坐标；拆掉后恢复（不拆玩家方块）。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void plot_blocked_by_player(GameTestHelper h) {
+        Placed p = placeAndRegister(h);
+        ServerLevel level = h.getLevel();
+        try {
+            var plot = p.plan().info().plots().get(0);
+            BlockPos at = new BlockPos(plot.box().centerX() - plot.box().centerX() % 2 + (plot.box().minX() % 2 == 0 ? 0 : 1),
+                    plot.box().minY(), plot.box().minZ() + 2);
+            at = new BlockPos(plot.box().minX() + 2, plot.box().minY() + 1, plot.box().minZ() + 2);
+            level.setBlockAndUpdate(at, net.minecraft.world.level.block.Blocks.COBBLESTONE.defaultBlockState());
+            io.github.happysnappingturtle.mythicage.village.PlotWatch.check(level, p.plan());
+            var blocked = VillagePlans.get(level.getServer()).blocked(p.village().id());
+            h.assertTrue(at.equals(blocked.get(plot.id())), "被占用并记下坐标：" + blocked);
+            h.assertTrue(level.getBlockState(at).is(net.minecraft.world.level.block.Blocks.COBBLESTONE), "不拆玩家方块");
+            level.setBlockAndUpdate(at, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+            io.github.happysnappingturtle.mythicage.village.PlotWatch.check(level, p.plan());
+            h.assertTrue(!VillagePlans.get(level.getServer()).blocked(p.village().id()).containsKey(plot.id()), "清空后恢复");
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T13b-65：主路铺好（村口到广场之间的路面），跨区块不断。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void main_road_paved(GameTestHelper h) {
+        Placed p = placeAndRegister(h);
+        ServerLevel level = h.getLevel();
+        try {
+            BlockPos e = block(p.plan().anchors("entrance").get(0));
+            BlockPos c = block(p.plan().info().center());
+            int dx = Integer.signum(c.getX() - e.getX());
+            int dz = Integer.signum(c.getZ() - e.getZ());
+            boolean alongX = Math.abs(c.getX() - e.getX()) > Math.abs(c.getZ() - e.getZ());
+            int paved = 0;
+            int total = 0;
+            for (int k = 0; k < 24; k++) {
+                int x = alongX ? e.getX() + dx * k : e.getX();
+                int z = alongX ? e.getZ() : e.getZ() + dz * k;
+                int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x, z) - 1;
+                var s = level.getBlockState(new BlockPos(x, y, z));
+                total++;
+                if (s.is(net.minecraft.world.level.block.Blocks.DIRT_PATH) || s.is(net.minecraft.world.level.block.Blocks.GRAVEL)
+                        || s.is(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.POLYGONAL_MARBLE.get())) {
+                    paved++;
+                }
+            }
+            h.assertTrue(paved >= total - 2, "主路铺好：" + paved + " / " + total);
+        } finally {
+            cleanup(h, p);
         }
         h.succeed();
     }

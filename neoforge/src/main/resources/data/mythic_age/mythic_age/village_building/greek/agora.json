@@ -21,18 +21,18 @@
     "meeting": 1
   },
   "anchors": {
+    "agora_gate": [
+      [
+        7,
+        0,
+        14
+      ]
+    ],
     "center": [
       [
         7,
         2,
         7
-      ]
-    ],
-    "entrance": [
-      [
-        7,
-        0,
-        14
       ]
     ]
   },

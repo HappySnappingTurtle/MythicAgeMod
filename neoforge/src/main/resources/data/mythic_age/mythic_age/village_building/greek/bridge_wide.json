@@ -1,0 +1,49 @@
+{
+  "id": "greek:bridge_wide",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/bridge_wide",
+  "size": [
+    21,
+    8,
+    7
+  ],
+  "floor_y": 4,
+  "category": "terrain",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "bridge"
+  ],
+  "terrain": [
+    "riverbank"
+  ],
+  "provides": {},
+  "anchors": {
+    "crossing": [
+      [
+        -1,
+        4,
+        3
+      ],
+      [
+        21,
+        4,
+        3
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:marble_ashlar": 408,
+    "minecraft:gravel": 57,
+    "mythic_age:marble_ashlar_wall": 34,
+    "mythic_age:marble_ashlar_stairs": 20
+  },
+  "door": {
+    "pos": [
+      -1,
+      4,
+      4
+    ],
+    "facing": "west"
+  }
+}

@@ -10,6 +10,7 @@ import io.github.happysnappingturtle.mythicage.core.village.gen.BiomeView;
 import io.github.happysnappingturtle.mythicage.core.village.gen.CivRule;
 import io.github.happysnappingturtle.mythicage.core.village.gen.CivSelector;
 import io.github.happysnappingturtle.mythicage.core.village.gen.FixedPlanner;
+import io.github.happysnappingturtle.mythicage.core.village.gen.HillsidePlanner;
 import io.github.happysnappingturtle.mythicage.core.village.gen.PatronPicker;
 import io.github.happysnappingturtle.mythicage.core.village.gen.SiteScorer;
 import io.github.happysnappingturtle.mythicage.core.village.gen.TerrainSampler;
@@ -74,16 +75,30 @@ public final class CivVillageStructure extends Structure {
         int x = context.chunkPos().getMiddleBlockX();
         int z = context.chunkPos().getMiddleBlockZ();
         BiomeView biomes = WorldgenViews.biomes(context.chunkGenerator(), context.randomState());
-        TerrainSampler terrain = WorldgenViews.terrain(context.chunkGenerator(), context.heightAccessor(), context.randomState());
+        TerrainSampler terrain = WorldgenViews.terrain(context.chunkGenerator(), context.heightAccessor(), context.randomState(), x, z);
         Optional<VillagePlan> plan = plan(x, z, biomes, terrain, new ArrayList<>());
         return plan.map(p -> new GenerationStub(new BlockPos(p.center().x(), p.center().y(), p.center().z()),
-                builder -> {
-                    for (VillagePlan.Placement b : p.buildings()) {
-                        builder.addPiece(new VillageBuildingPiece(context.structureTemplateManager(), b.template(),
-                                new BlockPos(b.origin().x(), b.origin().y(), b.origin().z()), rotation(b.turn())));
-                    }
-                    builder.addPiece(new VillageInfoPiece(p, templateSet));
-                }));
+                builder -> addPieces(builder, p, context.structureTemplateManager())));
+    }
+
+    /** 片段顺序：预留地块（整平）→ 建筑 → 道路 → 信息片段。 */
+    void addPieces(net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder builder, VillagePlan p,
+                   net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager manager) {
+        for (VillagePlan.Plot plot : p.plots()) {
+            builder.addPiece(new VillagePlotPiece(plot.box()));
+        }
+        Map<String, io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec> specs = VillageBuildings.all();
+        for (VillagePlan.Placement b : p.buildings()) {
+            var spec = specs.get(b.building());
+            boolean shape = spec == null || !(spec.category().equals("terrain") || b.building().endsWith("_harbor"));
+            builder.addPiece(new VillageBuildingPiece(manager, b.template(),
+                    new BlockPos(b.origin().x(), b.origin().y(), b.origin().z()), rotation(b.turn()),
+                    spec == null ? 0 : spec.floorY(), shape));
+        }
+        for (VillagePlan.Path path : p.paths()) {
+            builder.addPiece(new VillagePathPiece(path.width(), path.points()));
+        }
+        builder.addPiece(new VillageInfoPiece(p, templateSet));
     }
 
     /** 不碰世界的规划（GameTest、密度工具也用）。失败原因写进 problems。 */
@@ -102,19 +117,14 @@ public final class CivVillageStructure extends Structure {
         }
         int cx = s.get().x();
         int cz = s.get().z();
-        // 主神按聚会钟的位置抽：先按固定布局算出钟的位置（广场中央），抽完再正式规划
+        String patron = PatronPicker.pick(cfg, civ.get(), biomes, cx, s.get().y(), cz);
+        if (HillsidePlanner.ID.equals(layout)) {
+            return HillsidePlanner.plan(cx, cz, terrain, VillageBuildings.all(), civ.get(), patron, problems);
+        }
         if (!FixedPlanner.ID.equals(layout)) {
             MythicAge.LOGGER.warn("未知的村庄布局 {}，按 fixed 处理", layout);
         }
-        Optional<VillagePlan> draft = FixedPlanner.planAny(List.of(new int[]{cx, cz}), terrain, VillageBuildings.all(),
-                civ.get(), "", problems);
-        if (draft.isEmpty()) {
-            return Optional.empty();
-        }
-        var bell = draft.get().center();
-        String patron = PatronPicker.pick(cfg, civ.get(), biomes, bell.x(), bell.y(), bell.z());
-        return Optional.of(new VillagePlan(draft.get().civ(), patron, draft.get().layout(), draft.get().layoutVersion(),
-                draft.get().center(), draft.get().buildings(), draft.get().anchors()));
+        return FixedPlanner.planAny(List.of(new int[]{cx, cz}), terrain, VillageBuildings.all(), civ.get(), patron, problems);
     }
 
     public String templateSet() {

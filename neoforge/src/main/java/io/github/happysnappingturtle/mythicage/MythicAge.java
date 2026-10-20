@@ -133,6 +133,8 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onChunkLoad);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
 
         // 晋升、立祀、改奉与主神像（T11a）
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);

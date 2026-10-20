@@ -14,4 +14,12 @@ public interface TerrainSampler {
     default boolean water(int x, int z) {
         return surface(x, z) > floor(x, z);
     }
+
+    /**
+     * 定位用的较准地面（地面上第一格）：每座建筑、每块地块落位时取一次。默认同 {@link #floor}；
+     * 世界生成时比网格估算更准也更贵（约 0.35 ms）。
+     */
+    default int ground(int x, int z) {
+        return floor(x, z);
+    }
 }

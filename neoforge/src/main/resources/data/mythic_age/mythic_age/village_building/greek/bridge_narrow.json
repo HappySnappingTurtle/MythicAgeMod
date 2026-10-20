@@ -1,0 +1,49 @@
+{
+  "id": "greek:bridge_narrow",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/bridge_narrow",
+  "size": [
+    15,
+    7,
+    5
+  ],
+  "floor_y": 3,
+  "category": "terrain",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "bridge"
+  ],
+  "terrain": [
+    "riverbank"
+  ],
+  "provides": {},
+  "anchors": {
+    "crossing": [
+      [
+        -1,
+        3,
+        2
+      ],
+      [
+        15,
+        3,
+        2
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:polygonal_marble": 219,
+    "minecraft:gravel": 22,
+    "mythic_age:polygonal_marble_wall": 22,
+    "mythic_age:marble_ashlar_stairs": 12
+  },
+  "door": {
+    "pos": [
+      -1,
+      3,
+      2
+    ],
+    "facing": "west"
+  }
+}

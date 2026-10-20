@@ -1,0 +1,69 @@
+{
+  "id": "greek:poseidon_harbor",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/poseidon_harbor",
+  "size": [
+    20,
+    14,
+    19
+  ],
+  "floor_y": 5,
+  "category": "patron",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "dock"
+  ],
+  "terrain": [
+    "coast"
+  ],
+  "provides": {},
+  "anchors": {
+    "berth": [
+      [
+        17,
+        3,
+        17
+      ]
+    ],
+    "haul": [
+      [
+        15,
+        5,
+        4
+      ]
+    ],
+    "workstation": [
+      [
+        4,
+        5,
+        2
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:marble_ashlar": 245,
+    "mythic_age:smooth_marble": 231,
+    "minecraft:dirt": 160,
+    "mythic_age:terracotta_roof_slab": 154,
+    "mythic_age:polished_marble": 96,
+    "minecraft:water": 90,
+    "mythic_age:olive_log": 35,
+    "mythic_age:olive_planks": 24,
+    "mythic_age:terracotta_ridge": 11,
+    "mythic_age:marble_column": 10,
+    "mythic_age:marble_wall": 6,
+    "mythic_age:marble_column_base": 5,
+    "mythic_age:doric_capital": 5,
+    "mythic_age:olive_fence": 4,
+    "minecraft:decorated_pot": 3
+  },
+  "door": {
+    "pos": [
+      17,
+      5,
+      0
+    ],
+    "facing": "north"
+  }
+}

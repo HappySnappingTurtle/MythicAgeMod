@@ -29,7 +29,7 @@ import java.util.Map;
 public final class VillageInfoPiece extends StructurePiece {
     /** 登记所需的全部信息。 */
     public record Info(String civ, String patron, String layout, int layoutVersion, String templateSet, Pos center,
-                       Map<String, List<Pos>> anchors, List<Box> built) {
+                       Map<String, List<Pos>> anchors, List<Box> built, List<VillagePlan.Plot> plots) {
     }
 
     private final Info info;
@@ -38,7 +38,7 @@ public final class VillageInfoPiece extends StructurePiece {
         super(ModStructures.INFO_PIECE.get(), 0, new BoundingBox(new BlockPos(plan.center().x(), plan.center().y(),
                 plan.center().z())));
         this.info = new Info(plan.civ(), plan.patron(), plan.layout(), plan.layoutVersion(), templateSet, plan.center(),
-                plan.anchors(), plan.builtBoxes());
+                plan.anchors(), plan.builtBoxes(), plan.plots());
     }
 
     public VillageInfoPiece(StructurePieceSerializationContext context, CompoundTag tag) {
@@ -76,6 +76,18 @@ public final class VillageInfoPiece extends StructurePiece {
             boxes.add(new IntArrayTag(new int[]{b.minX(), b.minY(), b.minZ(), b.maxX(), b.maxY(), b.maxZ()}));
         }
         t.put("built", boxes);
+        ListTag plots = new ListTag();
+        for (VillagePlan.Plot pl : i.plots()) {
+            CompoundTag c = new CompoundTag();
+            c.putString("id", pl.id());
+            c.putString("kind", pl.kind());
+            c.putString("stage", pl.stage());
+            Box b = pl.box();
+            c.putIntArray("box", new int[]{b.minX(), b.minY(), b.minZ(), b.maxX(), b.maxY(), b.maxZ()});
+            c.putString("front", pl.front());
+            plots.add(c);
+        }
+        t.put("plots", plots);
         return t;
     }
 
@@ -94,8 +106,15 @@ public final class VillageInfoPiece extends StructurePiece {
             int[] v = ((IntArrayTag) b).getAsIntArray();
             built.add(new Box(v[0], v[1], v[2], v[3], v[4], v[5]));
         }
+        List<VillagePlan.Plot> plots = new ArrayList<>();
+        for (Tag x : t.getList("plots", Tag.TAG_COMPOUND)) {
+            CompoundTag c = (CompoundTag) x;
+            int[] v = c.getIntArray("box");
+            plots.add(new VillagePlan.Plot(c.getString("id"), c.getString("kind"), c.getString("stage"),
+                    new Box(v[0], v[1], v[2], v[3], v[4], v[5]), c.getString("front")));
+        }
         return new Info(t.getString("civ"), t.getString("patron"), t.getString("layout"), t.getInt("layoutVersion"),
-                t.getString("templateSet"), unpack(t.getLong("center")), anchors, built);
+                t.getString("templateSet"), unpack(t.getLong("center")), anchors, built, plots);
     }
 
     public static long pack(Pos p) {

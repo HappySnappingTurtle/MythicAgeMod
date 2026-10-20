@@ -339,12 +339,26 @@ def export_template(b: Building, short: str, meta: dict, civ="greek"):
                                 "state": Int(index[key])}))
         if name != "minecraft:air":
             materials[name] = materials.get(name, 0) + 1
+    # 实体：只导出牲畜（白模里的 NoAI 去掉，加 PersistenceRequired 防止消失）；展示框、船等留到需要时再支持
+    import re
+    from nbtio import Byte, Double, TAG_DOUBLE
+    entities = []
+    for cmd in b.commands:
+        m = re.match(r"summon (?:minecraft:)?(sheep|goat|cow|pig|chicken) ~([-\d.]+) ~([-\d.]+) ~([-\d.]+)", cmd)
+        if not m:
+            continue
+        ex, ey, ez = float(m.group(2)) - x0, float(m.group(3)) - y0, float(m.group(4)) - z0
+        entities.append(Compound({
+            "pos": List(TAG_DOUBLE, [Double(ex), Double(ey), Double(ez)]),
+            "blockPos": List(TAG_INT, [Int(int(ex)), Int(int(ey)), Int(int(ez))]),
+            "nbt": Compound({"id": String("minecraft:" + m.group(1)), "PersistenceRequired": Byte(1)}),
+        }))
     root = Compound({
         "DataVersion": Int(DATA_VERSION),
         "size": List(TAG_INT, [Int(v) for v in size]),
         "palette": List(TAG_COMPOUND, palette),
         "blocks": List(TAG_COMPOUND, blocks),
-        "entities": List(TAG_COMPOUND, []),
+        "entities": List(TAG_COMPOUND, entities),
     })
     tpl = DATA_ROOT / "structure" / "village" / civ / f"{short}.nbt"
     write_gzip(tpl, root)

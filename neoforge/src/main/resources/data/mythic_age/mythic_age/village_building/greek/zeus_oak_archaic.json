@@ -1,0 +1,51 @@
+{
+  "id": "greek:zeus_oak_archaic",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/zeus_oak_archaic",
+  "size": [
+    15,
+    14,
+    15
+  ],
+  "floor_y": 1,
+  "category": "patron",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "patron"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "anchors": {
+    "sacred_tree": [
+      [
+        7,
+        1,
+        10
+      ],
+      [
+        7,
+        1,
+        4
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:oak_leaves": 463,
+    "minecraft:coarse_dirt": 161,
+    "minecraft:cauldron": 37,
+    "minecraft:oak_log": 35,
+    "minecraft:oak_wood": 25
+  },
+  "door": {
+    "pos": [
+      7,
+      1,
+      15
+    ],
+    "facing": "south"
+  }
+}

@@ -100,11 +100,19 @@ def _gable_roof_z(b: Building, x0, x1, z0, z1, y):
                 b.set(x, y + d // 2, z, "roof_slab", type="bottom" if d % 2 == 0 else "top")
 
 
-def poseidon_harbor() -> Building:
+def poseidon_harbor(natural=False) -> Building:
+    """natural=True：正式模板用，不带白模的海床、填土与围边，海水用世界里真实的海。"""
     b = Building("greek_poseidon_harbor", "波塞冬·码头与渔船棚")
     X, SHORE, Z = 18, 8, 20  # 宽 0..18；z < 8 是陆地，z ≥ 8 是海
     surface = -2  # 水面比地面低 1 格，驳岸高出水面
-    # 白模底座：海床与陆地填土（正式生成时是真实海岸，由 V0 shore 工序做驳岸）
+    if not natural:
+        _white_base(b, X, SHORE, Z, surface)
+    _harbor_body(b, X, SHORE, Z, surface)
+    return b
+
+
+def _white_base(b: Building, X, SHORE, Z, surface):
+    """白模底座：海床与陆地填土（高空平台下面是空的，水要自己围住）。"""
     b.fill(-1, -5, -1, X + 1, -5, Z + 1, BASE)
     b.fill(0, -4, 0, X, -2, SHORE - 1, BASE)
     b.fill(0, -1, 0, X, -1, SHORE - 1, "grass")
@@ -120,6 +128,9 @@ def poseidon_harbor() -> Building:
         b.set(X + 1, -1, z, "grass")
     b.fill(0, -4, SHORE, X, surface, Z, SEA)
     b.clear(0, surface + 1, SHORE, X, -1, Z)  # 海面上方掀掉平台草皮
+
+
+def _harbor_body(b: Building, X, SHORE, Z, surface):
     # 驳岸：大理石方石砌到水底，顶面与地面平
     b.fill(0, -4, SHORE, X, -1, SHORE, "step")
     # 石堤：从岸边伸进海里，两侧系船石，堤头是泊位
@@ -167,7 +178,6 @@ def poseidon_harbor() -> Building:
         'summon minecraft:boat ~9.5 ~-1 ~11.5 {Type:"oak",Rotation:[0f,0f]}',
         'summon minecraft:boat ~16.8 ~-1 ~14.5 {Type:"spruce",Rotation:[0f,0f]}',
     ]
-    return b
 
 
 def poseidon_spring() -> Building:

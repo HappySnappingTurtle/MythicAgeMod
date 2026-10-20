@@ -24,6 +24,10 @@ public final class ModStructures {
             PIECES.register("village_building", () -> (StructurePieceType.StructureTemplateType) VillageBuildingPiece::new);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> INFO_PIECE =
             PIECES.register("village_info", () -> VillageInfoPiece::new);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> PATH_PIECE =
+            PIECES.register("village_path", () -> VillagePathPiece::new);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> PLOT_PIECE =
+            PIECES.register("village_plot", () -> VillagePlotPiece::new);
 
     private ModStructures() {
     }

@@ -51,6 +51,8 @@ public final class VillagePlans extends SavedData {
     }
 
     private final Map<UUID, Plan> plans = new LinkedHashMap<>();
+    /** 被玩家占用的预留地块：村庄 → 地块 id → 冲突坐标（V0 §5.3）。 */
+    private final Map<UUID, Map<String, net.minecraft.core.BlockPos>> blocked = new HashMap<>();
     private final Map<String, UUID> byStart = new HashMap<>();
     private final Map<ResourceKey<Level>, SpaceIndex<UUID>> space = new HashMap<>();
 
@@ -73,6 +75,7 @@ public final class VillagePlans extends SavedData {
 
     public void remove(UUID village) {
         Plan old = plans.remove(village);
+        blocked.remove(village);
         if (old != null) {
             byStart.remove(startKey(old.dim(), old.structure(), old.start()));
             SpaceIndex<UUID> idx = space.get(old.dim());
@@ -106,6 +109,21 @@ public final class VillagePlans extends SavedData {
         return p != null && space.get(p.dim()).within(village, x, z, extra);
     }
 
+    /** 记下一块地块的占用情况：conflict 为空表示已清空、恢复 reserved。返回状态是否有变化。 */
+    public boolean setBlocked(UUID village, String plot, Optional<net.minecraft.core.BlockPos> conflict) {
+        Map<String, net.minecraft.core.BlockPos> m = blocked.computeIfAbsent(village, k -> new HashMap<>());
+        net.minecraft.core.BlockPos old = conflict.isPresent() ? m.put(plot, conflict.get()) : m.remove(plot);
+        boolean changed = !java.util.Objects.equals(old, conflict.orElse(null));
+        if (changed) {
+            setDirty();
+        }
+        return changed;
+    }
+
+    public Map<String, net.minecraft.core.BlockPos> blocked(UUID village) {
+        return Map.copyOf(blocked.getOrDefault(village, Map.of()));
+    }
+
     public List<Plan> all() {
         return new ArrayList<>(plans.values());
     }
@@ -133,6 +151,11 @@ public final class VillagePlans extends SavedData {
                         ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(c.getString("dim"))),
                         c.getString("structure"), c.getLong("start"), VillageInfoPiece.read(c.getCompound("info")),
                         c.getBoolean("populated")));
+                CompoundTag bl = c.getCompound("blocked");
+                for (String k : bl.getAllKeys()) {
+                    r.blocked.computeIfAbsent(c.getUUID("village"), x -> new HashMap<>())
+                            .put(k, net.minecraft.core.BlockPos.of(bl.getLong(k)));
+                }
             } catch (RuntimeException e) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄规划：{}（{}）", c, e.getMessage());
             }
@@ -152,6 +175,9 @@ public final class VillagePlans extends SavedData {
             c.putLong("start", p.start());
             c.put("info", VillageInfoPiece.write(p.info()));
             c.putBoolean("populated", p.populated());
+            CompoundTag bl = new CompoundTag();
+            blocked.getOrDefault(p.village(), Map.of()).forEach((k, v) -> bl.putLong(k, v.asLong()));
+            c.put("blocked", bl);
             list.add(c);
         }
         tag.put("plans", list);

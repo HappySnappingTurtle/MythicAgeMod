@@ -62,8 +62,8 @@ def _corbel_span(b: Building, x0, x1, z0, z1, water_top, deck):
                     b.set(x, y, z, "_mason")
 
 
-def bridge(name, title, road, spans, masonry, wall):
-    """road：路宽；spans：孔数（每孔 5 格，孔间 1 格桥墩）。"""
+def bridge(name, title, road, spans, masonry, wall, natural=False):
+    """road：路宽；spans：孔数（每孔 5 格，孔间 1 格桥墩）。natural=True：正式模板用，不造白模河道。"""
     river_w = spans * 5 + (spans - 1)
     rx0 = 6
     rx1 = rx0 + river_w - 1
@@ -71,7 +71,8 @@ def bridge(name, title, road, spans, masonry, wall):
     bz0 = (zc1 - road) // 2  # 桥身（含护墙）起止
     bz1 = bz0 + road + 1
     b = Building(name, title)
-    _river(b, rx0, rx1, zc0, zc1)
+    if not natural:
+        _river(b, rx0, rx1, zc0, zc1)
     deck = 2  # 桥面方块在 y = 2（比两岸高 3 格），护墙在 y = 3
     # 拱孔与桥墩
     for s in range(spans):
@@ -104,12 +105,14 @@ def bridge(name, title, road, spans, masonry, wall):
 B_STATE = {"polygonal": "mythic_age:polygonal_marble", "step": "mythic_age:marble_ashlar"}
 
 
-def bridge_narrow() -> Building:
-    return bridge("greek_bridge_narrow", "窄桥（路宽 3，迈锡尼式）", 3, 1, "polygonal", "mythic_age:polygonal_marble_wall")
+def bridge_narrow(natural=False) -> Building:
+    return bridge("greek_bridge_narrow", "窄桥（路宽 3，迈锡尼式）", 3, 1, "polygonal", "mythic_age:polygonal_marble_wall",
+                  natural)
 
 
-def bridge_wide() -> Building:
-    return bridge("greek_bridge_wide", "宽桥（路宽 5，两孔，希腊化式）", 5, 2, "step", "mythic_age:marble_ashlar_wall")
+def bridge_wide(natural=False) -> Building:
+    return bridge("greek_bridge_wide", "宽桥（路宽 5，两孔，希腊化式）", 5, 2, "step", "mythic_age:marble_ashlar_wall",
+                  natural)
 
 
 # ───────────── 台地 ─────────────

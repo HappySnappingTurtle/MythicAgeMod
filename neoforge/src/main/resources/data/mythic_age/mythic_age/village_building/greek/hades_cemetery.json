@@ -1,0 +1,70 @@
+{
+  "id": "greek:hades_cemetery",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/hades_cemetery",
+  "size": [
+    21,
+    13,
+    16
+  ],
+  "floor_y": 1,
+  "category": "patron",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "roadside"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "anchors": {
+    "grave_visit": [
+      [
+        3,
+        1,
+        8
+      ],
+      [
+        10,
+        1,
+        8
+      ],
+      [
+        17,
+        1,
+        8
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:spruce_leaves": 219,
+    "mythic_age:polygonal_marble_wall": 132,
+    "minecraft:coarse_dirt": 120,
+    "minecraft:dirt_path": 57,
+    "minecraft:spruce_log": 44,
+    "mythic_age:marble_ashlar": 42,
+    "minecraft:grass_block": 39,
+    "minecraft:polished_blackstone_bricks": 21,
+    "minecraft:dirt": 18,
+    "mythic_age:marble_ashlar_slab": 15,
+    "mythic_age:marble_wall": 13,
+    "minecraft:gravel": 6,
+    "minecraft:flower_pot": 5,
+    "mythic_age:greek_pediment": 4,
+    "mythic_age:marble_pillar": 3,
+    "mythic_age:greek_oil_lamp": 2,
+    "mythic_age:smooth_marble": 2,
+    "minecraft:decorated_pot": 2,
+    "mythic_age:polished_marble_slab": 1
+  },
+  "door": {
+    "pos": [
+      10,
+      1,
+      2
+    ],
+    "facing": "north"
+  }
+}

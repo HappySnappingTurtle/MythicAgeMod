@@ -1,0 +1,61 @@
+{
+  "id": "greek:poseidon_spring",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/poseidon_spring",
+  "size": [
+    10,
+    11,
+    9
+  ],
+  "floor_y": 2,
+  "category": "patron",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [
+    "patron"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {
+    "ritual": [
+      [
+        7,
+        3,
+        2
+      ]
+    ],
+    "water": [
+      [
+        5,
+        3,
+        4
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:marble_ashlar": 83,
+    "mythic_age:smooth_marble": 78,
+    "mythic_age:terracotta_roof_slab": 61,
+    "mythic_age:polished_marble": 53,
+    "minecraft:water": 31,
+    "mythic_age:greek_pediment": 30,
+    "mythic_age:marble_architrave": 25,
+    "mythic_age:marble_column": 10,
+    "mythic_age:terracotta_ridge": 8,
+    "mythic_age:smooth_marble_slab": 7,
+    "mythic_age:blue_meander_marble": 7,
+    "mythic_age:marble_column_base": 5,
+    "mythic_age:ionic_capital": 5,
+    "mythic_age:marble_wall": 3
+  },
+  "door": {
+    "pos": [
+      9,
+      2,
+      4
+    ],
+    "facing": "east"
+  }
+}

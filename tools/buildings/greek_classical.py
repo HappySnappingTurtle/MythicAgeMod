@@ -209,7 +209,7 @@ def house_court() -> Building:
     b.set(4, 1, 6, "lamp")
     for p in ((1, 0, 3), (9, 0, 3), (1, 0, 7), (9, 0, 7)):
         b.anchor("home", *p)
-    b.anchor("entrance", 5, 0, n)
+    b.anchor("yard_gate", 5, 0, n)
     return b
 
 

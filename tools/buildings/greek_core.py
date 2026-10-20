@@ -73,7 +73,7 @@ def agora() -> Building:
     for (lx, lz) in ((1, 1), (1, n - 2), (n - 2, 1), (n - 2, n - 2)):
         b.set(lx, 1, lz, "mythic_age:marble_wall")
         b.set(lx, 2, lz, "lamp")
-    b.anchor("entrance", c, 0, n - 1)
+    b.anchor("agora_gate", c, 0, n - 1)  # 广场南口（村口锚点 entrance 由规划器给出）
     return b
 
 
@@ -156,7 +156,7 @@ def house_small() -> Building:
     b.set(5, 0, 7, "pithos")
     b.anchor("home", 1, 0, 2)
     b.anchor("home", 2, 0, 2)
-    b.anchor("entrance", 3, 0, 8)
+    b.anchor("yard_gate", 3, 0, 8)
     return b
 
 
