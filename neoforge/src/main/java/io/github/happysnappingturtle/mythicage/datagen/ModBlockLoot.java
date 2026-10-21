@@ -49,6 +49,12 @@ public final class ModBlockLoot extends BlockLootSubProvider {
         }
     }
 
+    /** 多格方块只在主体格掉落本体（property = value 时），同原版床。 */
+    public <T extends Comparable<T> & StringRepresentable> LootTable.Builder onlyWhen(Block block, Property<T> property,
+                                                                                 T value) {
+        return createSinglePropConditionTable(block, property, value);
+    }
+
     /** 原版树叶掉落（树苗几率、木棍），供自定义战利品组合。 */
     public LootTable.Builder leaves(Block leaves, Block sapling) {
         return createLeavesDrops(leaves, sapling, NORMAL_LEAVES_SAPLING_CHANCES);

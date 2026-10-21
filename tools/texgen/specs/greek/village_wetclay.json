@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_wetclay",
+  "size": 32,
+  "palette": {
+    "m": "#857761",
+    "s": "#9a8b72",
+    "S": "#ad9e83"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ssssssssssssssssssssssSsSsssssss",
+      "sssSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSsSSSSSsSSSSSSSSSSSSSSSSSSSSSS",
+      "SsssSSSSssSSSSssssSSSSSSSSSSSSSS",
+      "ssssssssssssSSSSSSSSSsssssssssss",
+      "SSSSSSSSsSSSsssSSSSSSSsSssSSSSSS",
+      "SSSSSSSSSSSsssSsSsSSsssssssSSSSS",
+      "SSSSssssssssssssssssssmmssssssSS",
+      "sssSSSsSssssSssssSsSssssssssSSSs",
+      "SSSSSSSssssssssssSssssssssssSSSS",
+      "SSSSSSsSSsssSssssSsssssssssSSSSS",
+      "sssSSSSSSSssssssssssssssssssssss",
+      "SsssssssssssssssssssssssssSsssss",
+      "sssssSSSSSSSSssSsSssssSsSsssssss",
+      "sssssSSSSSSSsSSssssssSSSSsSsssss",
+      "mmmsssSSSSSSSsSssssssssssssmmmmm",
+      "sssmsssssssssssssssssSSssSSsssss",
+      "ssssssSSSSSSSSSssssSsSSSSSSsssss",
+      "sssssSSSSSSSSSSssSsSSSSSSSssssss",
+      "msssSSSSSSSSSSSSSSSSssssssssssss",
+      "sSSssssssssssssssssSSSSSSSSSSSss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "ssSSSSSSSSSSSsssSssssssSSSSSssss",
+      "SSsssssssssssSSSSSSSSSSsssssSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSssssssSSSSSSSSSSSS",
+      "ssssssssssssssSSSSSsssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "sSsSSSSSSSSSSSSSSSSSSSSSSSSSSSSs",
+      "ssssssSSSSSSSSSSSSSSSSSSSSSSSSsS"
+    ]
+  }
+}

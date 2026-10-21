@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_marble_ashlar": {
+      "conditions": {
+        "items": [
+          {
+            "items": "mythic_age:marble_ashlar"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "mythic_age:treading_vat"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_marble_ashlar"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "mythic_age:treading_vat"
+    ]
+  }
+}

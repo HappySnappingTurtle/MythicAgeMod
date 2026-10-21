@@ -1,0 +1,46 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_stone",
+  "size": 32,
+  "palette": {
+    "s": "#d6cebd",
+    "S": "#e0d9ca"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ssssssssssssssssssssssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "ssssssssssssssssssssssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSsssssssssssssssssSSSSSSSSS",
+      "sssssSSSSSSSSSSSSSSSSSSSSSSsssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSssssssssssssssssssssssssSSSS",
+      "ssssSSSSSSSSSSSSSSSSSSSSSSSSssSs",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSssssssssssssssssssSSSSSSSSSS",
+      "SSSssssSsssssssSSSssssssssSsssSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SsssSSSSSSSSSSSSSSSSSSSSSSSSSsSs",
+      "SSSSSSsSsssssssssssssssssSsSsSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "sSssSSSSSSSSSSSSSSSSSSSSSSSSSSsS",
+      "SSSsssssSssssssssssssssSsssssSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "sSsSSSSSSSSSSSSSSSSSSSSSSSSSSSsS",
+      "SSssssssssssssSSSSSsssssssssSssS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSssssssssSSSSSSSSSSSS",
+      "sSsssSsssssSSSSSSSSSssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSssssssssSSSSSSSSSSSS",
+      "sssssssssssssSSSSSSSssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "ssssssssssssssssssssssssssssssss",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+    ]
+  }
+}

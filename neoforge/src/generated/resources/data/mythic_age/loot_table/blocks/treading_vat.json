@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "mythic_age:treading_vat",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "part": "foot"
+              }
+            }
+          ],
+          "name": "mythic_age:treading_vat"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "mythic_age:blocks/treading_vat"
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,part=foot": {
+      "model": "mythic_age:block/treading_vat_front",
+      "y": 90
+    },
+    "facing=east,part=head": {
+      "model": "mythic_age:block/treading_vat_back",
+      "y": 90
+    },
+    "facing=north,part=foot": {
+      "model": "mythic_age:block/treading_vat_front"
+    },
+    "facing=north,part=head": {
+      "model": "mythic_age:block/treading_vat_back"
+    },
+    "facing=south,part=foot": {
+      "model": "mythic_age:block/treading_vat_front",
+      "y": 180
+    },
+    "facing=south,part=head": {
+      "model": "mythic_age:block/treading_vat_back",
+      "y": 180
+    },
+    "facing=west,part=foot": {
+      "model": "mythic_age:block/treading_vat_front",
+      "y": 270
+    },
+    "facing=west,part=head": {
+      "model": "mythic_age:block/treading_vat_back",
+      "y": 270
+    }
+  }
+}

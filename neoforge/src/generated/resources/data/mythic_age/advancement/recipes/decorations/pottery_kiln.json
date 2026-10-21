@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mudbrick": {
+      "conditions": {
+        "items": [
+          {
+            "items": "mythic_age:mudbrick"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "mythic_age:pottery_kiln"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mudbrick"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "mythic_age:pottery_kiln"
+    ]
+  }
+}

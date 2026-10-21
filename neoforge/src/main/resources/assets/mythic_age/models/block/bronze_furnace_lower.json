@@ -1,0 +1,683 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_daub",
+    "daub": "mythic_age:block/village/village_daub",
+    "fire": "mythic_age:block/village/village_fire",
+    "soot": "mythic_age:block/village/village_soot",
+    "leather": "mythic_age:block/village/village_leather",
+    "clay": "mythic_age:block/village/village_wetclay",
+    "wood": "mythic_age:block/village/village_wood"
+  },
+  "elements": [
+    {
+      "__comment": "炉身",
+      "from": [
+        1.2,
+        0,
+        4.0
+      ],
+      "to": [
+        14.8,
+        10,
+        10.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.6,
+        0,
+        0.6
+      ],
+      "to": [
+        11.4,
+        10,
+        14.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.7875,
+        0,
+        4.9958
+      ],
+      "to": [
+        15.2125,
+        10,
+        9.8042
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.7875,
+        0,
+        4.9958
+      ],
+      "to": [
+        15.2125,
+        10,
+        9.8042
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "炉肩",
+      "from": [
+        2.4,
+        10,
+        4.6
+      ],
+      "to": [
+        13.6,
+        14,
+        10.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.2,
+        10,
+        1.8
+      ],
+      "to": [
+        10.8,
+        14,
+        13.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0603,
+        10,
+        5.4201
+      ],
+      "to": [
+        13.9397,
+        14,
+        9.3799
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          10,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        2.0603,
+        10,
+        5.4201
+      ],
+      "to": [
+        13.9397,
+        14,
+        9.3799
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          10,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "烟囱根",
+      "from": [
+        3.8,
+        14,
+        5.3
+      ],
+      "to": [
+        12.2,
+        16.0,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.9,
+        14,
+        3.2
+      ],
+      "to": [
+        10.1,
+        16.0,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5452,
+        14,
+        5.9151
+      ],
+      "to": [
+        12.4548,
+        16.0,
+        8.8849
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          14,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5452,
+        14,
+        5.9151
+      ],
+      "to": [
+        12.4548,
+        16.0,
+        8.8849
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          14,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "炉口（坩埚）",
+      "from": [
+        5.4,
+        1.4,
+        0.5
+      ],
+      "to": [
+        10.6,
+        7.0,
+        1.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#soot"
+        }
+      }
+    },
+    {
+      "__comment": "炉口拱框",
+      "from": [
+        4.4,
+        0.8,
+        0.6
+      ],
+      "to": [
+        11.6,
+        8.0,
+        1.4
+      ],
+      "faces": {
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "西风箱",
+      "from": [
+        1.6,
+        0.4,
+        12.6
+      ],
+      "to": [
+        6.8,
+        4.4,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leather"
+        },
+        "south": {
+          "texture": "#leather"
+        },
+        "east": {
+          "texture": "#leather"
+        },
+        "west": {
+          "texture": "#leather"
+        },
+        "up": {
+          "texture": "#leather"
+        },
+        "down": {
+          "texture": "#leather"
+        }
+      }
+    },
+    {
+      "__comment": "西风箱把手",
+      "from": [
+        3.4,
+        4.4,
+        15.2
+      ],
+      "to": [
+        5.0,
+        5.0,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      }
+    },
+    {
+      "__comment": "西风箱陶管",
+      "from": [
+        3.6,
+        1.4,
+        11.4
+      ],
+      "to": [
+        4.8,
+        2.6,
+        12.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clay"
+        },
+        "south": {
+          "texture": "#clay"
+        },
+        "east": {
+          "texture": "#clay"
+        },
+        "west": {
+          "texture": "#clay"
+        },
+        "up": {
+          "texture": "#clay"
+        },
+        "down": {
+          "texture": "#clay"
+        }
+      }
+    },
+    {
+      "__comment": "东风箱",
+      "from": [
+        9.2,
+        0.4,
+        12.6
+      ],
+      "to": [
+        14.4,
+        4.4,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#leather"
+        },
+        "south": {
+          "texture": "#leather"
+        },
+        "east": {
+          "texture": "#leather"
+        },
+        "west": {
+          "texture": "#leather"
+        },
+        "up": {
+          "texture": "#leather"
+        },
+        "down": {
+          "texture": "#leather"
+        }
+      }
+    },
+    {
+      "__comment": "东风箱把手",
+      "from": [
+        11.0,
+        4.4,
+        15.2
+      ],
+      "to": [
+        12.6,
+        5.0,
+        16.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      }
+    },
+    {
+      "__comment": "东风箱陶管",
+      "from": [
+        11.2,
+        1.4,
+        11.4
+      ],
+      "to": [
+        12.4,
+        2.6,
+        12.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clay"
+        },
+        "south": {
+          "texture": "#clay"
+        },
+        "east": {
+          "texture": "#clay"
+        },
+        "west": {
+          "texture": "#clay"
+        },
+        "up": {
+          "texture": "#clay"
+        },
+        "down": {
+          "texture": "#clay"
+        }
+      }
+    }
+  ]
+}

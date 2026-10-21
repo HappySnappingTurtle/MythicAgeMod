@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:campfire"
+    },
+    "M": {
+      "item": "mythic_age:mudbrick"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "M M",
+    "MCM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:pottery_kiln"
+  }
+}

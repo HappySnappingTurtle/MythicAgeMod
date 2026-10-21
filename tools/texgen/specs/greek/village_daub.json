@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_daub",
+  "size": 32,
+  "palette": {
+    "k": "#3a2418",
+    "s": "#a06d4a",
+    "S": "#b5825b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SSSSSSSssssssssssssssssssssSSSSS",
+      "SSSSSSsssssssssssssssssssSSSSSSS",
+      "SSSSSSSSSssssssssssssssssSSSSSSS",
+      "SSSSSSSsSsssssssssssssssSssSSSSS",
+      "SSSSSSSSSSsssssssssssssSsSSSSSSS",
+      "SSSSSSsSsssssssssssssssssSsSSSSS",
+      "SSSSSSSkSsSssssssssssSSssSSSSSSS",
+      "SSSSSSSSkSssssssssssssSssSSSSSSS",
+      "SSSSSSSSkSSsSSssSsssssSSSSSSSSSS",
+      "SSSSSSSSkSSssSSssSSsSsSSsSSSSSSS",
+      "SSSSSSSSkSSSssSSSsSsSSSsSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSsSSSSSSS",
+      "SSSSSSSSSSSSSSSSsSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSkSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSkSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSSSSkSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSsSSSkSSSSS",
+      "SSSSSSSSsSsSSSsSSsSSSSSSSSSSSSSS",
+      "SSSSSSSSSSsssSsSssSSsSSSSSSSSSSS",
+      "SSSSSSSSSSSSssSSssssssSSSSSSSSSS",
+      "SSSSSSSSsssSssssssssssssSSSSSSSS",
+      "SSSSSSSSSSsSsssssssssssssSSSSSSS",
+      "SSSSSSSssSssssssssssssssSsSsSSSS",
+      "SSSSSSSSsssssssssssssssSSsSSSSSS",
+      "SSSSSSSSSsssssssssssssssSSSSSSSS",
+      "SSSSSSSSSSssssssssssssssssSSSSSS",
+      "SSSSSSssSsssssssssssssssssSSSSSS"
+    ]
+  }
+}

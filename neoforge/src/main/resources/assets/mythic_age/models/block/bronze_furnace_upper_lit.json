@@ -1,0 +1,460 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_daub",
+    "daub": "mythic_age:block/village/village_daub",
+    "fire": "mythic_age:block/village/village_fire",
+    "soot": "mythic_age:block/village/village_soot",
+    "leather": "mythic_age:block/village/village_leather",
+    "clay": "mythic_age:block/village/village_wetclay",
+    "wood": "mythic_age:block/village/village_wood"
+  },
+  "elements": [
+    {
+      "from": [
+        3.8,
+        0.0,
+        5.3
+      ],
+      "to": [
+        12.2,
+        1,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.9,
+        0.0,
+        3.2
+      ],
+      "to": [
+        10.1,
+        1,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5452,
+        0.0,
+        5.9151
+      ],
+      "to": [
+        12.4548,
+        1,
+        8.8849
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          -2,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5452,
+        0.0,
+        5.9151
+      ],
+      "to": [
+        12.4548,
+        1,
+        8.8849
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          -2,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "烟囱",
+      "from": [
+        5.0,
+        1,
+        5.9
+      ],
+      "to": [
+        11.0,
+        13,
+        8.9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        1,
+        4.4
+      ],
+      "to": [
+        9.5,
+        13,
+        10.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.818,
+        1,
+        6.3393
+      ],
+      "to": [
+        11.182,
+        13,
+        8.4607
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          1,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.818,
+        1,
+        6.3393
+      ],
+      "to": [
+        11.182,
+        13,
+        8.4607
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          1,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "烟囱口沿",
+      "from": [
+        4.4,
+        13,
+        5.6
+      ],
+      "to": [
+        11.6,
+        15,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        6.2,
+        13,
+        3.8
+      ],
+      "to": [
+        9.8,
+        15,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.1816,
+        13,
+        6.1272
+      ],
+      "to": [
+        11.8184,
+        15,
+        8.6728
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          13,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.1816,
+        13,
+        6.1272
+      ],
+      "to": [
+        11.8184,
+        15,
+        8.6728
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          13,
+          7.4
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "烟囱口",
+      "from": [
+        6.8,
+        14.98,
+        6.2
+      ],
+      "to": [
+        9.2,
+        15,
+        8.6
+      ],
+      "faces": {
+        "up": {
+          "texture": "#fire"
+        }
+      }
+    }
+  ]
+}

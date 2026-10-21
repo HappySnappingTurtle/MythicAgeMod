@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_wood",
+  "size": 32,
+  "palette": {
+    "m": "#6e5335",
+    "s": "#86683f",
+    "S": "#9c7b4b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "sSSSSmSSSSmSSSmsSSSsSSSSsSSSSSsS",
+      "sSSSSsSSSSsSSssSSSSmsSSSsSSSSSsS",
+      "sSSSSsSSSsSSSSssSSSmSSSSmSSSSSsS",
+      "sSSSSSSSSmSSSssSsSSsSSSSsSSSSssS",
+      "SSSSsSSSSsSSsssSSSssSSSsmSSSSsSS",
+      "SSSSsSSSSssSSsmsSsSmSSSSsSSSSsSS",
+      "SSSSsSSSSsSSSssSSSSmsSSSsSSSSsSS",
+      "SSSSsSSSSsSSssmssssmSSSSmSSSSsSS",
+      "SSSSsSSSSssSsSmsSssmsSsSsSSSSsSS",
+      "SSSSsSSSSsSssSmssssmsssSsSSSSsSS",
+      "SSSSsSSSSmssssmssssmsssSsSSSSsSS",
+      "SSSSsSSSSmssssmssssmssssmSSSSsSS",
+      "SSSSsSSsSsSSssmssssmssSSmSSSSsSS",
+      "sSSSSsSSSsSsssmssssmsssSmSSSSsSS",
+      "sSSSSsSSSSmsssmssssmsssSmSSSSssS",
+      "sSSSSsSSSSmsssmssssmsssSsSSSSSsS",
+      "sSSSSsSSSsmsssmssssmssSssSSSSSsS",
+      "sSSSSsSsSSmsssmssssmsssSmSSSSSsS",
+      "sSSSSsSSsSmsssmssssmssssmSSSSSsS",
+      "sSSSSsSSSsmsssmssssmssSSsSSSSSsS",
+      "sSSSSsSSSsmssssmssssmsSSSsSSSSsS",
+      "sSSSSsSSSsmssssmssssmSssSsSSSSsS",
+      "sSSSSsSSSsmSsssmssssmsSSSmSSSSsS",
+      "sSSSSsSSSssssssmssssmSSSsmSSSSsS",
+      "sSSSSsSSssmsssSmsssssSSsSmSSSSsS",
+      "sSSSSsSSSmmSsssmssssmsSSSmSSSSsS",
+      "sSSSSsSSSSmSsssssSSsmSsSSsSSSSsS",
+      "sSSSSsSSSSsSsSSsSSsSsssSSsSSSSsS",
+      "sSSSSsSSSSsSSSSmSSsssSSSSsSSSSsS",
+      "sSSSSsSSSSsSSsssSSsmSSsSsSSSSSsS",
+      "sSSSSsSSSSsSSsmssSSsSSSSsSSSSSsS",
+      "sSSSSsSSSSsSSSmSSSssSSSSsSSSSSsS"
+    ]
+  }
+}

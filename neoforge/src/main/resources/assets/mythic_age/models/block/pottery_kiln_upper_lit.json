@@ -1,0 +1,915 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_daub",
+    "daub": "mythic_age:block/village/village_daub",
+    "fire": "mythic_age:block/village/village_fire",
+    "soot": "mythic_age:block/village/village_soot"
+  },
+  "elements": [
+    {
+      "from": [
+        0.8,
+        0.0,
+        4.4
+      ],
+      "to": [
+        15.2,
+        1,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.4,
+        0.0,
+        0.8
+      ],
+      "to": [
+        11.6,
+        1,
+        15.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.3632,
+        0.0,
+        5.4544
+      ],
+      "to": [
+        15.6368,
+        1,
+        10.5456
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          -6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.3632,
+        0.0,
+        5.4544
+      ],
+      "to": [
+        15.6368,
+        1,
+        10.5456
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          -6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "穹顶·1",
+      "from": [
+        1.4,
+        1,
+        4.7
+      ],
+      "to": [
+        14.6,
+        4,
+        11.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.7,
+        1,
+        1.4
+      ],
+      "to": [
+        11.3,
+        4,
+        14.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.9996,
+        1,
+        5.6665
+      ],
+      "to": [
+        15.0004,
+        4,
+        10.3335
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          1,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.9996,
+        1,
+        5.6665
+      ],
+      "to": [
+        15.0004,
+        4,
+        10.3335
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          1,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "穹顶·2",
+      "from": [
+        2.3,
+        4,
+        5.15
+      ],
+      "to": [
+        13.7,
+        6.6,
+        10.85
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.15,
+        4,
+        2.3
+      ],
+      "to": [
+        10.85,
+        6.6,
+        13.7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        1.9542,
+        4,
+        5.9847
+      ],
+      "to": [
+        14.0458,
+        6.6,
+        10.0153
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          4,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        1.9542,
+        4,
+        5.9847
+      ],
+      "to": [
+        14.0458,
+        6.6,
+        10.0153
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          4,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "穹顶·3",
+      "from": [
+        3.5,
+        6.6,
+        5.75
+      ],
+      "to": [
+        12.5,
+        8.8,
+        10.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.75,
+        6.6,
+        3.5
+      ],
+      "to": [
+        10.25,
+        8.8,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.227,
+        6.6,
+        6.409
+      ],
+      "to": [
+        12.773,
+        8.8,
+        9.591
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          6.6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        3.227,
+        6.6,
+        6.409
+      ],
+      "to": [
+        12.773,
+        8.8,
+        9.591
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          6.6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "穹顶·4",
+      "from": [
+        5.0,
+        8.8,
+        6.5
+      ],
+      "to": [
+        11.0,
+        10.6,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        8.8,
+        5.0
+      ],
+      "to": [
+        9.5,
+        10.6,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.818,
+        8.8,
+        6.9393
+      ],
+      "to": [
+        11.182,
+        10.6,
+        9.0607
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          8.8,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.818,
+        8.8,
+        6.9393
+      ],
+      "to": [
+        11.182,
+        10.6,
+        9.0607
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          8.8,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "出烟口",
+      "from": [
+        6.1,
+        10.6,
+        7.05
+      ],
+      "to": [
+        9.9,
+        12.4,
+        8.95
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        7.05,
+        10.6,
+        6.1
+      ],
+      "to": [
+        8.95,
+        12.4,
+        9.9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.9847,
+        10.6,
+        7.3282
+      ],
+      "to": [
+        10.0153,
+        12.4,
+        8.6718
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          10.6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.9847,
+        10.6,
+        7.3282
+      ],
+      "to": [
+        10.0153,
+        12.4,
+        8.6718
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          10.6,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        5.8,
+        0.0,
+        0.6
+      ],
+      "to": [
+        10.2,
+        0.8,
+        1.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#soot"
+        }
+      }
+    },
+    {
+      "__comment": "烟口内",
+      "from": [
+        7.0,
+        12.4,
+        7.0
+      ],
+      "to": [
+        9.0,
+        12.42,
+        9.0
+      ],
+      "faces": {
+        "up": {
+          "texture": "#fire"
+        }
+      }
+    }
+  ]
+}

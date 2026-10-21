@@ -1,0 +1,521 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_daub",
+    "daub": "mythic_age:block/village/village_daub",
+    "fire": "mythic_age:block/village/village_fire",
+    "soot": "mythic_age:block/village/village_soot"
+  },
+  "elements": [
+    {
+      "__comment": "窑脚（外扩）",
+      "from": [
+        0.3,
+        0,
+        4.15
+      ],
+      "to": [
+        15.7,
+        2.5,
+        11.85
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.15,
+        0,
+        0.3
+      ],
+      "to": [
+        11.85,
+        2.5,
+        15.7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        -0.1671,
+        0,
+        5.2776
+      ],
+      "to": [
+        16.1671,
+        2.5,
+        10.7224
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        -0.1671,
+        0,
+        5.2776
+      ],
+      "to": [
+        16.1671,
+        2.5,
+        10.7224
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "燃烧室",
+      "from": [
+        0.6,
+        2.5,
+        4.3
+      ],
+      "to": [
+        15.4,
+        10,
+        11.7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.3,
+        2.5,
+        0.6
+      ],
+      "to": [
+        11.7,
+        10,
+        15.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.1511,
+        2.5,
+        5.3837
+      ],
+      "to": [
+        15.8489,
+        10,
+        10.6163
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          2.5,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.1511,
+        2.5,
+        5.3837
+      ],
+      "to": [
+        15.8489,
+        10,
+        10.6163
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          2.5,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "装坯室",
+      "from": [
+        0.8,
+        10,
+        4.4
+      ],
+      "to": [
+        15.2,
+        16.0,
+        11.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        4.4,
+        10,
+        0.8
+      ],
+      "to": [
+        11.6,
+        16.0,
+        15.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.3632,
+        10,
+        5.4544
+      ],
+      "to": [
+        15.6368,
+        16.0,
+        10.5456
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          10,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "from": [
+        0.3632,
+        10,
+        5.4544
+      ],
+      "to": [
+        15.6368,
+        16.0,
+        10.5456
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          10,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "south": {
+          "texture": "#daub"
+        },
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "down": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "进火口（生火时发亮）",
+      "from": [
+        5.2,
+        0,
+        -0.1
+      ],
+      "to": [
+        10.8,
+        6.4,
+        1.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#soot"
+        }
+      }
+    },
+    {
+      "__comment": "进火口拱框",
+      "from": [
+        4.2,
+        0,
+        0.0
+      ],
+      "to": [
+        11.8,
+        7.4,
+        1.0
+      ],
+      "faces": {
+        "east": {
+          "texture": "#daub"
+        },
+        "west": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    },
+    {
+      "__comment": "装窑门（封泥）",
+      "from": [
+        5.8,
+        12,
+        0.6
+      ],
+      "to": [
+        10.2,
+        16.0,
+        1.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#soot"
+        }
+      }
+    },
+    {
+      "__comment": "窑门门槛",
+      "from": [
+        5.2,
+        11.4,
+        0.7
+      ],
+      "to": [
+        10.8,
+        12,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#daub"
+        },
+        "up": {
+          "texture": "#daub"
+        }
+      }
+    }
+  ]
+}

@@ -44,6 +44,11 @@
     "mythic_age:mudbrick",
     "mythic_age:pithos",
     "mythic_age:amphora_stack",
+    "mythic_age:pottery_kiln",
+    "mythic_age:mason_bench",
+    "mythic_age:bronze_furnace",
+    "mythic_age:greek_anvil",
+    "mythic_age:treading_vat",
     "mythic_age:patron_statue_core",
     "mythic_age:patron_statue_part"
   ]

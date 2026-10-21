@@ -450,6 +450,47 @@ public final class GreekRecipes {
                 .define('S', io.github.happysnappingturtle.mythicage.content.greek.GreekWood.OLIVE_SLAB)
                 .unlockedBy("has_ceramic_component", has(CERAMIC_COMPONENT))
                 .save(out, id("amphora_stack"));
+        // 工作站（第 2 批）
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.POTTERY_WHEEL)
+                .pattern(" L ").pattern("PPP").pattern(" G ")
+                .define('L', Items.CLAY_BALL).define('P', io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture.OLIVE_PLANKS)
+                .define('G', io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture.OLIVE_LOG)
+                .unlockedBy("has_clay_ball", has(Items.CLAY_BALL))
+                .save(out, id("pottery_wheel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.POTTERY_KILN)
+                .pattern("MMM").pattern("M M").pattern("MCM")
+                .define('M', io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MUDBRICK)
+                .define('C', Items.CAMPFIRE)
+                .unlockedBy("has_mudbrick", has(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MUDBRICK))
+                .save(out, id("pottery_kiln"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MASON_BENCH)
+                .pattern("IS").pattern("AA")
+                .define('I', Items.IRON_NUGGET).define('S', Items.STICK)
+                .define('A', io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR)
+                .unlockedBy("has_marble_ashlar", has(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR))
+                .save(out, id("mason_bench"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BRONZE_FURNACE)
+                .pattern(" M ").pattern("MCM").pattern("LML")
+                .define('M', io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MUDBRICK)
+                .define('C', Items.CAMPFIRE).define('L', Items.LEATHER)
+                .unlockedBy("has_mudbrick", has(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MUDBRICK))
+                .save(out, id("bronze_furnace"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.GREEK_ANVIL)
+                .pattern("BBB").pattern(" G ")
+                .define('B', BRONZE_INGOT).define('G', io.github.happysnappingturtle.mythicage.content.greek.GreekAgriculture.OLIVE_LOG)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
+                .save(out, id("greek_anvil"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.TREADING_VAT)
+                .pattern("A A").pattern("AAA")
+                .define('A', io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR)
+                .unlockedBy("has_marble_ashlar", has(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR))
+                .save(out, id("treading_vat"));
     }
 
     public static ResourceLocation id(String path) {

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "mythic_age:olive_log"
+    },
+    "L": {
+      "item": "minecraft:clay_ball"
+    },
+    "P": {
+      "item": "mythic_age:olive_planks"
+    }
+  },
+  "pattern": [
+    " L ",
+    "PPP",
+    " G "
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:pottery_wheel"
+  }
+}

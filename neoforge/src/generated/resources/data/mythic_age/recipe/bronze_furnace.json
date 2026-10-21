@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:campfire"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "M": {
+      "item": "mythic_age:mudbrick"
+    }
+  },
+  "pattern": [
+    " M ",
+    "MCM",
+    "LML"
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:bronze_furnace"
+  }
+}

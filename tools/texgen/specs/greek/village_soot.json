@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_soot",
+  "size": 32,
+  "palette": {
+    "m": "#2f2723",
+    "s": "#3d332d",
+    "S": "#4a3e36"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "sssssssssssmmmmmmmmmmsssssssssss",
+      "ssssssssssssmmmmmmmmmsssssssssss",
+      "sssssssssssssmmmmmmmmsssssssssss",
+      "ssssssssssssssmmmmsmssssssssssmm",
+      "mmmsssssssssssssssssssssssssmmmm",
+      "mmssssssssssssssssssssssssssssmm",
+      "mmmsssssSSSsssssssssssssssmmmmmm",
+      "mmmssssSSSSSSsssssssssssssmmmmmm",
+      "mmmsssSSSSSSSSSssssssssssmsmmmmm",
+      "mmssssSSSSSSSsssssssssssssssmmmm",
+      "mmsssssSSSSSssssssssssssssssmmmm",
+      "mmmsssSSSSSssssssssssssssssssmms",
+      "mmsssssSSsssssssssssssssssssssss",
+      "sssssssSsSssssssssssssssssssssss",
+      "ssssssssssssssssssssssssssssssss",
+      "sssssssSssssssssmmssssssssssssss",
+      "sssssssssssssssssmssssssSSssssss",
+      "sssssssssssssssmsmsssssssSssssss",
+      "ssssssssssssssmsmmmsssssssssssss",
+      "sssssssssssssmsmmmssssssssssssss",
+      "sssssssssssssmsmmmmsssssssssssss",
+      "sssssssmssmmmmmmmmmsmsssssssssss",
+      "sssssssmmmmmmmmmmmmmmsssssssssss",
+      "sssssssmmmmmmmmmmmmmmsssssssssss",
+      "ssssssmmmmmmmmmmmmmmmmssssssssss",
+      "ssssssmmmmmmmmmmmmmmsmmsssssssss",
+      "sssssmmmmmmmmmmmmmmmmsssssssssss",
+      "sssssssmmmmmmmmmmmmmmsssssssssss",
+      "ssssssmmmmmmmmmmmmmmssssssssssss",
+      "ssssssssssssmmmmmmmmmmssssssssss",
+      "sssssssssssmmmmmmmmmmsssssssssss",
+      "ssssssssssssmmmmmmmmmsssssssssss"
+    ]
+  }
+}

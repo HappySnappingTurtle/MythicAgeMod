@@ -1,0 +1,375 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_stone",
+    "stone": "mythic_age:block/village/village_stone",
+    "must": "mythic_age:block/village/village_must",
+    "rim": "mythic_age:block/village/village_vat_rim",
+    "rim_back": "mythic_age:block/village/village_vat_rim_back"
+  },
+  "elements": [
+    {
+      "__comment": "池底",
+      "from": [
+        0.5,
+        0,
+        0.5
+      ],
+      "to": [
+        15.5,
+        1.5,
+        31.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "北壁",
+      "from": [
+        0.5,
+        1.5,
+        0.5
+      ],
+      "to": [
+        15.5,
+        8.6,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "南壁",
+      "from": [
+        0.5,
+        1.5,
+        30
+      ],
+      "to": [
+        15.5,
+        8.6,
+        31.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "西壁",
+      "from": [
+        0.5,
+        1.5,
+        2
+      ],
+      "to": [
+        2,
+        8.6,
+        30
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "东壁",
+      "from": [
+        14,
+        1.5,
+        2
+      ],
+      "to": [
+        15.5,
+        8.6,
+        30
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "池沿顶面·前（染着浆迹）",
+      "from": [
+        0.5,
+        8.6,
+        0.5
+      ],
+      "to": [
+        15.5,
+        8.6,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "__comment": "池沿顶面·后",
+      "from": [
+        0.5,
+        8.6,
+        16
+      ],
+      "to": [
+        15.5,
+        8.6,
+        31.5
+      ],
+      "faces": {
+        "up": {
+          "texture": "#rim_back"
+        }
+      }
+    },
+    {
+      "__comment": "葡萄浆",
+      "from": [
+        2,
+        1.5,
+        2
+      ],
+      "to": [
+        14,
+        5.5,
+        30
+      ],
+      "faces": {
+        "up": {
+          "texture": "#must"
+        }
+      }
+    },
+    {
+      "__comment": "出水口",
+      "from": [
+        6.4,
+        2.0,
+        -2.8
+      ],
+      "to": [
+        9.6,
+        3.8,
+        0.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "出水口里的浆",
+      "from": [
+        7.0,
+        3.4,
+        -2.8
+      ],
+      "to": [
+        9.0,
+        3.42,
+        0.5
+      ],
+      "faces": {
+        "up": {
+          "texture": "#must"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        1.5,
+        0,
+        -1.5
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        -2
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        4
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        -1
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        -2
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        -2
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    }
+  }
+}

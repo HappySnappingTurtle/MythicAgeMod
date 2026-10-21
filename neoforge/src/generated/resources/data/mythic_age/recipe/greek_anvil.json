@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "mythic_age:bronze_ingot"
+    },
+    "G": {
+      "item": "mythic_age:olive_log"
+    }
+  },
+  "pattern": [
+    "BBB",
+    " G "
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:greek_anvil"
+  }
+}
