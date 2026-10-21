@@ -112,7 +112,7 @@ def wheat_field() -> Building:
         for z in range(1, 10):
             d = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
             if d <= r - 0.6:
-                b.set(x, -1, z, "floor")
+                b.set(x, -1, z, "mythic_age:threshing_floor")
             elif d <= r + 0.4:
                 b.set(x, -1, z, "step")
                 b.set(x, 0, z, "smooth_slab", type="bottom")
@@ -145,8 +145,8 @@ def pottery() -> Building:
         b.set(x, 3, 3, "beam", axis="x")
     b.fill(1, 3, 2, 7, 3, 2, "plank_slab", type="top")
     b.hip_roof(-1, 9, 0, 4, 4)
-    # 棚下：陶轮（替身：切石机）、黏土池、晾坯架
-    b.set(3, 0, 2, "minecraft:stonecutter")
+    # 棚下：陶轮、黏土池、晾坯架
+    b.set(3, 0, 2, "mythic_age:pottery_wheel", facing="south")
     b.anchor("workstation", 3, 0, 3)
     b.fill(5, -1, 2, 6, -1, 2, "minecraft:clay")
     b.set(5, 0, 2, "smooth_slab", type="bottom")
@@ -154,12 +154,12 @@ def pottery() -> Building:
     for x in (1, 2):
         b.set(x, 1, 2, "plank_slab", type="top")
         b.set(x, 2, 2, "pithos")
-    # 院里的泥砖窑：3 × 3、两层高，南面炉口，顶上冒烟
-    b.fill(5, 0, 5, 7, 1, 7, "mudbrick")
-    b.set(6, 2, 6, "mudbrick")
-    b.set(6, 0, 7, "minecraft:furnace", facing="south", lit="true")
-    b.set(6, 3, 6, "minecraft:campfire", lit="true", signal_fire="true")
-    b.anchor("workstation", 6, 0, 8)
+    # 院里的陶窑（两格高、正在烧），旁边一堆柴
+    b.set(6, 0, 6, "mythic_age:pottery_kiln", facing="south", half="lower", lit="true")
+    b.set(6, 1, 6, "mythic_age:pottery_kiln", facing="south", half="upper", lit="true")
+    b.set(7, 0, 5, "beam", axis="x")
+    b.set(7, 0, 6, "beam", axis="x")
+    b.anchor("workstation", 6, 0, 7)
     # 院里成品陶罐
     for (x, z) in ((1, 5), (2, 6), (1, 7)):
         b.set(x, 0, z, "pithos")

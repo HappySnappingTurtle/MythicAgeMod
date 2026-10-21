@@ -63,4 +63,14 @@ public record BuildingSpec(String id, String civ, String template, int sizeX, in
     public List<Pos> anchors(String name) {
         return anchors.getOrDefault(name, List.of());
     }
+
+    /**
+     * 按主神挑建筑变体（T13b 阶段 ③：卫城山花楣饰随主神变）：有 {@code <civ>:<shortId>_<patron>} 就用它，
+     * 否则用 {@code <civ>:<shortId>}；都没有返回 null。
+     */
+    public static BuildingSpec forPatron(java.util.Map<String, BuildingSpec> specs, String civ, String shortId,
+                                         String patron) {
+        BuildingSpec v = patron == null ? null : specs.get(civ + ":" + shortId + "_" + patron);
+        return v != null ? v : specs.get(civ + ":" + shortId);
+    }
 }

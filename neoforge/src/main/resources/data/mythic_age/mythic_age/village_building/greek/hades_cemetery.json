@@ -39,12 +39,12 @@
     ]
   },
   "materials": {
-    "minecraft:spruce_leaves": 219,
+    "mythic_age:cypress_leaves": 219,
     "mythic_age:polygonal_marble_wall": 132,
     "minecraft:coarse_dirt": 120,
     "minecraft:dirt_path": 57,
-    "minecraft:spruce_log": 44,
-    "mythic_age:marble_ashlar": 42,
+    "mythic_age:cypress_log": 44,
+    "mythic_age:marble_ashlar": 43,
     "minecraft:grass_block": 39,
     "minecraft:polished_blackstone_bricks": 21,
     "minecraft:dirt": 18,
@@ -55,8 +55,8 @@
     "mythic_age:greek_pediment": 4,
     "mythic_age:marble_pillar": 3,
     "mythic_age:greek_oil_lamp": 2,
-    "mythic_age:smooth_marble": 2,
-    "minecraft:decorated_pot": 2,
+    "mythic_age:marble_lekythos": 2,
+    "mythic_age:grave_relief": 1,
     "mythic_age:polished_marble_slab": 1
   },
   "door": {

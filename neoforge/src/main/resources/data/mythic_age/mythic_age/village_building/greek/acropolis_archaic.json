@@ -48,7 +48,7 @@
     "mythic_age:polished_marble": 165,
     "mythic_age:terracotta_roof_slab": 152,
     "mythic_age:smooth_marble": 85,
-    "minecraft:calcite": 45,
+    "mythic_age:plaster": 45,
     "mythic_age:smooth_marble_slab": 37,
     "mythic_age:marble_cornice": 36,
     "mythic_age:greek_pediment": 30,
@@ -56,18 +56,19 @@
     "mythic_age:triglyph_frieze": 28,
     "mythic_age:olive_slab": 25,
     "mythic_age:olive_log": 24,
-    "minecraft:terracotta": 23,
+    "mythic_age:plaster_dado": 23,
     "mythic_age:terracotta_ridge": 10,
     "mythic_age:terracotta_antefix": 10,
     "mythic_age:marble_column": 8,
     "mythic_age:marble_column_base": 4,
     "mythic_age:doric_capital": 4,
-    "minecraft:decorated_pot": 3,
+    "mythic_age:pithos": 3,
     "mythic_age:greek_oil_lamp": 3,
     "minecraft:white_bed": 2,
     "mythic_age:olive_door": 2,
-    "mythic_age:greek_brazier": 2,
-    "mythic_age:olive_trapdoor": 2
+    "mythic_age:olive_trapdoor": 2,
+    "mythic_age:greek_brazier": 1,
+    "mythic_age:village_altar": 1
   },
   "door": {
     "pos": [

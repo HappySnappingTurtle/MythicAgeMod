@@ -68,7 +68,8 @@ def agora() -> Building:
     for (hx, hz) in ((c, 0), (c, n - 1), (0, c), (n - 1, c)):
         for y in (1, 2):
             b.set(hx, y, hz, "mythic_age:marble_wall")
-        b.set(hx, 3, hz, "mythic_age:polished_marble")
+        facing = "north" if hz == 0 else "south" if hz == n - 1 else "west" if hx == 0 else "east"
+        b.set(hx, 3, hz, "mythic_age:herm_head", facing=facing)  # 界柱胸像，面朝路口外
     # 四角油灯柱
     for (lx, lz) in ((1, 1), (1, n - 2), (n - 2, 1), (n - 2, n - 2)):
         b.set(lx, 1, lz, "mythic_age:marble_wall")
@@ -85,8 +86,8 @@ def krene() -> Building:
     b.fill(0, 1, 0, 0, 4, 5, "wall_marble")
     b.set(0, 2, 2, "meander_blue")
     b.set(0, 2, 3, "meander_blue")
-    b.set(1, 3, 2, "mythic_age:marble_wall")  # 出水口（正式版：狮头出水口）
-    b.set(1, 3, 3, "mythic_age:marble_wall")
+    b.set(0, 3, 2, "mythic_age:lion_spout", facing="east")  # 狮头出水口砌在出水墙里，朝池子
+    b.set(0, 3, 3, "mythic_age:lion_spout", facing="east")
     for z in (0, 5):
         b.fill(1, 1, z, 4, 1, z, "wall_marble")
     # 蓄水池：池底下沉一格，池沿是台阶

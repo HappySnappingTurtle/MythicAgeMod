@@ -345,7 +345,7 @@ public final class VillageGenGameTests {
             for (var plot : plots) {
                 Box b = plot.box();
                 h.assertTrue(level.getBlockState(new BlockPos(b.minX(), b.minY(), b.minZ())).is(
-                        io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_WALL.get()), "界桩：" + plot.id());
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BOUNDARY_STONE.get()), "界桩：" + plot.id());
                 for (int[] c : new int[][]{{b.minX() + 1, b.minZ() + 1}, {b.maxX() - 1, b.maxZ() - 1}, {b.centerX(), b.centerZ()}}) {
                     BlockPos ground = new BlockPos(c[0], b.minY() - 1, c[1]);
                     h.assertTrue(!level.getBlockState(ground).isAir() && level.getBlockState(ground.above()).isAir(),

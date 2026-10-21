@@ -62,7 +62,8 @@ public final class DensityTool {
                                         .then(Commands.argument("radius", IntegerArgumentType.integer(16, 512))
                                                 .executes(DensityTool::run))))
                                 .then(Commands.literal("bench").executes(DensityTool::bench))
-                                .then(Commands.literal("audit").executes(DensityTool::audit)))));
+                                .then(Commands.literal("audit").executes(DensityTool::audit))
+                                .then(Commands.literal("anchors").executes(DensityTool::anchors)))));
     }
 
     private static int run(CommandContext<CommandSourceStack> ctx) {
@@ -81,6 +82,25 @@ public final class DensityTool {
             ctx.getSource().sendFailure(Component.literal("密度工具失败：" + e));
             return 0;
         }
+    }
+
+    /** 列出玩家所在村庄的主神与全部锚点坐标（实机取景用），写进审计日志。 */
+    private static int anchors(CommandContext<CommandSourceStack> ctx) {
+        ServerLevel level = ctx.getSource().getLevel();
+        net.minecraft.core.BlockPos at = net.minecraft.core.BlockPos.containing(ctx.getSource().getPosition());
+        var plans = io.github.happysnappingturtle.mythicage.village.VillagePlans.get(level.getServer());
+        var id = plans.at(level.dimension(), at.getX(), at.getZ());
+        if (id.isEmpty()) {
+            ctx.getSource().sendFailure(Component.literal("不在文明村庄里"));
+            return 0;
+        }
+        var info = plans.byVillage(id.get()).orElseThrow().info();
+        StringBuilder sb = new StringBuilder("anchors " + info.patron() + " center=" + info.center());
+        info.anchors().forEach((k, v) -> sb.append(" ").append(k).append("=").append(v));
+        info.plots().forEach(p -> sb.append(" plot:").append(p.kind()).append("=").append(p.box()));
+        MythicAgeAuditLog.write(sb.toString());
+        ctx.getSource().sendSuccess(() -> Component.literal("锚点已写入日志"), false);
+        return 1;
     }
 
     /**

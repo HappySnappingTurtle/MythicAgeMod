@@ -36,7 +36,7 @@
   },
   "materials": {
     "mythic_age:marble_ashlar": 83,
-    "mythic_age:smooth_marble": 78,
+    "mythic_age:smooth_marble": 75,
     "mythic_age:terracotta_roof_slab": 61,
     "mythic_age:polished_marble": 53,
     "minecraft:water": 31,
@@ -48,7 +48,7 @@
     "mythic_age:blue_meander_marble": 7,
     "mythic_age:marble_column_base": 5,
     "mythic_age:ionic_capital": 5,
-    "mythic_age:marble_wall": 3
+    "mythic_age:lion_spout": 3
   },
   "door": {
     "pos": [

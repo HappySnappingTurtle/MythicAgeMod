@@ -121,7 +121,7 @@ def altar(b: Building):
     """露天祭坛：地块东侧、正门前；装饰性（不是玩家的神坛方块）。"""
     b.fill(28, 0, 6, 28, 0, 8, "floor")
     b.set(28, 1, 6, "smooth_slab", type="bottom")
-    b.set(28, 1, 7, "brazier", lit="true")
+    b.set(28, 1, 7, "mythic_age:village_altar", facing="east")
     b.set(28, 1, 8, "smooth_slab", type="bottom")
     b.anchor("ritual", 29, 0, CENTER_Z)
 
@@ -154,11 +154,31 @@ def priest_house(b: Building, ox=14, oz=-10):
     b.anchor("priest_home", x0 + 1, 0, z0 + 2)  # 祭司床位（不生成普通居民）
 
 
-def build(stage: str) -> Building:
+PATRON_ORNAMENT = {"zeus": "pediment_thunderbolt", "poseidon": "pediment_trident"}
+
+
+# 各阶段神庙台基最下一级的范围（small / medium / large_temple 里 crepidoma 的参数）
+CREPIDOMA = {"archaic": (9, 3, 19, 11), "classical": (5, 2, 23, 12), "heroic": (0, 0, 24, 14), "mythic": (0, 0, 24, 14)}
+
+
+def hades_accents(b: Building, stage: str):
+    """哈迪斯：神庙台基最下一级的外圈换成磨制黑石砖（规划篇 §5「黑石点缀」）。"""
+    x0, z0, x1, z1 = CREPIDOMA[stage]
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            if x in (x0, x1) or z in (z0, z1):
+                b.set(x, 0, z, "minecraft:polished_blackstone_bricks")
+
+
+def build(stage: str, patron: str | None = None) -> Building:
     titles = {"archaic": "卫城·远古（小神庙）", "classical": "卫城·古典（中神庙）", "heroic": "卫城·英雄（大神庙）",
               "mythic": "卫城·神话（大神庙 + 大祭坛）"}
-    b = Building(f"greek_acropolis_{stage}", titles[stage])
+    b = Building(f"greek_acropolis_{stage}" + (f"_{patron}" if patron else ""), titles[stage])
     {"archaic": small_temple, "classical": medium_temple, "heroic": large_temple, "mythic": large_temple}[stage](b)
+    if patron in PATRON_ORNAMENT:
+        b.pediment_ornaments(PATRON_ORNAMENT[patron])
+    elif patron == "hades":
+        hades_accents(b, stage)
     if stage == "mythic":
         # 神话阶段：正门前的露天祭坛换成帕加马式大祭坛（台阶朝东，封闭的一面对着神庙正门）
         from greek_heroic import great_altar_into

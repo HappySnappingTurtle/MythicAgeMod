@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+import re
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -50,11 +51,11 @@ B = {
     "polygonal_wall": MA + "polygonal_marble_wall",
     "meander_blue": MA + "blue_meander_marble",
     "smooth_slab": MA + "smooth_marble_slab",
-    # 民居（白模替身：白灰墙 → 方解石，赭色勒脚 → 陶瓦，泥砖 → 泥砖，陶瓮 → 饰纹陶罐）
-    "plaster": "minecraft:calcite",
-    "socle": "minecraft:terracotta",
-    "mudbrick": "minecraft:mud_bricks",
-    "pithos": "minecraft:decorated_pot",
+    # 民居（T13b 阶段 ③ 换装：白灰墙、赭红墙裙、日晒泥砖、陶瓮都是正式方块）
+    "plaster": MA + "plaster",
+    "socle": MA + "plaster_dado",
+    "mudbrick": MA + "mudbrick",
+    "pithos": MA + "pithos",
     "beam": MA + "olive_log",
     "planks": MA + "olive_planks",
     "plank_slab": MA + "olive_slab",
@@ -74,19 +75,23 @@ CATEGORY = [
     ("大理石墙", ("smooth_marble",), (222, 218, 205)),
     ("檐部", ("architrave", "frieze", "cornice", "pediment"), (170, 160, 140)),
     ("屋顶", ("terracotta_roof", "ridge", "antefix"), (181, 83, 46)),
-    ("白灰墙", ("calcite",), (245, 245, 240)),
-    ("勒脚 / 泥砖", ("terracotta", "mud_bricks"), (150, 95, 67)),
+    ("勒脚 / 泥砖", ("plaster_dado", "mudbrick"), (150, 95, 67)),
+    ("白灰墙", ("plaster",), (245, 245, 240)),
     ("木作", ("olive",), (122, 92, 60)),
     ("神像 / 祭坛 / 火盆", ("statue", "brazier", "lamp"), (214, 170, 60)),
     ("床", ("bed",), (90, 120, 200)),
-    ("陶瓮", ("decorated_pot",), (170, 110, 70)),
+    ("陶瓮 / 油瓶", ("pithos", "lekythos", "decorated_pot"), (170, 110, 70)),
+    ("工作站", ("pottery_", "bronze_furnace", "anvil", "mason_bench", "treading_vat"), (130, 80, 50)),
+    ("雕刻 / 圣物", ("herm_head", "lion_spout", "grave_relief", "boundary_stone", "omphalos", "village_altar",
+                   "pediment_thunderbolt", "pediment_trident"), (230, 200, 120)),
     ("挡土墙", ("polygonal",), (140, 140, 132)),
     ("路面", ("path", "gravel"), (160, 140, 100)),
     ("水", ("water",), (90, 140, 220)),
     ("树叶", ("leaves",), (80, 140, 60)),
     ("树干", ("_log", "_wood"), (95, 70, 45)),
     ("草地 / 土", ("grass_block", "dirt"), (150, 175, 110)),
-    ("铜鼎（替身）", ("cauldron",), (120, 100, 70)),
+    ("铜鼎", ("tripod", "cauldron"), (120, 100, 70)),
+    ("打谷场", ("threshing_floor",), (180, 170, 150)),
     ("黑石", ("blackstone",), (50, 48, 55)),
 ]
 
@@ -202,6 +207,29 @@ class Building:
             for z in range(z0 + 2 * row, z1 - 2 * row + 1):
                 self.set(x, y + row, z, "pediment", facing=facing)
             row += 1
+
+    def pediment_ornaments(self, kind):
+        """在每面宽 ≥ 9 的山花底行正中前一格挂 3 格楣饰（规划篇 §5 主神差异），三叉戟再在中间那格上叠叉头。
+        kind：pediment_thunderbolt / pediment_trident。"""
+        gables = {}
+        for (x, y, z), state in self.blocks.items():
+            if "greek_pediment" in state:
+                facing = re.search(r"facing=(\w+)", state).group(1)
+                key = (facing, x if facing in ("east", "west") else z)
+                gables.setdefault(key, []).append((x, y, z))
+        step = {"east": (1, 0), "west": (-1, 0), "north": (0, -1), "south": (0, 1)}
+        for (facing, _), cells in gables.items():
+            y0 = min(c[1] for c in cells)
+            row = sorted(c for c in cells if c[1] == y0)
+            if len(row) < 9:
+                continue
+            mid = row[len(row) // 2]
+            dx, dz = step[facing]
+            along = (0, 1) if facing in ("east", "west") else (1, 0)
+            for k in (-1, 0, 1):
+                self.set(mid[0] + dx + along[0] * k, y0, mid[2] + dz + along[1] * k, MA + kind, facing=facing)
+            if kind == "pediment_trident":
+                self.set(mid[0] + dx, y0 + 1, mid[2] + dz, MA + kind, facing=facing)
 
     def crepidoma(self, x0, z0, x1, z1, steps, y=0):
         """台基：自 y 起 steps 级，每级向内收 1 格；返回台面（柱座）所在高度。"""

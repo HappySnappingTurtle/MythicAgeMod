@@ -55,8 +55,9 @@ final class TerrainOps {
         return GreekMaterials.POLYGONAL_MARBLE.get().defaultBlockState();
     }
 
+    /** 预留地块四角的界石（T13b 阶段 ③ 换装：原先用大理石墙柱替身）。 */
     static BlockState marker() {
-        return GreekMaterials.MARBLE_WALL.get().defaultBlockState();
+        return io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BOUNDARY_STONE.get().defaultBlockState();
     }
 
     static BlockState coping() {

@@ -30,7 +30,7 @@
     ]
   },
   "materials": {
-    "mythic_age:smooth_marble": 46,
+    "mythic_age:smooth_marble": 44,
     "mythic_age:marble_ashlar": 38,
     "mythic_age:terracotta_roof_slab": 30,
     "mythic_age:polished_marble": 20,
@@ -41,7 +41,7 @@
     "mythic_age:marble_column": 4,
     "mythic_age:marble_column_base": 2,
     "mythic_age:blue_meander_marble": 2,
-    "mythic_age:marble_wall": 2,
+    "mythic_age:lion_spout": 2,
     "mythic_age:doric_capital": 2
   },
   "door": {

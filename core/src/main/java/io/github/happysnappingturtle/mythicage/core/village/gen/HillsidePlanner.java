@@ -170,7 +170,10 @@ public final class HillsidePlanner {
 
     private boolean acropolis() {
         beginStep();
-        BuildingSpec a = spec("acropolis_archaic");
+        BuildingSpec a = BuildingSpec.forPatron(specs, civ, "acropolis_archaic", patron);
+        if (a == null) {
+            a = spec("acropolis_archaic");
+        }
         record Cand(int x, int z, double score) {
         }
         List<Cand> cands = new ArrayList<>();
@@ -333,7 +336,7 @@ public final class HillsidePlanner {
         String facing = t.rotateFacing(s.doorFacing());
         Pos door = TemplateTransform.toWorld(origin, s.door(), t);
         int[] d = dir(facing);
-        doors.add(new Door(new Pos(door.x() + d[0], ground, door.z() + d[1]), s.id().endsWith(":acropolis_archaic") ? 3 : 2));
+        doors.add(new Door(new Pos(door.x() + d[0], ground, door.z() + d[1]), s.id().contains(":acropolis_archaic") ? 3 : 2));
         return p;
     }
 

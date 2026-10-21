@@ -21,7 +21,10 @@ public final class FixedPlanner {
     public static Optional<VillagePlan> plan(int ax, int az, TerrainSampler terrain, Map<String, BuildingSpec> specs,
                                              String civ, String patron, List<String> problems) {
         BuildingSpec agora = spec(specs, civ + ":agora");
-        BuildingSpec acropolis = spec(specs, civ + ":acropolis_archaic");
+        BuildingSpec acropolis = BuildingSpec.forPatron(specs, civ, "acropolis_archaic", patron);
+        if (acropolis == null) {
+            acropolis = spec(specs, civ + ":acropolis_archaic");
+        }
         BuildingSpec house = spec(specs, civ + ":house_small");
         PlanBuilder b = new PlanBuilder(terrain);
         try {

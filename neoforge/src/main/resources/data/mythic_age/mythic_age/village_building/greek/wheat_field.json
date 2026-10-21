@@ -432,7 +432,7 @@
   "materials": {
     "minecraft:farmland": 80,
     "minecraft:wheat": 80,
-    "mythic_age:polished_marble": 25,
+    "mythic_age:threshing_floor": 25,
     "mythic_age:marble_ashlar": 20,
     "mythic_age:smooth_marble_slab": 20,
     "minecraft:water": 8,

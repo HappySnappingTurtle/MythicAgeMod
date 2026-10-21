@@ -154,6 +154,31 @@ public final class VillageBlockGameTests {
         h.succeed();
     }
 
+    /** TC-T13b-71：换装后的村庄模板里没有白模替身方块（规划篇 §4.2 两张表）。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void templates_have_no_stand_ins(GameTestHelper h) {
+        List<Block> standIns = List.of(Blocks.CALCITE, Blocks.TERRACOTTA, Blocks.MUD_BRICKS, Blocks.DECORATED_POT,
+                Blocks.CAULDRON, Blocks.BREWING_STAND, Blocks.CHISELED_QUARTZ_BLOCK, Blocks.POTTED_AZALEA,
+                Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES, Blocks.STONECUTTER, Blocks.FURNACE, Blocks.BLAST_FURNACE,
+                Blocks.ANVIL, Blocks.SMITHING_TABLE);
+        var manager = h.getLevel().getStructureManager();
+        var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings();
+        List<String> found = new java.util.ArrayList<>();
+        var specs = io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all();
+        h.assertTrue(specs.size() >= 19, "村庄建筑数据应有 19 份，实际 " + specs.size());
+        for (var spec : specs.values()) {
+            var tpl = manager.get(net.minecraft.resources.ResourceLocation.parse(spec.template()));
+            h.assertTrue(tpl.isPresent(), "缺少模板 " + spec.template());
+            for (Block b : standIns) {
+                if (!tpl.get().filterBlocks(BlockPos.ZERO, settings, b).isEmpty()) {
+                    found.add(spec.id() + " 含 " + b);
+                }
+            }
+        }
+        h.assertTrue(found.isEmpty(), "模板里还有替身方块：" + found);
+        h.succeed();
+    }
+
     private static PedimentOrnamentBlock.Part part(GameTestHelper h, int x, int y, int z) {
         return h.getBlockState(new BlockPos(x, y, z)).getValue(PedimentOrnamentBlock.PART);
     }

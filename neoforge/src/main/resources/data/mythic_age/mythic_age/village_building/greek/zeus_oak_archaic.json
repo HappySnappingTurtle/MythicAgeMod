@@ -36,7 +36,7 @@
   "materials": {
     "minecraft:oak_leaves": 463,
     "minecraft:coarse_dirt": 161,
-    "minecraft:cauldron": 37,
+    "mythic_age:bronze_tripod": 37,
     "minecraft:oak_log": 35,
     "minecraft:oak_wood": 25
   },

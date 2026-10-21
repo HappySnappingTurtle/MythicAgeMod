@@ -309,4 +309,25 @@ class VillageGenTest {
         assertEquals(Optional.of("a"), idx.at(25, 5));
         assertEquals(Optional.of("b"), idx.at(31, 5));
     }
+
+    // ───────────── 阶段 ③：卫城按主神挑变体 ─────────────
+
+    @Test
+    void tc74_acropolisVariantByPatron() throws IOException {
+        Map<String, BuildingSpec> specs = specs();
+        assertEquals("greek:acropolis_archaic_zeus", BuildingSpec.forPatron(specs, "greek", "acropolis_archaic", "zeus").id());
+        assertEquals("greek:acropolis_archaic_poseidon",
+                BuildingSpec.forPatron(specs, "greek", "acropolis_archaic", "poseidon").id());
+        assertEquals("greek:acropolis_archaic_hades", BuildingSpec.forPatron(specs, "greek", "acropolis_archaic", "hades").id());
+        // 没有变体的主神、主神为空：退回通用版
+        assertEquals("greek:acropolis_archaic", BuildingSpec.forPatron(specs, "greek", "acropolis_archaic", "athena").id());
+        assertEquals("greek:acropolis_archaic", BuildingSpec.forPatron(specs, "greek", "acropolis_archaic", null).id());
+        assertEquals(null, BuildingSpec.forPatron(specs, "greek", "no_such", "zeus"));
+        // 规划结果里用的是主神的变体
+        List<String> problems = new ArrayList<>();
+        Optional<VillagePlan> plan = HillsidePlanner.plan(200, 0, CONE, specs, "greek", "zeus", problems);
+        assertTrue(plan.isPresent(), problems.toString());
+        assertTrue(plan.get().buildings().stream().anyMatch(p -> p.building().equals("greek:acropolis_archaic_zeus")),
+                "宙斯村庄的卫城应是带雷霆楣饰的变体");
+    }
 }

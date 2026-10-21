@@ -40,8 +40,11 @@ class HillsidePlannerTest {
         return p.buildings().stream().filter(b -> b.building().equals("greek:" + building)).count();
     }
 
+    /** 卫城有按主神的变体（acropolis_archaic_zeus 等），按前缀找。 */
     static VillagePlan.Placement one(VillagePlan p, String building) {
-        return p.buildings().stream().filter(b -> b.building().equals("greek:" + building)).findFirst().orElseThrow();
+        return p.buildings().stream().filter(b -> b.building().equals("greek:" + building)
+                || building.equals("acropolis_archaic") && b.building().startsWith("greek:acropolis_archaic_"))
+                .findFirst().orElseThrow();
     }
 
     @Test

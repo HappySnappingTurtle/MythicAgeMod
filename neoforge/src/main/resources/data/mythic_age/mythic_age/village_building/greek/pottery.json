@@ -36,25 +36,23 @@
       [
         7,
         1,
-        8
+        7
       ]
     ]
   },
   "materials": {
     "minecraft:packed_mud": 79,
-    "minecraft:calcite": 52,
+    "mythic_age:plaster": 52,
     "mythic_age:terracotta_roof_slab": 48,
-    "minecraft:terracotta": 31,
-    "mythic_age:olive_log": 27,
-    "minecraft:mud_bricks": 18,
+    "mythic_age:plaster_dado": 31,
+    "mythic_age:olive_log": 29,
     "mythic_age:olive_slab": 9,
     "mythic_age:terracotta_ridge": 7,
-    "minecraft:decorated_pot": 5,
+    "mythic_age:pithos": 5,
     "minecraft:clay": 2,
-    "minecraft:stonecutter": 1,
-    "mythic_age:smooth_marble_slab": 1,
-    "minecraft:furnace": 1,
-    "minecraft:campfire": 1
+    "mythic_age:pottery_kiln": 2,
+    "mythic_age:pottery_wheel": 1,
+    "mythic_age:smooth_marble_slab": 1
   },
   "door": {
     "pos": [

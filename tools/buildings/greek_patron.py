@@ -74,12 +74,12 @@ def zeus_oak(walled=True) -> Building:
                 d = math.hypot(x - c, z - c)
                 if d <= r and _free(b, x, y, z) and not (d > r - 1.3 and (x * 7 + z * 13 + y * 5) % 4 == 0):
                     b.set(x, y, z, "minecraft:oak_leaves", persistent="true")
-    # 铜鼎圈：半径 6 的一圈首尾相接（白模用炼药锅替身；正式版是三足铜鼎方块，鼎身架高），南面留口
+    # 铜鼎圈：半径 6 的一圈首尾相接的三足铜鼎，南面留口
     for x in range(1, n):
         for z in range(1, n):
             d = math.hypot(x - c, z - c)
             if 5.5 <= d < 6.5 and not (z > c and abs(x - c) <= 1):
-                b.set(x, 0, z, "minecraft:cauldron")
+                b.set(x, 0, z, "mythic_age:bronze_tripod", facing="north")
     b.anchor("sacred_tree", c, 0, c + 3)
     b.anchor("sacred_tree", c, 0, c - 3)
     return b
@@ -189,7 +189,7 @@ def poseidon_spring() -> Building:
     for z in range(1, D):
         b.set(0, 2, z, "meander_blue")
     for z in (2, 4, 6):
-        b.set(1, 3, z, "mythic_age:marble_wall")  # 出水口（正式版：狮头出水口）
+        b.set(0, 3, z, "mythic_age:lion_spout", facing="east")  # 狮头出水口砌在出水墙里，朝池子
     # 南北墙围住水池间，前廊两侧敞开
     for z in (0, D):
         b.fill(1, 1, z, 5, 4, z, "wall_marble")
@@ -228,9 +228,9 @@ def poseidon_spring() -> Building:
 # ───────────── 哈迪斯 ─────────────
 
 def cypress(b: Building, x, z, h, y0=0):
-    """地中海柏树：细高的深色树柱（白模用云杉木 + 云杉叶），树干在中间，顶端收尖。"""
+    """地中海柏树：细高的深色树柱，树干在中间，顶端收尖。"""
     for y in range(y0, y0 + h - 2):
-        b.set(x, y, z, "minecraft:spruce_log", axis="y")
+        b.set(x, y, z, "mythic_age:cypress_log", axis="y")
     for y in range(y0 + 1, y0 + h + 1):
         k = y - y0
         r = 0 if k >= h - 1 else 1
@@ -238,7 +238,7 @@ def cypress(b: Building, x, z, h, y0=0):
             for dz in range(-r, r + 1):
                 full = k in range(3, h - 3) and (k + dx + dz) % 3 == 0
                 if (abs(dx) + abs(dz) <= 1 or full) and _free(b, x + dx, y, z + dz):
-                    b.set(x + dx, y, z + dz, "minecraft:spruce_leaves", persistent="true")
+                    b.set(x + dx, y, z + dz, "mythic_age:cypress_leaves", persistent="true")
 
 
 def hades_cemetery() -> Building:
@@ -272,7 +272,8 @@ def hades_cemetery() -> Building:
         if kind == "naiskos":
             for x in (a + 2, a + 4):
                 b.fill(x, 3, 5, x, 4, 5, "mythic_age:marble_wall")
-            b.fill(a + 3, 3, 5, a + 3, 4, 5, "wall_marble")  # 浮雕面（正式版：墓碑浮雕方块）
+            b.set(a + 3, 3, 5, "step")
+            b.set(a + 3, 4, 5, "mythic_age:grave_relief", facing="north")  # 浮雕面朝路
             for x in range(a + 2, a + 5):
                 b.set(x, 5, 5, "pediment", facing="north")
             b.set(a + 3, 6, 5, "pediment", facing="north")
@@ -280,7 +281,7 @@ def hades_cemetery() -> Building:
             b.fill(a + 3, 3, 5, a + 3, 5, 5, "mythic_age:marble_pillar")
             b.set(a + 3, 6, 5, "mythic_age:polished_marble_slab", type="bottom")
             for x in (a + 1, a + 5):
-                b.set(x, 3, 5, "pithos")  # 大理石油瓶（lekythos，白模用饰纹陶罐）
+                b.set(x, 3, 5, "mythic_age:marble_lekythos", facing="north")
         # 园内：低矮墓碑两排、供奉的小陶瓶与油灯；后角一株柏树
         if kind == "tumulus":
             cx, cz = a + 3, 10

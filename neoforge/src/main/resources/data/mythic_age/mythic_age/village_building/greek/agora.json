@@ -41,9 +41,10 @@
     "mythic_age:marble_ashlar": 57,
     "mythic_age:olive_leaves": 34,
     "mythic_age:marble_stairs": 16,
-    "mythic_age:polished_marble": 13,
     "mythic_age:marble_wall": 12,
+    "mythic_age:polished_marble": 9,
     "mythic_age:greek_oil_lamp": 4,
+    "mythic_age:herm_head": 4,
     "mythic_age:olive_log": 3,
     "minecraft:bell": 1
   },
