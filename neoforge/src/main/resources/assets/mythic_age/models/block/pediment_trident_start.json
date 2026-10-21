@@ -1,0 +1,391 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_marble",
+    "marble": "mythic_age:block/village/village_marble",
+    "gold": "mythic_age:block/village/village_gold",
+    "blue": "mythic_age:block/village/village_blue",
+    "line": "mythic_age:block/village/village_relief_panel"
+  },
+  "elements": [
+    {
+      "__comment": "蓝色底面",
+      "from": [
+        0,
+        2,
+        16.95
+      ],
+      "to": [
+        16,
+        16,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#blue"
+        }
+      }
+    },
+    {
+      "__comment": "浪纹底带",
+      "from": [
+        0,
+        2.2,
+        15.2
+      ],
+      "to": [
+        16,
+        4.0,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪身",
+      "from": [
+        0.0,
+        4.0,
+        15.2
+      ],
+      "to": [
+        5.4,
+        5.6,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "from": [
+        1.6,
+        5.6,
+        15.2
+      ],
+      "to": [
+        6.6,
+        7.2,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪头",
+      "from": [
+        3.4,
+        7.2,
+        15.2
+      ],
+      "to": [
+        7.6,
+        8.6,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "卷回",
+      "from": [
+        6.2,
+        5.0,
+        15.2
+      ],
+      "to": [
+        7.8,
+        7.2,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪尖",
+      "from": [
+        5.0,
+        8.6,
+        15.4
+      ],
+      "to": [
+        7.0,
+        9.4,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪身",
+      "from": [
+        8.0,
+        4.0,
+        15.2
+      ],
+      "to": [
+        13.4,
+        5.6,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "from": [
+        9.6,
+        5.6,
+        15.2
+      ],
+      "to": [
+        14.6,
+        7.2,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪头",
+      "from": [
+        11.4,
+        7.2,
+        15.2
+      ],
+      "to": [
+        15.6,
+        8.6,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "卷回",
+      "from": [
+        14.2,
+        5.0,
+        15.2
+      ],
+      "to": [
+        15.8,
+        7.2,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "浪尖",
+      "from": [
+        13.0,
+        8.6,
+        15.4
+      ],
+      "to": [
+        15.0,
+        9.4,
+        17.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    }
+  ]
+}

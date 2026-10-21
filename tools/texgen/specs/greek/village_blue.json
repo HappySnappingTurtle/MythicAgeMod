@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_blue",
+  "size": 32,
+  "palette": {
+    "d": "#25426a",
+    "m": "#2c4f7c",
+    "s": "#335a8a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ssmmmmmmmmmmmmmmmmmmmmmsmssmmssm",
+      "mssmmmmmmmmmmmmmmmmmmmsmsmsmmsss",
+      "smmsmmmmmmmmmmmmmmmmmmmsmmmmmsmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmsmmsmmms",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "dmmmmmmmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmmmmmmmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dddmmmdmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmdmmmdmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmdddm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmdmmm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "dmmmmmdmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "dmmmmmmdmmmmmmmmmmmmmmmmmmmmmmmm",
+      "dmmmmmmdmmmmmmmmmmmmmmmsmmmmmmmm",
+      "dmmmmmmdmmmmmmmmmmmmmmmsssmmmmmm",
+      "dmmmmmmdmmmmmmmmmmmmmsmssssmmmmm",
+      "mmmmmmmdmmmmmmmmmmmmmmmssmsmmmmm",
+      "mmmmmmmdmmmmmmmmmmmmmsmsssssmmmm",
+      "mmmmmmmdmmmmmmmmmmmmmmmmmsmmmmmm",
+      "mmmmmmmdmmmmmmmmmmmmmmmsmssmmmmm",
+      "mmmmmmmmmmmmmmmmmmmmmmmsmsmmmssm",
+      "smsmmmmmmmmmmmmmmmmmmmsmssmsmsms",
+      "ssmmmmmmmmmmmmmmmmmmmmsmssmmmssm"
+    ]
+  }
+}

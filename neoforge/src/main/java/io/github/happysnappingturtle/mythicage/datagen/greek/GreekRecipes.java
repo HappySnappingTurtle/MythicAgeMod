@@ -523,6 +523,21 @@ public final class GreekRecipes {
                 .requires(net.neoforged.neoforge.common.Tags.Items.INGOTS_GOLD).requires(net.neoforged.neoforge.common.Tags.Items.INGOTS_GOLD)
                 .unlockedBy("has_bronze_tripod", has(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BRONZE_TRIPOD))
                 .save(out, id("oracle_tripod"));
+        // 三角楣饰（第 5 批）：平滑大理石 + 金粒 + 青金石（蓝色底面）→ 3 格
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PEDIMENT_THUNDERBOLT, 3)
+                .requires(SMOOTH_MARBLE).requires(SMOOTH_MARBLE).requires(SMOOTH_MARBLE)
+                .requires(net.neoforged.neoforge.common.Tags.Items.NUGGETS_GOLD).requires(Items.LAPIS_LAZULI)
+                .requires(net.neoforged.neoforge.common.Tags.Items.NUGGETS_GOLD)
+                .unlockedBy("has_smooth_marble", has(SMOOTH_MARBLE))
+                .save(out, id("pediment_thunderbolt"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PEDIMENT_TRIDENT, 4)
+                .requires(SMOOTH_MARBLE).requires(SMOOTH_MARBLE).requires(SMOOTH_MARBLE).requires(SMOOTH_MARBLE)
+                .requires(net.neoforged.neoforge.common.Tags.Items.NUGGETS_GOLD).requires(Items.LAPIS_LAZULI)
+                .requires(Items.PRISMARINE_SHARD)
+                .unlockedBy("has_smooth_marble", has(SMOOTH_MARBLE))
+                .save(out, id("pediment_trident"));
     }
 
     public static ResourceLocation id(String path) {

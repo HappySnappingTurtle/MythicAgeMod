@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "tag": "c:nuggets/gold"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "item": "minecraft:prismarine_shard"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "mythic_age:pediment_trident"
+  }
+}

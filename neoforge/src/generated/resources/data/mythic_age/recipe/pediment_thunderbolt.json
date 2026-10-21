@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "item": "mythic_age:smooth_marble"
+    },
+    {
+      "tag": "c:nuggets/gold"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "tag": "c:nuggets/gold"
+    }
+  ],
+  "result": {
+    "count": 3,
+    "id": "mythic_age:pediment_thunderbolt"
+  }
+}

@@ -3,6 +3,7 @@ package io.github.happysnappingturtle.mythicage.gametest;
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks;
+import io.github.happysnappingturtle.mythicage.content.greek.village.PedimentOrnamentBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.village.TallWorkstationBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.village.TreadingVatBlock;
 import net.minecraft.core.BlockPos;
@@ -124,5 +125,36 @@ public final class VillageBlockGameTests {
         place(h, p, vat, new BlockPos(2, 1, 3));
         h.assertBlockNotPresent(vat, new BlockPos(2, 2, 3));
         h.succeed();
+    }
+
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void pediment_ornament_parts(GameTestHelper h) {
+        ground(h);
+        Block bolt = GreekVillageBlocks.PEDIMENT_TRIDENT.get();
+        BlockState south = bolt.defaultBlockState().setValue(PedimentOrnamentBlock.FACING, Direction.SOUTH);
+        // 朝南：模型 +x（顺时针）是西，所以西端是 start、东端是 end
+        for (int x = 3; x <= 5; x++) {
+            h.setBlock(new BlockPos(x, 3, 5), south);
+        }
+        h.setBlock(new BlockPos(4, 4, 5), south);
+        h.setBlock(new BlockPos(8, 3, 5), south);
+        h.assertTrue(part(h, 5, 3, 5) == PedimentOrnamentBlock.Part.START, "西端应为 start，实际 " + part(h, 5, 3, 5));
+        h.assertTrue(part(h, 4, 3, 5) == PedimentOrnamentBlock.Part.MIDDLE, "中间应为 middle");
+        h.assertTrue(part(h, 3, 3, 5) == PedimentOrnamentBlock.Part.END, "东端应为 end");
+        h.assertTrue(part(h, 4, 4, 5) == PedimentOrnamentBlock.Part.TOP, "叠在上面的应为 top");
+        h.assertTrue(part(h, 8, 3, 5) == PedimentOrnamentBlock.Part.SINGLE, "单独一格应为 single");
+        // 拆掉一端，剩下两格重新拼
+        h.setBlock(new BlockPos(5, 3, 5), Blocks.AIR);
+        h.assertTrue(part(h, 4, 3, 5) == PedimentOrnamentBlock.Part.START, "拆掉西端后中间那格变 start");
+        // 朝向不同的不相连
+        h.setBlock(new BlockPos(9, 3, 5), bolt.defaultBlockState().setValue(PedimentOrnamentBlock.FACING, Direction.NORTH));
+        h.assertTrue(part(h, 8, 3, 5) == PedimentOrnamentBlock.Part.SINGLE, "朝向不同不应相连");
+        h.assertTrue(h.getBlockState(new BlockPos(4, 3, 5)).getCollisionShape(h.getLevel(),
+                h.absolutePos(new BlockPos(4, 3, 5))).isEmpty(), "楣饰没有碰撞");
+        h.succeed();
+    }
+
+    private static PedimentOrnamentBlock.Part part(GameTestHelper h, int x, int y, int z) {
+        return h.getBlockState(new BlockPos(x, y, z)).getValue(PedimentOrnamentBlock.PART);
     }
 }

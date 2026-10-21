@@ -122,7 +122,7 @@ public class TreadingVatBlock extends HorizontalDirectionalBlock {
     }
 
     /** 朝北的形状转到四个朝向（俯视顺时针，同方块状态的 y 旋转）。 */
-    private static Map<Direction, VoxelShape> rotations(VoxelShape north) {
+    public static Map<Direction, VoxelShape> rotations(VoxelShape north) {
         Map<Direction, VoxelShape> out = new EnumMap<>(Direction.class);
         for (Direction d : Direction.Plane.HORIZONTAL) {
             int turns = (d.get2DDataValue() + 2) % 4; // 南 0、西 1、北 2、东 3 → 北 0、东 1、南 2、西 3

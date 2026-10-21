@@ -6,6 +6,7 @@ import io.github.happysnappingturtle.mythicage.content.greek.architecture.Facing
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.content.greek.village.LionSpoutBlock;
+import io.github.happysnappingturtle.mythicage.content.greek.village.PedimentOrnamentBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.village.PithosBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.village.TallWorkstationBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.village.TreadingVatBlock;
@@ -207,6 +208,31 @@ public final class GreekVillageBlocks {
             .itemTags(GreekMaterials.MARBLE_FAMILY_ITEM)
             .lang("大理石油瓶", "Marble Lekythos", "大理石のレキュトス")
             .register();
+
+    // ───────────── 第 5 批：三角楣饰（规划篇 §5，挂在山花正面；底行横向连放 3 格，三叉戟中间那格上面再叠 1 格放叉头） ─────────────
+
+    public static final DeferredBlock<PedimentOrnamentBlock> PEDIMENT_THUNDERBOLT = Content.block("pediment_thunderbolt",
+                    GREEK, p -> new PedimentOrnamentBlock(p, false))
+            .properties(GreekVillageBlocks::ornament)
+            .model(new BlockModelSpec.StateModels(s -> "_" + s.getValue(PedimentOrnamentBlock.PART).getSerializedName(),
+                    true, "_single"))
+            .tags(BlockTags.MINEABLE_WITH_PICKAXE)
+            .lang("宙斯雷霆楣饰", "Thunderbolt Pediment Relief", "雷霆のペディメント装飾")
+            .register();
+
+    public static final DeferredBlock<PedimentOrnamentBlock> PEDIMENT_TRIDENT = Content.block("pediment_trident",
+                    GREEK, p -> new PedimentOrnamentBlock(p, true))
+            .properties(GreekVillageBlocks::ornament)
+            .model(new BlockModelSpec.StateModels(s -> "_" + s.getValue(PedimentOrnamentBlock.PART).getSerializedName(),
+                    true, "_single"))
+            .tags(BlockTags.MINEABLE_WITH_PICKAXE)
+            .lang("三叉戟海浪楣饰", "Trident and Waves Pediment Relief", "三叉戟と波のペディメント装飾")
+            .register();
+
+    private static BlockBehaviour.Properties ornament() {
+        return BlockBehaviour.Properties.ofFullCopy(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.SMOOTH_MARBLE.get())
+                .noOcclusion().noCollission();
+    }
 
     private static BlockBehaviour.Properties carved() {
         return BlockBehaviour.Properties.ofFullCopy(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.SMOOTH_MARBLE.get())

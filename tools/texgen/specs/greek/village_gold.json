@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_gold",
+  "size": 32,
+  "palette": {
+    "s": "#c99a30",
+    "S": "#dcb244",
+    "h": "#ecc964"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "sssssssssssssSSSSSssssssssssssss",
+      "ssssssssssSsSSSSSSsSssssssssssss",
+      "sssssssssSSSSSSSSSSSssssssssssss",
+      "sssssSSSSSSSSSSSSSSSSSssssssssss",
+      "sssssSSSSSSSSSSSSSSSSSSSSSSSssss",
+      "sssSSSSSSSSSSSSSSSSSSSSSSSSSSsSs",
+      "ssSSSSSSSSSSShhhShSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSShhhhhShhSSSSSSSSSSS",
+      "SSSSSSSSSShSShhhhhhhShSSSSSSSSSS",
+      "SSSSSSSSSSSSShhShhhhSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSShhSSSSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSShhShSSSSSS",
+      "SSSSSSSSSSSSSSSSSSSSSSShhhSSSSSS",
+      "SSSSSSSsSssSSSSSSSSSSShhhhhhSSSS",
+      "SSSSSsSssssssssSssSSSShhhhhhSSSS",
+      "SSSSSSsssssssssssssSSShhhhhhSSSS",
+      "SSSSSsssssssssssssSSSShhhhhhhSSS",
+      "SSSSsssssssssssssSSSSShhhhhhSSSS",
+      "SSSSSSssssssssssSSSSSShhhhhhSSSS",
+      "SSSSSsssssssssSSSSSSSSSShShSSSSS",
+      "SSSSSsssssssSSSSSSSSSSSSSSSSSSSS",
+      "SSSSssssssssSSSSSSSSSSSSSSSSSSSS",
+      "SSSSSsssssssSSSSShSSSSSSSSSSSSSS",
+      "SSSssssssssSSSShhhSSSSSSSSSSSSSS",
+      "SSSSSssssssSSSSShhhSSSSSSSSSSSSS",
+      "SSSSSssssssSSSShhhhSSSSSSSSSSSSS",
+      "SSSSssssssssSSSShSSSSSSSSSSSSSSS",
+      "sSsssssssssSSSSSSSSSSSSsssSSSssS",
+      "ssssssssssssSSSSSSSSSSSsssssssss",
+      "ssssssssssSSSSSSSSSSssssssssssss",
+      "sssssssssssSsSSSSSSSssssssssssss",
+      "sssssssssssSsSSSSSsSssssssssssss"
+    ]
+  }
+}

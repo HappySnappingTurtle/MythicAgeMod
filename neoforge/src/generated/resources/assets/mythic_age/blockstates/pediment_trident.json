@@ -1,0 +1,79 @@
+{
+  "variants": {
+    "facing=east,part=end": {
+      "model": "mythic_age:block/pediment_trident_end",
+      "y": 90
+    },
+    "facing=east,part=middle": {
+      "model": "mythic_age:block/pediment_trident_middle",
+      "y": 90
+    },
+    "facing=east,part=single": {
+      "model": "mythic_age:block/pediment_trident_single",
+      "y": 90
+    },
+    "facing=east,part=start": {
+      "model": "mythic_age:block/pediment_trident_start",
+      "y": 90
+    },
+    "facing=east,part=top": {
+      "model": "mythic_age:block/pediment_trident_top",
+      "y": 90
+    },
+    "facing=north,part=end": {
+      "model": "mythic_age:block/pediment_trident_end"
+    },
+    "facing=north,part=middle": {
+      "model": "mythic_age:block/pediment_trident_middle"
+    },
+    "facing=north,part=single": {
+      "model": "mythic_age:block/pediment_trident_single"
+    },
+    "facing=north,part=start": {
+      "model": "mythic_age:block/pediment_trident_start"
+    },
+    "facing=north,part=top": {
+      "model": "mythic_age:block/pediment_trident_top"
+    },
+    "facing=south,part=end": {
+      "model": "mythic_age:block/pediment_trident_end",
+      "y": 180
+    },
+    "facing=south,part=middle": {
+      "model": "mythic_age:block/pediment_trident_middle",
+      "y": 180
+    },
+    "facing=south,part=single": {
+      "model": "mythic_age:block/pediment_trident_single",
+      "y": 180
+    },
+    "facing=south,part=start": {
+      "model": "mythic_age:block/pediment_trident_start",
+      "y": 180
+    },
+    "facing=south,part=top": {
+      "model": "mythic_age:block/pediment_trident_top",
+      "y": 180
+    },
+    "facing=west,part=end": {
+      "model": "mythic_age:block/pediment_trident_end",
+      "y": 270
+    },
+    "facing=west,part=middle": {
+      "model": "mythic_age:block/pediment_trident_middle",
+      "y": 270
+    },
+    "facing=west,part=single": {
+      "model": "mythic_age:block/pediment_trident_single",
+      "y": 270
+    },
+    "facing=west,part=start": {
+      "model": "mythic_age:block/pediment_trident_start",
+      "y": 270
+    },
+    "facing=west,part=top": {
+      "model": "mythic_age:block/pediment_trident_top",
+      "y": 270
+    }
+  }
+}

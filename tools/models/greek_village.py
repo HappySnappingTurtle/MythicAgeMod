@@ -839,6 +839,136 @@ def lekythos_elements():
             box((7.0, 8.0, 3.5), (9.0, 8.6, 3.8), "marble", comment="握手")]
     return els
 
+# ───────────── 第 5 批：三角楣饰（规划篇 §5 主神差异） ─────────────
+# 挂在山花正面的浮雕：方块放在山花前面一格，背面贴着山花（模型 z 16–17 伸进山花面 1 像素的凹槽），
+# 底子刷成蓝色（古希腊山花底面原本涂蓝），浮雕向外凸出约 2–3 像素。横向连放 3 格拼成完整图案；
+# 三叉戟中间那格上面再叠一格放叉头。PART：single / start（模型 −x 端）/ middle / end（+x 端）/ top。
+
+GOLD = {"k": "#6b4a12", "d": "#8f661c", "m": "#b08425", "s": "#c99a30", "S": "#dcb244", "h": "#ecc964", "H": "#f8e39a"}
+BLUE = {"k": "#1d3550", "d": "#25426a", "m": "#2c4f7c", "s": "#335a8a", "S": "#3d6698"}
+
+
+def gold_rows(k=301):
+    return smooth_rows(k, 8, 0.38, 0.55)
+
+
+def blue_rows(k=311):
+    """山花底面的蓝（石青）：刷子笔触般的横向深浅。"""
+    return smooth_rows(k, 8, 0.25, 0.5, ("x", 7, 0.08), keys="kdmsS")
+
+
+FRONT = 17.0
+
+
+def rel(x0, y0, x1, y1, depth, t, comment=None):
+    """贴在山花面上的浮雕块：从 z = 17 往外凸 depth。"""
+    return box((x0, y0, FRONT - depth), (x1, y1, FRONT), t, faces="nsewud", comment=comment)
+
+
+def backdrop(y0):
+    return [box((0, y0, FRONT - 0.05), (16, 16, FRONT), "blue", faces="n", comment="蓝色底面")]
+
+
+def mirror_x(els):
+    out = []
+    for e in els:
+        e = json.loads(json.dumps(e))
+        x0, x1 = e["from"][0], e["to"][0]
+        e["from"][0], e["to"][0] = round(16 - x1, 4), round(16 - x0, 4)
+        f = e["faces"]
+        if "east" in f or "west" in f:
+            f["east"], f["west"] = f.get("west"), f.get("east")
+            e["faces"] = {k: v for k, v in f.items() if v is not None}
+        out.append(e)
+    return out
+
+
+def bolt_end():
+    """雷霆一端（朝模型 −x）：细杵从握柄伸出，到端头鼓成花萼形，萼口炸出一束火焰——中股直伸收尖，
+    上下两股先向外弯开、再把尖端朝前（古风瓶画里对称的「双头火炬」）。"""
+    g = "gold"
+    core = [rel(9.6, 8.0, 16, 10.0, 2.4, g, "杵"),
+            rel(13.0, 7.4, 14.0, 10.6, 2.8, g, "箍"),
+            rel(8.4, 7.2, 9.6, 10.8, 2.8, g, "花萼·底"), rel(7.2, 6.4, 8.4, 11.6, 2.8, g, "花萼·口"),
+            rel(2.4, 8.3, 7.2, 9.7, 2.6, g, "中股"), rel(0.8, 8.6, 2.4, 9.4, 2.4, g, "中股尖")]
+    prong = [rel(5.6, 11.0, 7.4, 12.6, 2.4, g, "侧股·根"), rel(4.2, 12.2, 6.0, 14.0, 2.3, g, "侧股·外弯"),
+             rel(2.4, 13.0, 4.4, 14.4, 2.2, g, "侧股·回头"), rel(0.8, 12.6, 2.6, 13.6, 2.0, g, "侧股尖"),
+             rel(4.2, 10.0, 5.4, 11.2, 2.0, g, "细焰")]
+    lower = []
+    for e in prong:
+        e2 = json.loads(json.dumps(e))
+        y0, y1 = e2["from"][1], e2["to"][1]
+        e2["from"][1], e2["to"][1] = round(18 - y1, 4), round(18 - y0, 4)
+        f = e2["faces"]
+        f["up"], f["down"] = f.get("down"), f.get("up")
+        e2["faces"] = {k: v for k, v in f.items() if v is not None}
+        e2.pop("__comment", None)
+        lower.append(e2)
+    return core + prong + lower
+
+
+def bolt_middle():
+    """雷霆中段：握柄——中间一段加粗、两头各一道箍，左右接细杵。"""
+    g = "gold"
+    return [rel(0, 8.0, 16, 10.0, 2.4, g, "杵"),
+            rel(5.4, 7.0, 10.6, 11.0, 3.0, g, "握柄"),
+            rel(4.4, 6.6, 5.4, 11.4, 3.2, g, "箍"), rel(10.6, 6.6, 11.6, 11.4, 3.2, g),
+            rel(1.0, 7.6, 2.0, 10.4, 2.8, g, "细箍"), rel(14.0, 7.6, 15.0, 10.4, 2.8, g)]
+
+
+def bolt_single():
+    """单格雷霆：整根缩在一格里——握柄居中，两端各一束三股火焰。"""
+    g = "gold"
+    half = [rel(4.4, 8.3, 8, 9.7, 2.4, g, "杵"), rel(3.4, 7.2, 4.4, 10.8, 2.6, g, "花萼"),
+            rel(0.6, 8.5, 3.4, 9.5, 2.4, g, "中股"),
+            rel(2.2, 10.4, 3.6, 11.8, 2.2, g, "侧股"), rel(0.8, 11.4, 2.4, 12.4, 2.0, g),
+            rel(2.2, 6.2, 3.6, 7.6, 2.2, g), rel(0.8, 5.6, 2.4, 6.6, 2.0, g)]
+    return half + mirror_x(half) + [rel(6.2, 7.4, 9.8, 10.6, 2.8, g, "握柄")]
+
+
+def waves(period=8):
+    """卷浪纹（希腊 running wave）：一条底带上每 8 像素一个向右卷起的浪头，浪头高到半格。"""
+    m = "marble"
+    els = [rel(0, 2.2, 16, 4.0, 1.8, m, "浪纹底带")]
+    for ox in range(0, 16, period):
+        els += [rel(ox + 0.0, 4.0, ox + 5.4, 5.6, 1.8, m, "浪身"),
+                rel(ox + 1.6, 5.6, ox + 6.6, 7.2, 1.8, m),
+                rel(ox + 3.4, 7.2, ox + 7.6, 8.6, 1.8, m, "浪头"),
+                rel(ox + 6.2, 5.0, ox + 7.8, 7.2, 1.8, m, "卷回"),
+                rel(ox + 5.0, 8.6, ox + 7.0, 9.4, 1.6, m, "浪尖")]
+    return els
+
+
+def trident_head(y0, s=1.0):
+    """三叉戟头：横档上三股粗叉，中股带矛形尖，两侧股尖外侧各一个倒钩（波塞冬尼亚钱币上波塞冬举的三叉戟）。"""
+    g = "gold"
+
+    def r(x0, a, x1, b, d, c=None):
+        return rel(x0, y0 + a * s, x1, y0 + b * s, d, g, c)
+
+    els = [r(1.6, 0, 14.4, 2.0, 2.4, "横档"),
+           r(6.9, 2.0, 9.1, 9.0, 2.6, "中股"),
+           r(6.0, 9.0, 10.0, 10.6, 2.6, "中股矛尖"), r(6.8, 10.6, 9.2, 11.8, 2.4), r(7.5, 11.8, 8.5, 12.8, 2.2)]
+    side = [r(1.6, 2.0, 3.8, 7.6, 2.4, "侧股"), r(1.9, 7.6, 3.5, 9.0, 2.2), r(2.2, 9.0, 3.2, 10.0, 2.0),
+            r(0.2, 5.6, 1.6, 7.6, 2.0, "倒钩")]
+    return els + side + mirror_x(side)
+
+
+def ornament_models():
+    t = {"particle": vtex("village_marble"), "marble": vtex("village_marble"), "gold": vtex("village_gold"),
+         "blue": vtex("village_blue"), "line": vtex("village_relief_panel")}
+    model("pediment_thunderbolt_start", t, backdrop(2) + bolt_end())
+    model("pediment_thunderbolt_end", t, backdrop(2) + mirror_x(bolt_end()))
+    model("pediment_thunderbolt_middle", t, backdrop(2) + bolt_middle())
+    model("pediment_thunderbolt_single", t, backdrop(2) + bolt_single())
+    model("pediment_thunderbolt_top", t, backdrop(0))
+    model("pediment_trident_start", t, backdrop(2) + waves())
+    model("pediment_trident_end", t, backdrop(2) + waves())
+    model("pediment_trident_middle", t, backdrop(2) + waves() + [rel(6.9, 4.0, 9.1, 16, 2.4, "gold", "戟杆")])
+    model("pediment_trident_top", t, backdrop(0) + [rel(6.9, 0, 9.1, 3.0, 2.4, "gold", "戟杆")] + trident_head(3.0))
+    small = [rel(7.2, 4.0, 8.8, 8.0, 2.2, "gold", "戟杆")] + trident_head(8.0, 0.6)
+    model("pediment_trident_single", t, backdrop(2) + waves() + small)
+
 # ───────────── 输出 ─────────────
 
 def main():
@@ -931,9 +1061,14 @@ def main():
                         "eye": vtex("village_dark")}, herm_elements())
     model("grave_relief", {"particle": mv, "marble": mv, "panel": vtex("village_relief_panel")}, relief_elements())
     model("marble_lekythos", {"particle": mv, "marble": mv}, lekythos_elements())
+    # 第 5 批：三角楣饰
+    spec("village_gold", rows(gold_rows()), GOLD, 32, FOLDER)
+    spec("village_blue", rows(blue_rows()), BLUE, 32, FOLDER)
+    ornament_models()
     print("第 1 批：plaster、plaster_dado、mudbrick、pithos_{empty,half,full}、amphora_stack")
     print("第 2 批：pottery_wheel、pottery_kiln_{lower,upper}[_lit]、mason_bench、bronze_furnace_{lower,upper}[_lit]、greek_anvil、treading_vat_{front,back}")
     print("第 3 批：village_altar、boundary_stone、threshing_floor、bronze_tripod、oracle_tripod、omphalos、lion_spout、herm_head、grave_relief、marble_lekythos")
+    print("第 5 批：pediment_thunderbolt_*、pediment_trident_*（single/start/middle/end/top）")
 
 
 if __name__ == "__main__":
