@@ -46,8 +46,10 @@ class TradeTableTest {
     void tc01ParsesDefault() {
         TradeTable t = greek();
         assertEquals(Civilization.GREEK, t.civ());
-        assertEquals(22, t.offers().stream().filter(x -> x.category() == TradeOffer.Category.SUPPLIES).count(),
-                "奠酒、主神像、20 件次神祠商品（T11b）");
+        assertEquals(24, t.offers().stream().filter(x -> x.category() == TradeOffer.Category.SUPPLIES).count(),
+                "奠酒、主神像、20 件次神祠商品（T11b）、村庄指引（T13b）、传令杖（T14）");
+        TradeOffer guide = t.offer("village_guide").orElseThrow();
+        assertEquals(8, guide.price().items().get(0).count(), "村庄指引 8 绿宝石（T13b §7）");
         assertTrue(t.offers().stream().filter(x -> x.category() == TradeOffer.Category.GOD_POWER)
                 .allMatch(x -> x.price().isFavor()), "神力一律恩宠价（T13）");
         TradeOffer o = t.offer("libation").orElseThrow();

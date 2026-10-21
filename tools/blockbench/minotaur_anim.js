@@ -7,6 +7,7 @@
 (function () {
     const MA = window.MA;
     MA.run('tools/blockbench/lib/axes.js');
+    MA.run('tools/blockbench/lib/clearance.js');
     const A = MA.axes;
 
     // 握持约束：斧柄在零姿势下沿 +Z 穿过左拳的握孔（拇指一侧进、小指一侧出）。
@@ -186,6 +187,70 @@
                 tail_tip: { rotation: k([[0, [-10, 0, 0]], [0.8, [6, 0, 0]]]) },
             },
         },
+        // ───────── 召唤版（T14 设计文档 §6.1） ─────────
+        attack_swing: {
+            length: 0.5,
+            loop: 'hold',
+            // 下劈（用户 2026-10-21：要用斧刃砍）：双刃斧的刃面在斧柄所在的平面里，整个挥砍中斧只绕柄保持 rz = 0，
+            // 让刃面竖在挥动平面里；手臂外展由前臂反向抵消。举斧（0.18 秒）斧头在左肩后上方，劈下（0.3 秒）斧头朝正前略向下，
+            // 下面那片刃口在前。两帧由 search_chop.js 在网格里搜出（按方块自身朝向检查不碰头、不入地，刃面法向接近左右方向）。
+            groundLock: [0, 0.18, 0.24, 0.3, 0.5],
+            bones: {
+                pelvis: { rotation: k([[0, [0, 0, 0]], [0.18, [-3, 0, 0]], [0.3, [10, 0, 0]], [0.5, [0, 0, 0]]]) },
+                torso: { rotation: k([[0, [6, 0, 0]], [0.18, [-8, 8, 0]], [0.3, [24, -4, 0]], [0.5, [6, 0, 0]]]) },
+                neck: { rotation: k([[0, [-3, 0, 0]], [0.18, [4, -4, 0]], [0.3, [-12, 2, 0]], [0.5, [-3, 0, 0]]]) },
+                head: { rotation: k([[0, [-3, 0, 0]], [0.18, [2, -4, 0]], [0.3, [-10, 2, 0]], [0.5, [-3, 0, 0]]]) },
+                upper_arm_l: { rotation: k([[0, HOLD.upper_arm_l], [0.18, [-160, 0, 15]], [0.3, [-80, 0, 10]], [0.5, HOLD.upper_arm_l]]) },
+                forearm_l: { rotation: k([[0, HOLD.forearm_l], [0.18, [-20, 0, -15]], [0.3, [-30, 0, -10]], [0.5, HOLD.forearm_l]]) },
+                hand_l: { rotation: k([[0, HOLD.hand_l], [0.18, [30, 0, 0]], [0.3, [90, 0, 0]], [0.5, HOLD.hand_l]]) },
+                axe: { rotation: k([[0, HOLD.axe], [0.18, [0, 0, 0]], [0.3, [0, 0, 0]], [0.5, HOLD.axe]]) },
+                upper_arm_r: { rotation: k([[0, [-4, 0, -7]], [0.18, [-30, 0, -14]], [0.3, [18, 0, -10]], [0.5, [-4, 0, -7]]]) },
+                forearm_r: { rotation: k([[0, [-14, 0, 0]], [0.18, [-30, 0, 0]], [0.3, [-10, 0, 0]], [0.5, [-14, 0, 0]]]) },
+                thigh_l: { rotation: k([[0, [-6, 0, 0]], [0.3, [-22, 0, 0]], [0.5, [-6, 0, 0]]]) },
+                shin_l: { rotation: k([[0, [10, 0, 0]], [0.3, [24, 0, 0]], [0.5, [10, 0, 0]]]) },
+                hoof_l: { rotation: k([[0, [-4, 0, 0]], [0.3, [-8, 0, 0]], [0.5, [-4, 0, 0]]]) },
+                thigh_r: { rotation: k([[0, [-6, 0, 0]], [0.3, [4, 0, 0]], [0.5, [-6, 0, 0]]]) },
+                shin_r: { rotation: k([[0, [10, 0, 0]], [0.3, [12, 0, 0]], [0.5, [10, 0, 0]]]) },
+                hoof_r: { rotation: k([[0, [-4, 0, 0]], [0.3, [-12, 0, 0]], [0.5, [-4, 0, 0]]]) },
+                tail_root: { rotation: k([[0, [12, 0, 0]], [0.18, [8, 0, 10]], [0.3, [20, 0, -10]], [0.5, [12, 0, 0]]]) },
+            },
+        },
+        toss: {
+            length: 0.6,
+            loop: 'hold',
+            // 从刨地的伏身姿势猛地抬头上挑（0.15 秒）→ 直身昂首（0.3 秒）→ 回到待机（0.6 秒）
+            groundLock: [0, 0.15, 0.3, 0.6],
+            bones: {
+                pelvis: { rotation: k([[0, CROUCH.pelvis], [0.15, [6, 0, 0]], [0.3, [-4, 0, 0]], [0.6, [0, 0, 0]]]) },
+                torso: { rotation: k([[0, CROUCH.torso], [0.15, [8, 0, 0]], [0.3, [-8, 0, 0]], [0.6, [6, 0, 0]]]) },
+                neck: { rotation: k([[0, CROUCH.neck], [0.15, [-24, 0, 0]], [0.3, [-20, 0, 0]], [0.6, [-3, 0, 0]]]) },
+                head: { rotation: k([[0, CROUCH.head], [0.15, [-34, 0, 0]], [0.3, [-26, 0, 0]], [0.6, [-3, 0, 0]]]) },
+                jaw: { rotation: k([[0, [0, 0, 0]], [0.15, [10, 0, 0]], [0.3, [6, 0, 0]], [0.6, [0, 0, 0]]]) },
+                upper_arm_l: { rotation: k([[0, TUCK.upper_arm_l], [0.3, [6, 0, 30]], [0.6, HOLD.upper_arm_l]]) },
+                forearm_l: { rotation: k([[0, TUCK.forearm_l], [0.3, [-60, 0, -30]], [0.6, HOLD.forearm_l]]) },
+                hand_l: { rotation: k([[0, TUCK.hand_l], [0.3, [-30, 0, 0]], [0.6, HOLD.hand_l]]) },
+                axe: { rotation: k([[0, TUCK.axe], [0.3, [0, 0, -30]], [0.6, HOLD.axe]]) },
+                upper_arm_r: { rotation: k([[0, CROUCH.upper_arm_r], [0.15, [-30, 0, -24]], [0.3, [-10, 0, -20]], [0.6, [-4, 0, -7]]]) },
+                forearm_r: { rotation: k([[0, CROUCH.forearm_r], [0.3, [-24, 0, 0]], [0.6, [-14, 0, 0]]]) },
+                thigh_l: { rotation: k([[0, CROUCH.thigh_l], [0.15, [-28, 0, 0]], [0.3, [-10, 0, 0]], [0.6, [-6, 0, 0]]]) },
+                shin_l: { rotation: k([[0, CROUCH.shin_l], [0.15, [30, 0, 0]], [0.3, [12, 0, 0]], [0.6, [10, 0, 0]]]) },
+                hoof_l: { rotation: k([[0, CROUCH.hoof_l], [0.15, [-8, 0, 0]], [0.3, [-2, 0, 0]], [0.6, [-4, 0, 0]]]) },
+                thigh_r: { rotation: k([[0, CROUCH.thigh_r], [0.15, [6, 0, 0]], [0.3, [-2, 0, 0]], [0.6, [-6, 0, 0]]]) },
+                shin_r: { rotation: k([[0, CROUCH.shin_r], [0.15, [14, 0, 0]], [0.3, [10, 0, 0]], [0.6, [10, 0, 0]]]) },
+                hoof_r: { rotation: k([[0, CROUCH.hoof_r], [0.15, [-20, 0, 0]], [0.3, [-8, 0, 0]], [0.6, [-4, 0, 0]]]) },
+                tail_root: { rotation: k([[0, CROUCH.tail_root], [0.3, [24, 0, 0]], [0.6, [12, 0, 0]]]) },
+                tail_tip: { rotation: k([[0, CROUCH.tail_tip], [0.3, [14, 0, 0]], [0.6, [6, 0, 0]]]) },
+            },
+        },
+    };
+    // 刨地（顶飞前摇 0.8 秒）：冲锋蓄力动作按 0.8 倍时间压缩（伏身低头、右蹄刨地两次）
+    ANIMS.paw = {
+        length: 0.8,
+        loop: 'hold',
+        groundLock: ANIMS.charge_windup.groundLock.map((t) => Math.round(t * 0.8 * 1000) / 1000),
+        bones: Object.fromEntries(Object.entries(ANIMS.charge_windup.bones).map(([b, ch]) => [b,
+            Object.fromEntries(Object.entries(ch).map(([c, frames]) => [c,
+                frames.map(([t, v]) => [Math.round(t * 0.8 * 1000) / 1000, v])]))])),
     };
     MA.MINOTAUR_ANIMS = ANIMS;
 
@@ -266,17 +331,13 @@
             anim.select();
             Timeline.setTime(t);
             Animator.preview();
-            const box = (c) => new THREE.Box3().setFromObject(c.mesh);
-            for (const a of axe) {
-                const ab = box(a);
-                for (const h of head) {
-                    if (ab.intersectsBox(box(h))) {
-                        throw new Error('动画 ' + anim.name + ' 在 ' + t + ' 秒：' + a.name + ' 穿进 ' + h.name);
-                    }
-                }
+            // 按方块自身朝向判断（lib/clearance.js），不用轴对齐包围盒——斜着的长斧柄的包围盒会误判
+            const r = MA.preciseHit(axe, head);
+            if (r.hit) {
+                throw new Error('动画 ' + anim.name + ' 在 ' + t + ' 秒：' + r.hit);
             }
             for (const c of Cube.all) {
-                if (c.visibility && box(c).min.y < -0.05) {
+                if (c.visibility && new THREE.Box3().setFromObject(c.mesh).min.y < -0.05) {
                     throw new Error('动画 ' + anim.name + ' 在 ' + t + ' 秒：' + c.name + ' 低于地面');
                 }
             }

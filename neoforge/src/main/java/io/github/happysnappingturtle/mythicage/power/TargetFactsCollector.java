@@ -44,8 +44,19 @@ public final class TargetFactsCollector {
     private TargetFactsCollector() {
     }
 
+    private static final java.util.Set<EntityType<?>> TEST_BOSS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     public static boolean isBoss(Entity e) {
-        return e.getType().is(BOSS);
+        return e.getType().is(BOSS) || TEST_BOSS.contains(e.getType());
+    }
+
+    /** 只供 GameTest：把某种实体临时当作 Boss（传 null 清空）。 */
+    public static void bossForTest(@javax.annotation.Nullable EntityType<?> type) {
+        if (type == null) {
+            TEST_BOSS.clear();
+        } else {
+            TEST_BOSS.add(type);
+        }
     }
 
     public static boolean isElite(Entity e) {

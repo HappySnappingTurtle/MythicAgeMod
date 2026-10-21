@@ -10,6 +10,8 @@
     {"id": "gp_gr_pestilence", "category": "god_power", "result": {"item": "mythic_age:gp_gr_pestilence", "count": 1}, "price": {"favor": 30}, "minAge": "classical", "venues": ["guardian"], "minorGod": "ares"},
     {"id": "gp_gr_curse", "category": "god_power", "result": {"item": "mythic_age:gp_gr_curse", "count": 1}, "price": {"favor": 60}, "minAge": "heroic", "venues": ["guardian"], "minorGod": "aphrodite"},
     {"id": "libation", "category": "supplies", "result": {"item": "mythic_age:libation", "count": 2}, "price": {"items": [{"item": "minecraft:emerald", "count": 1}]}, "minAge": "archaic", "venues": ["guardian"], "dailyLimit": 8},
+    {"id": "kerykeion", "category": "supplies", "result": {"item": "mythic_age:kerykeion", "count": 1}, "price": {"favor": 5}, "minAge": "archaic", "venues": ["guardian"]},
+    {"id": "summon_minotaur", "category": "summon", "result": {"item": "mythic_age:summon_token_minotaur", "count": 1}, "price": {"favor": 18}, "minAge": "classical", "venues": ["guardian"], "minorGod": "athena"},
     {"id": "village_guide", "category": "supplies", "result": {"item": "minecraft:filled_map", "count": 1}, "price": {"items": [{"item": "minecraft:emerald", "count": 8}]}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "patron_statue", "category": "supplies", "result": {"item": "mythic_age:patron_statue", "count": 1}, "price": {"favor": 30}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "athena_olive_oil", "category": "supplies", "result": {"item": "mythic_age:olive_oil", "count": 4}, "price": {"items": [{"item": "minecraft:emerald", "count": 3}]}, "minAge": "classical", "venues": ["guardian"], "dailyLimit": 4, "minorGod": "athena", "minorGodDiscount": {"athena": 0.1}},

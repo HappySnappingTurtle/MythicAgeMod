@@ -14,7 +14,11 @@ public enum MythAnimState {
     WALK("walk"),
     CHARGE_WINDUP("charge_windup"),
     CHARGE_RUN("charge_run"),
-    CHARGE_RECOVER("charge_recover");
+    CHARGE_RECOVER("charge_recover"),
+    /** 召唤版弥诺陶洛斯（T14）：挥斧普攻、顶飞前的刨地、顶飞。 */
+    ATTACK_SWING("attack_swing"),
+    PAW("paw"),
+    TOSS("toss");
 
     private static final MythAnimState[] VALUES = values();
     private final String animation;

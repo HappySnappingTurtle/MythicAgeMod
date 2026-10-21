@@ -65,6 +65,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.init();
         io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.init();
         io.github.happysnappingturtle.mythicage.village.VillageGuide.init();
+        io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.init(modBus);
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
@@ -141,6 +142,21 @@ public final class MythicAge {
 
         // 晋升、立祀、改奉与主神像（T11a）
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);
+        // 召唤框架（T14）
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonUnits::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onEntityJoin);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onEntityLeave);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onIncomingDamage);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onPlayerHurt);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onDeath);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onLoggedIn);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onTravel);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onChangedDimension);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onChangeTarget);
+        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onRegisterCommands);
+        game.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent e) ->
+                io.github.happysnappingturtle.mythicage.summon.SummonService.onServerStopped());
         // 神力执行框架（T12）
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerSpecLoader::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onServerTickPost);

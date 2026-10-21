@@ -1,0 +1,14 @@
+{
+  "_note": "召唤版弥诺陶洛斯（01_希腊 §5）：生命 80、斧 8；顶飞：刨地 16 刻（0.8 秒）、冷却 240 刻（12 秒）、垂直速度 0.9（约 4 格）、水平推力 0.8、脱战 60 刻（3 秒）",
+  "max_health": 80,
+  "attack_damage": 8,
+  "movement_speed": 0.3,
+  "armor": 4,
+  "special": {
+    "windup_ticks": 16,
+    "cooldown_ticks": 240,
+    "lift": 0.9,
+    "push": 0.8,
+    "disengage_ticks": 60
+  }
+}

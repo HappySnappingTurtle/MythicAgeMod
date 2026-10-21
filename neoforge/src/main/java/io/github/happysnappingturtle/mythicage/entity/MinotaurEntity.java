@@ -61,8 +61,7 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
                 continue;
             }
             RawAnimation raw = switch (s) {
-                case CHARGE_WINDUP -> RawAnimation.begin().thenPlayAndHold(s.animation());
-                case CHARGE_RECOVER -> RawAnimation.begin().thenPlayAndHold(s.animation());
+                case CHARGE_WINDUP, CHARGE_RECOVER, PAW, ATTACK_SWING, TOSS -> RawAnimation.begin().thenPlayAndHold(s.animation());
                 default -> RawAnimation.begin().thenLoop(s.animation());
             };
             ANIMATIONS.put(s, raw);
@@ -70,6 +69,8 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
     }
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** 一次性动画（挥斧、顶飞）播完后由服务端回到 AUTO 的刻数；0 = 不计时。 */
+    private int animUntil;
     private final ChargeTimeline charge = new ChargeTimeline();
     private float chargeYaw;
     private int clientSeenAnimStart = -1;
@@ -205,9 +206,19 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
         setDeltaMovement(0, v.y, 0);
     }
 
+    /** 服务端：播放一次性动画，ticks 刻后回到 AUTO。 */
+    public void playOnce(MythAnimState state, int ticks) {
+        setAnimState(state);
+        animUntil = tickCount + ticks;
+    }
+
     @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
+        if (animUntil > 0 && tickCount >= animUntil) {
+            animUntil = 0;
+            setAnimState(MythAnimState.AUTO);
+        }
         if (charge.active()) {
             haltInput();
             tickCharge();

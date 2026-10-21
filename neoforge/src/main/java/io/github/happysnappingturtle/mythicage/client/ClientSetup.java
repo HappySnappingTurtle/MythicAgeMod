@@ -34,6 +34,9 @@ public final class ClientSetup {
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
+        // 召唤版弥诺陶洛斯（T14）：与 T7 共用模型与动画
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.MINOTAUR.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));
