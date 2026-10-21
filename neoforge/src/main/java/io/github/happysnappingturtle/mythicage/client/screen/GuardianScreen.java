@@ -107,7 +107,7 @@ public class GuardianScreen extends Screen {
             }
         } else {
             status = Component.translatable(r.reason().langKey(), r.arg(), shrineName());
-            statusColor = r.reason() == TradeReason.DUPLICATE ? DIM : BAD;
+            statusColor = r.reason() == TradeReason.DUPLICATE || r.reason() == TradeReason.SEARCHING ? DIM : BAD;
         }
         rebuildWidgets();
     }

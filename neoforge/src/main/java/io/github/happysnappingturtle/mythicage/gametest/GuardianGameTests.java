@@ -471,4 +471,50 @@ public final class GuardianGameTests {
         h.assertTrue(PlayerDataNbt.read(PlayerDataNbt.write(d)).equals(d), "限购台账往返一致");
         h.succeed();
     }
+
+    // ───────────── 村庄指引（TC-T13b-72a、72b；用正式交易表） ─────────────
+
+    private static final String GUIDE_BATCH = "guardian_guide";
+
+    /**
+     * 下单先返回「搜索中」，搜索没完成时重复下单不会起第二次搜索；完成后：找到就扣 8 绿宝石给 1 张带村庄图标的地图，
+     * 找不到就不扣钱（GameTest 世界附近不一定有希腊村庄，两种结果都核对「只在成交时扣钱」）。
+     */
+    @GameTest(template = T, batch = GUIDE_BATCH, timeoutTicks = 4000)
+    public static void village_guide_charges_only_when_found(GameTestHelper h) {
+        GuardianEntity g = guardian(h);
+        FakePlayer p = blessed(h, g, "ma_guide", 0);
+        p.getInventory().add(new ItemStack(Items.EMERALD, 12));
+        expect(h, buy(p, TradeService.VILLAGE_GUIDE, 0), TradeReason.SEARCHING);
+        h.assertTrue(io.github.happysnappingturtle.mythicage.village.VillageGuide.running(p), "应在搜索");
+        expect(h, buy(p, TradeService.VILLAGE_GUIDE, 0), TradeReason.SEARCHING);
+        h.assertTrue(count(p, Items.EMERALD) == 12, "搜索期间不扣钱");
+        h.succeedWhen(() -> {
+            var o = TradeService.lastGuideForTest(p);
+            h.assertTrue(o.isPresent(), "搜索还没完成");
+            if (o.get().ok()) {
+                h.assertTrue(count(p, Items.EMERALD) == 4, "找到村庄应扣 8 绿宝石，剩 " + count(p, Items.EMERALD));
+                h.assertTrue(count(p, Items.FILLED_MAP) == 1, "应得到 1 张地图");
+                var stack = o.get().given();
+                var deco = stack.get(net.minecraft.core.component.DataComponents.MAP_DECORATIONS);
+                h.assertTrue(deco != null && !deco.decorations().isEmpty(), "地图上应有村庄标记");
+            } else {
+                h.assertTrue(o.get().reason() == TradeReason.NO_VILLAGE_NEARBY, "应为附近没有村庄，实际 " + o.get().reason());
+                h.assertTrue(count(p, Items.EMERALD) == 12 && count(p, Items.FILLED_MAP) == 0, "找不到时不扣钱、不给地图");
+            }
+            h.assertTrue(!io.github.happysnappingturtle.mythicage.village.VillageGuide.running(p), "搜索结束应释放");
+        });
+    }
+
+    /** 背包放不下地图时直接拒绝，不启动搜索。 */
+    @GameTest(template = T, batch = GUIDE_BATCH)
+    public static void village_guide_needs_free_slot(GameTestHelper h) {
+        GuardianEntity g = guardian(h);
+        FakePlayer p = blessed(h, g, "ma_guide_full", 0);
+        fill(p);
+        p.getInventory().items.set(0, new ItemStack(Items.EMERALD, 9)); // 付 8 颗后还剩 1 颗占着格子
+        expect(h, buy(p, TradeService.VILLAGE_GUIDE, 0), TradeReason.INVENTORY_FULL);
+        h.assertTrue(!io.github.happysnappingturtle.mythicage.village.VillageGuide.running(p), "不应启动搜索");
+        h.succeed();
+    }
 }

@@ -234,6 +234,7 @@ public final class VillageService {
         }
         VillageSpace.villageAt(p.serverLevel(), p.blockPosition()).ifPresent(v -> {
             INSIDE.put(p.getUUID(), v.id());
+            VillageVisits.mark(p, v);
             p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
             p.connection.send(new ClientboundSetTitleTextPacket(stagedTitle(v)));
             p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle(v)));
@@ -253,7 +254,10 @@ public final class VillageService {
             INSIDE.remove(p.getUUID());
         }
         Optional<VillageRegistry.Village> v = VillageSpace.villageAt(p.serverLevel(), p.blockPosition());
-        v.ifPresent(x -> INSIDE.put(p.getUUID(), x.id()));
+        v.ifPresent(x -> {
+            INSIDE.put(p.getUUID(), x.id());
+            VillageVisits.mark(p, x);
+        });
         return v;
     }
 

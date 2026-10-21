@@ -312,6 +312,9 @@ public final class TradeService {
     }
 
     static ItemStack resultOf(TradeOffer o, Civilization civ, Session s) {
+        if (o.id().equals(VILLAGE_GUIDE)) {
+            return io.github.happysnappingturtle.mythicage.village.VillageGuide.displayStack(civ);
+        }
         return o.result().item().equals(STATUE_ITEM) ? PatronStatues.stack(civ, s.patron())
                 : stack(o.result().item(), o.result().count());
     }
@@ -426,6 +429,9 @@ public final class TradeService {
                 return Outcome.of(TradeReason.NOT_ENOUGH_ITEMS);
             }
         }
+        if (offer.id().equals(VILLAGE_GUIDE)) {
+            return beginGuide(player, civ, offer, items, plan, requestId);
+        }
         ItemStack result = resultOf(offer, civ, s);
         if (result.isEmpty() || !plan.insert(offer.result().item(), result.getCount(), result.getMaxStackSize())) {
             return Outcome.of(TradeReason.INVENTORY_FULL);
@@ -453,6 +459,78 @@ public final class TradeService {
         }
         give(player, result.copy());
         return new Outcome(TradeReason.OK, 0, result);
+    }
+
+    // ───────────── 村庄指引（T13b 设计文档 §7） ─────────────
+
+    /** 村庄指引的商品 id：找到村庄才成交，搜索在后台进行。 */
+    public static final String VILLAGE_GUIDE = "village_guide";
+    private static final Map<UUID, Outcome> LAST_GUIDE = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static Outcome beginGuide(ServerPlayer player, Civilization civ, TradeOffer offer, List<TradeOffer.ItemAmount> items,
+                                      InventoryPlan plan, String requestId) {
+        if (!plan.insert("minecraft:filled_map", 1, 1)) {
+            return Outcome.of(TradeReason.INVENTORY_FULL);
+        }
+        BlockPos from = player.blockPosition();
+        long today = MythDays.today(player.server);
+        LAST_GUIDE.remove(player.getUUID());
+        io.github.happysnappingturtle.mythicage.village.VillageGuide.begin(player, civ,
+                found -> finishGuide(player, civ, offer, items, requestId, from, today, found));
+        return Outcome.of(TradeReason.SEARCHING);
+    }
+
+    /** 主线程：找到就再验一次、扣绿宝石、给地图；找不到不扣钱。会话还开着就推送结果，否则发聊天消息。 */
+    private static void finishGuide(ServerPlayer player, Civilization civ, TradeOffer offer, List<TradeOffer.ItemAmount> items,
+                                    String requestId, BlockPos from, long today,
+                                    Optional<io.github.happysnappingturtle.mythicage.village.VillageGuide.Found> found) {
+        if (player.hasDisconnected()) {
+            return;
+        }
+        Outcome o = found.isEmpty() ? Outcome.of(TradeReason.NO_VILLAGE_NEARBY)
+                : settleGuide(player, civ, offer, items, requestId, from, today, found.get());
+        LAST_GUIDE.put(player.getUUID(), o);
+        Session s = SESSIONS.get(player.getUUID());
+        if (s != null && s.civ() == civ) {
+            respond(player, requestId, o);
+        } else if (o.ok()) {
+            player.sendSystemMessage(Component.translatable("mythic_age.village_guide.delivered", o.given().getHoverName()));
+        } else {
+            player.sendSystemMessage(Component.translatable(o.reason().langKey(), o.arg(), ""));
+        }
+    }
+
+    private static Outcome settleGuide(ServerPlayer player, Civilization civ, TradeOffer offer, List<TradeOffer.ItemAmount> items,
+                                       String requestId, BlockPos from, long today,
+                                       io.github.happysnappingturtle.mythicage.village.VillageGuide.Found f) {
+        InventoryPlan plan = plan(player);
+        for (TradeOffer.ItemAmount a : items) {
+            if (!plan.remove(a.item(), a.count())) {
+                return Outcome.of(TradeReason.NOT_ENOUGH_ITEMS);
+            }
+        }
+        if (!plan.insert("minecraft:filled_map", 1, 1)) {
+            return Outcome.of(TradeReason.INVENTORY_FULL);
+        }
+        Transactions.Result r = MythData.transact(player, new Transactions.Request("trade:" + requestId,
+                ReceiptBook.Scope.REQUEST, List.of(TxSteps.recordDaily(offer.key(civ), today, offer.dailyLimit()))));
+        if (r.status() == Transactions.Status.DUPLICATE) {
+            return Outcome.of(TradeReason.DUPLICATE);
+        }
+        if (!r.committed()) {
+            return Outcome.of(TradeReason.DAILY_LIMIT);
+        }
+        for (TradeOffer.ItemAmount a : items) {
+            removeItems(player, a.item(), a.count());
+        }
+        ItemStack map = io.github.happysnappingturtle.mythicage.village.VillageGuide.map(player.serverLevel(), civ, from, f);
+        give(player, map.copy());
+        return new Outcome(TradeReason.OK, 0, map);
+    }
+
+    /** 只供 GameTest：最近一次村庄指引搜索的结果。 */
+    public static Optional<Outcome> lastGuideForTest(ServerPlayer player) {
+        return Optional.ofNullable(LAST_GUIDE.get(player.getUUID()));
     }
 
     // ───────────── 初见与补领 ─────────────

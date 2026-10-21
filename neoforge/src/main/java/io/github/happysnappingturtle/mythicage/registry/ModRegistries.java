@@ -27,6 +27,9 @@ public final class ModRegistries {
     public static final DeferredRegister<net.minecraft.world.entity.EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(Registries.ENTITY_TYPE, MythicAgeIds.MOD_ID);
 
+    public static final DeferredRegister<net.minecraft.world.level.saveddata.maps.MapDecorationType> MAP_DECORATIONS =
+            DeferredRegister.create(Registries.MAP_DECORATION_TYPE, MythicAgeIds.MOD_ID);
+
     private ModRegistries() {
     }
 
@@ -40,5 +43,6 @@ public final class ModRegistries {
         MENU_TYPES.register(modBus);
         FEATURES.register(modBus);
         ENTITY_TYPES.register(modBus);
+        MAP_DECORATIONS.register(modBus);
     }
 }

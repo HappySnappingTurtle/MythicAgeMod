@@ -263,6 +263,11 @@ public final class VillageGenGameTests {
             VillageService.titleFor(fp);
             fp.moveTo(east.maxX() + 1.5, y, z);
             h.assertTrue(VillageService.titleFor(fp).isPresent(), "离开后再进入，再次显示");
+            // TC-T13b-72c：进村标题弹出时记下进过的村庄（按结构起点），重复进出只记一次
+            var visits = io.github.happysnappingturtle.mythicage.village.VillageVisits.get(h.getLevel().getServer());
+            var seen = visits.visited(fp.getUUID(), h.getLevel().dimension());
+            h.assertTrue(seen.size() == 1 && seen.contains(p.plan().start()), "应记下这座村庄的起点，实际 " + seen);
+            visits.forget(fp.getUUID());
         } finally {
             cleanup(h, p);
         }

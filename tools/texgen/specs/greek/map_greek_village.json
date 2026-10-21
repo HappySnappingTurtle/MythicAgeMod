@@ -1,0 +1,30 @@
+{
+  "template": "pixels",
+  "out": "map/decorations/greek_village",
+  "size": 16,
+  "palette": {
+    "k": "#3a2e22",
+    "H": "#f4efe3"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      ".......kk.......",
+      ".....kkHHkk.....",
+      "...kkHHHHHHkk...",
+      ".kkHHHHHHHHHHkk.",
+      ".kkkkkkkkkkkkkk.",
+      "..kHHHHHHHHHHk..",
+      "..kkkkkkkkkkkk..",
+      "..kHkkHkkHkkHk..",
+      "..kHkkHkkHkkHk..",
+      "..kHkkHkkHkkHk..",
+      "..kHkkHkkHkkHk..",
+      ".kkkkkkkkkkkkkk.",
+      ".kHHHHHHHHHHHHk.",
+      "kkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkk"
+    ]
+  }
+}

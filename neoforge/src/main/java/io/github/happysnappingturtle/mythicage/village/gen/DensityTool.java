@@ -63,7 +63,8 @@ public final class DensityTool {
                                                 .executes(DensityTool::run))))
                                 .then(Commands.literal("bench").executes(DensityTool::bench))
                                 .then(Commands.literal("audit").executes(DensityTool::audit))
-                                .then(Commands.literal("anchors").executes(DensityTool::anchors)))));
+                                .then(Commands.literal("anchors").executes(DensityTool::anchors))
+                                .then(Commands.literal("guide").executes(DensityTool::guide)))));
     }
 
     private static int run(CommandContext<CommandSourceStack> ctx) {
@@ -82,6 +83,29 @@ public final class DensityTool {
             ctx.getSource().sendFailure(Component.literal("密度工具失败：" + e));
             return 0;
         }
+    }
+
+    /** 不经交易，直接用村庄指引的搜索给自己一张希腊村庄指引地图（实机验证用）。 */
+    private static int guide(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer player = ctx.getSource().getPlayerOrException();
+        var civ = io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK;
+        net.minecraft.core.BlockPos from = player.blockPosition();
+        long t0 = System.nanoTime();
+        boolean started = io.github.happysnappingturtle.mythicage.village.VillageGuide.begin(player, civ, found -> {
+            long ms = (System.nanoTime() - t0) / 1_000_000;
+            if (found.isEmpty()) {
+                player.sendSystemMessage(Component.literal("指引：半径内没有没去过的村庄（" + ms + " ms）"));
+                return;
+            }
+            var f = found.get();
+            player.getInventory().add(io.github.happysnappingturtle.mythicage.village.VillageGuide.map(player.serverLevel(), civ, from, f));
+            MythicAgeAuditLog.write("guide " + f.center() + " patron=" + f.patron() + " " + ms + "ms");
+            player.sendSystemMessage(Component.literal("指引：" + f.center().toShortString() + " " + f.patron() + "（" + ms + " ms）"));
+        });
+        if (!started) {
+            ctx.getSource().sendFailure(Component.literal("上一次搜索还没完成"));
+        }
+        return started ? 1 : 0;
     }
 
     /** 列出玩家所在村庄的主神与全部锚点坐标（实机取景用），写进审计日志。 */
