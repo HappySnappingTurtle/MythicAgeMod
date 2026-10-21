@@ -13,6 +13,26 @@
     {
       "type": "paletted_permutations",
       "textures": [
+        "minecraft:block/birch_log"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_birch_log",
+      "permutations": {
+        "mythic_age_laurel_log": "mythic_age:palettes/laurel_log"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/birch_log_top"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_birch_log_top",
+      "permutations": {
+        "mythic_age_laurel_log_top": "mythic_age:palettes/laurel_log_top"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
         "minecraft:block/iron_ore"
       ],
       "palette_key": "mythic_age:palettes/key/minecraft_block_iron_ore__keep_minecraft_block_stone",
@@ -37,7 +57,18 @@
       ],
       "palette_key": "mythic_age:palettes/key/minecraft_block_spruce_log",
       "permutations": {
+        "mythic_age_cypress_log": "mythic_age:palettes/cypress_log",
         "mythic_age_olive_log": "mythic_age:palettes/olive_log"
+      }
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "minecraft:block/spruce_log_top"
+      ],
+      "palette_key": "mythic_age:palettes/key/minecraft_block_spruce_log_top",
+      "permutations": {
+        "mythic_age_cypress_log_top": "mythic_age:palettes/cypress_log_top"
       }
     },
     {

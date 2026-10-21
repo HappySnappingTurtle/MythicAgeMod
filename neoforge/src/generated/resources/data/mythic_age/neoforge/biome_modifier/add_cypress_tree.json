@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:has_feature/cypress_tree",
+  "features": "mythic_age:cypress_tree",
+  "step": "vegetal_decoration"
+}

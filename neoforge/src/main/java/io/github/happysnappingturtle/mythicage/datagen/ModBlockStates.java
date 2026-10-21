@@ -133,7 +133,7 @@ public final class ModBlockStates extends BlockStateProvider {
                     .texture("all", l.texture()).texture("overlay", l.overlays().get(i)).renderType("cutout_mipped");
         }
         getVariantBuilder(block).forAllStatesExcept(state -> ConfiguredModel.builder()
-                .modelFile(models[state.getValue(l.property())]).build(),
+                .modelFile(models[l.property() == null ? 0 : state.getValue(l.property())]).build(),
                 LeavesBlock.DISTANCE, LeavesBlock.PERSISTENT, LeavesBlock.WATERLOGGED);
     }
 

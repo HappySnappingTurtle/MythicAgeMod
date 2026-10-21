@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "laurel_log_top",
+  "base": "minecraft:block/birch_log_top",
+  "ramp": [
+    "#6e4f36",
+    "#8a6648",
+    "#a5805e",
+    "#bd9a77",
+    "#d2b391"
+  ],
+  "note": "月桂原木顶面：偏粉的浅褐木心"
+}

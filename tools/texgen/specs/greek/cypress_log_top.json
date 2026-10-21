@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "cypress_log_top",
+  "base": "minecraft:block/spruce_log_top",
+  "ramp": [
+    "#5a3b25",
+    "#7a5434",
+    "#9b6e45",
+    "#b88a5c",
+    "#cfa577"
+  ],
+  "note": "柏树原木顶面：偏红的芯材"
+}

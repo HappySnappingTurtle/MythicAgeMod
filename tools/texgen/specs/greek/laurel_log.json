@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "laurel_log",
+  "base": "minecraft:block/birch_log",
+  "ramp": [
+    "#2f2e29",
+    "#46443d",
+    "#5e5c53",
+    "#76736a",
+    "#8c897e"
+  ],
+  "note": "月桂原木侧面：白桦原木的光滑树皮与横向皮孔，换成光滑的灰色树皮"
+}

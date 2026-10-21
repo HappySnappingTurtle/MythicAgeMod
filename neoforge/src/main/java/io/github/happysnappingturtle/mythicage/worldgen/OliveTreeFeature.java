@@ -112,13 +112,13 @@ public class OliveTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
-    private static boolean replaceable(WorldGenLevel level, BlockPos p) {
+    static boolean replaceable(WorldGenLevel level, BlockPos p) {
         BlockState s = level.getBlockState(p);
         return s.isAir() || s.canBeReplaced() || s.is(BlockTags.LEAVES) || s.is(BlockTags.SAPLINGS);
     }
 
     /** 树叶到最近原木的距离（原版树叶 1–7，超过 6 会腐烂；这里只保留 ≤6 的）。 */
-    private static Map<BlockPos, Integer> distances(Set<BlockPos> logs, Set<BlockPos> leaves) {
+    static Map<BlockPos, Integer> distances(Set<BlockPos> logs, Set<BlockPos> leaves) {
         Map<BlockPos, Integer> dist = new HashMap<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         for (BlockPos l : logs) {

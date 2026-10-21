@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:has_feature/laurel_tree",
+  "features": "mythic_age:laurel_tree",
+  "step": "vegetal_decoration"
+}

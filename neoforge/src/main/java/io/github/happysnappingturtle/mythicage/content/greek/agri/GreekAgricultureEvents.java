@@ -34,6 +34,15 @@ public final class GreekAgricultureEvents {
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(GreekAgriculture.OLIVE_SAPLING.getId(),
                     GreekAgriculture.POTTED_OLIVE_SAPLING);
             FireBlock fire = (FireBlock) Blocks.FIRE;
+            // 柏树、月桂（T13b 第 4 批）
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.CYPRESS_SAPLING.getId(),
+                    io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.POTTED_CYPRESS_SAPLING);
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.LAUREL_SAPLING.getId(),
+                    io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.POTTED_LAUREL_SAPLING);
+            fire.setFlammable(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.CYPRESS_LOG.get(), 5, 5);
+            fire.setFlammable(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.LAUREL_LOG.get(), 5, 5);
+            fire.setFlammable(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.CYPRESS_LEAVES.get(), 30, 60);
+            fire.setFlammable(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.LAUREL_LEAVES.get(), 30, 60);
             for (Block log : new Block[]{GreekAgriculture.OLIVE_LOG.get(), GreekAgriculture.OLIVE_WOOD.get(),
                     GreekAgriculture.STRIPPED_OLIVE_LOG.get(), GreekAgriculture.STRIPPED_OLIVE_WOOD.get()}) {
                 fire.setFlammable(log, 5, 5);

@@ -40,6 +40,7 @@ import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import io.github.happysnappingturtle.mythicage.content.greek.GreekTrees;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -55,6 +56,8 @@ public final class ModWorldGen {
     public static final net.minecraft.tags.TagKey<Biome> OLIVE_COMMON_BIOMES = ModTags.biome("has_feature/olive_tree_common");
     public static final net.minecraft.tags.TagKey<Biome> OLIVE_SPARSE_BIOMES = ModTags.biome("has_feature/olive_tree_sparse");
     public static final net.minecraft.tags.TagKey<Biome> GRAPEVINE_BIOMES = ModTags.biome("has_feature/wild_grapevine");
+    public static final net.minecraft.tags.TagKey<Biome> CYPRESS_BIOMES = ModTags.biome("has_feature/cypress_tree");
+    public static final net.minecraft.tags.TagKey<Biome> LAUREL_BIOMES = ModTags.biome("has_feature/laurel_tree");
 
     public static final int TIN_COUNT = 5;
     public static final int TIN_SIZE = 7;
@@ -77,6 +80,9 @@ public final class ModWorldGen {
     public static final int OLIVE_SPARSE_RARITY = 4;
     /** 野葡萄藤：每 8 个区块约 1 片，每片 3–6 株（尝试 12 次）。 */
     public static final int GRAPEVINE_RARITY = 8;
+    /** 柏树、月桂（T13b 第 4 批）：希腊地域少量点缀——柏树每 8 个区块约 1 棵，月桂每 10 个区块约 1 棵。 */
+    public static final int CYPRESS_RARITY = 8;
+    public static final int LAUREL_RARITY = 10;
 
     public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_GRAPEVINE_CONFIGURED =
             key(Registries.CONFIGURED_FEATURE, "patch_wild_grapevine");
@@ -86,6 +92,10 @@ public final class ModWorldGen {
     public static final ResourceKey<BiomeModifier> ADD_OLIVE_COMMON = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_olive_tree_common");
     public static final ResourceKey<BiomeModifier> ADD_OLIVE_SPARSE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_olive_tree_sparse");
     public static final ResourceKey<BiomeModifier> ADD_WILD_GRAPEVINE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_wild_grapevine");
+    public static final ResourceKey<PlacedFeature> CYPRESS_TREE_PLACED = key(Registries.PLACED_FEATURE, "cypress_tree");
+    public static final ResourceKey<PlacedFeature> LAUREL_TREE_PLACED = key(Registries.PLACED_FEATURE, "laurel_tree");
+    public static final ResourceKey<BiomeModifier> ADD_CYPRESS = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_cypress_tree");
+    public static final ResourceKey<BiomeModifier> ADD_LAUREL = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_laurel_tree");
 
     private ModWorldGen() {
     }
@@ -105,6 +115,8 @@ public final class ModWorldGen {
         ctx.register(TIN_ORE_CONFIGURED, stoneOre(GreekMaterials.TIN_ORE, TIN_SIZE));
         ctx.register(MARBLE_CONFIGURED, stoneOre(GreekMaterials.MARBLE, MARBLE_SIZE));
         ctx.register(GreekAgriculture.OLIVE_TREE_CONFIGURED, GreekAgriculture.oliveTreeConfigured());
+        ctx.register(GreekTrees.CYPRESS_TREE_CONFIGURED, GreekTrees.cypressConfigured());
+        ctx.register(GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.laurelConfigured());
         ctx.register(WILD_GRAPEVINE_CONFIGURED, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
                 FeatureUtils.simplePatchConfiguration(Feature.SIMPLE_BLOCK,
                         new SimpleBlockConfiguration(BlockStateProvider.simple(GreekAgriculture.WILD_GRAPEVINE.get())),
@@ -128,17 +140,25 @@ public final class ModWorldGen {
                 BiomeFilter.biome())));
         ctx.register(OLIVE_TREE_COMMON, oliveTree(cf, OLIVE_COMMON_RARITY));
         ctx.register(OLIVE_TREE_SPARSE, oliveTree(cf, OLIVE_SPARSE_RARITY));
+        ctx.register(CYPRESS_TREE_PLACED, tree(cf, GreekTrees.CYPRESS_TREE_CONFIGURED, GreekTrees.CYPRESS_SAPLING.get(),
+                CYPRESS_RARITY));
+        ctx.register(LAUREL_TREE_PLACED, tree(cf, GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.LAUREL_SAPLING.get(),
+                LAUREL_RARITY));
         ctx.register(WILD_GRAPEVINE_PLACED, new PlacedFeature(cf.getOrThrow(WILD_GRAPEVINE_CONFIGURED), List.of(
                 RarityFilter.onAverageOnceEvery(GRAPEVINE_RARITY), InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
     }
 
     private static PlacedFeature oliveTree(HolderGetter<ConfiguredFeature<?, ?>> cf, int rarity) {
-        return new PlacedFeature(cf.getOrThrow(GreekAgriculture.OLIVE_TREE_CONFIGURED), List.of(
+        return tree(cf, GreekAgriculture.OLIVE_TREE_CONFIGURED, GreekAgriculture.OLIVE_SAPLING.get(), rarity);
+    }
+
+    private static PlacedFeature tree(HolderGetter<ConfiguredFeature<?, ?>> cf, ResourceKey<ConfiguredFeature<?, ?>> tree,
+                                      Block sapling, int rarity) {
+        return new PlacedFeature(cf.getOrThrow(tree), List.of(
                 RarityFilter.onAverageOnceEvery(rarity), InSquarePlacement.spread(),
                 SurfaceWaterDepthFilter.forMaxDepth(0), PlacementUtils.HEIGHTMAP_OCEAN_FLOOR,
-                BlockPredicateFilter.forPredicate(BlockPredicate.wouldSurvive(
-                        GreekAgriculture.OLIVE_SAPLING.get().defaultBlockState(), BlockPos.ZERO)),
+                BlockPredicateFilter.forPredicate(BlockPredicate.wouldSurvive(sapling.defaultBlockState(), BlockPos.ZERO)),
                 BiomeFilter.biome()));
     }
 
@@ -156,5 +176,9 @@ public final class ModWorldGen {
                 HolderSet.direct(placed.getOrThrow(OLIVE_TREE_SPARSE)), GenerationStep.Decoration.VEGETAL_DECORATION));
         ctx.register(ADD_WILD_GRAPEVINE, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(GRAPEVINE_BIOMES),
                 HolderSet.direct(placed.getOrThrow(WILD_GRAPEVINE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
+        ctx.register(ADD_CYPRESS, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(CYPRESS_BIOMES),
+                HolderSet.direct(placed.getOrThrow(CYPRESS_TREE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
+        ctx.register(ADD_LAUREL, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(LAUREL_BIOMES),
+                HolderSet.direct(placed.getOrThrow(LAUREL_TREE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
     }
 }

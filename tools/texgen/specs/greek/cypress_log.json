@@ -1,0 +1,13 @@
+{
+  "template": "recolor",
+  "id": "cypress_log",
+  "base": "minecraft:block/spruce_log",
+  "ramp": [
+    "#2e2620",
+    "#463a31",
+    "#5f5045",
+    "#78695c",
+    "#928373"
+  ],
+  "note": "柏树原木侧面：云杉原木的纵向沟纹，换成灰褐、纵向开裂的老柏树皮"
+}

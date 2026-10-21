@@ -33,6 +33,10 @@ public final class ModBiomeTags extends BiomeTagsProvider {
         tag(ModWorldGen.OLIVE_SPARSE_BIOMES).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS,
                 Biomes.WINDSWEPT_FOREST);
         // 野葡萄藤：希腊主群系与繁花森林
+        // 柏树：丘陵、草甸、平原（地中海柏树长在干燥的山坡）；月桂：繁花森林、风袭森林、草甸（较湿润的林地、沟谷）
+        tag(ModWorldGen.CYPRESS_BIOMES).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS, Biomes.WINDSWEPT_FOREST,
+                Biomes.MEADOW, Biomes.PLAINS);
+        tag(ModWorldGen.LAUREL_BIOMES).add(Biomes.FLOWER_FOREST, Biomes.WINDSWEPT_FOREST, Biomes.MEADOW);
         tag(ModWorldGen.GRAPEVINE_BIOMES).addTag(ModTags.region(Civilization.GREEK)).add(Biomes.FLOWER_FOREST);
     }
 }
