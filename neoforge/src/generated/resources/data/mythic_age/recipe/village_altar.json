@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "mythic_age:greek_altar"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:village_altar"
+  }
+}

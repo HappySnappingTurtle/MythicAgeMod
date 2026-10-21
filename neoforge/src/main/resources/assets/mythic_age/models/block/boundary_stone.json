@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_marble",
+    "marble": "mythic_age:block/village/village_marble",
+    "face": "mythic_age:block/village/village_horos"
+  },
+  "elements": [
+    {
+      "__comment": "立柱",
+      "from": [
+        4,
+        0,
+        6
+      ],
+      "to": [
+        12,
+        14.6,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#face"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "顶面收分",
+      "from": [
+        4.4,
+        14.6,
+        6.4
+      ],
+      "to": [
+        11.6,
+        15.2,
+        9.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        }
+      }
+    }
+  ]
+}

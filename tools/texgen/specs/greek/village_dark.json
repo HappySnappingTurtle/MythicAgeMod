@@ -1,0 +1,46 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_dark",
+  "size": 32,
+  "palette": {
+    "k": "#9d978a",
+    "i": "#7d776c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkiikkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkikiikkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkiiiiikkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkiiiiikkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkiiiikikkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkikkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkikkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "iikkkkkkkkkkkkkkkkkkkkkkkkkkkkki",
+      "kikkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "iikkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "ikkkkkkkkkkkkkkkkkkkkkkkkkkkkkki",
+      "iikkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkikkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+    ]
+  }
+}

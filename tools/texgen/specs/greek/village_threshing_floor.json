@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_threshing_floor",
+  "size": 16,
+  "palette": {
+    "J": "#6a6052",
+    "d": "#857a6a",
+    "s": "#ab9f8b",
+    "S": "#bcb09a",
+    "y": "#c9a95a",
+    "Y": "#dcc27a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SddddJJJdJJSSSSS",
+      "JSSSSJSSSSSdJJdJ",
+      "JSSSSSsSSSSSSSSS",
+      "JSSSSSJSSSJSSSSS",
+      "JSSYySdsSSJSSSSS",
+      "sSSSSSSSSsdSSSJd",
+      "SJSSSJJdJSJSJdSs",
+      "SSdJSSSJSSSSsSSs",
+      "SSJSSSSdSSSSJssS",
+      "SSSSSSSJSSSYysSS",
+      "sdddSSSdSSSSSSss",
+      "JSSSdJSddSSSdSJd",
+      "SSSSSSJsSsJSSSSS",
+      "JSSSSSYysSJSSSSS",
+      "dSSSSSsssSJSSSSS",
+      "JSSSSdssssJSSSSS"
+    ]
+  }
+}

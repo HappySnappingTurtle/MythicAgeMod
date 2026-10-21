@@ -1,0 +1,45 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_relief_panel",
+  "size": 32,
+  "palette": {
+    "d": "#bdb7aa"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd"
+    ]
+  }
+}

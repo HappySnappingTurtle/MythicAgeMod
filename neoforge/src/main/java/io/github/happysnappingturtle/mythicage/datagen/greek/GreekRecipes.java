@@ -491,6 +491,38 @@ public final class GreekRecipes {
                 .define('A', io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR)
                 .unlockedBy("has_marble_ashlar", has(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE_ASHLAR))
                 .save(out, id("treading_vat"));
+        // 村庄与圣物（第 3 批）：大理石雕件走切石机
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BOUNDARY_STONE, 2);
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.OMPHALOS, 1);
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.HERM_HEAD, 1);
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.GRAVE_RELIEF, 1);
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.MARBLE_LEKYTHOS, 1);
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.LION_SPOUT, 1);
+        // 奥林匹斯祭坛 1 → 村庄祭坛 1（只换成不登记的装饰版）
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.VILLAGE_ALTAR)
+                .requires(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple.GREEK_ALTAR)
+                .unlockedBy("has_greek_altar", has(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple.GREEK_ALTAR))
+                .save(out, id("village_altar"));
+        // 石头 4 → 打谷场铺石 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.THRESHING_FLOOR, 4)
+                .pattern("SS").pattern("SS").define('S', Items.STONE)
+                .unlockedBy("has_stone", has(Items.STONE))
+                .save(out, id("threshing_floor"));
+        // 青铜锭 7 → 三足铜鼎 1（鼎腹 + 三足）
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BRONZE_TRIPOD)
+                .pattern("B B").pattern("BBB").pattern("B B").define('B', BRONZE_INGOT)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
+                .save(out, id("bronze_tripod"));
+        // 三足铜鼎 + 金锭 2 → 神谕三足鼎
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS,
+                        io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.ORACLE_TRIPOD)
+                .requires(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BRONZE_TRIPOD)
+                .requires(net.neoforged.neoforge.common.Tags.Items.INGOTS_GOLD).requires(net.neoforged.neoforge.common.Tags.Items.INGOTS_GOLD)
+                .unlockedBy("has_bronze_tripod", has(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BRONZE_TRIPOD))
+                .save(out, id("oracle_tripod"));
     }
 
     public static ResourceLocation id(String path) {

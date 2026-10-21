@@ -1,0 +1,432 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/village/village_marble",
+    "marble": "mythic_age:block/village/village_marble",
+    "hair": "mythic_age:block/village/village_hair",
+    "band": "mythic_age:block/village/village_dark",
+    "eye": "mythic_age:block/village/village_dark"
+  },
+  "elements": [
+    {
+      "__comment": "方柱上段",
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        6.2,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "左臂榫",
+      "from": [
+        2.2,
+        4.0,
+        7.0
+      ],
+      "to": [
+        4,
+        6.0,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "右臂榫",
+      "from": [
+        12,
+        4.0,
+        7.0
+      ],
+      "to": [
+        13.8,
+        6.0,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "颈",
+      "from": [
+        6.6,
+        6.2,
+        6.8
+      ],
+      "to": [
+        9.4,
+        7.4,
+        9.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "头",
+      "from": [
+        5.4,
+        7.4,
+        5.6
+      ],
+      "to": [
+        10.6,
+        12.8,
+        10.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "头顶（头发）",
+      "from": [
+        5.6,
+        12.8,
+        6.0
+      ],
+      "to": [
+        10.4,
+        13.8,
+        10.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hair"
+        },
+        "south": {
+          "texture": "#hair"
+        },
+        "east": {
+          "texture": "#hair"
+        },
+        "west": {
+          "texture": "#hair"
+        },
+        "up": {
+          "texture": "#hair"
+        },
+        "down": {
+          "texture": "#hair"
+        }
+      }
+    },
+    {
+      "__comment": "脑后长发",
+      "from": [
+        5.4,
+        7.6,
+        9.4
+      ],
+      "to": [
+        10.6,
+        12.8,
+        11.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hair"
+        },
+        "south": {
+          "texture": "#hair"
+        },
+        "east": {
+          "texture": "#hair"
+        },
+        "west": {
+          "texture": "#hair"
+        },
+        "down": {
+          "texture": "#hair"
+        }
+      }
+    },
+    {
+      "__comment": "额前卷发",
+      "from": [
+        5.4,
+        11.8,
+        5.3
+      ],
+      "to": [
+        10.6,
+        12.8,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hair"
+        },
+        "south": {
+          "texture": "#hair"
+        },
+        "east": {
+          "texture": "#hair"
+        },
+        "west": {
+          "texture": "#hair"
+        },
+        "up": {
+          "texture": "#hair"
+        },
+        "down": {
+          "texture": "#hair"
+        }
+      }
+    },
+    {
+      "__comment": "发带",
+      "from": [
+        5.3,
+        12.2,
+        5.6
+      ],
+      "to": [
+        10.7,
+        12.6,
+        10.9
+      ],
+      "faces": {
+        "east": {
+          "texture": "#band"
+        },
+        "west": {
+          "texture": "#band"
+        },
+        "up": {
+          "texture": "#band"
+        }
+      }
+    },
+    {
+      "__comment": "长须",
+      "from": [
+        6.0,
+        6.4,
+        4.6
+      ],
+      "to": [
+        10.0,
+        9.4,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hair"
+        },
+        "south": {
+          "texture": "#hair"
+        },
+        "east": {
+          "texture": "#hair"
+        },
+        "west": {
+          "texture": "#hair"
+        },
+        "up": {
+          "texture": "#hair"
+        },
+        "down": {
+          "texture": "#hair"
+        }
+      }
+    },
+    {
+      "__comment": "须尖",
+      "from": [
+        6.8,
+        5.2,
+        4.8
+      ],
+      "to": [
+        9.2,
+        6.4,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hair"
+        },
+        "south": {
+          "texture": "#hair"
+        },
+        "east": {
+          "texture": "#hair"
+        },
+        "west": {
+          "texture": "#hair"
+        },
+        "up": {
+          "texture": "#hair"
+        },
+        "down": {
+          "texture": "#hair"
+        }
+      }
+    },
+    {
+      "__comment": "鼻",
+      "from": [
+        7.6,
+        9.6,
+        4.9
+      ],
+      "to": [
+        8.4,
+        11.2,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#marble"
+        },
+        "south": {
+          "texture": "#marble"
+        },
+        "east": {
+          "texture": "#marble"
+        },
+        "west": {
+          "texture": "#marble"
+        },
+        "up": {
+          "texture": "#marble"
+        },
+        "down": {
+          "texture": "#marble"
+        }
+      }
+    },
+    {
+      "__comment": "左眼",
+      "from": [
+        6.4,
+        11.0,
+        5.58
+      ],
+      "to": [
+        7.2,
+        11.6,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#eye"
+        }
+      }
+    },
+    {
+      "__comment": "右眼",
+      "from": [
+        8.8,
+        11.0,
+        5.58
+      ],
+      "to": [
+        9.6,
+        11.6,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#eye"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,366 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "wall": "mythic_age:block/smooth_marble",
+    "lion": "mythic_age:block/village/village_lion",
+    "mouth": "mythic_age:block/village/village_dark"
+  },
+  "elements": [
+    {
+      "__comment": "墙块",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wall",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#wall",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#wall",
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#wall",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#wall",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#wall",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "__comment": "鬃毛",
+      "from": [
+        4.6,
+        4.4,
+        -1.6
+      ],
+      "to": [
+        11.4,
+        12.4,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "from": [
+        5.4,
+        3.6,
+        -1.6
+      ],
+      "to": [
+        10.6,
+        13.2,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "from": [
+        3.8,
+        5.4,
+        -1.2
+      ],
+      "to": [
+        12.2,
+        11.4,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "左耳",
+      "from": [
+        5.0,
+        12.4,
+        -2.0
+      ],
+      "to": [
+        6.4,
+        13.6,
+        -1.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "右耳",
+      "from": [
+        9.6,
+        12.4,
+        -2.0
+      ],
+      "to": [
+        11.0,
+        13.6,
+        -1.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "脸",
+      "from": [
+        5.6,
+        6.4,
+        -2.6
+      ],
+      "to": [
+        10.4,
+        11.6,
+        -1.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "口鼻",
+      "from": [
+        6.2,
+        5.2,
+        -4.2
+      ],
+      "to": [
+        9.8,
+        9.2,
+        -2.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "鼻梁",
+      "from": [
+        7.0,
+        8.6,
+        -4.0
+      ],
+      "to": [
+        9.0,
+        10.6,
+        -2.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lion"
+        },
+        "south": {
+          "texture": "#lion"
+        },
+        "east": {
+          "texture": "#lion"
+        },
+        "west": {
+          "texture": "#lion"
+        },
+        "up": {
+          "texture": "#lion"
+        },
+        "down": {
+          "texture": "#lion"
+        }
+      }
+    },
+    {
+      "__comment": "张开的嘴（出水）",
+      "from": [
+        6.9,
+        5.6,
+        -4.22
+      ],
+      "to": [
+        9.1,
+        6.8,
+        -4.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#mouth"
+        }
+      }
+    },
+    {
+      "__comment": "左眼",
+      "from": [
+        6.2,
+        9.8,
+        -2.62
+      ],
+      "to": [
+        7.2,
+        10.6,
+        -2.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#mouth"
+        }
+      }
+    },
+    {
+      "__comment": "右眼",
+      "from": [
+        8.8,
+        9.8,
+        -2.62
+      ],
+      "to": [
+        9.8,
+        10.6,
+        -2.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#mouth"
+        }
+      }
+    }
+  ]
+}

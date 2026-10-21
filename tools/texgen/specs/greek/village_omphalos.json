@@ -1,0 +1,49 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_omphalos",
+  "size": 32,
+  "palette": {
+    "d": "#bdb7aa",
+    "m": "#d3cec3",
+    "S": "#eae7df",
+    "h": "#f2f0ea",
+    "H": "#f9f8f4"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SdSSSSSdSdSSSSSdSdSSSSSdSdSSSSSd",
+      "dHSSSSSHdHSSSSSHdHSSSSSHdHSSSSSH",
+      "SdHSSSHdSdHSSSHdSdHSSSHdSdHSSSHd",
+      "SSdHSHdSSSdHSHdSSSdHSHdSSSdHSHdS",
+      "SSSdSdSSSSSdSdSSSSSdSdSSSSSdSdSS",
+      "ShSHdHSSSSSHdHSSSSSHdHSSSSSHdHSh",
+      "ShHdhdHhSSHdSdHSSSHdmdHShSHdSdHh",
+      "hHdhSSdHSHdSSSdHSHdSmhdHSHdhShdH",
+      "SdhhhhhdSdSSSSSdSdSSShhdSdhhhhhd",
+      "dHhhhhhHdHSSSSSHdHShSShHdHhhhhhH",
+      "hdHhhhHdSdHSSSHdSdHhSSHdhdHhhhHd",
+      "hhdHhHdhhSdHSHdSSSdHhHdhhhdHhHdh",
+      "hhhdSdhhhhhdSdShSSSdSdhhhhhdSdhh",
+      "hhhHdHhhhhhHdHhSShhHdHhhhhhHdHhh",
+      "hhHdhdHhhhHdSdHShSHdSdHhhhHdhdHh",
+      "hHdhhhdHhHdhhhdHSHdShSdHhHdhhhdH",
+      "SdhhhhhdSdhhhhSdSdSSShhdSdhhhhhd",
+      "dHhhhhhHdHSmhSSHdHhShShHdHhhhhhH",
+      "hdHhhhHdhdHmShHdSdHSShHdhdHhhhHd",
+      "hhdHhHdhhhdHmHdmShdHhHdhhhdHhHdh",
+      "hhhdSdhhhhSdSdmShSSdSdhhhhhdSdhh",
+      "hhhHdHhhhhhHdHmSSShHdHhhhhhHdHhh",
+      "hhHdhdHhhhHdhdHShSHdSdHSShHdhdHh",
+      "hHdhhhdHSHdhSSdHSHdSSSdHhHdShhdH",
+      "SdhhhhhdSdSSSSSdSdSShhSdSdhShShd",
+      "dHShSSSHdHSSSSSHdHSSSSSHdHhhhhSH",
+      "SdHSSSHdSdHSSSHdSdHSSSHdSdHShSHd",
+      "SSdHSHdSSSdHSHdSSSdHSHdSSSdHSHdh",
+      "SShdSdSSSSSdSdmSSSSdSdSSSSSdSdSS",
+      "SShHdHSSSSSHdHmSSSSHdHSSSSSHdHhh",
+      "SSHdSdHSSSHdSdHSSSHdSdHSSSHdSdHS",
+      "SHdSSSdHSHdSSmdHSHdSSSdHSHdSSSdH"
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_horos",
+  "size": 32,
+  "palette": {
+    "m": "#d3cec3",
+    "S": "#eae7df",
+    "h": "#f2f0ea",
+    "H": "#f9f8f4",
+    "i": "#7d776c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "SShmhSSSShhhhhhhhhhhhShSSShShSSS",
+      "SSShSSSShhhhhhhhhhhShhShhSSSSShS",
+      "SSSmSSShShSShhhhhhhhhhhShShSSSSS",
+      "SSSSSShhhhhSShhhhhhhhhhhShSSShSS",
+      "SSSSmShhhhhhhhhhhhhhhhShSSSSSSSS",
+      "hhSSmhSSShShhhhihihhhhhShhShhSSS",
+      "SSSSmSSShhhhhhhiiihhmhhSShSSShSS",
+      "SSSSSSSShhhhhhhiHihhmhhhhSShSSSS",
+      "SSSSSmhShhhhhhhihihhmhhhhhSSSSSS",
+      "SSSSSSShShhhhhhHhHhhhhhhhSShhSSS",
+      "SSSSSmShShhhhhhiiihhhhhhSSSSSSSS",
+      "SSSSSmShhhhhhhhiHihhhhhhhShhSSSS",
+      "SSSSSSmhhhhhhhhihihmhhhhhhSShSSS",
+      "SSSSShhShhhhhhhiiimhhhhhhhSSSSSS",
+      "SSSSShmShhhhhhhHHHhhhhhhhhSSSSSS",
+      "SSSShShhhhhhhhhiihhhhhhhhhShhSSS",
+      "SSSSShmhhhhhhhhiHihhhhhhhhhhSSSS",
+      "SSSSSShhShhhhhhiiHhhhhhhhhShShSS",
+      "SSSShhShhhhhhhhiHmhhhhhhhhhhSSSS",
+      "SSSSShShmhhhhhhHhmhhhhhhhSSSSSSS",
+      "SSShhhhShmhhhhhiiihhhhhhhhhSSSSS",
+      "SSSShSSShhhhhhhiHihhhhhhSSSSSSSS",
+      "SSSSShhSSmhhhhhimihhhhhhhhhhhSSS",
+      "SSSSSShhSmhhhhhiiihhhhhhhhhShSSS",
+      "SSSSSShShmhhhhhHHHhhhhhhhhSSSSSS",
+      "SSSSSSShhhhhhhhiiihhhhhhhhShShSS",
+      "SSSSSSSSShmhhhmiHHhhhhhShSSSShhS",
+      "ShSShShSSSSmhmhHihhhhhhhhhShSSSS",
+      "hSSSSSSSShShmmhiiihhhShhhhhShSSS",
+      "SSShSShhShhhmhhHHHhhhhhhShSSSSSh",
+      "hhSShSSSShhhmhhhhhhhhhhShhSSShSS",
+      "SSSShShhhhSSmhhhhhhhhhhhhShhSSSS"
+    ]
+  }
+}

@@ -542,6 +542,303 @@ def rim_rows(back=False):
     return g
 
 
+# ───────────── 第 3 批：村庄与圣物 ─────────────
+# 尺寸按实物（1 格 ≈ 1 m）；比 1 格高的（神谕三足鼎、大理石油瓶、铜鼎耳环）往上伸出半格以内，碰撞箱同高（同栅栏）。
+
+MARBLE = {"k": "#9d978a", "d": "#bdb7aa", "m": "#d3cec3", "s": "#e1ddd4", "S": "#eae7df", "h": "#f2f0ea", "H": "#f9f8f4",
+          "i": "#7d776c", "I": "#8f897d"}
+BRONZE = {"k": "#2e1c10", "d": "#4a2f19", "m": "#674223", "s": "#85582c", "S": "#a06d36", "h": "#bf8a45", "H": "#dcae68",
+          "g": "#4d6e55", "G": "#628a6c"}
+FLAG = {"j": "#4f473d", "J": "#6a6052", "d": "#857a6a", "m": "#998e7c", "s": "#ab9f8b", "S": "#bcb09a", "h": "#cbbfa8",
+        "y": "#c9a95a", "Y": "#dcc27a"}
+
+
+def marble_rows(k=201):
+    """雕刻用白大理石：很淡的大团明暗 + 一两道灰色细纹。"""
+    g = smooth_rows(k, 16, 0.16, 0.62, keys="msShH")
+    for (x0, y0, dx) in ((3, 0, 1), (20, 6, -1)):
+        x = x0
+        for y in range(y0, 32):
+            if noise(x, y, k + 3) > 0.45:
+                g[y][x % 32] = "m"
+            if noise(x, y, k + 4) > 0.7:
+                x += dx
+    return g
+
+
+def bronze_rows(k=211):
+    """青铜：暖褐金属，大团明暗，零星铜绿。"""
+    g = smooth_rows(k, 8, 0.4, 0.5, keys="dmsShH")
+    for y in range(32):
+        for x in range(32):
+            if noise(x, y, k + 5) > 0.975:
+                g[y][x] = "G" if noise(x, y, k + 6) > 0.5 else "g"
+    return g
+
+
+def bronze_inner_rows(k=215):
+    """鼎口顶面（按方块坐标取样）：半径 6.2 以内是深色鼎内（越往中心越暗），外圈是铜沿。"""
+    g = bronze_rows(k)
+    for y in range(32):
+        for x in range(32):
+            d = math.hypot((x + 0.5) / 2 - 8, (y + 0.5) / 2 - 8)
+            if d < 6.0:
+                g[y][x] = "k" if d < 3.5 or noise(x, y, k + 1) > 0.6 else "d"
+            elif d < 6.6:
+                g[y][x] = "H"
+    return g
+
+
+FONT = {"Η": ["X.X", "XXX", "X.X", "X.X"], "Ο": ["XXX", "X.X", "X.X", "XXX"], "Ρ": ["XX.", "X.X", "XX.", "X.."],
+        "Σ": ["XXX", "X..", ".X.", "XXX"]}
+
+
+def horos_rows():
+    """界石正面：大理石，刻 ΗΟΡΟΣ（「界」）五个字母，自上而下一列（刻痕深色、下沿一道亮边）。
+    模型正面占贴图 x 8–24（方块坐标 4–12）、y 2–32（方块高度 15 → 0）。"""
+    g = marble_rows(221)
+    y = 5
+    for ch in "ΗΟΡΟΣ":
+        for r, line in enumerate(FONT[ch]):
+            for c, v in enumerate(line):
+                if v == "X":
+                    g[y + r][15 + c] = "i"
+                    if y + r + 1 < 32 and g[y + r + 1][15 + c] not in "iI":
+                        g[y + r + 1][15 + c] = "H"
+        y += 5
+    return g
+
+
+def threshing_rows(k=231):
+    """打谷场铺石（16×16）：不规则扁石板，缝里填压实的土，偶有几根麦秆。"""
+    import random
+    rnd = random.Random(k)
+    # 抖动网格上的种子：石板大小均匀（纯随机种子会挤在一起，接缝糊成一片）
+    seeds = [((i + 0.5) * 16 / 3 + rnd.uniform(-1.2, 1.2) + (j % 2) * 1.6, (j + 0.5) * 16 / 3 + rnd.uniform(-1.2, 1.2),
+              rnd.random()) for i in range(3) for j in range(3)]
+    g = grid(16, 16)
+    for y in range(16):
+        for x in range(16):
+            ds = sorted((min(abs(x - sx), 16 - abs(x - sx)) ** 2 + min(abs(y - sy), 16 - abs(y - sy)) ** 2, t)
+                        for sx, sy, t in seeds)
+            if math.sqrt(ds[1][0]) - math.sqrt(ds[0][0]) < 0.6:
+                g[y][x] = "J" if noise(x, y, k + 1) > 0.3 else "d"
+            else:
+                v = 0.55 + 0.2 * ds[0][1] + 0.1 * (noise(x, y, k + 2) - 0.5)
+                g[y][x] = ramp(v, "dmsSh")
+    for (x, y) in ((3, 4), (11, 9), (6, 13)):
+        g[y][x], g[y][x + 1] = "Y", "y"
+    return g
+
+
+def omphalos_rows():
+    """肚脐石：大理石面上刻出一张羊毛带结成的网（agrenon）：斜向网格凸起（亮）+ 下沿阴影，交点打结。"""
+    g = marble_rows(241)
+    for y in range(32):
+        for x in range(32):
+            a, b = (x + y) % 8, (x - y) % 8
+            if a == 0 or b == 0:
+                g[y][x] = "H"
+            elif a == 1 or b == 7:
+                g[y][x] = "d"
+            if (x + y) % 8 == 0 and (x - y) % 8 == 0:
+                g[y][x] = "S"
+                if y + 1 < 32:
+                    g[y + 1][x] = "k"
+    return g
+
+
+LION = {"k": "#6e6252", "d": "#9a8c76", "m": "#b3a58c", "s": "#c6b9a0", "S": "#d4c8b0", "h": "#e0d6c1", "H": "#ebe3d2"}
+
+
+def lion_rows(k=271):
+    """狮头：风化的暖黄大理石（比墙面暗一档，好从白墙上跳出来），鬃毛是一缕缕弯曲的刻纹。"""
+    g = smooth_rows(k, 8, 0.2, 0.55, keys="msShH")
+    for y in range(32):
+        for x in range(32):
+            ph = (x + 3 * math.sin(y / 3.0) + 2 * noise(x // 4, y // 4, k + 1)) % 5
+            if ph < 1:
+                g[y][x] = "d"
+            elif ph < 1.6:
+                g[y][x] = "m"
+    return g
+
+
+def relief_rows():
+    """墓碑浮雕底面：稍暗的大理石底子，人物轮廓周围留一圈阴影（人物本身是凸起的方块）。"""
+    g = smooth_rows(251, 16, 0.14, 0.42, keys="kdm")
+    return g
+
+
+def ring_xz(cx, cy, z, r, t, w=0.8, comment=None):
+    """竖立在 x-y 平面里的八边形圆环（铜鼎耳环）：上下左右四根 + 四角各一根转 45° 的短杆。"""
+    h = r * 0.42
+    els = [box((cx - h, cy + r - w, z - w / 2), (cx + h, cy + r, z + w / 2), t, comment=comment),
+           box((cx - h, cy - r, z - w / 2), (cx + h, cy - r + w, z + w / 2), t),
+           box((cx - r, cy - h, z - w / 2), (cx - r + w, cy + h, z + w / 2), t),
+           box((cx + r - w, cy - h, z - w / 2), (cx + r, cy + h, z + w / 2), t)]
+    d = r * 0.71
+    L = (r - h) * 0.75
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            mx, my = cx + sx * (d - w * 0.3), cy + sy * (d - w * 0.3)
+            ang = 45 if sx * sy > 0 else -45
+            els.append(box((mx - L / 2, my - w / 2, z - w / 2), (mx + L / 2, my + w / 2, z + w / 2), t,
+                           rotation={"angle": -ang, "axis": "z", "origin": [mx, my, z]}))
+    return els
+
+
+def village_altar_model():
+    """装饰祭坛：外观同玩家的奥林匹斯祭坛（规划篇 §4.2「外观与神坛一致但不登记」），直接继承它的模型。"""
+    (MODELS / "village_altar.json").write_text(json.dumps({"parent": "mythic_age:block/greek_altar"}, indent=2) + "\n",
+                                               encoding="utf-8")
+
+
+def horos_elements():
+    """界石（horos）：雅典广场界石那样的长方大理石立柱，约 1 m 高；正面刻 ΗΟΡΟΣ，顶面略收、粗凿。"""
+    return [box((4, 0, 6), (12, 14.6, 10), {"north": "face", "south": "marble", "east": "marble", "west": "marble",
+                                             "up": "marble", "down": "marble"}, comment="立柱"),
+            box((4.4, 14.6, 6.4), (11.6, 15.2, 9.6), "marble", faces="nsewu", comment="顶面收分")]
+
+
+def tripod_elements():
+    """三足铜鼎（多多那铜鼎圈，几何时期式）：深腹圆鼎架在三根扁足上，口沿两侧竖着两只大圆环耳；
+    鼎内壁深色。鼎口直径近 1 格（相邻铜鼎首尾相接），连耳约 1.2 m。"""
+    els = []
+    for (x, z, n) in ((8, 2.2, "前足"), (3.0, 11.4, "左后足"), (13.0, 11.4, "右后足")):
+        els.append(box((x - 0.9, 0.6, z - 0.7), (x + 0.9, 9.0, z + 0.7), "bronze", comment=n))
+        els.append(box((x - 1.2, 0, z - 1.0), (x + 1.2, 0.6, z + 1.0), "bronze"))
+    els += ring_y(8, 8, 4.0, 6.8, 7.8, "bronze", comment="鼎底")
+    els += ring_y(8, 8, 5.8, 7.8, 9.4, "bronze", comment="鼎腹·下")
+    els += octa_y(8, 8, 6.9, 9.4, 12.6, "bronze", faces="nsewd", comment="鼎腹")
+    els += octa_y(8, 8, 7.3, 12.6, 13.4, {"north": "bronze", "south": "bronze", "east": "bronze", "west": "bronze",
+                                          "down": "bronze", "up": "mouth"}, comment="口沿（顶面贴图：外圈铜沿、里面是深色鼎内）")
+    for cx in (2.4, 13.6):
+        els += ring_xz(cx, 15.8, 8, 2.4, "bronze", w=0.7, comment="环耳")
+        els.append(box((cx - 0.4, 13.4, 7.6), (cx + 0.4, 13.8, 8.4), "bronze", comment="耳座"))
+    return els
+
+
+def oracle_tripod_elements():
+    """神谕三足鼎（德尔斐）：细高的三足架，足端狮爪；架顶是带两只环耳的鼎（lebes），鼎口盖着圆形座板（女祭司坐的地方）；
+    三足之间一圈细拉杆。座面约 1.2 m 高。"""
+    els = []
+    for (x, z, n) in ((8, 3.0, "前足"), (3.6, 10.6, "左后足"), (12.4, 10.6, "右后足")):
+        els.append(box((x - 0.6, 1.0, z - 0.6), (x + 0.6, 15.0, z + 0.6), "bronze", comment=n))
+        els.append(box((x - 1.0, 0, z - 1.0), (x + 1.0, 1.0, z + 1.0), "bronze", comment=n + "狮爪"))
+    for (a, b, n) in (((8, 3.0), (3.6, 10.6), "拉杆·左"), ((8, 3.0), (12.4, 10.6), "拉杆·右"),
+                      ((3.6, 10.6), (12.4, 10.6), "拉杆·后")):
+        mx, mz = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+        L = math.hypot(b[0] - a[0], b[1] - a[1])
+        ang = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
+        ang = max(-45, min(45, round(-ang / 22.5) * 22.5)) if abs(ang) <= 45 else None
+        if ang is None:
+            # 斜 60° 的拉杆：用两段转 ±45° 的短杆近似
+            ang = 45 if (b[1] - a[1]) * (b[0] - a[0]) < 0 else -45
+        els.append(box((mx - L / 2, 6.0, mz - 0.3), (mx + L / 2, 6.6, mz + 0.3), "bronze", comment=n,
+                       rotation={"angle": ang, "axis": "y", "origin": [mx, 6.0, mz]}))
+    els += ring_y(8, 8, 2.6, 13.6, 14.6, "bronze", comment="鼎底")
+    els += ring_y(8, 8, 4.2, 14.6, 15.8, "bronze", comment="鼎腹·下")
+    els += ring_y(8, 8, 4.9, 15.8, 17.6, "bronze", comment="鼎腹")
+    els += ring_y(8, 8, 5.4, 17.6, 18.2, "bronze", comment="座板")
+    els += ring_y(8, 8, 1.6, 18.2, 18.6, "bronze", comment="座板钮")
+    for cx in (3.0, 13.0):
+        els += ring_xz(cx, 20.0, 8, 1.8, "bronze", w=0.55, comment="环耳")
+    return els
+
+
+def omphalos_elements():
+    """肚脐石（omphalos）：方形矮座上的圆锥形大理石，表面刻着一张羊毛带结成的网（agrenon），约 1 m 高。"""
+    els = [box((1.5, 0, 1.5), (14.5, 1.8, 14.5), "base", comment="矮座")]
+    for (r, y0, y1, n) in ((6.4, 1.8, 5, "石身·下"), (6.2, 5, 8, "石身"), (5.6, 8, 10.4, "石身·肩"),
+                           (4.7, 10.4, 12.4, "石身·上"), (3.5, 12.4, 14, "石顶"), (2.0, 14, 15.2, "石尖")):
+        els += ring_y(8, 8, r, y0, y1, "net", comment=n)
+    return els
+
+
+def lion_spout_elements():
+    """狮头出水口：整块大理石墙面，正面（北）伸出一只张口的狮头（鬃毛一圈、口鼻前突、张开的嘴是出水口）。
+    狮头约 35 cm 宽，伸出墙面 4 像素。"""
+    c = {k: "wall" for k in ("north", "south", "east", "west", "up", "down")}
+    els = [box((0, 0, 0), (16, 16, 16), c, comment="墙块")]
+    for f in els[0]["faces"]:
+        els[0]["faces"][f]["cullface"] = f
+    els += [box((4.6, 4.4, -1.6), (11.4, 12.4, 0), "lion", comment="鬃毛"),
+            box((5.4, 3.6, -1.6), (10.6, 13.2, 0), "lion"),
+            box((3.8, 5.4, -1.2), (12.2, 11.4, 0), "lion"),
+            box((5.0, 12.4, -2.0), (6.4, 13.6, -1.2), "lion", comment="左耳"),
+            box((9.6, 12.4, -2.0), (11.0, 13.6, -1.2), "lion", comment="右耳"),
+            box((5.6, 6.4, -2.6), (10.4, 11.6, -1.6), "lion", comment="脸"),
+            box((6.2, 5.2, -4.2), (9.8, 9.2, -2.6), "lion", comment="口鼻"),
+            box((7.0, 8.6, -4.0), (9.0, 10.6, -2.6), "lion", comment="鼻梁"),
+            box((6.9, 5.6, -4.22), (9.1, 6.8, -4.2), "mouth", faces="n", comment="张开的嘴（出水）"),
+            box((6.2, 9.8, -2.62), (7.2, 10.6, -2.6), "mouth", faces="n", comment="左眼"),
+            box((8.8, 9.8, -2.62), (9.8, 10.6, -2.6), "mouth", faces="n", comment="右眼")]
+    return els
+
+
+def herm_elements():
+    """界柱胸像（herma 顶）：放在大理石墙柱顶上，接着方柱往上——方柱顶两侧伸出方形短臂榫，上面是蓄须的赫尔墨斯头像
+    （古风式：楔形长须、额前一排卷发、头顶发带）。柱宽同墙柱（8 像素）。"""
+    return [box((4, 0, 4), (12, 6.2, 12), "marble", comment="方柱上段"),
+            box((2.2, 4.0, 7.0), (4, 6.0, 9.0), "marble", comment="左臂榫"),
+            box((12, 4.0, 7.0), (13.8, 6.0, 9.0), "marble", comment="右臂榫"),
+            box((6.6, 6.2, 6.8), (9.4, 7.4, 9.6), "marble", comment="颈"),
+            box((5.4, 7.4, 5.6), (10.6, 12.8, 10.8), "marble", comment="头"),
+            box((5.6, 12.8, 6.0), (10.4, 13.8, 10.8), "hair", comment="头顶（头发）"),
+            box((5.4, 7.6, 9.4), (10.6, 12.8, 11.0), "hair", faces="nsewd", comment="脑后长发"),
+            box((5.4, 11.8, 5.3), (10.6, 12.8, 5.6), "hair", comment="额前卷发"),
+            box((5.3, 12.2, 5.6), (10.7, 12.6, 10.9), "band", faces="ewu", comment="发带"),
+            box((6.0, 6.4, 4.6), (10.0, 9.4, 5.6), "hair", comment="长须"),
+            box((6.8, 5.2, 4.8), (9.2, 6.4, 5.6), "hair", comment="须尖"),
+            box((7.6, 9.6, 4.9), (8.4, 11.2, 5.6), "marble", comment="鼻"),
+            box((6.4, 11.0, 5.58), (7.2, 11.6, 5.6), "eye", faces="n", comment="左眼"),
+            box((8.8, 11.0, 5.58), (9.6, 11.6, 5.6), "eye", faces="n", comment="右眼")]
+
+
+def relief_elements():
+    """墓碑浮雕（小神庙式墓碑 naiskos 的浮雕面）：两侧壁柱、上方横楣、下方基座围出凹进的画面，
+    画面里是凸起的握手（dexiosis）场景——左边坐在椅（klismos）上的妇人，右边站着的男子，两人右手相握。"""
+    m = "marble"
+    els = [box((0, 0, 1.6), (16, 16, 16), {"north": "panel", "south": m, "east": m, "west": m, "up": m, "down": m},
+               comment="碑身（正面是凹进的画面）"),
+           box((0, 0, 0), (2.4, 16, 1.6), m, faces="nsewud", comment="左壁柱"),
+           box((13.6, 0, 0), (16, 16, 1.6), m, faces="nsewud", comment="右壁柱"),
+           box((2.4, 13.4, 0), (13.6, 16, 1.6), m, faces="nud", comment="横楣"),
+           box((2.4, 0, 0), (13.6, 1.6, 1.6), m, faces="nud", comment="基座"),
+           box((3.0, 1.6, 1.0), (3.6, 9.0, 1.6), m, comment="椅背（klismos 后腿上翘成椅背）"),
+           box((5.6, 1.6, 1.0), (6.2, 4.6, 1.6), m, comment="椅前腿"),
+           box((3.0, 4.6, 0.9), (6.6, 5.2, 1.6), m, comment="椅面"),
+           box((3.8, 5.2, 0.6), (5.8, 9.6, 1.6), m, comment="妇人·上身"),
+           box((4.6, 4.8, 0.6), (8.0, 6.0, 1.6), m, comment="妇人·膝上"),
+           box((7.0, 2.2, 0.7), (8.0, 4.8, 1.6), m, comment="妇人·小腿"),
+           box((6.6, 1.6, 0.8), (8.6, 2.2, 1.6), m, comment="脚凳"),
+           box((3.6, 7.0, 0.9), (4.2, 11.2, 1.6), m, comment="面纱垂下"),
+           box((4.0, 9.6, 0.7), (5.8, 11.4, 1.6), m, comment="妇人·头"),
+           box((9.6, 1.6, 0.6), (12.0, 9.6, 1.6), m, comment="男子·长袍"),
+           box((10.0, 9.6, 0.7), (11.6, 11.6, 1.6), m, comment="男子·头"),
+           box((5.6, 7.0, 0.5), (9.6, 7.8, 1.2), m, comment="相握的右手（妇人伸臂、男子伸臂）")]
+    return els
+
+
+def lekythos_elements():
+    """大理石油瓶（墓上的大号 lekythos，约 1.4 m）：圈足、高筒形瓶身、斜肩、细颈、杯形口，背后一只把手；
+    瓶身正面浅浮雕两个相对握手的人像（同墓碑）。"""
+    els = []
+    for (r, y0, y1, n) in ((3.6, 0, 1.2, "圈足"), (2.6, 1.2, 2.0, "足颈"), (3.8, 2.0, 5.0, "瓶身·下"),
+                           (4.2, 5.0, 10.0, "瓶身"), (4.4, 10.0, 13.4, "瓶身·上"), (3.6, 13.4, 14.6, "肩"),
+                           (2.4, 14.6, 15.4, "肩·上"), (1.3, 15.4, 19.4, "颈"), (1.8, 19.4, 20.4, "口·下"),
+                           (2.3, 20.4, 22.0, "口")):
+        els += ring_y(8, 8, r, y0, y1, "marble", comment=n)
+    els += [box((7.4, 14.2, 11.4), (8.6, 18.2, 12.4), "marble", comment="把手·竖"),
+            box((7.4, 17.4, 9.2), (8.6, 18.2, 11.4), "marble", comment="把手·横"),
+            box((5.6, 5.0, 3.4), (7.0, 10.6, 3.8), "marble", comment="浮雕·左人"),
+            box((5.8, 10.6, 3.5), (6.8, 11.6, 3.8), "marble"),
+            box((9.0, 5.0, 3.4), (10.4, 10.6, 3.8), "marble", comment="浮雕·右人"),
+            box((9.2, 10.6, 3.5), (10.2, 11.6, 3.8), "marble"),
+            box((7.0, 8.0, 3.5), (9.0, 8.6, 3.8), "marble", comment="握手")]
+    return els
+
 # ───────────── 输出 ─────────────
 
 def main():
@@ -606,8 +903,37 @@ def main():
     model("treading_vat_front", vt, front, render_type="minecraft:cutout")
     model("treading_vat_back", vt, back, render_type="minecraft:cutout")
     model("treading_vat_item", vt, vat_elements(), render_type="minecraft:cutout", display=LONG_DISPLAY)
+    # 第 3 批：村庄与圣物
+    spec("village_marble", rows(marble_rows()), MARBLE, 32, FOLDER)
+    spec("village_bronze", rows(bronze_rows()), BRONZE, 32, FOLDER)
+    spec("village_bronze_inner", rows(bronze_inner_rows()), BRONZE, 32, FOLDER)
+    spec("village_horos", rows(horos_rows()), MARBLE, 32, FOLDER)
+    spec("village_threshing_floor", rows(threshing_rows()), FLAG, 16, FOLDER)
+    spec("village_omphalos", rows(omphalos_rows()), MARBLE, 32, FOLDER)
+    spec("village_relief_panel", rows(relief_rows()), MARBLE, 32, FOLDER)
+    spec("village_lion", rows(lion_rows()), LION, 32, FOLDER)
+    spec("village_hair", rows(lion_rows(281)), MARBLE, 32, FOLDER)
+    spec("village_dark", rows(smooth_rows(261, 8, 0.15, 0.3, keys="kiI")), MARBLE, 32, FOLDER)
+    mv = vtex("village_marble")
+    village_altar_model()
+    model("boundary_stone", {"particle": mv, "marble": mv, "face": vtex("village_horos")}, horos_elements())
+    (MODELS / "threshing_floor.json").write_text(json.dumps(
+        {"parent": "minecraft:block/cube_all", "textures": {"all": vtex("village_threshing_floor")}}, indent=2) + "\n",
+        encoding="utf-8")
+    bz = {"particle": vtex("village_bronze"), "bronze": vtex("village_bronze"), "mouth": vtex("village_bronze_inner")}
+    model("bronze_tripod", bz, tripod_elements())
+    model("oracle_tripod", bz, oracle_tripod_elements())
+    model("omphalos", {"particle": vtex("village_omphalos"), "net": vtex("village_omphalos"),
+                       "base": "mythic_age:block/marble_ashlar"}, omphalos_elements())
+    model("lion_spout", {"particle": "mythic_age:block/smooth_marble", "wall": "mythic_age:block/smooth_marble",
+                         "lion": vtex("village_lion"), "mouth": vtex("village_dark")}, lion_spout_elements())
+    model("herm_head", {"particle": mv, "marble": mv, "hair": vtex("village_hair"), "band": vtex("village_dark"),
+                        "eye": vtex("village_dark")}, herm_elements())
+    model("grave_relief", {"particle": mv, "marble": mv, "panel": vtex("village_relief_panel")}, relief_elements())
+    model("marble_lekythos", {"particle": mv, "marble": mv}, lekythos_elements())
     print("第 1 批：plaster、plaster_dado、mudbrick、pithos_{empty,half,full}、amphora_stack")
     print("第 2 批：pottery_wheel、pottery_kiln_{lower,upper}[_lit]、mason_bench、bronze_furnace_{lower,upper}[_lit]、greek_anvil、treading_vat_{front,back}")
+    print("第 3 批：village_altar、boundary_stone、threshing_floor、bronze_tripod、oracle_tripod、omphalos、lion_spout、herm_head、grave_relief、marble_lekythos")
 
 
 if __name__ == "__main__":

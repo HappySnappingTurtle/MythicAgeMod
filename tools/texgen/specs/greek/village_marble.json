@@ -1,0 +1,47 @@
+{
+  "template": "pixels",
+  "out": "block/village/village_marble",
+  "size": 32,
+  "palette": {
+    "m": "#d3cec3",
+    "S": "#eae7df",
+    "h": "#f2f0ea"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "hhSShhhhhhhhhhhhhhhhhhhhhhhhhhSS",
+      "SShhhhhhhhhhhhhhhhhhhhhhhhhhhhhS",
+      "hhhmhhhhhhhhhhhhhhhhhhhhhhhhhhSh",
+      "hShmhhhhhhhhhhhhhhhhhhhhhhhhhhSS",
+      "hhShmhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "SShSmhhhhhhhhhhhhhhhhhhhhhhhhhSh",
+      "hhhhhhhhhhhhhhhhhhhhmhhhhhhhhhhh",
+      "hShhmhhhhhhhhhhhhhhhmhhhhhhhhhhh",
+      "hhhhhhhhhhhhhhhhhhhhmhhhhhhhhhhh",
+      "hhhhhmhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "hhhhhmhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "hhhhhhhhhhhShShShShhhhhhhhhhhhhh",
+      "hhhhhhhhhhhShhSSSShhmhhhhhhhhhhh",
+      "hhhhhhmhhShShShhShhhmShhhhhhhhhh",
+      "hhhhhhhhhhhShShSShShmhhhhhhhhhhh",
+      "hhhhhhhhhhhhhSSSSSShhhShhhhhhhhh",
+      "hhhhhhhhhhhhhSShSSmSShhhhhhhhhhh",
+      "hhhhhhhmhSShhhhSShmhhSShhhhhhhhh",
+      "hhhhhhhhhhhhhhhSSmShhhhhhhhhhhhh",
+      "hhhhhhhhmhhhhhShmShhShShhhhhhhhh",
+      "hhhhhhhhhhhhSShhhSShShhhhhhhhhhh",
+      "hhhhhhhhmhhhhSShShhhhhhhhhhhhhhh",
+      "hhhhhhhhmhhhhhhmhhhhhhhhhhhhhhhh",
+      "hhhhhhhhmhhhhhhmhhhhhhhhhhhhhhhh",
+      "hhhhhhhhmhhhhhhhhhhhhhhhhhhhhhhh",
+      "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "hhhhhhhhmhhhhhhhhhhhhhhhhhhhhhhh",
+      "ShhhhhhhmhhhhhhhhhhhhhhhhhhhhhSh",
+      "hhhSShhhhhhhhhhhhhhhhhhhhhhhhhSS",
+      "ShShShhhhhhhhhmhhhhhhhhhhhhhShSS",
+      "SSSShhhhhmhhhhmhhhhhhhhhhhhhShhS",
+      "SShSShhhhhhhhhmhhhhhhhhhhhhhhhSh"
+    ]
+  }
+}
