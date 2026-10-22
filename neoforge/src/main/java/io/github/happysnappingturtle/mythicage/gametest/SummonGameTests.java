@@ -13,12 +13,16 @@ import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.power.TargetFactsCollector;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
 import io.github.happysnappingturtle.mythicage.summon.MythSummon;
+import io.github.happysnappingturtle.mythicage.summon.SummonPayloads;
 import io.github.happysnappingturtle.mythicage.summon.SummonRegistry;
+import io.github.happysnappingturtle.mythicage.summon.SummonScreens;
 import io.github.happysnappingturtle.mythicage.summon.SummonService;
 import io.github.happysnappingturtle.mythicage.summon.SummonTargets;
 import io.github.happysnappingturtle.mythicage.summon.SummonUnits;
+import io.github.happysnappingturtle.mythicage.summon.SummonView;
 import io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons;
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonMinotaurEntity;
+import io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -424,6 +428,257 @@ public final class SummonGameTests {
         TradeService.close(p);
         g.discard();
         SummonTargets.ownerForTest(p, false);
+        h.succeed();
+    }
+
+    // ───────────── 管理界面（阶段 ②，TC-T14-70～76） ─────────────
+
+    private static SummonPayloads.Command cmd(SummonPayloads.Action a, UUID unit, SummonMode mode) {
+        return new SummonPayloads.Command(a, unit, mode);
+    }
+
+    /** TC-T14-70、76：快照列出存活与等待重生的单位；编解码往返一致。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void view_lists_units(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_summon_view", Age.CLASSICAL, new BlockPos(8, 2, 3));
+        try {
+            SummonMinotaurEntity m = summon(h, p, new BlockPos(8, 2, 8));
+            SummonRegistry reg = SummonRegistry.get(h.getLevel().getServer());
+            SummonRegistry.Unit waiting = reg.add(UUID.randomUUID(), p.getUUID(), "greek:minotaur");
+            waiting.respawning = true;
+            waiting.respawnAt = h.getLevel().getServer().overworld().getGameTime() + 1200;
+            SummonView v = SummonScreens.view(p);
+            h.assertTrue(v.occupied() == 2 && v.cap() == 3, "占用 2 / 上限 3，实际 " + v.occupied() + " / " + v.cap());
+            h.assertTrue(v.rows().size() == 2, "两行");
+            SummonView.Row alive = v.rows().stream().filter(r -> r.unitId().equals(m.link().unitId)).findFirst().orElseThrow();
+            h.assertTrue(alive.where() == SummonView.Where.NEAR && alive.health() > 0 && alive.recallable(), "存活单位：同维度、有生命、可召回");
+            SummonView.Row w = v.rows().stream().filter(r -> r.unitId().equals(waiting.unitId)).findFirst().orElseThrow();
+            h.assertTrue(w.where() == SummonView.Where.RESPAWNING && w.value() > 0 && !w.recallable(), "等待重生：倒计时 > 0、不可召回");
+            net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+            SummonView.STREAM_CODEC.encode(buf, v);
+            h.assertTrue(SummonView.STREAM_CODEC.decode(buf).equals(v), "编解码往返一致");
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-71、72：单个改驻守（驻守点 = 单位位置）；非战斗单位不能改自由攻击。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void view_mode_command(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_summon_mode", Age.CLASSICAL, new BlockPos(8, 2, 3));
+        try {
+            SummonMinotaurEntity m = summon(h, p, new BlockPos(8, 2, 8));
+            UUID id = m.link().unitId;
+            h.assertTrue(SummonService.command(p, cmd(SummonPayloads.Action.MODE, id, SummonMode.GUARD)), "改驻守生效");
+            SummonRegistry.Unit u = SummonRegistry.get(h.getLevel().getServer()).get(id).orElseThrow();
+            h.assertTrue(m.link().mode == SummonMode.GUARD && u.mode == SummonMode.GUARD, "实体与登记都为驻守");
+            h.assertTrue(m.link().guard != null && m.link().guard.distSqr(m.blockPosition()) <= 1, "驻守点 = 单位位置");
+            SummonUnits.putForTest(new SummonUnitCard("greek", "test_scout", "mythic_age:summon_minotaur", 1, 1, false,
+                    "mythic_age:summon_token_minotaur"));
+            SummonRegistry.Unit scout = SummonRegistry.get(h.getLevel().getServer()).add(UUID.randomUUID(), p.getUUID(), "greek:test_scout");
+            h.assertTrue(!SummonService.command(p, cmd(SummonPayloads.Action.MODE, scout.unitId, SummonMode.FREE))
+                    && scout.mode == SummonMode.FOLLOW, "非战斗单位不能改自由攻击");
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-73：召回 30 格外驻守的单位——改为跟随并出现在主人身边。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void view_recall(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_summon_recall", Age.CLASSICAL, new BlockPos(8, 2, 3));
+        try {
+            SummonMinotaurEntity m = summon(h, p, new BlockPos(8, 2, 33));
+            SummonService.setMode(m, SummonMode.GUARD, m.blockPosition());
+            h.assertTrue(SummonService.command(p, cmd(SummonPayloads.Action.RECALL, m.link().unitId, SummonMode.FOLLOW)), "召回生效");
+            h.assertTrue(m.link().mode == SummonMode.FOLLOW, "改为跟随");
+            h.assertTrue(m.distanceTo(p) < 5, "出现在主人身边，实际 " + m.distanceTo(p));
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-74、75：别人的单位不受指令影响；附近单位驻守主人脚下。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void view_owner_only_and_guard_here(GameTestHelper h) {
+        floor(h);
+        FakePlayer a = owner(h, "ma_summon_va", Age.CLASSICAL, new BlockPos(8, 2, 3));
+        FakePlayer b = owner(h, "ma_summon_vb", Age.CLASSICAL, new BlockPos(8, 2, 30));
+        try {
+            SummonMinotaurEntity ma = summon(h, a, new BlockPos(6, 2, 8));
+            SummonMinotaurEntity mb = summon(h, b, new BlockPos(8, 2, 26));
+            h.assertTrue(!SummonService.command(a, cmd(SummonPayloads.Action.DISMISS, mb.link().unitId, SummonMode.FOLLOW)),
+                    "不能遣散别人的单位");
+            h.assertTrue(mb.isAlive() && SummonRegistry.get(h.getLevel().getServer()).get(mb.link().unitId).isPresent(), "B 的单位还在");
+            h.assertTrue(SummonService.command(a, SummonPayloads.Command.all(SummonPayloads.Action.ALL_GUARD_HERE)), "驻守于此生效");
+            h.assertTrue(ma.link().mode == SummonMode.GUARD && a.blockPosition().equals(ma.link().guard), "A 的单位驻守 A 脚下");
+            h.assertTrue(mb.link().mode == SummonMode.FOLLOW, "B 的单位不变");
+            h.assertTrue(SummonService.command(a, SummonPayloads.Command.all(SummonPayloads.Action.ALL_FOLLOW))
+                    && ma.link().mode == SummonMode.FOLLOW, "全部跟随");
+        } finally {
+            cleanup(h, a, b);
+        }
+        h.succeed();
+    }
+
+    // ───────────── 天马（阶段 ②，TC-T14-80～89） ─────────────
+
+    private static final String PEG_BATCH = "summon_pegasus";
+
+    private static SummonPegasusEntity pegasus(GameTestHelper h, FakePlayer p, BlockPos at) {
+        SummonService.Result r = SummonService.summon(p, SummonUnits.card("greek:pegasus").orElseThrow(),
+                Vec3.atBottomCenterOf(h.absolutePos(at)));
+        h.assertTrue(r == SummonService.Result.OK, "召唤天马应成功，实际 " + r);
+        return h.getLevel().getEntitiesOfClass(SummonPegasusEntity.class, new AABB(h.absolutePos(BlockPos.ZERO)).inflate(80),
+                e -> p.getUUID().equals(e.link().owner)).get(0);
+    }
+
+    /** TC-T14-80：主人头顶开阔，天马飞到主人上空盘旋。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 200)
+    public static void pegasus_circles_above_owner(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_fly", Age.ARCHAIC, new BlockPos(8, 2, 18));
+        SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 14));
+        double floorY = h.absolutePos(new BlockPos(0, 2, 0)).getY();
+        h.succeedWhen(() -> {
+            h.assertTrue(g.flying(), "应在飞");
+            h.assertTrue(g.getY() - floorY >= 4, "离地应 ≥ 4 格，实际 " + (g.getY() - floorY));
+            double dx = g.getX() - p.getX();
+            double dz = g.getZ() - p.getZ();
+            h.assertTrue(dx * dx + dz * dz <= 64, "水平距离主人 ≤ 8 格");
+            cleanup(h, p);
+        });
+    }
+
+    /** TC-T14-81：主人头顶 3 格有一层石头，天马留在地面。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 120)
+    public static void pegasus_stays_low_under_roof(GameTestHelper h) {
+        floor(h);
+        for (int x = 0; x < 17; x++) {
+            for (int z = 0; z < 36; z++) {
+                h.setBlock(new BlockPos(x, 5, z), Blocks.STONE);
+            }
+        }
+        FakePlayer p = owner(h, "ma_peg_roof", Age.ARCHAIC, new BlockPos(8, 2, 18));
+        SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 14));
+        double floorY = h.absolutePos(new BlockPos(0, 2, 0)).getY();
+        h.runAfterDelay(80, () -> {
+            cleanup(h, p);
+            h.assertTrue(!g.flying() && g.getY() - floorY < 1.5, "有遮挡时应在地面，离地 " + (g.getY() - floorY));
+            h.assertTrue(g.indoor(), "应判为室内（收翼）");
+            h.succeed();
+        });
+    }
+
+    /** TC-T14-82、83：天眼只标敌方；传令杖的攻击指令不算天马。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 100)
+    public static void pegasus_sky_eye_marks_enemies_only(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_eye", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        try {
+            SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 8));
+            Zombie z = zombie(h, new BlockPos(8, 2, 30));
+            Cow cow = h.spawn(EntityType.COW, new BlockPos(4, 2, 20));
+            g.skyEye();
+            h.assertTrue(g.lastMarked().contains(z.getUUID()), "僵尸应被标出");
+            h.assertTrue(!g.lastMarked().contains(cow.getUUID()) && !g.lastMarked().contains(p.getUUID()), "牛与主人不标");
+            h.assertTrue(SummonService.commandAttack(p, z) == 0, "非战斗单位不接受攻击指令");
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-84：只有主人骑得上（FakePlayer 一律不能骑，真正的上马在实机验证；这里核对判定）。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 100)
+    public static void pegasus_rides_owner_only(GameTestHelper h) {
+        floor(h);
+        FakePlayer a = owner(h, "ma_peg_ride_a", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        FakePlayer b = owner(h, "ma_peg_ride_b", Age.ARCHAIC, new BlockPos(9, 2, 4));
+        try {
+            SummonPegasusEntity g = pegasus(h, a, new BlockPos(8, 2, 6));
+            h.assertTrue(!g.canMount(b), "别人骑不上");
+            h.assertTrue(g.canMount(a), "主人能骑");
+            h.assertTrue(g.interact(b, InteractionHand.MAIN_HAND).consumesAction() && !b.isPassenger(), "别人右键：提示、不上马");
+        } finally {
+            cleanup(h, a, b);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-85、86：有骑手时在空中耐力每刻 −1，到 0 为止；落地每刻 +2（骑手用盔甲架代替：FakePlayer 不能骑）。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 120)
+    public static void pegasus_stamina(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_stamina", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 8));
+        net.minecraft.world.entity.decoration.ArmorStand rider = h.spawn(EntityType.ARMOR_STAND, new BlockPos(8, 2, 10));
+        h.assertTrue(rider.startRiding(g, true) && g.isVehicle(), "盔甲架骑上");
+        Vec3 air = Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(8, 9, 8)));
+        g.moveTo(air.x, air.y, air.z);
+        g.setStaminaForTest(5);
+        h.runAfterDelay(10, () -> {
+            h.assertTrue(g.stamina() == 0, "空中耐力应耗到 0，实际 " + g.stamina());
+            Vec3 ground = Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(8, 2, 8)));
+            g.moveTo(ground.x, ground.y, ground.z);
+            g.setOnGround(true);
+        });
+        h.runAfterDelay(16, () -> {
+            int s = g.stamina();
+            rider.discard();
+            cleanup(h, p);
+            h.assertTrue(s >= 6 && s <= 14, "落地后每刻 +2，5 刻后应约 10，实际 " + s);
+            h.succeed();
+        });
+    }
+
+    /** TC-T14-87、88：天马倒下后等待重生、仍占位；主人没有神坛就不重生，放下神坛后在神坛旁重生，unitId 不变。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 100)
+    public static void pegasus_respawns_at_altar(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_respawn", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        ShrineRegistry shrines = ShrineRegistry.get(h.getLevel().getServer());
+        GlobalPos altar = GlobalPos.of(h.getLevel().dimension(), h.absolutePos(new BlockPos(8, 2, 30)));
+        try {
+            SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 8));
+            UUID unit = g.link().unitId;
+            g.kill();
+            SummonRegistry reg = SummonRegistry.get(h.getLevel().getServer());
+            SummonRegistry.Unit u = reg.get(unit).orElseThrow();
+            h.assertTrue(u.respawning && SummonService.occupied(p) == 1, "等待重生、仍占 1 个名额");
+            u.respawnAt = h.getLevel().getServer().overworld().getGameTime();
+            SummonService.tickRespawns(h.getLevel().getServer());
+            h.assertTrue(u.respawning, "没有神坛：不重生");
+            shrines.add(new ShrineRegistry.Entry(altar, p.getUUID(), "ma_peg_respawn", Direction.SOUTH, Civilization.GREEK, "greek:altar"));
+            SummonService.tickRespawns(h.getLevel().getServer());
+            h.assertTrue(!u.respawning && u.unitId.equals(unit), "放下神坛后重生，unitId 不变");
+            Entity back = SummonService.find(h.getLevel().getServer(), u);
+            h.assertTrue(back instanceof SummonPegasusEntity && back.blockPosition().distSqr(altar.pos()) <= 9, "在神坛旁重生");
+        } finally {
+            shrines.remove(altar);
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
+    /** TC-T14-89：天马不受摔落伤害。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 60)
+    public static void pegasus_no_fall_damage(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_fall", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        try {
+            SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 8));
+            float hp = g.getHealth();
+            h.assertTrue(!g.causeFallDamage(30, 1, g.damageSources().fall()) && g.getHealth() == hp, "摔落不掉血");
+        } finally {
+            cleanup(h, p);
+        }
         h.succeed();
     }
 }

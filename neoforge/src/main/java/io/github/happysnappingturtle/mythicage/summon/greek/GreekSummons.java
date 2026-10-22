@@ -28,6 +28,22 @@ public final class GreekSummons {
                             .clientTrackingRange(10)
                             .build("mythic_age:summon_minotaur"));
 
+    /** 召唤版天马（T14 §11.4）：碰撞 0.9 × 1.5（翅膀不进碰撞）；骑手坐在鬐甲后方。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<SummonPegasusEntity>> PEGASUS =
+            ModRegistries.ENTITY_TYPES.register("summon_pegasus",
+                    () -> EntityType.Builder.of(SummonPegasusEntity::new, MobCategory.MISC)
+                            .sized(0.9F, 1.5F)
+                            .eyeHeight(1.35F)
+                            .passengerAttachments(new net.minecraft.world.phys.Vec3(0, 1.3, -0.1))
+                            .clientTrackingRange(10)
+                            .build("mythic_age:summon_pegasus"));
+
+    public static final DeferredItem<SummonTokenItem> PEGASUS_TOKEN = Content.item("summon_token_pegasus", GREEK,
+                    p -> new SummonTokenItem("greek:pegasus", p))
+            .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .lang("天马召唤符", "Pegasus Summoning Tablet", "ペガサス召喚の札")
+            .register();
+
     public static final DeferredItem<SummonTokenItem> MINOTAUR_TOKEN = Content.item("summon_token_minotaur", GREEK,
                     p -> new SummonTokenItem("greek:minotaur", p))
             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -45,5 +61,7 @@ public final class GreekSummons {
     public static void init(IEventBus modBus) {
         modBus.addListener((EntityAttributeCreationEvent e) ->
                 e.put(MINOTAUR.get(), SummonMinotaurEntity.createSummonAttributes().build()));
+        modBus.addListener((EntityAttributeCreationEvent e) ->
+                e.put(PEGASUS.get(), SummonPegasusEntity.createSummonAttributes().build()));
     }
 }

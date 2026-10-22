@@ -197,7 +197,8 @@ public final class MultiCivGameTests {
         h.succeed();
     }
 
-    @GameTest(template = T, batch = ON)
+    /** 神坛间距不分主人：单独一批，免得与同批其他测试放的希腊神坛挨得太近（场地排布随用例数变化）。 */
+    @GameTest(template = T, batch = "multiciv_shrine_kinds")
     public static void shrine_limits_and_spacing_are_per_kind(GameTestHelper h) {
         floor(h);
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_kinds"));

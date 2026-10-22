@@ -94,6 +94,9 @@ public class SummonTokenItem extends Item {
         if (net.minecraft.locale.Language.getInstance().has(key)) {
             lines.add(Component.translatable(key).withStyle(net.minecraft.ChatFormatting.GRAY));
         }
-        lines.add(Component.translatable("mythic_age.summon.token_tip").withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+        // 单位自己的规则说明（如天马会在神坛旁重生）优先；没有就用通用说明
+        String rule = getDescriptionId() + ".rule";
+        lines.add(Component.translatable(net.minecraft.locale.Language.getInstance().has(rule) ? rule : "mythic_age.summon.token_tip")
+                .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
     }
 }

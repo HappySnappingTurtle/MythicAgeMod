@@ -60,6 +60,12 @@ public final class SummonTargets {
         return SummonTargetRules.canAttack(TargetFactsCollector.collect(owner, target, ownVillages(owner)), s.combatUnit());
     }
 
+    /** 从主人的角度看 target 是不是敌方（不论单位能不能打）：天马的天眼按它标记。 */
+    public static boolean isEnemyOf(ServerPlayer owner, LivingEntity target) {
+        return target.isAlive() && target != owner
+                && SummonTargetRules.canAttack(TargetFactsCollector.collect(owner, target, ownVillages(owner)), true);
+    }
+
     private static Set<UUID> ownVillages(ServerPlayer owner) {
         long now = owner.level().getGameTime();
         Map.Entry<Long, Set<UUID>> e = OWN_VILLAGES.get(owner.getUUID());

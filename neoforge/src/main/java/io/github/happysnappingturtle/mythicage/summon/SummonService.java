@@ -189,7 +189,7 @@ public final class SummonService {
     public static int commandGuard(ServerPlayer owner, BlockPos post) {
         int n = 0;
         for (Mob m : nearbyUnits(owner, COMMAND_RADIUS)) {
-            if (((MythSummon) m).link().mode == SummonMode.FOLLOW) {
+            if (((MythSummon) m).link().mode == SummonMode.FOLLOW && !m.isVehicle()) {
                 setMode(m, SummonMode.GUARD, post);
                 n++;
             }
@@ -231,6 +231,80 @@ public final class SummonService {
             }
         }
         return anyCombat ? n : 0;
+    }
+
+    // ───────────── 管理界面指令（§11.2） ─────────────
+
+    /** 执行管理界面的指令；只处理发令者自己的单位。返回是否生效。 */
+    public static boolean command(ServerPlayer p, SummonPayloads.Command c) {
+        SummonRegistry reg = SummonRegistry.get(p.server);
+        return switch (c.action()) {
+            case ALL_FOLLOW -> {
+                boolean any = false;
+                for (SummonRegistry.Unit u : reg.byOwner(p.getUUID())) {
+                    any |= !u.respawning && changeMode(p, u, SummonMode.FOLLOW);
+                }
+                yield any;
+            }
+            case ALL_GUARD_HERE -> {
+                int n = 0;
+                for (Mob m : nearbyUnits(p, COMMAND_RADIUS)) {
+                    setMode(m, SummonMode.GUARD, p.blockPosition());
+                    n++;
+                }
+                yield n > 0;
+            }
+            default -> {
+                Optional<SummonRegistry.Unit> u = reg.get(c.unitId()).filter(x -> x.owner.equals(p.getUUID()));
+                if (u.isEmpty()) {
+                    yield false;
+                }
+                yield switch (c.action()) {
+                    case MODE -> !u.get().respawning && changeMode(p, u.get(), c.mode());
+                    case RECALL -> recall(p, u.get());
+                    case DISMISS -> dismiss(p.server, u.get().unitId);
+                    default -> false;
+                };
+            }
+        };
+    }
+
+    /** 改一个单位的模式；驻守点取单位当前位置（未载入时取最后已知位置）。非战斗单位不能改成自由攻击。 */
+    private static boolean changeMode(ServerPlayer p, SummonRegistry.Unit u, SummonMode mode) {
+        boolean combat = SummonUnits.card(u.card).map(SummonUnitCard::combat).orElse(true);
+        if (mode == SummonMode.FREE && !combat) {
+            return false;
+        }
+        Entity e = find(p.server, u);
+        if (e instanceof Mob m) {
+            setMode(m, mode, mode == SummonMode.GUARD ? m.blockPosition() : null);
+        } else {
+            u.mode = mode;
+            u.guard = mode == SummonMode.GUARD ? u.last : null;
+            SummonRegistry.get(p.server).setDirty();
+        }
+        return true;
+    }
+
+    /** 召回：只限与主人同维度；改为跟随并瞬移到主人身边（未载入的临时载入区块再取）。 */
+    private static boolean recall(ServerPlayer p, SummonRegistry.Unit u) {
+        if (u.respawning) {
+            return false;
+        }
+        Entity e = find(p.server, u);
+        if (e != null && e.level() != p.level()) {
+            return false;
+        }
+        if (e == null && (u.last == null || !u.last.dimension().equals(p.level().dimension()))) {
+            return false;
+        }
+        changeMode(p, u, SummonMode.FOLLOW);
+        if (e instanceof Mob m) {
+            teleportNear(m, p);
+        } else {
+            pullLater(p, u);
+        }
+        return true;
     }
 
     // ───────────── 脱战（顶飞） ─────────────
@@ -402,12 +476,20 @@ public final class SummonService {
             Entity e = find(p.server, u);
             if (e instanceof Mob m && e.level() == p.level()) {
                 teleportNear(m, p);
-            } else if (e == null && !PENDING_PULL.containsKey(u.unitId)) {
-                ChunkPos c = new ChunkPos(u.last.pos());
-                p.serverLevel().setChunkForced(c.x, c.z, true);
-                PENDING_PULL.put(u.unitId, new Pending(p.getUUID(), p.serverLevel(), c, 10));
+            } else if (e == null) {
+                pullLater(p, u);
             }
         }
+    }
+
+    /** 临时强制载入单位最后所在的区块，之后几秒内取到实体就拉到主人身边。 */
+    private static void pullLater(ServerPlayer p, SummonRegistry.Unit u) {
+        if (u.last == null || PENDING_PULL.containsKey(u.unitId)) {
+            return;
+        }
+        ChunkPos c = new ChunkPos(u.last.pos());
+        p.serverLevel().setChunkForced(c.x, c.z, true);
+        PENDING_PULL.put(u.unitId, new Pending(p.getUUID(), p.serverLevel(), c, 10));
     }
 
     /** 每 20 刻处理一次等待拉回的单位：取到实体就拉到主人身边并解除临时强制加载。 */
@@ -546,6 +628,19 @@ public final class SummonService {
     public static void onRegisterCommands(net.neoforged.neoforge.event.RegisterCommandsEvent event) {
         event.getDispatcher().register(net.minecraft.commands.Commands.literal("mythicage")
                 .then(net.minecraft.commands.Commands.literal("dev").requires(s -> s.hasPermission(2))
+                        // 开发命令：骑上自己 16 格内最近的、可骑乘的召唤单位（实机测试用；FakePlayer 不能骑）
+                        .then(net.minecraft.commands.Commands.literal("summon_ride").executes(ctx -> {
+                            ServerPlayer p = ctx.getSource().getPlayerOrException();
+                            Optional<io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity> mount = p.serverLevel()
+                                    .getEntitiesOfClass(io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity.class,
+                                            p.getBoundingBox().inflate(16), e -> e.canMount(p))
+                                    .stream().min(java.util.Comparator.comparingDouble(e -> e.distanceToSqr(p)));
+                            if (mount.isEmpty() || !mount.get().mount(p)) {
+                                ctx.getSource().sendFailure(Component.literal("附近没有能骑的单位"));
+                                return 0;
+                            }
+                            return 1;
+                        }))
                         .then(net.minecraft.commands.Commands.literal("summon")
                                 .then(net.minecraft.commands.Commands.argument("card",
                                                 com.mojang.brigadier.arguments.StringArgumentType.greedyString())

@@ -1,0 +1,13 @@
+{
+  "_note": "召唤版天马（01_希腊 §5、T14 §11.4）：生命 30、不战斗；AI 飞速 0.5 格/刻，骑乘飞速 0.55 格/刻，飞行耐力 600 刻（30 秒，07 号）；天眼：半径 32 格、每 200 刻一次、标记 100 刻",
+  "max_health": 30,
+  "movement_speed": 0.3,
+  "special": {
+    "fly_speed": 0.5,
+    "ride_fly_speed": 0.55,
+    "stamina_ticks": 600,
+    "sky_eye_radius": 32,
+    "sky_eye_period": 200,
+    "sky_eye_ticks": 100
+  }
+}

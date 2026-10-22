@@ -83,6 +83,24 @@ public final class ClientHooks {
         io.github.happysnappingturtle.mythicage.client.power.ClientAuras.accept(payload);
     }
 
+    /** 天马天眼（T14 阶段 ②）。 */
+    public static void skyEye(io.github.happysnappingturtle.mythicage.summon.SkyEyePayload payload) {
+        ClientSkyEye.accept(payload);
+    }
+
+    /** 召唤管理界面（T14 阶段 ②）：已开着就刷新，否则在当前界面之上打开。 */
+    public static void summonView(io.github.happysnappingturtle.mythicage.summon.SummonPayloads.View payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.SummonScreen open) {
+            open.update(payload.view());
+        } else if (mc.screen instanceof net.minecraft.client.gui.screens.ConfirmScreen) {
+            // 遣散确认框开着：这份刷新丢掉，回到管理界面后会再要
+            return;
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.SummonScreen(payload.view(), mc.screen));
+        }
+    }
+
     /** 界面关闭时的回调；目前没有需要清理的客户端状态，留作 T9b 的动画联动入口。 */
     public static void clearTradeScreen(GuardianScreen screen) {
     }

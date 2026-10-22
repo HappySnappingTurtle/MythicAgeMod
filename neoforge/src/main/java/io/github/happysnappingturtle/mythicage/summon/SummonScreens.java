@@ -1,34 +1,77 @@
 package io.github.happysnappingturtle.mythicage.summon;
 
 import io.github.happysnappingturtle.mythicage.core.summon.SummonUnitCard;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 召唤管理的入口（T14 设计文档 §7）。阶段 ① 先在聊天里列出单位；阶段 ② 换成管理界面。
+ * 召唤管理界面的服务端入口（T14 设计文档 §7、§11.2）：组装快照、处理打开 / 刷新与指令。
+ * 入口：传令杖右键空气、信仰面板「神话单位」按钮。
  */
 public final class SummonScreens {
     private SummonScreens() {
     }
 
     public static void open(ServerPlayer p) {
-        var units = SummonRegistry.get(p.server).byOwner(p.getUUID());
-        p.sendSystemMessage(Component.translatable("mythic_age.summon.summary", SummonService.occupied(p), SummonService.cap(p)));
-        for (SummonRegistry.Unit u : units) {
-            Component name = SummonUnits.card(u.card).map(SummonUnitCard::entity)
-                    .map(id -> Component.translatable("entity." + id.replace(':', '.')))
-                    .orElse(Component.literal(u.card));
-            Entity e = SummonService.find(p.server, u);
-            Component where = u.respawning
-                    ? Component.translatable("mythic_age.summon.where_respawning",
-                    Math.max(0, (u.respawnAt - p.server.overworld().getGameTime()) / 20))
-                    : e == null ? Component.translatable("mythic_age.summon.where_unloaded")
-                    : e.level() != p.level() ? Component.translatable("mythic_age.summon.where_dimension",
-                    e.level().dimension().location().toString())
-                    : Component.translatable("mythic_age.summon.where_distance", (int) e.distanceTo(p));
-            p.sendSystemMessage(Component.translatable("mythic_age.summon.line", name,
-                    Component.translatable("mythic_age.summon.mode." + u.mode.id()), where));
+        PacketDistributor.sendToPlayer(p, new SummonPayloads.View(view(p)));
+    }
+
+    public static SummonView view(ServerPlayer p) {
+        List<SummonView.Row> rows = new ArrayList<>();
+        long now = p.server.overworld().getGameTime();
+        for (SummonRegistry.Unit u : SummonRegistry.get(p.server).byOwner(p.getUUID())) {
+            SummonUnitCard card = SummonUnits.card(u.card).orElse(null);
+            String entity = card == null ? "" : card.entity();
+            String token = card == null ? "" : card.token();
+            boolean combat = card == null || card.combat();
+            Entity e = u.respawning ? null : SummonService.find(p.server, u);
+            float hp = e instanceof LivingEntity le ? le.getHealth() : -1;
+            float max = e instanceof LivingEntity le ? le.getMaxHealth() : -1;
+            SummonView.Where where;
+            int value = 0;
+            String dim = "";
+            if (u.respawning) {
+                where = SummonView.Where.RESPAWNING;
+                value = (int) Math.max(0, (u.respawnAt - now) / 20);
+            } else if (e != null && e.level() != p.level()) {
+                where = SummonView.Where.DIMENSION;
+                dim = e.level().dimension().location().toString();
+            } else if (e == null && u.last != null && !u.last.dimension().equals(p.level().dimension())) {
+                where = SummonView.Where.DIMENSION;
+                dim = u.last.dimension().location().toString();
+            } else if (e == null) {
+                where = SummonView.Where.UNLOADED;
+            } else {
+                where = SummonView.Where.NEAR;
+                value = (int) e.distanceTo(p);
+            }
+            boolean recallable = where == SummonView.Where.NEAR || where == SummonView.Where.UNLOADED;
+            rows.add(new SummonView.Row(u.unitId, u.card, entity, token, combat, hp, max, u.mode, where, value, dim, recallable));
         }
+        return new SummonView(SummonService.occupied(p), SummonService.cap(p), List.copyOf(rows));
+    }
+
+    public static void handleRequest(SummonPayloads.Request payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer p) {
+                open(p);
+            }
+        });
+    }
+
+    /** 执行指令后立即回一份新快照，界面不用等下一次刷新。 */
+    public static void handleCommand(SummonPayloads.Command payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer p) {
+                SummonService.command(p, payload);
+                open(p);
+            }
+        });
     }
 }

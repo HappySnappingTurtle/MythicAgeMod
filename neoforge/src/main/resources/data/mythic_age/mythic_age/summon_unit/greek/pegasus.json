@@ -1,0 +1,7 @@
+{
+  "entity": "mythic_age:summon_pegasus",
+  "cost": 1,
+  "combat": false,
+  "respawn": {"kind": "shrine", "delayDays": 1},
+  "token": "mythic_age:summon_token_pegasus"
+}

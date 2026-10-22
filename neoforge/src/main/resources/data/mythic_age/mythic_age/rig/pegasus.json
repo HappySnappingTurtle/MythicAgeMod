@@ -1,0 +1,45 @@
+{
+  "model": "mythic_age:pegasus",
+  "collision": {
+    "width": 0.9,
+    "height": 1.5
+  },
+  "locators": {
+    "rider_seat": [
+      0,
+      22.5,
+      -1.5
+    ],
+    "nose": [
+      0,
+      19.2126,
+      20.3472
+    ],
+    "eye_glint": [
+      0,
+      25.6352,
+      14.2488
+    ],
+    "hoof_fl": [
+      2.6,
+      0,
+      6.8
+    ],
+    "hoof_fr": [
+      -2.6,
+      0,
+      6.8
+    ],
+    "hoof_hl": [
+      2.6,
+      0,
+      -7.9
+    ],
+    "hoof_hr": [
+      -2.6,
+      0,
+      -7.9
+    ]
+  },
+  "variants": {}
+}

@@ -60,7 +60,11 @@ class TradeTableTest {
         assertEquals(8, o.dailyLimit());
         assertEquals("greek:libation", o.key(Civilization.GREEK));
         assertTrue(t.offersAt(TradeOffer.Venue.STATUE).stream().allMatch(x -> x.category() == TradeOffer.Category.GOD_POWER
-                && !x.patron().isEmpty()), "神像前只有主神神力（T13）");
+                        && !x.patron().isEmpty() || x.category() == TradeOffer.Category.SUMMON),
+                "神像前只有主神神力（T13）与天马召唤符（T14 §2.1）");
+        TradeOffer pegasus = t.offer("summon_pegasus").orElseThrow();
+        assertTrue(pegasus.patron().isEmpty() && pegasus.price().isFavor() && pegasus.minAge() == Age.ARCHAIC,
+                "天马召唤符：全体主神的神像前，恩宠价，远古起（T14 §2.1）");
     }
 
     @Test

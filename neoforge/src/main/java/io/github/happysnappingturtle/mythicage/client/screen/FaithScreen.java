@@ -102,6 +102,12 @@ public class FaithScreen extends Screen {
         }
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
                 .bounds(left + W - 58, top + H - BOTTOM + 4, 50, 16).build());
+        // 神话单位（T14 D8）：打开召唤管理界面，关闭后回到这里
+        Component units = Component.translatable("mythic_age.summon.title");
+        int uw = font.width(units) + 12;
+        addRenderableWidget(Button.builder(units, b -> PacketDistributor.sendToServer(
+                        new io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Request()))
+                .bounds(left + W - 62 - uw, top + H - BOTTOM + 4, uw, 16).build());
     }
 
     @Override

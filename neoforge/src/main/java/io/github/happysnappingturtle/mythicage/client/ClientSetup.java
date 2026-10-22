@@ -37,6 +37,14 @@ public final class ClientSetup {
         // 召唤版弥诺陶洛斯（T14）：与 T7 共用模型与动画
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
+        // 召唤版天马（T14 阶段 ②）：眼睛金光只在天眼时画
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.PEGASUS.get(),
+                ctx -> {
+                    var r = new MythGeoRenderer<>(ctx, new MythGeoModel<io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity>(
+                            "pegasus", Set.of("bridle", "saddle")), 0.9F);
+                    r.addRenderLayer(new io.github.happysnappingturtle.mythicage.client.geo.SkyEyeGlowLayer(r));
+                    return r;
+                });
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));

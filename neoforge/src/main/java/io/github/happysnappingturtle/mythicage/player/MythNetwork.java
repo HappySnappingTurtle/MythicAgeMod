@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "10";
+    private static final String PROTOCOL_VERSION = "12";
 
     private MythNetwork() {
     }
@@ -61,6 +61,20 @@ public final class MythNetwork {
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.tradeClose())
                 .playToServer(TradePayloads.Buy.TYPE, TradePayloads.Buy.STREAM_CODEC, TradeService::handleBuy)
                 .playToServer(TradePayloads.Blessing.TYPE, TradePayloads.Blessing.STREAM_CODEC, TradeService::handleBlessing)
-                .playToServer(TradePayloads.Closed.TYPE, TradePayloads.Closed.STREAM_CODEC, TradeService::handleClosed);
+                .playToServer(TradePayloads.Closed.TYPE, TradePayloads.Closed.STREAM_CODEC, TradeService::handleClosed)
+                // 天马天眼（T14 阶段 ②）：只发给主人
+                .playToClient(io.github.happysnappingturtle.mythicage.summon.SkyEyePayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.summon.SkyEyePayload.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.skyEye(payload))
+                // 召唤管理界面（T14 阶段 ②）
+                .playToClient(io.github.happysnappingturtle.mythicage.summon.SummonPayloads.View.TYPE,
+                        io.github.happysnappingturtle.mythicage.summon.SummonPayloads.View.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.summonView(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Request.TYPE,
+                        io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Request.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.summon.SummonScreens::handleRequest)
+                .playToServer(io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Command.TYPE,
+                        io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Command.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.summon.SummonScreens::handleCommand);
     }
 }

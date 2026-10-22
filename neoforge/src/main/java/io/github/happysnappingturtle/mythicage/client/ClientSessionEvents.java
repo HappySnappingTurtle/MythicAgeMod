@@ -18,6 +18,7 @@ public final class ClientSessionEvents {
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientMythData.reset();
         ClientBelievers.onLoggingOut(event);
+        ClientSkyEye.clear();
     }
 
     @SubscribeEvent
