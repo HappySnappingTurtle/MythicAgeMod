@@ -1,7 +1,7 @@
 package io.github.happysnappingturtle.mythicage.client.summon;
 
 import io.github.happysnappingturtle.mythicage.client.geo.MythGeoModel;
-import io.github.happysnappingturtle.mythicage.summon.greek.SummonCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.centaur.AbstractCentaurEntity;
 import net.minecraft.util.Mth;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.constant.DataTickets;
@@ -13,7 +13,7 @@ import java.util.Set;
  * 半人马模型（T14 §6.3）：视线的水平偏转加在腰（waist）上——人上身独立转向目标（±90°，超出部分由马身整体转身），
  * 俯仰加在头上。野外版（T15）隐藏豹皮骨骼 pelt。
  */
-public class CentaurGeoModel extends MythGeoModel<SummonCentaurEntity> {
+public class CentaurGeoModel<T extends AbstractCentaurEntity> extends MythGeoModel<T> {
     private final Set<String> hidden;
 
     public CentaurGeoModel(Set<String> hiddenBones) {
@@ -22,7 +22,7 @@ public class CentaurGeoModel extends MythGeoModel<SummonCentaurEntity> {
     }
 
     @Override
-    public void setCustomAnimations(SummonCentaurEntity animatable, long instanceId, AnimationState<SummonCentaurEntity> state) {
+    public void setCustomAnimations(T animatable, long instanceId, AnimationState<T> state) {
         for (String bone : hidden) {
             getBone(bone).ifPresent(b -> b.setHidden(true));
         }

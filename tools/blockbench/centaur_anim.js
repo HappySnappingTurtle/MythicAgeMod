@@ -144,6 +144,24 @@
                 arrow: vis([[0, false]]),
             }),
         },
+        // 营火边休息（野外版夜里，T15 §2）：马身卧下（腹部离地约 2u），前腿向前折、后腿收在身侧；人上身坐直，弓横放膝前
+        rest: {
+            length: 4.0,
+            loop: 'loop',
+            bones: merge(poses([[0, REST], [4.0, REST]]), restProps, {
+                body: { position: [[0, [0, -8.5, 0]], [2.0, [0, -8.3, 0]], [4.0, [0, -8.5, 0]]] },
+                leg_fl: { rotation: [[0, [-82, 0, -6]]] },
+                leg_fl_lower: { rotation: [[0, [150, 0, 0]]] },
+                leg_fr: { rotation: [[0, [-82, 0, 6]]] },
+                leg_fr_lower: { rotation: [[0, [150, 0, 0]]] },
+                leg_hl: { rotation: [[0, [-70, -20, -10]]] },
+                leg_hl_lower: { rotation: [[0, [-100, 0, 0]]] },
+                leg_hr: { rotation: [[0, [-70, 20, 10]]] },
+                leg_hr_lower: { rotation: [[0, [-100, 0, 0]]] },
+                waist: { rotation: [[0, [-4, 0, 0]], [2.0, [-2, 3, 0]], [4.0, [-4, 0, 0]]] },
+                tail: { rotation: [[0, [45, 12, 0]], [2.0, [45, 18, 0]], [4.0, [45, 12, 0]]] },
+            }),
+        },
         // 踢击 0.9 秒：0–0.6 前身抬起（预警）、前腿折起；0.72 前蹄向前踢出（服务端第 12 刻判定）；0.9 落回
         kick: {
             length: 0.9,

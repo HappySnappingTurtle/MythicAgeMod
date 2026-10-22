@@ -55,6 +55,14 @@ public final class SummonUnits {
         return cards;
     }
 
+    private static volatile Map<String, Stats> statsByFile = Map.of();
+
+    /** 按文件名取数值（野外生物用，T15）：{@code statsFile("greek", "wild_centaur")}；缺失时返回空表。 */
+    public static Stats statsFile(String civ, String file) {
+        Stats s = statsByFile.get(civ + ":" + file);
+        return s != null ? s : new Stats(Map.of(), new JsonObject());
+    }
+
     /** 文明:id → 数值（缺失时返回空表，单位用自身默认值）。 */
     public static Stats stats(String key) {
         Stats s = stats.get(key);
@@ -112,9 +120,10 @@ public final class SummonUnits {
         @Override
         protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
             Map<String, Stats> next = new HashMap<>();
+            Map<String, Stats> byFile = new HashMap<>();
             files.forEach((file, json) -> {
                 String[] ci = civAndId(file);
-                if (ci == null || !ci[1].startsWith("summon_")) {
+                if (ci == null) {
                     return;
                 }
                 try {
@@ -126,12 +135,17 @@ public final class SummonUnits {
                         }
                     }
                     JsonObject special = o.has("special") ? o.getAsJsonObject("special") : new JsonObject();
-                    next.put(ci[0] + ":" + ci[1].substring("summon_".length()), new Stats(Map.copyOf(attrs), special));
+                    Stats st = new Stats(Map.copyOf(attrs), special);
+                    byFile.put(ci[0] + ":" + ci[1], st);
+                    if (ci[1].startsWith("summon_")) {
+                        next.put(ci[0] + ":" + ci[1].substring("summon_".length()), st);
+                    }
                 } catch (RuntimeException e) {
                     MythicAge.LOGGER.error("单位数值 {} 解析失败，已忽略：{}", file, e.getMessage());
                 }
             });
             stats = Map.copyOf(next);
+            statsByFile = Map.copyOf(byFile);
         }
     }
 }

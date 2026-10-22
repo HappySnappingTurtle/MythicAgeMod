@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:region/greek/arcadia",
+  "features": "mythic_age:centaur_camp",
+  "step": "surface_structures"
+}

@@ -1,0 +1,15 @@
+{
+  "_note": "野外半人马（01_希腊 W1）：生命 40；拉弓 16 刻射箭 5、两箭间隔 24 刻；踢击 7；风筝 10–16 格；不掷松（T15 D1）",
+  "max_health": 40,
+  "movement_speed": 0.3,
+  "special": {
+    "arrow_damage": 5,
+    "draw_ticks": 16,
+    "shot_cooldown": 24,
+    "kick_damage": 7,
+    "kick_windup": 12,
+    "kick_cooldown": 40,
+    "keep_min": 10,
+    "keep_max": 16
+  }
+}

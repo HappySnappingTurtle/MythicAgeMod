@@ -1,0 +1,9 @@
+{
+  "_note": "W1 野外半人马（01_希腊 §6、T15 §2）：中立群居，只随半人马营地生成（阿卡迪亚子区，约每 256×256 格一群），群 3–5 含 1 只首领",
+  "entity": "mythic_age:centaur",
+  "attitude": "neutral",
+  "spawn": "structure",
+  "biomes": ["#mythic_age:region/greek/arcadia"],
+  "group": [3, 5],
+  "density": {"area": 256, "max": 1}
+}

@@ -42,6 +42,12 @@ public final class ModTags {
                 ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "region/" + civ.id()));
     }
 
+    /** 神话子区（T15，01_希腊 §2），例如 {@code mythic_age:region/greek/arcadia}；只用于生物与结构的生成规则。 */
+    public static TagKey<Biome> subregion(Civilization civ, String name) {
+        return TagKey.create(Registries.BIOME,
+                ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "region/" + civ.id() + "/" + name));
+    }
+
     /** 文明地域副群系，例如 {@code mythic_age:region/greek_secondary}。 */
     public static TagKey<Biome> regionSecondary(Civilization civ) {
         return TagKey.create(Registries.BIOME,

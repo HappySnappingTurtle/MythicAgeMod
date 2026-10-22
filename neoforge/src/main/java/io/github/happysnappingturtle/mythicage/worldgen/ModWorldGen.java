@@ -96,6 +96,8 @@ public final class ModWorldGen {
     public static final ResourceKey<PlacedFeature> LAUREL_TREE_PLACED = key(Registries.PLACED_FEATURE, "laurel_tree");
     public static final ResourceKey<BiomeModifier> ADD_CYPRESS = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_cypress_tree");
     public static final ResourceKey<BiomeModifier> ADD_LAUREL = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_laurel_tree");
+    /** 半人马营地（T15 阶段 ①）：阿卡迪亚子区。 */
+    public static final ResourceKey<BiomeModifier> ADD_CENTAUR_CAMP = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_centaur_camp");
 
     private ModWorldGen() {
     }
@@ -117,6 +119,9 @@ public final class ModWorldGen {
         ctx.register(GreekAgriculture.OLIVE_TREE_CONFIGURED, GreekAgriculture.oliveTreeConfigured());
         ctx.register(GreekTrees.CYPRESS_TREE_CONFIGURED, GreekTrees.cypressConfigured());
         ctx.register(GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.laurelConfigured());
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED, new ConfiguredFeature<>(
+                io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_FEATURE.get(),
+                net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE));
         ctx.register(WILD_GRAPEVINE_CONFIGURED, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
                 FeatureUtils.simplePatchConfiguration(Feature.SIMPLE_BLOCK,
                         new SimpleBlockConfiguration(BlockStateProvider.simple(GreekAgriculture.WILD_GRAPEVINE.get())),
@@ -144,6 +149,10 @@ public final class ModWorldGen {
                 CYPRESS_RARITY));
         ctx.register(LAUREL_TREE_PLACED, tree(cf, GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.LAUREL_SAPLING.get(),
                 LAUREL_RARITY));
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED, new PlacedFeature(
+                cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED), List.of(
+                RarityFilter.onAverageOnceEvery(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CAMP_RARITY),
+                InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
         ctx.register(WILD_GRAPEVINE_PLACED, new PlacedFeature(cf.getOrThrow(WILD_GRAPEVINE_CONFIGURED), List.of(
                 RarityFilter.onAverageOnceEvery(GRAPEVINE_RARITY), InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
@@ -178,6 +187,10 @@ public final class ModWorldGen {
                 HolderSet.direct(placed.getOrThrow(WILD_GRAPEVINE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
         ctx.register(ADD_CYPRESS, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(CYPRESS_BIOMES),
                 HolderSet.direct(placed.getOrThrow(CYPRESS_TREE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
+        ctx.register(ADD_CENTAUR_CAMP, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(ModTags.subregion(Civilization.GREEK, "arcadia")),
+                HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED)),
+                GenerationStep.Decoration.SURFACE_STRUCTURES));
         ctx.register(ADD_LAUREL, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(LAUREL_BIOMES),
                 HolderSet.direct(placed.getOrThrow(LAUREL_TREE_PLACED)), GenerationStep.Decoration.VEGETAL_DECORATION));
     }

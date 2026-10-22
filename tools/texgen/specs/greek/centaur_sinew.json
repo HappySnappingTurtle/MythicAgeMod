@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "item/centaur_sinew",
+  "size": 16,
+  "palette": {
+    "o": "#1e140d",
+    "d": "#3b2a1e",
+    "m": "#5a4130",
+    "h": "#8a6a4e",
+    "k": "#c9b48a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "......oooo......",
+      "....oommmmoo....",
+      "...omdddddmmo...",
+      "..omdo....odmo..",
+      "..odo......odo..",
+      ".omdo......ohmo.",
+      ".odo..okko..odo.",
+      ".odo..kkkk..odo.",
+      ".omdo.okko.odmo.",
+      "..odo......odo..",
+      "..omdo....odmo..",
+      "...omddddddmo.h.",
+      "....oommmmoo.h..",
+      "......oooo..h...",
+      "................"
+    ]
+  }
+}

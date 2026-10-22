@@ -37,6 +37,15 @@ public final class ModBiomeTags extends BiomeTagsProvider {
         tag(ModWorldGen.CYPRESS_BIOMES).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS, Biomes.WINDSWEPT_FOREST,
                 Biomes.MEADOW, Biomes.PLAINS);
         tag(ModWorldGen.LAUREL_BIOMES).add(Biomes.FLOWER_FOREST, Biomes.WINDSWEPT_FOREST, Biomes.MEADOW);
+        // 希腊神话子区（T15，01_希腊 §2）：只用于野外生物与小结构的生成规则
+        tag(ModTags.subregion(Civilization.GREEK, "arcadia")).add(Biomes.MEADOW, Biomes.FLOWER_FOREST, Biomes.PLAINS,
+                Biomes.SUNFLOWER_PLAINS);
+        tag(ModTags.subregion(Civilization.GREEK, "lerna")).add(Biomes.SWAMP);
+        tag(ModTags.subregion(Civilization.GREEK, "aegean")).add(Biomes.STONY_SHORE);
+        tag(ModTags.subregion(Civilization.GREEK, "highlands")).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS,
+                Biomes.WINDSWEPT_FOREST);
+        tag(ModTags.subregion(Civilization.GREEK, "olympus")).add(Biomes.JAGGED_PEAKS);
+        tag(ModTags.subregion(Civilization.GREEK, "nemea")).add(Biomes.SAVANNA);
         tag(ModWorldGen.GRAPEVINE_BIOMES).addTag(ModTags.region(Civilization.GREEK)).add(Biomes.FLOWER_FOREST);
     }
 }

@@ -50,6 +50,9 @@ public final class ClientSetup {
                 ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.summon.CentaurGeoModel(Set.of()), 1.1F));
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.CENTAUR_PINE.get(),
                 io.github.happysnappingturtle.mythicage.client.summon.CentaurPineRenderer::new);
+        // 野外半人马（T15）：同一模型，不披豹皮
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.summon.CentaurGeoModel(Set.of("pelt")), 1.1F));
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));

@@ -66,6 +66,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.init();
         io.github.happysnappingturtle.mythicage.village.VillageGuide.init();
         io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.init(modBus);
+        io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.init(modBus);
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
@@ -144,6 +145,7 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);
         // 召唤框架（T14）
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonUnits::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.wild.WildCreatures::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onEntityJoin);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onEntityLeave);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onIncomingDamage);
