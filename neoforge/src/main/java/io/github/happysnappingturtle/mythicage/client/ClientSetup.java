@@ -53,6 +53,11 @@ public final class ClientSetup {
         // 野外半人马（T15）：同一模型，不披豹皮
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.summon.CentaurGeoModel(Set.of("pelt")), 1.1F));
+        // 斯廷法利斯怪鸟（T15 阶段 ②）：领头鸟才显示冠羽；青铜羽弹射物画成物品贴图
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_BIRD.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.wild.StymphalianGeoModel(), 0.8F));
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.BRONZE_FEATHER_SHOT.get(),
+                net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));

@@ -1,0 +1,24 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shapeless",
+    "category": "equipment",
+    "ingredients": [
+      {
+        "item": "mythic_age:bronze_ingot"
+      },
+      {
+        "item": "mythic_age:bronze_ingot"
+      },
+      {
+        "item": "minecraft:leather"
+      }
+    ],
+    "result": {
+      "count": 1,
+      "id": "mythic_age:krotala"
+    }
+  }
+}

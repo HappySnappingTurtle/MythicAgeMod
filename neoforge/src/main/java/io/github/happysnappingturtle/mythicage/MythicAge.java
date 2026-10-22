@@ -105,6 +105,7 @@ public final class MythicAge {
         // 实体与美术管线（T7）
         game.addListener(RigRegistry::onAddReloadListeners);
         game.addListener(EntityDevCommand::onRegisterCommands);
+        game.addListener(io.github.happysnappingturtle.mythicage.wild.WildDevCommand::onRegisterCommands);
 
         // 神庙通用职责（T10b）与希腊神庙判定（T8a）
         game.addListener(ShrineService::onServerTickPost);

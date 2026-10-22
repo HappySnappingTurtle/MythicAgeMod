@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/krotala",
+  "size": 16,
+  "palette": {
+    "o": "#3a2410",
+    "d": "#6e4518",
+    "m": "#a8742e",
+    "h": "#d9a24a",
+    "k": "#f6d68a",
+    "l": "#6b4426",
+    "L": "#8a5a32"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "..oo.......oo...",
+      ".ohko.....okho..",
+      ".ohmo.....omho..",
+      ".ohmdo...odmho..",
+      "..ohmo...omho...",
+      "..ohmdo.odmho...",
+      "...ohmo.omho....",
+      "...ohmdodmho....",
+      "....ohmmmho.....",
+      "....oommmoo.....",
+      ".....olllo......",
+      ".....oLLLo......",
+      "....olLLLlo.....",
+      ".....ooooo......",
+      "................"
+    ]
+  }
+}

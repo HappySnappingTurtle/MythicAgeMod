@@ -2,7 +2,11 @@ package io.github.happysnappingturtle.mythicage.wild.greek;
 
 import io.github.happysnappingturtle.mythicage.content.Content;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
+import io.github.happysnappingturtle.mythicage.content.BlockModelSpec;
+import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
+import io.github.happysnappingturtle.mythicage.entity.stymphalian.StymphalianBirdEntity;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -10,12 +14,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -46,14 +55,61 @@ public final class GreekWild {
             ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "centaur_camp"));
     public static final ResourceKey<PlacedFeature> CENTAUR_CAMP_PLACED =
             ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "centaur_camp"));
-    /** 营地：阿卡迪亚子区里平均每 200 个区块尝试 1 处（地面不平就放弃），约每 256×256 格一群。 */
-    public static final int CAMP_RARITY = 200;
+
+    /** 斯廷法利斯怪鸟（W3）：敌对、群居、只随沼泽鸟巢生成；领头鸟放大 1.15 倍。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<StymphalianBirdEntity>> STYMPHALIAN_BIRD =
+            ModRegistries.ENTITY_TYPES.register("stymphalian_bird",
+                    () -> EntityType.Builder.of(StymphalianBirdEntity::new, MobCategory.MONSTER)
+                            .sized(0.8F, 1.0F)
+                            .eyeHeight(0.85F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:stymphalian_bird"));
+
+    /** 怪鸟射出的青铜羽（弹射物）。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<BronzeFeatherEntity>> BRONZE_FEATHER_SHOT =
+            ModRegistries.ENTITY_TYPES.register("bronze_feather",
+                    () -> EntityType.Builder.<BronzeFeatherEntity>of(BronzeFeatherEntity::new, MobCategory.MISC)
+                            .sized(0.3F, 0.3F)
+                            .clientTrackingRange(6)
+                            .updateInterval(2)
+                            .build("mythic_age:bronze_feather"));
+
+    /** 青铜羽毛：怪鸟掉落（→ 青铜箭、熔成青铜粒，T17）。 */
+    public static final DeferredItem<Item> BRONZE_FEATHER = Content.item("bronze_feather", GREEK)
+            .lang("青铜羽毛", "Bronze Feather", "青銅の羽根")
+            .register();
+
+    /** 青铜响板 Krotala：摇响惊散怪鸟（D5：2 青铜锭 + 1 皮革）。 */
+    public static final DeferredItem<KrotalaItem> KROTALA = Content.item("krotala", GREEK, KrotalaItem::new)
+            .properties(p -> p.stacksTo(1))
+            .lang("青铜响板", "Krotala", "青銅のクロタラ")
+            .register();
+
+    /** 插地青铜羽：鸟巢附近泥地里的迹象，挖掉得 1 根青铜羽毛。 */
+    public static final DeferredBlock<StuckFeatherBlock> STUCK_BRONZE_FEATHER = Content.block("stuck_bronze_feather", GREEK,
+                    StuckFeatherBlock::new)
+            .properties(() -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).noCollission().instabreak()
+                    .sound(SoundType.CHAIN).noOcclusion().pushReaction(PushReaction.DESTROY))
+            .model(BlockModelSpec.cross(ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "block/stuck_bronze_feather")))
+            .noItem()
+            .loot(LootSpec.other(() -> BRONZE_FEATHER.get()))
+            .lang("插地青铜羽", "Stuck Bronze Feather", "地に刺さった青銅の羽根")
+            .register();
+
+    public static final DeferredHolder<Feature<?>, StymphalianNestFeature> STYMPHALIAN_NEST_FEATURE =
+            ModRegistries.FEATURES.register("stymphalian_nest", () -> new StymphalianNestFeature(NoneFeatureConfiguration.CODEC));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> STYMPHALIAN_NEST_CONFIGURED =
+            ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "stymphalian_nest"));
+    public static final ResourceKey<PlacedFeature> STYMPHALIAN_NEST_PLACED =
+            ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "stymphalian_nest"));
 
     private GreekWild() {
     }
 
     public static void init(IEventBus modBus) {
-        modBus.addListener((EntityAttributeCreationEvent e) ->
-                e.put(CENTAUR.get(), WildCentaurEntity.createWildAttributes().build()));
+        modBus.addListener((EntityAttributeCreationEvent e) -> {
+            e.put(CENTAUR.get(), WildCentaurEntity.createWildAttributes().build());
+            e.put(STYMPHALIAN_BIRD.get(), StymphalianBirdEntity.createAttributes().build());
+        });
     }
 }

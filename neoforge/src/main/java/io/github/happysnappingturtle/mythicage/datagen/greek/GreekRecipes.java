@@ -57,6 +57,12 @@ public final class GreekRecipes {
         // bronze_smelting：青铜混合物 → 青铜锭
         smeltAndBlast(out, BRONZE_MIX, BRONZE_INGOT, 0.7f, "bronze_ingot");
 
+        // 青铜响板 Krotala（T15 D5）：青铜锭 2 + 皮革 1（无序，希腊古典时代）。
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.KROTALA)
+                .requires(BRONZE_INGOT, 2).requires(Items.LEATHER)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
+                .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL), id("krotala"));
+
         pottery(out);
         marble(out);
         village(out);

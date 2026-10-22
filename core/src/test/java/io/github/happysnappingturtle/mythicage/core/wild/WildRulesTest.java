@@ -58,6 +58,50 @@ class WildRulesTest {
         assertNotEquals(WildSpawnRules.areaKey(-1, 0, 256), WildSpawnRules.areaKey(0, 0, 256), "负坐标另算一个区域");
     }
 
+    /** TC-T15-06：小结构落点——每个区域恰好 1 个候选区块（max 1），至多 max 个；同种子结果不变；负坐标区域也一样。 */
+    @Test
+    void tc06_areaSite() {
+        for (int[] area : new int[][]{{0, 0}, {-1, -1}, {3, -2}}) {
+            int ones = 0;
+            int twos = 0;
+            for (int x = 0; x < 24; x++) {
+                for (int z = 0; z < 24; z++) {
+                    int cx = area[0] * 24 + x;
+                    int cz = area[1] * 24 + z;
+                    if (WildSpawnRules.isAreaSite(42L, "greek:stymphalian_bird", cx, cz, 384, 1)) {
+                        ones++;
+                    }
+                    if (WildSpawnRules.isAreaSite(42L, "greek:stymphalian_bird", cx, cz, 384, 2)) {
+                        twos++;
+                    }
+                }
+            }
+            assertEquals(1, ones, "max 1：区域里恰好 1 个候选区块");
+            assertTrue(twos >= 1 && twos <= 2, "max 2：1–2 个，实际 " + twos);
+        }
+        // 同种子同结果；换种子或换生物，候选区块会变（不要求每次都变，只要 10 个区域里有变的）
+        int moved = 0;
+        for (int a = 0; a < 10; a++) {
+            int site42 = -1;
+            int site7 = -1;
+            for (int i = 0; i < 16 * 16; i++) {
+                int cx = a * 16 + i % 16;
+                int cz = i / 16;
+                if (WildSpawnRules.isAreaSite(42L, "greek:centaur", cx, cz, 256, 1)) {
+                    assertTrue(WildSpawnRules.isAreaSite(42L, "greek:centaur", cx, cz, 256, 1), "可重复");
+                    site42 = i;
+                }
+                if (WildSpawnRules.isAreaSite(7L, "greek:centaur", cx, cz, 256, 1)) {
+                    site7 = i;
+                }
+            }
+            if (site42 != site7) {
+                moved++;
+            }
+        }
+        assertTrue(moved > 0, "换种子后候选区块应有变化");
+    }
+
     @Test
     void tc04_groupAggro() {
         assertTrue(GroupAggro.alertsGroup(GroupAggro.Source.PLAYER));

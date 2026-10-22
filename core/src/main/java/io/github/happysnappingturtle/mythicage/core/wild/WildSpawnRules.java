@@ -23,4 +23,29 @@ public final class WildSpawnRules {
     public static boolean densityAllows(int existingGroups, int max) {
         return existingGroups < max;
     }
+
+    /**
+     * 小结构（营地、鸟巢……）的落点：按世界种子在每个 area × area 区域里固定挑出至多 max 个区块，只有这些区块会尝试生成，
+     * 所以同一区域最多 max 处，同一个世界每次算出来都一样（生成线程上不用查已有结构）。
+     * salt 区分不同生物，免得不同结构总挑同一个区块；area 按格数，不足一个区块的部分向上取整。
+     */
+    public static boolean isAreaSite(long seed, String salt, int chunkX, int chunkZ, int area, int max) {
+        int cells = Math.max(1, (area + 15) / 16);
+        long ax = Math.floorDiv(chunkX, cells);
+        long az = Math.floorDiv(chunkZ, cells);
+        long base = mix(seed ^ salt.hashCode()) ^ mix(ax * 0x9E3779B97F4A7C15L + az);
+        for (int i = 0; i < max; i++) {
+            long h = mix(base + i * 0xC2B2AE3D27D4EB4FL);
+            if (ax * cells + Math.floorMod(h, cells) == chunkX && az * cells + Math.floorMod(h >>> 32, cells) == chunkZ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static long mix(long z) {
+        z = (z ^ (z >>> 30)) * 0xBF58476D1CE4E5B9L;
+        z = (z ^ (z >>> 27)) * 0x94D049BB133111EBL;
+        return z ^ (z >>> 31);
+    }
 }

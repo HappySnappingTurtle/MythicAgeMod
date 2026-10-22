@@ -1,0 +1,10 @@
+{
+  "_note": "W3 斯廷法利斯怪鸟（01_希腊 §6、T15 §3）：敌对群居，只随沼泽鸟巢生成（勒拿子区），群 5–8 含 1 只领头鸟；巢间距 ≥ 24 区块（384 格内最多 1 巢）；村庄 64 格内不生成",
+  "entity": "mythic_age:stymphalian_bird",
+  "attitude": "hostile",
+  "spawn": "structure",
+  "biomes": ["#mythic_age:region/greek/lerna"],
+  "group": [5, 8],
+  "density": {"area": 384, "max": 1},
+  "avoid_villages": 64
+}

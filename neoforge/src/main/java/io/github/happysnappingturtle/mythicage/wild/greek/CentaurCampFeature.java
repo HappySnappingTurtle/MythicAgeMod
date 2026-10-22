@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import io.github.happysnappingturtle.mythicage.core.wild.WildCreatureCard;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
 import io.github.happysnappingturtle.mythicage.wild.WildCreatures;
+import io.github.happysnappingturtle.mythicage.wild.WildSpawning;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -38,6 +39,9 @@ public class CentaurCampFeature extends Feature<NoneFeatureConfiguration> {
         WorldGenLevel level = ctx.level();
         RandomSource r = ctx.random();
         BlockPos o = ctx.origin();
+        if (!WildSpawning.areaSiteAllows(level, o, "greek:centaur", 256)) {
+            return false;
+        }
         int y0 = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, o.getX(), o.getZ());
         int lo = y0;
         int hi = y0;

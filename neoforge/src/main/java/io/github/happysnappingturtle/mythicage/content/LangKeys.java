@@ -269,6 +269,9 @@ public final class LangKeys {
         add("item.mythic_age.summon_token_centaur.tip", "召出一位为你作战的半人马：保持距离拉弓射箭（6 点），近身时前蹄踢击；掷松——蓄力后掷出连根拔起的松树干，穿过 3 个敌人、伤害加倍", "Summons a Centaur that fights for you: keeps its distance and shoots arrows (6), kicks with its forehooves up close; Hurled Pine—after a wind-up throws an uprooted pine trunk through 3 enemies for double damage", "あなたのために戦うケンタウロスを召喚：距離を取って弓を射る（6）、近づかれると前脚で蹴る；投げ松——溜めの後、根こそぎの松の幹を投げて 3 体を貫き倍のダメージ");
         add("entity.mythic_age.centaur", "半人马", "Centaur", "ケンタウロス");
         add("entity.mythic_age.centaur.leader", "喀戎的后裔", "Scion of Chiron", "ケイローンの末裔");
+        add("entity.mythic_age.stymphalian_bird", "斯廷法利斯怪鸟", "Stymphalian Bird", "ステュムパーロスの怪鳥");
+        add("entity.mythic_age.bronze_feather", "青铜羽", "Bronze Feather", "青銅の羽根");
+        add("item.mythic_age.krotala.tip", "右键摇响：24 格内的斯廷法利斯怪鸟受惊高飞 4 秒，不能齐射；冷却 6 秒", "Use to rattle: Stymphalian Birds within 24 blocks take fright and fly high for 4 seconds, unable to volley; 6 s cooldown", "使用で鳴らす：24 ブロック以内のステュムパーロスの怪鳥が驚いて 4 秒間高く飛び、一斉射撃できない；クールダウン 6 秒");
         add("mythic_age.summon.not_your_mount", "%s只让它的主人骑", "%s lets only its master ride", "%sは主人しか乗せない");
         add("mythic_age.summon.cap_full", "神话单位已满（%s / %s）", "Myth units are at the limit (%s / %s)", "神話ユニットが上限です（%s / %s）");
         add("mythic_age.summon.interrupted", "召唤被打断", "Summoning interrupted", "召喚が中断されました");

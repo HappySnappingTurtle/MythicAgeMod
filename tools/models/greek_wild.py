@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """T15 希腊野外生物的物品贴图（16 × 16）：
   - 半人马鬃弦 centaur_sinew：一卷深棕鬃毛搓成的弦，中间一个结，两端散出发梢。
-运行：python3 tools/models/greek_wild.py && python3 tools/texgen/texgen.py --force tools/texgen/specs/greek/centaur_sinew.json
+  - 青铜羽毛 bronze_feather：斜放的一根青铜羽，深色羽轴、亮色前缘，羽根是一截细管。
+  - 青铜响板 krotala：两片长条青铜拍板，下端用皮绳连在一起（V 形张开）。
+  - 插地青铜羽 stuck_bronze_feather（方块，十字模型）：一根竖插的青铜羽，羽根没入地里。
+运行：python3 tools/models/greek_wild.py && python3 tools/texgen/texgen.py --force tools/texgen/specs/greek/<名>.json
 """
 from __future__ import annotations
 
@@ -26,9 +29,64 @@ SINEW = ["................",
          "................"]
 
 
+BRONZE_PAL = {"o": "#3a2410", "d": "#6e4518", "m": "#a8742e", "h": "#d9a24a", "k": "#f6d68a", "s": "#4e3112",
+              "l": "#6b4426", "L": "#8a5a32"}
+FEATHER = ["................",
+           "............oo..",
+           "...........okho.",
+           "..........ohksmo",
+           ".........ohksmdo",
+           "........ohksmdo.",
+           ".......ohksmdo..",
+           "......ohksmdo...",
+           ".....ohksmdo....",
+           "....ohksmdo.....",
+           "...ohksmdo......",
+           "...oksmdo.......",
+           "..osodo.........",
+           ".os.oo..........",
+           "os..............",
+           "o..............."]
+KROTALA = ["................",
+           "..oo.......oo...",
+           ".ohko.....okho..",
+           ".ohmo.....omho..",
+           ".ohmdo...odmho..",
+           "..ohmo...omho...",
+           "..ohmdo.odmho...",
+           "...ohmo.omho....",
+           "...ohmdodmho....",
+           "....ohmmmho.....",
+           "....oommmoo.....",
+           ".....olllo......",
+           ".....oLLLo......",
+           "....olLLLlo.....",
+           ".....ooooo......",
+           "................"]
+STUCK = ["................",
+         ".......oo.......",
+         "......okho......",
+         ".....ohksmo.....",
+         ".....ohksmo.....",
+         "....ohhksmdo....",
+         "....ohhksmdo....",
+         "....ohhksmdo....",
+         "....ohhksmdo....",
+         ".....ohksdo.....",
+         ".....ohksdo.....",
+         "......oksdo.....",
+         ".......so.......",
+         ".......so.......",
+         ".......so.......",
+         ".......so......."]
+
+
 def main():
     spec("centaur_sinew", SINEW, SINEW_PAL, 16, "item/")
-    print("centaur_sinew")
+    spec("bronze_feather", FEATHER, BRONZE_PAL, 16, "item/")
+    spec("krotala", KROTALA, BRONZE_PAL, 16, "item/")
+    spec("stuck_bronze_feather", STUCK, BRONZE_PAL, 16, "block/")
+    print("centaur_sinew bronze_feather krotala stuck_bronze_feather")
 
 
 if __name__ == "__main__":

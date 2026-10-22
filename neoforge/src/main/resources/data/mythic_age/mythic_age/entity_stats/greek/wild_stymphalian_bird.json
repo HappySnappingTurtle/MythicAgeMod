@@ -1,0 +1,10 @@
+{
+  "_note": "斯廷法利斯怪鸟（01_希腊 W3）：生命 10；抖羽 16 刻后每只射 1 根青铜羽（0.6 格/刻，伤害 3，可盾挡）；两轮间隔 80 刻；20 格内发现玩家",
+  "max_health": 10,
+  "flying_speed": 0.45,
+  "special": {
+    "feather_damage": 3,
+    "volley_cooldown": 80,
+    "aggro_range": 20
+  }
+}

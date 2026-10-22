@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:region/greek/lerna",
+  "features": "mythic_age:stymphalian_nest",
+  "step": "surface_structures"
+}
