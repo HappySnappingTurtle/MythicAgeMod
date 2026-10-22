@@ -44,6 +44,30 @@ public final class GreekSummons {
             .lang("天马召唤符", "Pegasus Summoning Tablet", "ペガサス召喚の札")
             .register();
 
+    /** 召唤版半人马（T14 §11.5）：碰撞 1.1 × 2.5。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<SummonCentaurEntity>> CENTAUR =
+            ModRegistries.ENTITY_TYPES.register("summon_centaur",
+                    () -> EntityType.Builder.of(SummonCentaurEntity::new, MobCategory.MISC)
+                            .sized(1.1F, 2.5F)
+                            .eyeHeight(2.2F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:summon_centaur"));
+
+    /** 半人马掷出的松树干。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<CentaurPineEntity>> CENTAUR_PINE =
+            ModRegistries.ENTITY_TYPES.register("centaur_pine",
+                    () -> EntityType.Builder.<CentaurPineEntity>of(CentaurPineEntity::new, MobCategory.MISC)
+                            .sized(0.7F, 0.7F)
+                            .clientTrackingRange(6)
+                            .updateInterval(1)
+                            .build("mythic_age:centaur_pine"));
+
+    public static final DeferredItem<SummonTokenItem> CENTAUR_TOKEN = Content.item("summon_token_centaur", GREEK,
+                    p -> new SummonTokenItem("greek:centaur", p))
+            .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .lang("半人马召唤符", "Centaur Summoning Tablet", "ケンタウロス召喚の札")
+            .register();
+
     public static final DeferredItem<SummonTokenItem> MINOTAUR_TOKEN = Content.item("summon_token_minotaur", GREEK,
                     p -> new SummonTokenItem("greek:minotaur", p))
             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -63,5 +87,7 @@ public final class GreekSummons {
                 e.put(MINOTAUR.get(), SummonMinotaurEntity.createSummonAttributes().build()));
         modBus.addListener((EntityAttributeCreationEvent e) ->
                 e.put(PEGASUS.get(), SummonPegasusEntity.createSummonAttributes().build()));
+        modBus.addListener((EntityAttributeCreationEvent e) ->
+                e.put(CENTAUR.get(), SummonCentaurEntity.createSummonAttributes().build()));
     }
 }

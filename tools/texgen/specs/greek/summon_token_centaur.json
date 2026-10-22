@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/summon_token_centaur",
+  "size": 16,
+  "palette": {
+    "o": "#3a1d10",
+    "R": "#d2834e",
+    "r": "#b4602f",
+    "s": "#8e4521",
+    "k": "#1e120c",
+    "h": "#e7a873"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".ohhkRkkRRRRRRo.",
+      ".oRkRRkkRRRRRRo.",
+      ".oRkRkkkRRRRRRo.",
+      ".okRkkkkRRRRRRo.",
+      ".oRkRRkkRRRRRRo.",
+      ".oRkRRkkkkkkkRo.",
+      ".oRRkRkkkkkkkko.",
+      ".oRRRRkkkkkkkRo.",
+      ".oRRRRkRkRkRkRo.",
+      ".oRRRRkRkRkRRko.",
+      ".oRRRkRRkRkRRRo.",
+      ".orrrrrrrrrrsso.",
+      ".oooooooooooooo.",
+      "................"
+    ]
+  }
+}

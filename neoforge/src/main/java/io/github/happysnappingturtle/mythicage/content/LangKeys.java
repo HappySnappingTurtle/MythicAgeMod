@@ -264,6 +264,9 @@ public final class LangKeys {
         add("entity.mythic_age.summon_pegasus", "天马", "Pegasus", "ペガサス");
         add("item.mythic_age.summon_token_pegasus.tip", "召出一匹天马：在你头顶盘旋侦察，每 10 秒用「天眼」标出 32 格内的敌人（只有你看得见）；空手右键可以骑乘飞行", "Summons Pegasus: circles above you as a scout and every 10 s its Sky Eye marks enemies within 32 blocks (only you see them); use it empty-handed to ride and fly", "ペガサスを召喚：頭上を旋回して偵察し、10 秒ごとに「天眼」で 32 ブロック内の敵を示す（あなたにだけ見える）。素手で使うと騎乗して飛べる");
         add("item.mythic_age.summon_token_pegasus.rule", "按住右键吟唱 1 秒召唤 · 占用 1 个神话单位名额 · 倒下 1 天后在你的神坛旁归来", "Hold use for 1 s to summon · takes 1 myth unit slot · returns beside your altar 1 day after falling", "使用を 1 秒長押しで召喚・神話ユニット枠 1・倒れても 1 日後に祭壇のそばへ戻る");
+        add("entity.mythic_age.summon_centaur", "半人马", "Centaur", "ケンタウロス");
+        add("entity.mythic_age.centaur_pine", "松树干", "Pine Trunk", "松の幹");
+        add("item.mythic_age.summon_token_centaur.tip", "召出一位为你作战的半人马：保持距离拉弓射箭（6 点），近身时前蹄踢击；掷松——蓄力后掷出连根拔起的松树干，穿过 3 个敌人、伤害加倍", "Summons a Centaur that fights for you: keeps its distance and shoots arrows (6), kicks with its forehooves up close; Hurled Pine—after a wind-up throws an uprooted pine trunk through 3 enemies for double damage", "あなたのために戦うケンタウロスを召喚：距離を取って弓を射る（6）、近づかれると前脚で蹴る；投げ松——溜めの後、根こそぎの松の幹を投げて 3 体を貫き倍のダメージ");
         add("mythic_age.summon.not_your_mount", "%s只让它的主人骑", "%s lets only its master ride", "%sは主人しか乗せない");
         add("mythic_age.summon.cap_full", "神话单位已满（%s / %s）", "Myth units are at the limit (%s / %s)", "神話ユニットが上限です（%s / %s）");
         add("mythic_age.summon.interrupted", "召唤被打断", "Summoning interrupted", "召喚が中断されました");

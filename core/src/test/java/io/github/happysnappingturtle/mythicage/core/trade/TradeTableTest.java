@@ -62,6 +62,10 @@ class TradeTableTest {
         assertTrue(t.offersAt(TradeOffer.Venue.STATUE).stream().allMatch(x -> x.category() == TradeOffer.Category.GOD_POWER
                         && !x.patron().isEmpty() || x.category() == TradeOffer.Category.SUMMON),
                 "神像前只有主神神力（T13）与天马召唤符（T14 §2.1）");
+        TradeOffer centaur = t.offer("summon_centaur").orElseThrow();
+        assertTrue("hermes".equals(centaur.minorGod()) && centaur.minAge() == Age.CLASSICAL
+                        && centaur.venues().equals(Set.of(TradeOffer.Venue.GUARDIAN)),
+                "半人马召唤符：祭司处，古典起，须供奉赫尔墨斯（T14 §2.1）");
         TradeOffer pegasus = t.offer("summon_pegasus").orElseThrow();
         assertTrue(pegasus.patron().isEmpty() && pegasus.price().isFavor() && pegasus.minAge() == Age.ARCHAIC,
                 "天马召唤符：全体主神的神像前，恩宠价，远古起（T14 §2.1）");

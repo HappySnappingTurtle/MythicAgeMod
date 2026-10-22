@@ -1,0 +1,19 @@
+{
+  "_note": "召唤版半人马（01_希腊 §5、T14 §11.5）：生命 70；拉弓 16 刻射箭 6、两箭间隔 20 刻；近身踢击 7（抬身 12 刻）、冷却 40 刻；掷松：蓄力 20 刻、伤害 12（×2）、穿过 3 个目标、冷却 300 刻（15 秒）；风筝距离 10–14 格",
+  "max_health": 70,
+  "movement_speed": 0.32,
+  "special": {
+    "arrow_damage": 6,
+    "draw_ticks": 16,
+    "shot_cooldown": 20,
+    "kick_damage": 7,
+    "kick_windup": 12,
+    "kick_cooldown": 40,
+    "pine_damage": 12,
+    "pine_windup": 20,
+    "pine_cooldown": 300,
+    "pine_pierce": 3,
+    "keep_min": 10,
+    "keep_max": 14
+  }
+}

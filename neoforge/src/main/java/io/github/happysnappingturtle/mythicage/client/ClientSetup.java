@@ -45,6 +45,11 @@ public final class ClientSetup {
                     r.addRenderLayer(new io.github.happysnappingturtle.mythicage.client.geo.SkyEyeGlowLayer(r));
                     return r;
                 });
+        // 召唤版半人马（T14 阶段 ③）：上身随视线转向；松树干投射物
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.CENTAUR.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.summon.CentaurGeoModel(Set.of()), 1.1F));
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.CENTAUR_PINE.get(),
+                io.github.happysnappingturtle.mythicage.client.summon.CentaurPineRenderer::new);
         // 神庙祭司（T9b）：GeckoLib 模型，无隐藏骨骼
         event.registerEntityRenderer(ModEntities.GREEK_GUARDIAN.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("greek_guardian", Set.of()), 0.5F));

@@ -51,6 +51,29 @@ for i, row in enumerate(_PEG):
     PEGASUS.append(".o" + inner + "o.")
 PEGASUS += [".oooooooooooooo.", "................"]
 
+# 黑绘半人马弓手（面朝左：人上身竖直、左手持弓在身前，马身向右、四条马腿）
+_CEN = ["..k.kk......",
+        ".k..kk......",
+        ".k.kkk......",
+        "k.kkkk......",
+        ".k..kk......",
+        ".k..kkkkkkk.",
+        "..k.kkkkkkkk",
+        "....kkkkkkk.",
+        "....k.k.k.k.",
+        "....k.k.k..k",
+        "...k..k.k...",
+        "............"]
+CENTAUR = ["................", ".oooooooooooooo."]
+for i, row in enumerate(_CEN):
+    inner = row.replace(".", "R")
+    if i == 0:
+        inner = "hh" + inner[2:]
+    if i == len(_CEN) - 1:
+        inner = "rrrrrrrrrrss"
+    CENTAUR.append(".o" + inner + "o.")
+CENTAUR += [".oooooooooooooo.", "................"]
+
 KERY = {"o": "#3b2412", "g": "#c8902a", "G": "#e8bf52", "H": "#fbe7a0", "s": "#4d6e3b", "S": "#7aa05c",
         "w": "#f4efe3", "W": "#c9c2b1"}
 KERYKEION = ["...........ww...",
@@ -74,8 +97,9 @@ KERYKEION = ["...........ww...",
 def main():
     spec("summon_token_minotaur", MINOTAUR, TABLET, 16, "item/")
     spec("summon_token_pegasus", PEGASUS, TABLET, 16, "item/")
+    spec("summon_token_centaur", CENTAUR, TABLET, 16, "item/")
     spec("kerykeion", KERYKEION, KERY, 16, "item/")
-    print("summon_token_minotaur、summon_token_pegasus、kerykeion")
+    print("summon_token_minotaur、summon_token_pegasus、summon_token_centaur、kerykeion")
 
 
 if __name__ == "__main__":

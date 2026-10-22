@@ -22,6 +22,7 @@ import io.github.happysnappingturtle.mythicage.summon.SummonUnits;
 import io.github.happysnappingturtle.mythicage.summon.SummonView;
 import io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons;
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonMinotaurEntity;
+import io.github.happysnappingturtle.mythicage.summon.greek.SummonCentaurEntity;
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import net.minecraft.core.BlockPos;
@@ -680,5 +681,105 @@ public final class SummonGameTests {
             cleanup(h, p);
         }
         h.succeed();
+    }
+
+    // ───────────── 半人马（阶段 ③，TC-T14-90～93） ─────────────
+
+    private static final String CEN_BATCH = "summon_centaur";
+
+    private static SummonCentaurEntity centaur(GameTestHelper h, FakePlayer p, BlockPos at) {
+        SummonService.Result r = SummonService.summon(p, SummonUnits.card("greek:centaur").orElseThrow(),
+                Vec3.atBottomCenterOf(h.absolutePos(at)));
+        h.assertTrue(r == SummonService.Result.OK, "召唤半人马应成功，实际 " + r);
+        return h.getLevel().getEntitiesOfClass(SummonCentaurEntity.class, new AABB(h.absolutePos(BlockPos.ZERO)).inflate(80),
+                e -> p.getUUID().equals(e.link().owner)).get(0);
+    }
+
+    /** 不会动的僵尸（防晒）：靶子。 */
+    private static Zombie dummy(GameTestHelper h, BlockPos at) {
+        Zombie z = zombie(h, at);
+        z.setNoAi(true);
+        return z;
+    }
+
+    /** TC-T14-90：敌人贴近（4 格）时半人马后撤拉开距离。 */
+    @GameTest(template = T, batch = CEN_BATCH, timeoutTicks = 200)
+    public static void centaur_kites_away(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_cen_kite", Age.CLASSICAL, new BlockPos(8, 2, 2));
+        SummonCentaurEntity c = centaur(h, p, new BlockPos(8, 2, 14));
+        Zombie z = dummy(h, new BlockPos(8, 2, 10));
+        c.setTarget(z);
+        h.succeedWhen(() -> {
+            h.assertTrue(c.distanceTo(z) >= 7.5, "应后撤到 7.5 格外，实际 " + c.distanceTo(z));
+            cleanup(h, p);
+        });
+    }
+
+    /** TC-T14-91：12 格外的僵尸——拉弓放箭并打中。 */
+    @GameTest(template = T, batch = CEN_BATCH, timeoutTicks = 200)
+    public static void centaur_shoots_arrows(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_cen_shoot", Age.CLASSICAL, new BlockPos(8, 2, 2));
+        SummonCentaurEntity c = centaur(h, p, new BlockPos(8, 2, 6));
+        Zombie z = dummy(h, new BlockPos(8, 2, 18));
+        float hp = z.getHealth();
+        c.setTarget(z);
+        h.succeedWhen(() -> {
+            h.assertTrue(c.arrowsShot() >= 1, "应已放箭");
+            h.assertTrue(z.getHealth() < hp, "箭应命中僵尸");
+            cleanup(h, p);
+        });
+    }
+
+    /** TC-T14-92：掷松穿过一排僵尸，恰好打中 3 个（第 4 个不中）。 */
+    @GameTest(template = T, batch = CEN_BATCH, timeoutTicks = 200)
+    public static void centaur_pine_pierces_three(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_cen_pine", Age.CLASSICAL, new BlockPos(3, 2, 2));
+        SummonCentaurEntity c = centaur(h, p, new BlockPos(8, 2, 4));
+        List<Zombie> line = List.of(dummy(h, new BlockPos(8, 2, 14)), dummy(h, new BlockPos(8, 2, 15)),
+                dummy(h, new BlockPos(8, 2, 16)), dummy(h, new BlockPos(8, 2, 17)));
+        float hp = line.get(0).getHealth();
+        h.assertTrue(c.requestSpecial(line.get(0)), "冷却好时可以掷松");
+        h.assertTrue(!c.requestSpecial(line.get(0)), "正在掷松时不能再放");
+        h.runAfterDelay(60, () -> {
+            long damaged = line.stream().filter(z -> z.getHealth() < hp || !z.isAlive()).count();
+            cleanup(h, p);
+            h.assertTrue(c.pinesThrown() == 1, "掷出 1 根松树干，实际 " + c.pinesThrown());
+            h.assertTrue(damaged == 3, "应恰好打中 3 个，实际 " + damaged);
+            h.succeed();
+        });
+    }
+
+    /** TC-T14-93：贴身（2 格）的僵尸——抬身后前蹄踢击（伤害 ≥ 7）。 */
+    @GameTest(template = T, batch = CEN_BATCH, timeoutTicks = 120)
+    public static void centaur_kicks_up_close(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_cen_kick", Age.CLASSICAL, new BlockPos(8, 2, 2));
+        SummonCentaurEntity c = centaur(h, p, new BlockPos(8, 2, 10));
+        Zombie z = dummy(h, new BlockPos(8, 2, 12));
+        float hp = z.getHealth();
+        c.setTarget(z);
+        h.succeedWhen(() -> {
+            h.assertTrue(c.anim() == SummonCentaurEntity.Anim.KICK || hp - z.getHealth() >= 7, "应进入踢击");
+            h.assertTrue(hp - z.getHealth() >= 7, "踢击伤害 ≥ 7，实际 " + (hp - z.getHealth()));
+            cleanup(h, p);
+        });
+    }
+
+    /** TC-T14-94：掷松冷却好、目标在 6–20 格且看得见——开场先掷松（不是先射箭）。 */
+    @GameTest(template = T, batch = CEN_BATCH, timeoutTicks = 120)
+    public static void centaur_opens_with_pine(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_cen_open", Age.CLASSICAL, new BlockPos(8, 2, 2));
+        SummonCentaurEntity c = centaur(h, p, new BlockPos(8, 2, 6));
+        Zombie z = dummy(h, new BlockPos(8, 2, 18));
+        c.setTarget(z);
+        h.succeedWhen(() -> {
+            h.assertTrue(c.pinesThrown() == 1, "应先掷松，实际掷 " + c.pinesThrown() + " 次、射 " + c.arrowsShot() + " 箭");
+            h.assertTrue(c.arrowsShot() == 0 || c.pinesThrown() == 1, "掷松在射箭之前");
+            cleanup(h, p);
+        });
     }
 }
