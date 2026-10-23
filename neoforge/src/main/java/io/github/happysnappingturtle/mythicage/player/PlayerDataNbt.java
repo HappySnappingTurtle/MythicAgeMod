@@ -5,6 +5,8 @@ import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.player.PlayerMythData;
 import io.github.happysnappingturtle.mythicage.core.player.ReceiptBook;
+import io.github.happysnappingturtle.mythicage.core.relic.RelicBinding;
+import io.github.happysnappingturtle.mythicage.core.relic.RelicState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -19,9 +21,10 @@ import java.util.Optional;
  * 格式 2（T11a）：各文明加主神认可、Boss 凭证、改奉日、仪式村庄、待弹成功界面，根加试炼击败次数；
  * 格式 1 的存档缺这些字段，读作空。
  * 格式 3（T12）：各文明加神力共享冷却到期刻，根加各神力长冷却到期刻；旧档缺省为 0。
+ * 格式 4（T16）：根加圣物绑定表 {@code relics}；旧档没有这个键，读作空表。
  */
 public final class PlayerDataNbt {
-    public static final int FORMAT = 3;
+    public static final int FORMAT = 4;
 
     private PlayerDataNbt() {
     }
@@ -97,6 +100,17 @@ public final class PlayerDataNbt {
             daily.put(key, t);
         });
         root.put("tradeDaily", daily);
+        ListTag relics = new ListTag();
+        data.relics().view().forEach((id, b) -> {
+            CompoundTag t = new CompoundTag();
+            t.putString("id", id);
+            t.putString("state", b.state().name());
+            t.putUUID("instance", b.instance());
+            t.putString("civ", b.civ().id());
+            t.putString("where", b.where());
+            relics.add(t);
+        });
+        root.put("relics", relics);
         root.putLong("version", data.dataVersion());
         return root;
     }
@@ -176,8 +190,23 @@ public final class PlayerDataNbt {
             data.tradeDaily().restore(key, new io.github.happysnappingturtle.mythicage.core.player.DailyLedger.DailyCount(
                     t.getLong("day"), t.getInt("count")));
         }
+        readRelics(root, data);
         data.setDataVersion(root.getLong("version"));
         return data;
+    }
+
+    /** 格式 4 的圣物绑定表（T16）；不合法的条目跳过并记录警告。 */
+    private static void readRelics(CompoundTag root, PlayerMythData data) {
+        for (Tag t : root.getList("relics", Tag.TAG_COMPOUND)) {
+            CompoundTag r = (CompoundTag) t;
+            try {
+                RelicState state = RelicState.valueOf(r.getString("state"));
+                Civilization civ = Civilization.byId(r.getString("civ")).orElseThrow();
+                data.relics().restore(r.getString("id"), new RelicBinding(state, r.getUUID("instance"), civ, r.getString("where")));
+            } catch (RuntimeException e) {
+                MythicAge.LOGGER.warn("[player data] 跳过不合法的圣物绑定：{}", r);
+            }
+        }
     }
 
     /** 格式 2 的仪式字段（T11a）；格式 1 没有这些键，全部读作空。 */

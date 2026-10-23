@@ -1,0 +1,6 @@
+{
+  "item": "mythic_age:pygmalion_statue",
+  "civ": "greek",
+  "worn": [{"group": "max_health.self_flat", "value": 4}],
+  "offered": [{"group": "max_health.believer_villager", "value": 0.4}]
+}

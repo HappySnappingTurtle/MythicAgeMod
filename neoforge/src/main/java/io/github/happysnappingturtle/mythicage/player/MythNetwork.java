@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "12";
+    private static final String PROTOCOL_VERSION = "13";
 
     private MythNetwork() {
     }
@@ -75,6 +75,13 @@ public final class MythNetwork {
                         io.github.happysnappingturtle.mythicage.summon.SummonScreens::handleRequest)
                 .playToServer(io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Command.TYPE,
                         io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Command.STREAM_CODEC,
-                        io.github.happysnappingturtle.mythicage.summon.SummonScreens::handleCommand);
+                        io.github.happysnappingturtle.mythicage.summon.SummonScreens::handleCommand)
+                // 神庙供奉栏（T16）
+                .playToClient(io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Shelf.TYPE,
+                        io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Shelf.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientRelics.accept(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.TYPE,
+                        io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.relic.RelicPayloads::handleRetrieve);
     }
 }

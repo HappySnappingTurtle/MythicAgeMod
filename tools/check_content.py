@@ -386,6 +386,56 @@ def check_textures(paths: Paths, report: Report) -> None:
             report.error(f"贴图 {f.relative_to(paths.root)} 尺寸为 {w}×{h}，物品与方块应为 16×16")
 
 
+# ---------------------------------------------------------------- 圣物卡（T16）
+
+CIVS = ("greek", "egyptian", "norse", "chinese", "atlantean")
+RELIC_SLOT_TAG = "data/curios/tags/item/mythic_relic.json"
+
+
+def check_relics(paths: Paths, report: Report) -> None:
+    """圣物卡 relic/<文明>/<id>.json：目录是五文明之一且与 civ 一致；物品已实现、带 curios:mythic_relic 标签、
+    三语都有佩戴与供奉说明（item.<物品>.worn / .offered）；两张卡不能指向同一个物品。效果组由游戏加载时校验。"""
+    tagged = set()
+    for d in paths.data():
+        f = d.parent / RELIC_SLOT_TAG
+        if f.exists():
+            tagged.update(v if isinstance(v, str) else v.get("id") for v in json.loads(f.read_text(encoding="utf-8"))["values"])
+    langs = {}
+    for loc in LOCALES:
+        merged = {}
+        for a in paths.assets():
+            f = a / "lang" / f"{loc}.json"
+            if f.exists():
+                merged.update(json.loads(f.read_text(encoding="utf-8")))
+        langs[loc] = merged
+    items = implemented_items(paths)
+    owners: dict[str, str] = {}
+    for d in paths.data():
+        root = d / MOD / MOD / "relic"
+        if not root.exists():
+            continue
+        for f in sorted(root.glob("*/*.json")):
+            card = f"{f.parent.name}:{f.stem}"
+            data = json.loads(f.read_text(encoding="utf-8"))
+            if f.parent.name not in CIVS:
+                report.error(f"圣物卡 {card}：目录 {f.parent.name} 不是五文明之一")
+            if data.get("civ") != f.parent.name:
+                report.error(f"圣物卡 {card}：civ「{data.get('civ')}」与目录不一致")
+            item = data.get("item", "")
+            if item not in items:
+                report.error(f"圣物卡 {card}：物品 {item} 未实现")
+            if item not in tagged:
+                report.error(f"圣物卡 {card}：物品 {item} 没有 curios:mythic_relic 标签")
+            if item in owners:
+                report.error(f"圣物卡 {card}：物品 {item} 已被 {owners[item]} 使用")
+            owners.setdefault(item, card)
+            name = item.split(":")[-1]
+            for loc in LOCALES:
+                for mode in ("worn", "offered"):
+                    if f"item.{MOD}.{name}.{mode}" not in langs[loc]:
+                        report.error(f"圣物卡 {card}：{loc} 缺少 item.{MOD}.{name}.{mode}")
+
+
 def run(root: Path, design: Path | None) -> Report:
     paths = Paths(root)
     report = Report()
@@ -394,6 +444,7 @@ def run(root: Path, design: Path | None) -> Report:
     check_lang(paths, report)
     check_textures(paths, report)
     check_recolor(paths, report)
+    check_relics(paths, report)
     check_rigs(root, report)
     return report
 

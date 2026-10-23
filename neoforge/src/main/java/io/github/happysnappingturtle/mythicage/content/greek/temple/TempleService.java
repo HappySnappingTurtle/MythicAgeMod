@@ -288,6 +288,8 @@ public final class TempleService {
     }
 
     static void send(ServerPlayer player, GreekAltarBlockEntity be) {
+        // 供奉栏先到，界面打开时就有数据（T16）
+        io.github.happysnappingturtle.mythicage.relic.RelicPayloads.sendShelf(player, (ServerLevel) be.getLevel(), be.getBlockPos());
         PacketDistributor.sendToPlayer(player, AltarSurveyPayload.of(be, player, rules()));
     }
 }

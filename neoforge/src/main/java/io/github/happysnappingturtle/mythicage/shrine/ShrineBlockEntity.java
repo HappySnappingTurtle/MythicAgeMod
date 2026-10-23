@@ -1,6 +1,8 @@
 package io.github.happysnappingturtle.mythicage.shrine;
 
 import io.github.happysnappingturtle.mythicage.core.player.Age;
+import io.github.happysnappingturtle.mythicage.relic.OfferedIndex;
+import io.github.happysnappingturtle.mythicage.relic.RelicShelf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -20,6 +22,8 @@ public abstract class ShrineBlockEntity extends BlockEntity {
     private UUID owner;
     private String ownerName = "";
     private Age ownerAge = Age.NONE;
+    /** 供奉架（T16）：各文明通用，能不能供奉由 {@link io.github.happysnappingturtle.mythicage.relic.RelicAnchor} 决定。 */
+    private final RelicShelf relics = new RelicShelf(this::setChanged);
 
     protected ShrineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -38,6 +42,10 @@ public abstract class ShrineBlockEntity extends BlockEntity {
 
     public Age ownerAge() {
         return ownerAge;
+    }
+
+    public RelicShelf relics() {
+        return relics;
     }
 
     public void bind(UUID owner, String name, Age age) {
@@ -59,6 +67,23 @@ public abstract class ShrineBlockEntity extends BlockEntity {
         super.onLoad();
         if (level instanceof ServerLevel server) {
             ShrineService.onLoaded(server, this);
+            OfferedIndex.update(server, this);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (level instanceof ServerLevel server) {
+            OfferedIndex.remove(server, getBlockPos());
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        if (level instanceof ServerLevel server) {
+            OfferedIndex.remove(server, getBlockPos());
         }
     }
 
@@ -70,6 +95,7 @@ public abstract class ShrineBlockEntity extends BlockEntity {
         }
         tag.putString("OwnerName", ownerName);
         tag.putString("OwnerAge", ownerAge.id());
+        relics.save(tag, registries);
     }
 
     @Override
@@ -78,5 +104,6 @@ public abstract class ShrineBlockEntity extends BlockEntity {
         owner = tag.hasUUID("Owner") ? tag.getUUID("Owner") : null;
         ownerName = tag.getString("OwnerName");
         ownerAge = Age.byId(tag.getString("OwnerAge")).orElse(Age.NONE);
+        relics.load(tag, registries);
     }
 }

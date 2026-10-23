@@ -133,6 +133,9 @@ public final class ShrineService {
     public static void onRemoved(Level level, BlockPos pos, ShrineKind kind) {
         if (level instanceof ServerLevel server) {
             GlobalPos key = GlobalPos.of(server.dimension(), pos);
+            if (server.getBlockEntity(pos) instanceof ShrineBlockEntity be) {
+                io.github.happysnappingturtle.mythicage.relic.RelicService.onShrineRemoved(server, pos, be);
+            }
             ShrineRegistry.get(server.getServer()).remove(key);
             OWNER_CHECK.remove(key);
             kind.hooks().onRemoved(server, key);

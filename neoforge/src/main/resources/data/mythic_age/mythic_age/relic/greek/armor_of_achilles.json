@@ -1,0 +1,6 @@
+{
+  "item": "mythic_age:armor_of_achilles",
+  "civ": "greek",
+  "worn": [{"group": "melee_damage_taken.self", "value": 0.08}],
+  "offered": [{"group": "melee_damage_taken.area_allies", "value": 0.15}]
+}

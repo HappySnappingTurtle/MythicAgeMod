@@ -68,6 +68,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.init(modBus);
         io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.init(modBus);
         GreekGuardian.init();
+        io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
         GreekAgricultureEvents.register(modBus);
@@ -78,6 +79,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.village.gen.ModStructures.register(modBus);
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.register(modBus);
         io.github.happysnappingturtle.mythicage.power.PowerItems.register(modBus);
+        io.github.happysnappingturtle.mythicage.relic.RelicItems.register(modBus);
         io.github.happysnappingturtle.mythicage.power.PowerRegistries.register(modBus);
         modBus.addListener(ModDataGen::gather);
         ModAttachments.register(modBus);
@@ -192,6 +194,10 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEvents::onPlayerAttack);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onRightClickBlock);
+
+        // 圣物框架（T16）
+        io.github.happysnappingturtle.mythicage.relic.RelicService.init();
+        io.github.happysnappingturtle.mythicage.relic.RelicEvents.register(game);
 
         // 希腊恩宠来源：信徒祈祷（T10）
         GreekPrayer.init(modBus, game);

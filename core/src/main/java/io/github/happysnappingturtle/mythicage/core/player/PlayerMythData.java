@@ -1,5 +1,7 @@
 package io.github.happysnappingturtle.mythicage.core.player;
 
+import io.github.happysnappingturtle.mythicage.core.relic.RelicBook;
+
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -192,6 +194,8 @@ public final class PlayerMythData {
     private final Deque<ConductEntry> recentConduct = new ArrayDeque<>();
     private final ReceiptBook receipts = new ReceiptBook();
     private final DailyLedger tradeDaily = new DailyLedger();
+    /** 圣物绑定表（T16）。 */
+    private final RelicBook relics = new RelicBook();
     private long dataVersion;
 
     public PlayerMythData() {
@@ -266,6 +270,11 @@ public final class PlayerMythData {
         return tradeDaily;
     }
 
+    /** 圣物绑定表（T16 设计文档 §2.2）。 */
+    public RelicBook relics() {
+        return relics;
+    }
+
     public long dataVersion() {
         return dataVersion;
     }
@@ -300,6 +309,7 @@ public final class PlayerMythData {
             }
         }
         c.tradeDaily.entriesFrom(tradeDaily);
+        c.relics.copyFrom(relics);
         c.dataVersion = dataVersion;
         return c;
     }
@@ -317,6 +327,7 @@ public final class PlayerMythData {
                 && List.copyOf(recentConduct).equals(List.copyOf(d.recentConduct))
                 && receipts.equals(d.receipts)
                 && tradeDaily.equals(d.tradeDaily)
+                && relics.equals(d.relics)
                 && dataVersion == d.dataVersion;
     }
 

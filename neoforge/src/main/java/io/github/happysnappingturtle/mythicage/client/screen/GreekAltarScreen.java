@@ -2,11 +2,15 @@ package io.github.happysnappingturtle.mythicage.client.screen;
 
 import io.github.happysnappingturtle.mythicage.client.TempleHighlightRenderer;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
+import io.github.happysnappingturtle.mythicage.client.ClientRelics;
+import io.github.happysnappingturtle.mythicage.relic.RelicPayloads;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
@@ -19,7 +23,10 @@ import java.util.Locale;
  */
 public class GreekAltarScreen extends Screen {
     private static final int W = 420;
-    private static final int H = 200;
+    /** 原来三栏的高度；下面是供奉栏（T16）。 */
+    private static final int BODY = 200;
+    private static final int STRIP = 44;
+    private static final int H = BODY + STRIP;
     private static final int PANEL = 0xE0201A14;
     private static final int BORDER = 0xFFB89A5A;
     private static final int TEXT = 0xFFEDE8DC;
@@ -43,7 +50,29 @@ public class GreekAltarScreen extends Screen {
         addRenderableWidget(Button.builder(Component.translatable("mythic_age.altar.highlight"), b -> {
             TempleHighlightRenderer.show(p);
             onClose();
-        }).bounds(left + W - 130, top + H - 28, 120, 20).build());
+        }).bounds(left + W - 130, top + BODY - 28, 120, 20).build());
+        RelicPayloads.Shelf shelf = ClientRelics.at(p.pos());
+        if (shelf != null && shelf.viewerIsOwner()) {
+            for (int i = 0; i < shelf.relics().size(); i++) {
+                int slot = i;
+                addRenderableWidget(Button.builder(Component.translatable("mythic_age.altar.relics.take"),
+                                b -> PacketDistributor.sendToServer(new RelicPayloads.Retrieve(p.pos(), slot)))
+                        .bounds(relicX(i) + 20, top + BODY + 18, 48, 18).build());
+            }
+        }
+    }
+
+    public BlockPos pos() {
+        return p.pos();
+    }
+
+    /** 收到新的供奉栏后重建按钮。 */
+    public void relicsChanged() {
+        rebuildWidgets();
+    }
+
+    private int relicX(int i) {
+        return left + 8 + 150 + i * 84;
     }
 
     @Override
@@ -70,8 +99,9 @@ public class GreekAltarScreen extends Screen {
         int c2 = c1 + colW + 4;
         int c3 = c2 + colW + 4;
         int y0 = top + 22;
-        g.fill(c2 - 3, y0, c2 - 2, top + H - 8, 0x60B89A5A);
-        g.fill(c3 - 3, y0, c3 - 2, top + H - 8, 0x60B89A5A);
+        g.fill(c2 - 3, y0, c2 - 2, top + BODY - 8, 0x60B89A5A);
+        g.fill(c3 - 3, y0, c3 - 2, top + BODY - 8, 0x60B89A5A);
+        renderRelics(g);
 
         // 左栏：身份与结构
         int y = y0;
@@ -152,7 +182,25 @@ public class GreekAltarScreen extends Screen {
                     .allMatch(r -> r.have() >= r.need()) && !p.unverified() ? OK : BAD);
         }
         line(g, Component.translatable("mythic_age.altar.highlight.legend").withStyle(ChatFormatting.ITALIC),
-                c3, top + H - 72, colW, DIM);
+                c3, top + BODY - 72, colW, DIM);
+    }
+
+    /** 供奉栏：已用 / 上限（含其他神庙），架上的圣物与「取出」按钮（按钮在 init 里）。 */
+    private void renderRelics(GuiGraphics g) {
+        int y = top + BODY;
+        g.fill(left + 4, y - 2, left + W - 4, y - 1, 0x60B89A5A);
+        RelicPayloads.Shelf shelf = ClientRelics.at(p.pos());
+        if (shelf == null) {
+            return;
+        }
+        g.drawString(font, Component.translatable("mythic_age.altar.relics", shelf.used(), shelf.cap()), left + 8, y + 4, BORDER, false);
+        g.drawString(font, Component.translatable("mythic_age.altar.relics.how"), left + 8, y + 24, DIM, false);
+        if (shelf.relics().isEmpty()) {
+            g.drawString(font, Component.translatable("mythic_age.altar.relics.empty"), relicX(0), y + 22, DIM, false);
+        }
+        for (int i = 0; i < shelf.relics().size(); i++) {
+            g.renderItem(shelf.relics().get(i), relicX(i), y + 19);
+        }
     }
 
     private int line(GuiGraphics g, Component text, int x, int y, int w, int color) {

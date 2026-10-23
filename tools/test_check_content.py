@@ -164,5 +164,46 @@ class CheckContentTest(unittest.TestCase):
         self.assertEqual([], r.errors)
 
 
+class RelicCardTest(unittest.TestCase):
+    """T16：圣物卡校验。"""
+
+    def run_with(self, card: dict, *, tag=True, worn_lang=True, folder="greek", second=False):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            fixture(root)
+            gen = root / "neoforge/src/generated/resources"
+            main = root / "neoforge/src/main/resources"
+            write(gen / "assets/mythic_age/models/item/crown.json", {"parent": "item/generated"})
+            if tag:
+                write(gen / "data/curios/tags/item/mythic_relic.json", {"values": ["mythic_age:crown"]})
+            write(main / f"data/mythic_age/mythic_age/relic/{folder}/crown.json", card)
+            if second:
+                write(main / f"data/mythic_age/mythic_age/relic/{folder}/crown2.json", card)
+            for loc in cc.LOCALES:
+                lang = {"item.mythic_age.crown.offered": "x"}
+                if worn_lang:
+                    lang["item.mythic_age.crown.worn"] = "x"
+                write(main / f"assets/mythic_age/lang/{loc}.json", lang)
+            report = cc.Report()
+            cc.check_relics(cc.Paths(root), report)
+            return report.errors
+
+    CARD = {"item": "mythic_age:crown", "civ": "greek"}
+
+    def test_valid(self):
+        self.assertEqual([], self.run_with(self.CARD))
+
+    def test_civ_mismatch_and_folder(self):
+        errors = self.run_with(self.CARD, folder="lemuria")
+        self.assertTrue(any("不是五文明之一" in e for e in errors))
+        self.assertTrue(any("与目录不一致" in e for e in errors))
+
+    def test_missing_item_tag_lang_duplicate(self):
+        self.assertTrue(any("未实现" in e for e in self.run_with({"item": "mythic_age:nope", "civ": "greek"})))
+        self.assertTrue(any("标签" in e for e in self.run_with(self.CARD, tag=False)))
+        self.assertTrue(any(".worn" in e for e in self.run_with(self.CARD, worn_lang=False)))
+        self.assertTrue(any("已被" in e for e in self.run_with(self.CARD, second=True)))
+
+
 if __name__ == "__main__":
     unittest.main()

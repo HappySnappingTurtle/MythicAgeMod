@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/armor_of_achilles",
+  "size": 16,
+  "palette": {
+    "o": "#1f140c",
+    "d": "#5a3a1e",
+    "m": "#8a5a2c",
+    "h": "#b07a3c",
+    "k": "#d9a85e",
+    "l": "#5a3a24",
+    "L": "#7a5434",
+    "i": "#e8dfc4"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "..oooo....oooo..",
+      ".oLLlo....olLLo.",
+      ".olloooooooollo.",
+      ".oiimmhkkhmmiio.",
+      "..odmhkhhkhmdo..",
+      "..omhkmmmmkhmo..",
+      "..omhmddddmhmo..",
+      "..odmhmmmmhmdo..",
+      "..odmmhkkhmmdo..",
+      "..oddmhhhhmddo..",
+      "..odddmmmmdddo..",
+      "..oiiiiiiiiiio..",
+      "...odmdmmdmdo...",
+      "....oooooooo....",
+      "................"
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/pygmalion_statue",
+  "size": 16,
+  "palette": {
+    "o": "#2a2620",
+    "s": "#9a9486",
+    "w": "#d6d1c2",
+    "W": "#f4f1e8",
+    "y": "#c9a64a",
+    "Y": "#ead27a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      ".......oo.......",
+      "......oWwo......",
+      "......oyYo......",
+      "......oWwo......",
+      ".......oo.......",
+      "......oWwo......",
+      ".....oWWwso.....",
+      ".....owWwso.....",
+      "......oWwo......",
+      "......oWso......",
+      "......oWso......",
+      "......oWso......",
+      ".....oWwwso.....",
+      "...ooyYYYYyoo...",
+      "...owWWWWWwso...",
+      "...oooooooooo..."
+    ]
+  }
+}

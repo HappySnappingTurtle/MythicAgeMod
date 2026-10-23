@@ -1,0 +1,6 @@
+{
+  "item": "mythic_age:rheia_crown",
+  "civ": "greek",
+  "worn": [{"group": "favor_cap.greek", "value": 50}],
+  "offered": [{"group": "prayer.R.greek", "value": 0.15}]
+}
