@@ -100,6 +100,10 @@ public final class ModWorldGen {
     public static final ResourceKey<BiomeModifier> ADD_CENTAUR_CAMP = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_centaur_camp");
     public static final ResourceKey<BiomeModifier> ADD_STYMPHALIAN_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_stymphalian_nest");
     public static final ResourceKey<BiomeModifier> ADD_HARPY_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_harpy_nest");
+    public static final ResourceKey<BiomeModifier> ADD_HAMADRYAD_GROVE = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_hamadryad_grove");
+    /** 树仙女圣林的群系：繁花森林、草甸（T15 阶段 ⑤）。 */
+    public static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> HAMADRYAD_GROVE_BIOMES =
+            io.github.happysnappingturtle.mythicage.content.ModTags.biome("wild/hamadryad_grove");
     public static final ResourceKey<BiomeModifier> ADD_KARKINOS_SPAWNS = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_karkinos_spawns");
     /** 卡尔基诺斯自然刷新的群系：勒拿沼泽 + 爱琴海石岸（T15 阶段 ④）。 */
     public static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> KARKINOS_BIOMES =
@@ -130,6 +134,9 @@ public final class ModWorldGen {
         ctx.register(GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.laurelConfigured());
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED, new ConfiguredFeature<>(
                 io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_FEATURE.get(),
+                net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE));
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD_GROVE_CONFIGURED, new ConfiguredFeature<>(
+                io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD_GROVE_FEATURE.get(),
                 net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_CONFIGURED, new ConfiguredFeature<>(
                 io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_FEATURE.get(),
@@ -166,6 +173,9 @@ public final class ModWorldGen {
                 LAUREL_RARITY));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED, new PlacedFeature(
                 cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED), List.of(
+                InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD_GROVE_PLACED, new PlacedFeature(
+                cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD_GROVE_CONFIGURED), List.of(
                 InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_PLACED, new PlacedFeature(
                 cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_CONFIGURED), List.of(
@@ -211,6 +221,9 @@ public final class ModWorldGen {
                 biomes.getOrThrow(ModTags.subregion(Civilization.GREEK, "arcadia")),
                 HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));
+        ctx.register(ADD_HAMADRYAD_GROVE, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(HAMADRYAD_GROVE_BIOMES),
+                HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD_GROVE_PLACED)),
+                GenerationStep.Decoration.VEGETAL_DECORATION));
         // 卡尔基诺斯：权重 4、每次 1 只（生物卡 greek:karkinos）；刷新条件见 WildSpawning.natural
         ctx.register(ADD_KARKINOS_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(biomes.getOrThrow(KARKINOS_BIOMES),
                 new net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData(

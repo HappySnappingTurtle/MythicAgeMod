@@ -1,0 +1,10 @@
+{
+  "_note": "W5 树仙女（01_希腊 §6、T15 §6）：中立、绑定本命橡木，只随圣林生成（繁花森林、草甸），每林 1–2 只；圣林间距 ≥ 20 区块（320 格见方 1 处）",
+  "entity": "mythic_age:hamadryad",
+  "attitude": "neutral",
+  "spawn": "structure",
+  "biomes": ["minecraft:flower_forest", "minecraft:meadow"],
+  "group": [1, 2],
+  "density": {"area": 320, "max": 1},
+  "avoid_villages": 0
+}

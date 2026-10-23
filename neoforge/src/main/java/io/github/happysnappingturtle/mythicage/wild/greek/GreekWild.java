@@ -5,6 +5,8 @@ import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.content.BlockModelSpec;
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEntity;
+import io.github.happysnappingturtle.mythicage.entity.hamadryad.RootSpikeEntity;
 import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
 import io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
@@ -140,6 +142,57 @@ public final class GreekWild {
             .lang("巨蟹甲壳", "Giant Crab Shell", "大蟹の甲羅")
             .register();
 
+    /** 树仙女（W5）：中立、绑定本命橡木，只随圣林生成。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<HamadryadEntity>> HAMADRYAD =
+            ModRegistries.ENTITY_TYPES.register("hamadryad",
+                    () -> EntityType.Builder.of(HamadryadEntity::new, MobCategory.CREATURE)
+                            .sized(0.6F, 1.8F)
+                            .eyeHeight(1.6F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:hamadryad"));
+
+    /** 根刺（树仙女的攻击）：裂纹 → 出刺 → 缩回。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<RootSpikeEntity>> ROOT_SPIKE =
+            ModRegistries.ENTITY_TYPES.register("root_spike",
+                    () -> EntityType.Builder.<RootSpikeEntity>of(RootSpikeEntity::new, MobCategory.MISC)
+                            .sized(1.6F, 1.0F)
+                            .clientTrackingRange(8)
+                            .build("mythic_age:root_spike"));
+
+    /** 本命橡木（D6）：原版橡木树皮压暗一档；掉落普通橡木原木（拿去放置不会变成别人的本命树）。不能去皮。 */
+    public static final DeferredBlock<net.minecraft.world.level.block.RotatedPillarBlock> HAMADRYAD_OAK_LOG =
+            Content.block("hamadryad_oak_log", GREEK, net.minecraft.world.level.block.RotatedPillarBlock::new)
+                    .properties(() -> BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.OAK_LOG)
+                            .mapColor(MapColor.COLOR_BROWN))
+                    .model(new BlockModelSpec.Log(
+                            io.github.happysnappingturtle.mythicage.content.Recolor.sprite("minecraft:block/oak_log", "hamadryad_oak_log"),
+                            io.github.happysnappingturtle.mythicage.content.Recolor.sprite("minecraft:block/oak_log_top", "hamadryad_oak_log_top")))
+                    .loot(LootSpec.other(() -> net.minecraft.world.item.Items.OAK_LOG))
+                    .tags(net.minecraft.tags.BlockTags.LOGS_THAT_BURN, net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE)
+                    .lang("本命橡木", "Hamadryad Oak Log", "ハマドリュアスの樫の原木")
+                    .register();
+
+    /** 还愿彩带：圣林橡树下挂的花环与红白羊毛带。 */
+    public static final DeferredBlock<VotiveRibbonBlock> VOTIVE_RIBBON = Content.block("votive_ribbon", GREEK, VotiveRibbonBlock::new)
+            .properties(() -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).noCollission().instabreak()
+                    .sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.DESTROY))
+            .model(BlockModelSpec.cross(ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "block/votive_ribbon")))
+            .itemTexture(ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "block/votive_ribbon"))
+            .lang("还愿彩带", "Votive Ribbon", "奉納のリボン")
+            .register();
+
+    /** 宁芙之露：树仙女的赠礼（→ 高级奠酒，T16）。 */
+    public static final DeferredItem<Item> NYMPH_DEW = Content.item("nymph_dew", GREEK)
+            .lang("宁芙之露", "Nymph's Dew", "ニンフの露")
+            .register();
+
+    public static final DeferredHolder<Feature<?>, HamadryadGroveFeature> HAMADRYAD_GROVE_FEATURE =
+            ModRegistries.FEATURES.register("hamadryad_grove", () -> new HamadryadGroveFeature(NoneFeatureConfiguration.CODEC));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> HAMADRYAD_GROVE_CONFIGURED =
+            ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "hamadryad_grove"));
+    public static final ResourceKey<PlacedFeature> HAMADRYAD_GROVE_PLACED =
+            ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "hamadryad_grove"));
+
     private GreekWild() {
     }
 
@@ -149,6 +202,7 @@ public final class GreekWild {
             e.put(STYMPHALIAN_BIRD.get(), StymphalianBirdEntity.createAttributes().build());
             e.put(HARPY.get(), HarpyEntity.createAttributes().build());
             e.put(KARKINOS.get(), KarkinosEntity.createAttributes().build());
+            e.put(HAMADRYAD.get(), HamadryadEntity.createAttributes().build());
         });
         // 自然刷新的野外神话生物：刷新条件由生物卡决定（村庄排除、区域密度），不要求黑暗
         modBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent e) ->

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#mythic_age:wild/hamadryad_grove",
+  "features": "mythic_age:hamadryad_grove",
+  "step": "vegetal_decoration"
+}

@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "block/votive_ribbon",
+  "size": 16,
+  "palette": {
+    "g": "#4f6e2a",
+    "G": "#6d8a3a",
+    "r": "#a83a2e",
+    "R": "#c8554a",
+    "w": "#e8e0cc",
+    "W": "#c9c0aa",
+    "a": "#8a6a32"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "..gGgGgaGgGgGg..",
+      ".gGgaGgGgGgaGgG.",
+      "..GgGgGgGgGgGg..",
+      "...r..w..R..w...",
+      "...R..W..r..W...",
+      "...r..w..R..w...",
+      "...R..w..r..W...",
+      "...r..W..R..w...",
+      "...R..w..r..w...",
+      "....r.W..R..W...",
+      "....R.w...r.w...",
+      "....r.w...R.W...",
+      ".....RW...r..w..",
+      ".....r....R..W..",
+      "..........r.....",
+      "................"
+    ]
+  }
+}

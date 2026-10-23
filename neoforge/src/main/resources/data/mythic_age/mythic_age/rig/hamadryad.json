@@ -1,0 +1,30 @@
+{
+  "model": "mythic_age:hamadryad",
+  "collision": {
+    "width": 0.6,
+    "height": 1.8
+  },
+  "locators": {
+    "eye": [
+      1.25,
+      25,
+      2.8
+    ],
+    "hand_l": [
+      3.6,
+      12.6,
+      0.2
+    ],
+    "hand_r": [
+      -3.6,
+      12.6,
+      0.2
+    ],
+    "tree_face": [
+      0,
+      20,
+      4.2
+    ]
+  },
+  "variants": {}
+}

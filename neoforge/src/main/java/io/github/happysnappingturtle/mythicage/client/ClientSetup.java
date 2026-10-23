@@ -56,6 +56,11 @@ public final class ClientSetup {
         // 斯廷法利斯怪鸟（T15 阶段 ②）：领头鸟才显示冠羽；青铜羽弹射物画成物品贴图
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_BIRD.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.wild.StymphalianGeoModel(), 0.8F));
+        // 树仙女与根刺（T15 阶段 ⑤）
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("hamadryad", Set.of()), 0.6F));
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.ROOT_SPIKE.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("root_spike", Set.of()), 0.0F));
         // 卡尔基诺斯（T15 阶段 ④）
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.KARKINOS.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("karkinos", Set.of()), 1.0F));

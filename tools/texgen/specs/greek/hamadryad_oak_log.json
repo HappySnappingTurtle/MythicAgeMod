@@ -1,0 +1,7 @@
+{
+  "template": "recolor",
+  "id": "hamadryad_oak_log",
+  "base": "minecraft:block/oak_log",
+  "ramp": ["#1e160d", "#2e2216", "#3f2f1e", "#55412a", "#6b5436"],
+  "note": "本命橡木侧面：原版橡木树皮整体压暗一档、沟纹更深（与树仙女化树树皮一致）"
+}

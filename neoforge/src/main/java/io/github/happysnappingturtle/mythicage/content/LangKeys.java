@@ -272,6 +272,13 @@ public final class LangKeys {
         add("entity.mythic_age.stymphalian_bird", "斯廷法利斯怪鸟", "Stymphalian Bird", "ステュムパーロスの怪鳥");
         add("entity.mythic_age.harpy", "哈耳庇厄", "Harpy", "ハルピュイア");
         add("entity.mythic_age.karkinos", "卡尔基诺斯", "Karkinos", "カルキノス");
+        add("entity.mythic_age.hamadryad", "树仙女", "Hamadryad", "ハマドリュアス");
+        add("entity.mythic_age.root_spike", "根刺", "Root Spike", "根の棘");
+        add("mythic_age.hamadryad.warn", "树皮渗出树液，林中传来一声叹息……", "Sap seeps from the bark; a sigh drifts through the grove…", "樹皮から樹液がにじみ、林にため息が響く……");
+        add("mythic_age.hamadryad.angry", "树仙女现身了！", "The hamadryad reveals herself!", "ハマドリュアスが姿を現した！");
+        add("mythic_age.hamadryad.cursed", "你毁了宁芙的树——双手变得沉重", "You destroyed a nymph's tree — your hands grow heavy", "ニンフの木を倒した——手が重くなる");
+        add("mythic_age.hamadryad.dew_given", "树仙女赠你一瓶宁芙之露", "The hamadryad gives you a vial of Nymph's Dew", "ハマドリュアスがニンフの露をくれた");
+        add("mythic_age.hamadryad.dew_resting", "她不久前才赠过露水", "She gave her dew not long ago", "少し前に露をくれたばかりだ");
         add("entity.mythic_age.bronze_feather", "青铜羽", "Bronze Feather", "青銅の羽根");
         add("item.mythic_age.krotala.tip", "右键摇响：24 格内的斯廷法利斯怪鸟受惊高飞 4 秒，不能齐射；冷却 6 秒", "Use to rattle: Stymphalian Birds within 24 blocks take fright and fly high for 4 seconds, unable to volley; 6 s cooldown", "使用で鳴らす：24 ブロック以内のステュムパーロスの怪鳥が驚いて 4 秒間高く飛び、一斉射撃できない；クールダウン 6 秒");
         add("mythic_age.summon.not_your_mount", "%s只让它的主人骑", "%s lets only its master ride", "%sは主人しか乗せない");

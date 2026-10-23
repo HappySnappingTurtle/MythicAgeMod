@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/nymph_dew",
+  "size": 16,
+  "palette": {
+    "o": "#2c3a2a",
+    "g": "#9fc0a8",
+    "G": "#d8ecdc",
+    "l": "#c9d47a",
+    "L": "#e8eca0",
+    "f": "#5d7a32",
+    "F": "#6d8a3a",
+    "c": "#8a6a32"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      ".........fF.....",
+      "........fFf.....",
+      "......oocfo.....",
+      "......ocGo......",
+      "......oGgo......",
+      ".....ogGggo.....",
+      "....ogGlllgo....",
+      "...ogGlLLllgo...",
+      "...oGlLLLlllo...",
+      "...oglLLllllo...",
+      "...ogllllllgo...",
+      "....oglllllo....",
+      ".....ooooooo....",
+      "................",
+      "................"
+    ]
+  }
+}

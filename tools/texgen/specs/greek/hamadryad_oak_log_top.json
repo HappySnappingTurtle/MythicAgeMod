@@ -1,0 +1,7 @@
+{
+  "template": "recolor",
+  "id": "hamadryad_oak_log_top",
+  "base": "minecraft:block/oak_log_top",
+  "ramp": ["#1e160d", "#3f2f1e", "#55412a", "#6e5838", "#86704a"],
+  "note": "本命橡木截面：年轮颜色略深，外圈树皮同侧面"
+}

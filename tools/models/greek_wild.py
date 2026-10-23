@@ -5,6 +5,8 @@
   - 青铜响板 krotala：两片长条青铜拍板，下端用皮绳连在一起（V 形张开）。
   - 插地青铜羽 stuck_bronze_feather（方块，十字模型）：一根竖插的青铜羽，羽根没入地里。
   - 风暴之羽 storm_feather：一根宽大的炭黑飞羽，浅灰横斑，羽轴浅色，前缘一道蓝白闪电光。
+  - 还愿彩带 votive_ribbon（方块，十字模型）：一圈橡叶花环挂下几条红白羊毛带（奥维德《变形记》8.744 圣橡上的彩带）。
+  - 宁芙之露 nymph_dew：一只小玻璃瓶，盛着淡金绿的露水，瓶口系一片橡叶。
   - 巨蟹甲壳 crab_shell：一块前宽后窄的橄榄青铜绿头胸甲，前侧缘锯齿，甲面深斑与亮点。
 运行：python3 tools/models/greek_wild.py && python3 tools/texgen/texgen.py --force tools/texgen/specs/greek/<名>.json
 """
@@ -119,6 +121,42 @@ SHELL = ["................",
          "................",
          "................"]
 
+RIBBON_PAL = {"g": "#4f6e2a", "G": "#6d8a3a", "r": "#a83a2e", "R": "#c8554a", "w": "#e8e0cc", "W": "#c9c0aa", "a": "#8a6a32"}
+RIBBON = ["..gGgGgaGgGgGg..",
+          ".gGgaGgGgGgaGgG.",
+          "..GgGgGgGgGgGg..",
+          "...r..w..R..w...",
+          "...R..W..r..W...",
+          "...r..w..R..w...",
+          "...R..w..r..W...",
+          "...r..W..R..w...",
+          "...R..w..r..w...",
+          "....r.W..R..W...",
+          "....R.w...r.w...",
+          "....r.w...R.W...",
+          ".....RW...r..w..",
+          ".....r....R..W..",
+          "..........r.....",
+          "................"]
+DEW_PAL = {"o": "#2c3a2a", "g": "#9fc0a8", "G": "#d8ecdc", "l": "#c9d47a", "L": "#e8eca0", "f": "#5d7a32", "F": "#6d8a3a",
+           "c": "#8a6a32"}
+DEW = ["................",
+       ".........fF.....",
+       "........fFf.....",
+       "......oocfo.....",
+       "......ocGo......",
+       "......oGgo......",
+       ".....ogGggo.....",
+       "....ogGlllgo....",
+       "...ogGlLLllgo...",
+       "...oGlLLLlllo...",
+       "...oglLLllllo...",
+       "...ogllllllgo...",
+       "....oglllllo....",
+       ".....ooooooo....",
+       "................",
+       "................"]
+
 
 def main():
     spec("centaur_sinew", SINEW, SINEW_PAL, 16, "item/")
@@ -127,7 +165,9 @@ def main():
     spec("stuck_bronze_feather", STUCK, BRONZE_PAL, 16, "block/")
     spec("storm_feather", STORM, STORM_PAL, 16, "item/")
     spec("crab_shell", SHELL, SHELL_PAL, 16, "item/")
-    print("centaur_sinew bronze_feather krotala stuck_bronze_feather storm_feather crab_shell")
+    spec("votive_ribbon", RIBBON, RIBBON_PAL, 16, "block/")
+    spec("nymph_dew", DEW, DEW_PAL, 16, "item/")
+    print("centaur_sinew bronze_feather krotala stuck_bronze_feather storm_feather crab_shell votive_ribbon nymph_dew")
 
 
 if __name__ == "__main__":

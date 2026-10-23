@@ -1,0 +1,255 @@
+{
+ "id": "WI-GR-05-ROOT",
+ "name": "根刺",
+ "model": "root_spike",
+ "height_limit_u": 18.0,
+ "atlas": 128,
+ "texels_per_unit": 2,
+ "collision_proposal_blocks": [
+  1.6,
+  1.0,
+  1.6
+ ],
+ "coordinate_system": "X anatomical left; Y up; Z forward; model rest coordinates; 16 units per block",
+ "bones": [
+  {
+   "id": "root",
+   "parent": null,
+   "pivot_model_units": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "crack",
+   "parent": "root",
+   "pivot_model_units": [
+    0,
+    0,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "spike_a",
+   "parent": "root",
+   "pivot_model_units": [
+    1.197,
+    0,
+    3.289
+   ],
+   "pivot_parent_local_units": [
+    1.197,
+    0,
+    3.289
+   ]
+  },
+  {
+   "id": "spike_b",
+   "parent": "root",
+   "pivot_model_units": [
+    2.25,
+    0,
+    -2.681
+   ],
+   "pivot_parent_local_units": [
+    2.25,
+    0,
+    -2.681
+   ]
+  },
+  {
+   "id": "spike_c",
+   "parent": "root",
+   "pivot_model_units": [
+    -3.447,
+    0,
+    -0.608
+   ],
+   "pivot_parent_local_units": [
+    -3.447,
+    0,
+    -0.608
+   ]
+  }
+ ],
+ "extra_bones": [],
+ "parts": [
+  {
+   "id": "crack",
+   "bone": "crack",
+   "center_model_units": [
+    0,
+    0.06,
+    0
+   ],
+   "size_model_units": [
+    26,
+    0.12,
+    26
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2a1f14",
+   "uv_group": "crack",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_a_base",
+   "bone": "spike_a",
+   "center_model_units": [
+    1.1971,
+    4.0,
+    3.2889
+   ],
+   "size_model_units": [
+    3.4,
+    8.0,
+    3.4
+   ],
+   "rotation_degrees_model_axes": [
+    16.91,
+    0,
+    -6.16
+   ],
+   "color": "#4a3826",
+   "uv_group": "spike_base",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_a_tip",
+   "bone": "spike_a",
+   "center_model_units": [
+    2.0179,
+    11.0,
+    5.5442
+   ],
+   "size_model_units": [
+    2.0,
+    8.0,
+    2.0
+   ],
+   "rotation_degrees_model_axes": [
+    27.056,
+    0,
+    -9.856
+   ],
+   "color": "#6b5232",
+   "uv_group": "spike_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_b_base",
+   "bone": "spike_b",
+   "center_model_units": [
+    2.2498,
+    4.0,
+    -2.6812
+   ],
+   "size_model_units": [
+    3.4,
+    8.0,
+    3.4
+   ],
+   "rotation_degrees_model_axes": [
+    -13.79,
+    0,
+    -11.57
+   ],
+   "color": "#4a3826",
+   "uv_group": "spike_base",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_b_tip",
+   "bone": "spike_b",
+   "center_model_units": [
+    3.7924,
+    11.0,
+    -4.5197
+   ],
+   "size_model_units": [
+    2.0,
+    8.0,
+    2.0
+   ],
+   "rotation_degrees_model_axes": [
+    -22.064,
+    0,
+    -18.512
+   ],
+   "color": "#6b5232",
+   "uv_group": "spike_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_c_base",
+   "bone": "spike_c",
+   "center_model_units": [
+    -3.4468,
+    4.0,
+    -0.6078
+   ],
+   "size_model_units": [
+    3.4,
+    8.0,
+    3.4
+   ],
+   "rotation_degrees_model_axes": [
+    -3.13,
+    0,
+    17.73
+   ],
+   "color": "#4a3826",
+   "uv_group": "spike_base",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spike_c_tip",
+   "bone": "spike_c",
+   "center_model_units": [
+    -5.8104,
+    11.0,
+    -1.0245
+   ],
+   "size_model_units": [
+    2.0,
+    8.0,
+    2.0
+   ],
+   "rotation_degrees_model_axes": [
+    -5.008,
+    0,
+    28.368
+   ],
+   "color": "#6b5232",
+   "uv_group": "spike_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  }
+ ],
+ "extra_parts": [],
+ "attachments": [],
+ "revisions": [
+  "v1（2026-10-22）：裂纹薄板 + 三根两节橡树根。"
+ ]
+}

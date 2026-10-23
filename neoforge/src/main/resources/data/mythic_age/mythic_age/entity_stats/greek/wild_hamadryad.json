@@ -1,0 +1,9 @@
+{
+  "_note": "树仙女（01_希腊 W5）：生命 24；根刺 6 点、每 60 刻一次；被激怒后 1200 刻（60 秒）内追究",
+  "max_health": 24,
+  "special": {
+    "spike_damage": 6,
+    "cast_cooldown": 60,
+    "anger_ticks": 1200
+  }
+}

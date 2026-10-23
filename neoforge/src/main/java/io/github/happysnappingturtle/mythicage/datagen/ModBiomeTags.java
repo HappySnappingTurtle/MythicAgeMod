@@ -45,6 +45,8 @@ public final class ModBiomeTags extends BiomeTagsProvider {
         tag(ModTags.subregion(Civilization.GREEK, "highlands")).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS,
                 Biomes.WINDSWEPT_FOREST);
         tag(ModTags.subregion(Civilization.GREEK, "olympus")).add(Biomes.JAGGED_PEAKS);
+        // 树仙女圣林：繁花森林与草甸（01_希腊 W5）
+        tag(ModWorldGen.HAMADRYAD_GROVE_BIOMES).add(Biomes.FLOWER_FOREST, Biomes.MEADOW);
         // 卡尔基诺斯：勒拿沼泽与爱琴海石岸的浅滩（01_希腊 W4）
         tag(ModWorldGen.KARKINOS_BIOMES).addTag(ModTags.subregion(Civilization.GREEK, "lerna"))
                 .addTag(ModTags.subregion(Civilization.GREEK, "aegean"));

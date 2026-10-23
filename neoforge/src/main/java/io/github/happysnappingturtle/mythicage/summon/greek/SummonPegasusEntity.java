@@ -420,7 +420,7 @@ public class SummonPegasusEntity extends PathfinderMob implements GeoEntity, Myt
         }
         double r2 = (double) eyeRadius * eyeRadius;
         List<LivingEntity> found = level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(eyeRadius),
-                e -> e != this && e != owner && distanceToSqr(e) <= r2 && SummonTargets.isEnemyOf(owner, e));
+                e -> e != this && e != owner && distanceToSqr(e) <= r2 && (e instanceof Disguised || SummonTargets.isEnemyOf(owner, e)));
         if (found.isEmpty()) {
             return;
         }

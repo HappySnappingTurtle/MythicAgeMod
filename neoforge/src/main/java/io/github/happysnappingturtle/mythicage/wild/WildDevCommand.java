@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * <pre>
  * /mythicage dev wild camp     半人马营地（营火在脚下）
  * /mythicage dev wild nest     斯廷法利斯鸟巢（树干从脚下的水底 / 地面长起）
+ * /mythicage dev wild grove    树仙女圣林（本命橡木种在脚下）
  * /mythicage dev wild harpy    哈耳庇厄崖巢（在附近 32 格内逐列找崖边）
  * /mythicage dev wild harpy_attack [目标]   让 32 格内最近的一只哈耳庇厄立刻对目标（默认是你）尖啸俯冲（跳过冷却）
  * </pre>
@@ -42,6 +43,7 @@ public final class WildDevCommand {
                         .then(Commands.literal("wild")
                                 .then(Commands.literal("camp").executes(WildDevCommand::camp))
                                 .then(Commands.literal("nest").executes(WildDevCommand::nest))
+                                .then(Commands.literal("grove").executes(WildDevCommand::grove))
                                 .then(Commands.literal("harpy").executes(WildDevCommand::harpy))
                                 .then(Commands.literal("harpy_attack").executes(c -> harpyAttack(c, c.getSource().getPlayerOrException()))
                                         .then(Commands.argument("target", net.minecraft.commands.arguments.EntityArgument.entity())
@@ -64,6 +66,15 @@ public final class WildDevCommand {
         BlockPos nest = StymphalianNestFeature.build(level, at, level.getRandom());
         int n = StymphalianNestFeature.spawnFlock(level, nest, level.getRandom());
         ctx.getSource().sendSuccess(() -> Component.literal("鸟巢 " + nest.toShortString() + "：怪鸟 " + n + " 只"), false);
+        return n;
+    }
+
+    private static int grove(CommandContext<CommandSourceStack> ctx) {
+        ServerLevel level = ctx.getSource().getLevel();
+        BlockPos at = BlockPos.containing(ctx.getSource().getPosition());
+        BlockPos root = io.github.happysnappingturtle.mythicage.wild.greek.HamadryadGroveFeature.build(level, at, level.getRandom());
+        int n = io.github.happysnappingturtle.mythicage.wild.greek.HamadryadGroveFeature.spawn(level, root, level.getRandom());
+        ctx.getSource().sendSuccess(() -> Component.literal("圣林 " + root.toShortString() + "：树仙女 " + n + " 只"), false);
         return n;
     }
 

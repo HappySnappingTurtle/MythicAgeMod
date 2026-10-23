@@ -1,0 +1,9 @@
+{
+  "model": "mythic_age:root_spike",
+  "collision": {
+    "width": 1.6,
+    "height": 1
+  },
+  "locators": {},
+  "variants": {}
+}

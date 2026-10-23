@@ -5,6 +5,8 @@ import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.wild.WildCreatureCard;
 import io.github.happysnappingturtle.mythicage.core.wild.GrabRules;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEntity;
+import io.github.happysnappingturtle.mythicage.entity.hamadryad.RootSpikeEntity;
 import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
 import io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
@@ -49,7 +51,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * T15 野外神话生物（TC-T15-10～16、20～27、30～38、40～46）。场地 17 × 36，地面在 y = 1。
+ * T15 野外神话生物（TC-T15-10～16、20～27、30～38、40～46、50～58）。场地 17 × 36，地面在 y = 1。
  * 怪鸟用例要白天：批次 wild_bird 每个用例开头设成正午；夜晚用例单独一批（改的是整个世界的时间）。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
@@ -61,6 +63,7 @@ public final class WildGameTests {
     private static final String HARPY = "wild_harpy";
     private static final String CRAB = "wild_crab";
     private static final String CRAB_DAY = "wild_crab_day";
+    private static final String DRYAD = "wild_dryad";
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
 
     private WildGameTests() {
@@ -946,6 +949,198 @@ public final class WildGameTests {
         e.discard();
         h.assertTrue(drops.size() == 1 && drops.get(0).is(GreekWild.CRAB_SHELL.get()) && drops.get(0).getCount() == 1,
                 "掉 1 块巨蟹甲壳，实际 " + drops);
+        h.succeed();
+    }
+
+    // ───────────── 阶段 ⑤ 树仙女 ─────────────
+
+    /** 一棵 5 格高的本命橡木（树根在 root），绑定一只树仙女站在 at。 */
+    private static HamadryadEntity dryad(GameTestHelper h, BlockPos root, BlockPos at) {
+        for (int i = 0; i < 5; i++) {
+            h.setBlock(root.above(i), GreekWild.HAMADRYAD_OAK_LOG.get());
+        }
+        HamadryadEntity d = h.spawn(GreekWild.HAMADRYAD.get(), at);
+        d.finalizeSpawn(h.getLevel(), h.getLevel().getCurrentDifficultyAt(d.blockPosition()), MobSpawnType.STRUCTURE, null);
+        d.bindTree(h.absolutePos(root));
+        return d;
+    }
+
+    private static void chop(GameTestHelper h, FakePlayer p, BlockPos rel) {
+        h.setBlock(rel, Blocks.OAK_LOG);
+        p.gameMode.destroyBlock(h.absolutePos(rel));
+    }
+
+    /** TC-T15-50：夜里走到树旁化树（碰撞像原木、高 2.9 格）；天亮现形。 */
+    @GameTest(template = T, batch = "wild_dryad_night", timeoutTicks = 200)
+    public static void hamadryad_night_tree_form(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 10), new BlockPos(8, 2, 12));
+        h.runAfterDelay(2, () -> timeOfDay(h, 18000));
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(d.form() == HamadryadEntity.Form.TREE && d.act() == HamadryadEntity.Act.NONE, "夜里化树"))
+                .thenExecute(() -> {
+                    h.assertTrue(d.canBeCollidedWith() && !d.isPushable(), "化树时像原木：挡路、推不动");
+                    h.assertTrue(Math.abs(d.getBbHeight() - 2.9F) < 0.01F, "高 2.9 格，实际 " + d.getBbHeight());
+                    timeOfDay(h, 6000);
+                })
+                .thenWaitUntil(() -> h.assertTrue(d.form() == HamadryadEntity.Form.MAIDEN && d.act() == HamadryadEntity.Act.NONE, "天亮现形"))
+                .thenExecute(() -> {
+                    h.assertTrue(!d.canBeCollidedWith(), "少女形态不挡路");
+                    d.discard();
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-51：本命树 16 格内砍 3 块原木——前两次只警告，第 3 次现形并唤根刺（裂纹 16 刻后才出刺）。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 120)
+    public static void hamadryad_warns_then_strikes(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 6), new BlockPos(8, 2, 8));
+        FakePlayer p = player(h, "ma_dryad_chop", new BlockPos(8, 2, 14));
+        chop(h, p, new BlockPos(5, 2, 14));
+        h.assertTrue(d.strikes(p) == 1 && !d.angry() && d.act() == HamadryadEntity.Act.WARN, "第 1 次：警告");
+        chop(h, p, new BlockPos(6, 2, 14));
+        h.assertTrue(d.strikes(p) == 2 && !d.angry(), "第 2 次：警告");
+        chop(h, p, new BlockPos(7, 2, 14));
+        h.assertTrue(d.angry() && d.getTarget() == p, "第 3 次：现形、记恨砍树者");
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(!h.getLevel().getEntitiesOfClass(RootSpikeEntity.class, h.getBounds().inflate(2)).isEmpty(), "唤出根刺"))
+                .thenExecute(() -> {
+                    RootSpikeEntity s = h.getLevel().getEntitiesOfClass(RootSpikeEntity.class, h.getBounds().inflate(2)).get(0);
+                    h.assertTrue(s.phase() == 0, "先是裂纹");
+                    h.assertTrue(s.position().distanceTo(p.position()) < 1.5, "根刺在砍树者脚下");
+                })
+                .thenWaitUntil(() -> {
+                    RootSpikeEntity s = h.getLevel().getEntitiesOfClass(RootSpikeEntity.class, h.getBounds().inflate(2)).get(0);
+                    h.assertTrue(s.phase() == 1, "出刺");
+                    h.assertTrue(s.age() == RootSpikeEntity.CRACK_TICKS, "裂纹满 16 刻才出刺，实际 " + s.age());
+                })
+                .thenExecute(() -> {
+                    d.discard();
+                    h.getLevel().getEntitiesOfClass(RootSpikeEntity.class, h.getBounds().inflate(2)).forEach(e -> e.discard());
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-52：本命树 16 格外砍原木不计次数。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_ignores_far_chopping(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 2), new BlockPos(8, 2, 4));
+        FakePlayer p = player(h, "ma_dryad_far", new BlockPos(8, 2, 30));
+        chop(h, p, new BlockPos(8, 2, 21));
+        h.assertTrue(d.strikes(p) == 0, "19 格外不计，实际 " + d.strikes(p));
+        d.discard();
+        h.succeed();
+    }
+
+    /** TC-T15-53：玩家砍掉树根那格本命橡木——她随之死去，砍树者挖掘疲劳 I 2400 刻。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_dies_with_tree_player(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 18), new BlockPos(8, 2, 21));
+        FakePlayer p = player(h, "ma_dryad_fell", new BlockPos(8, 2, 16));
+        p.gameMode.destroyBlock(h.absolutePos(new BlockPos(8, 2, 18)));
+        d.checkTreeNow();
+        h.assertTrue(!d.isAlive(), "树仙女随树死去");
+        var eff = p.getEffect(MobEffects.DIG_SLOWDOWN);
+        h.assertTrue(eff != null && eff.getAmplifier() == 0 && eff.getDuration() == HamadryadEntity.FATIGUE_TICKS,
+                "挖掘疲劳 I 2400 刻，实际 " + eff);
+        h.succeed();
+    }
+
+    /** TC-T15-54：本命橡木被非玩家原因毁掉——她死去，没人得挖掘疲劳。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_dies_with_tree_explosion(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 18), new BlockPos(8, 2, 21));
+        FakePlayer p = player(h, "ma_dryad_near", new BlockPos(8, 2, 16));
+        h.setBlock(new BlockPos(8, 2, 18), Blocks.AIR);
+        h.runAfterDelay(12, () -> {
+            h.assertTrue(!d.isAlive(), "10 刻一次的检查发现树没了，她死去");
+            h.assertTrue(p.getEffect(MobEffects.DIG_SLOWDOWN) == null, "非玩家原因不给挖掘疲劳");
+            h.succeed();
+        });
+    }
+
+    /** TC-T15-55：对本命橡木用骨粉 3 次得宁芙之露 1 个；3 个 MC 日内再用不给、不耗骨粉。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_gives_dew(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        HamadryadEntity d = dryad(h, new BlockPos(8, 2, 18), new BlockPos(8, 2, 21));
+        FakePlayer p = player(h, "ma_dryad_dew", new BlockPos(8, 2, 16));
+        p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, 6));
+        BlockPos log = h.absolutePos(new BlockPos(8, 3, 18));
+        Runnable use = () -> net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(
+                p, InteractionHand.MAIN_HAND, log, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(log), net.minecraft.core.Direction.NORTH, log, false)));
+        use.run();
+        use.run();
+        h.assertTrue(p.getInventory().countItem(GreekWild.NYMPH_DEW.get()) == 0, "两次还不给");
+        use.run();
+        h.assertTrue(p.getInventory().countItem(GreekWild.NYMPH_DEW.get()) == 1, "第 3 次给宁芙之露");
+        h.assertTrue(p.getMainHandItem().getCount() == 3, "用掉 3 份骨粉");
+        use.run();
+        use.run();
+        use.run();
+        h.assertTrue(p.getInventory().countItem(GreekWild.NYMPH_DEW.get()) == 1, "冷却中不再给");
+        h.assertTrue(p.getMainHandItem().getCount() == 3, "冷却中不耗骨粉");
+        h.assertTrue(d.dewReadyAt() >= h.getLevel().getGameTime() + HamadryadEntity.DEW_COOLDOWN - 2, "3 个 MC 日的冷却");
+        d.discard();
+        h.succeed();
+    }
+
+    /** TC-T15-57：圣林生成——本命橡木树干、三棵橡树、还愿彩带、蜂巢；1–2 只绑定本命树。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_grove_generates(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        BlockPos center = h.absolutePos(new BlockPos(8, 2, 18));
+        BlockPos root = io.github.happysnappingturtle.mythicage.wild.greek.HamadryadGroveFeature.build(h.getLevel(), center, h.getLevel().getRandom());
+        int n = io.github.happysnappingturtle.mythicage.wild.greek.HamadryadGroveFeature.spawn(h.getLevel(), root, h.getLevel().getRandom());
+        h.assertTrue(h.getLevel().getBlockState(root).is(GreekWild.HAMADRYAD_OAK_LOG.get())
+                && h.getLevel().getBlockState(root.above(5)).is(GreekWild.HAMADRYAD_OAK_LOG.get()), "本命橡木树干");
+        int oak = 0;
+        int ribbons = 0;
+        int hives = 0;
+        for (BlockPos q : BlockPos.betweenClosed(center.offset(-8, -1, -8), center.offset(8, 12, 8))) {
+            var st = h.getLevel().getBlockState(q);
+            oak += st.is(Blocks.OAK_LOG) ? 1 : 0;
+            ribbons += st.is(GreekWild.VOTIVE_RIBBON.get()) ? 1 : 0;
+            hives += st.is(Blocks.BEE_NEST) ? 1 : 0;
+        }
+        h.assertTrue(oak >= 15, "三棵普通橡树，原木 " + oak);
+        h.assertTrue(ribbons >= 4, "还愿彩带至少 4 条，实际 " + ribbons);
+        h.assertTrue(hives == 1, "一个蜂巢，实际 " + hives);
+        List<HamadryadEntity> ds = h.getLevel().getEntitiesOfClass(HamadryadEntity.class, new AABB(root).inflate(6));
+        h.assertTrue(n >= 1 && n <= 2 && ds.size() == n && ds.stream().allMatch(e -> root.equals(e.treeRoot())), "1–2 只绑定本命树");
+        ds.forEach(e -> e.discard());
+        h.succeed();
+    }
+
+    /** TC-T15-58：击杀只掉 1–2 根木棍。 */
+    @GameTest(template = T, batch = DRYAD, timeoutTicks = 40)
+    public static void hamadryad_loot(GameTestHelper h) {
+        floor(h);
+        HamadryadEntity e = h.spawn(GreekWild.HAMADRYAD.get(), new BlockPos(8, 2, 18));
+        LootTable table = h.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE,
+                ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "entities/hamadryad")));
+        for (int i = 0; i < 10; i++) {
+            LootParams params = new LootParams.Builder(h.getLevel())
+                    .withParameter(LootContextParams.THIS_ENTITY, e)
+                    .withParameter(LootContextParams.ORIGIN, e.position())
+                    .withParameter(LootContextParams.DAMAGE_SOURCE, h.getLevel().damageSources().generic())
+                    .create(LootContextParamSets.ENTITY);
+            List<ItemStack> drops = table.getRandomItems(params);
+            h.assertTrue(drops.size() == 1 && drops.get(0).is(Items.STICK) && drops.get(0).getCount() >= 1 && drops.get(0).getCount() <= 2,
+                    "1–2 根木棍，实际 " + drops);
+        }
+        e.discard();
         h.succeed();
     }
 }

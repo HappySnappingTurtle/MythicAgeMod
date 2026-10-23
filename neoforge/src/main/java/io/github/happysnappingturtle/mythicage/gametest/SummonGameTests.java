@@ -540,6 +540,24 @@ public final class SummonGameTests {
                 e -> p.getUUID().equals(e.link().owner)).get(0);
     }
 
+    /** TC-T15-56：天马天眼扫到树仙女（中立、伪装）也会标出，并调用 Disguised.reveal。 */
+    @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 100)
+    public static void pegasus_sky_eye_reveals_hamadryad(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_peg_dryad", Age.ARCHAIC, new BlockPos(8, 2, 4));
+        try {
+            SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 8));
+            var d = h.spawn(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HAMADRYAD.get(), new BlockPos(8, 2, 20));
+            g.skyEye();
+            h.assertTrue(g.lastMarked().contains(d.getUUID()), "树仙女应被标出");
+            h.assertTrue(d.revealedTo(), "调用了 reveal");
+            d.discard();
+        } finally {
+            cleanup(h, p);
+        }
+        h.succeed();
+    }
+
     /** TC-T14-80：主人头顶开阔，天马飞到主人上空盘旋。 */
     @GameTest(template = T, batch = PEG_BATCH, timeoutTicks = 200)
     public static void pegasus_circles_above_owner(GameTestHelper h) {
