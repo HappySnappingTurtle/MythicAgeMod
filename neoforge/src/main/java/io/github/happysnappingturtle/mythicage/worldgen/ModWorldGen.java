@@ -99,6 +99,10 @@ public final class ModWorldGen {
     /** 半人马营地（T15 阶段 ①）：阿卡迪亚子区。 */
     public static final ResourceKey<BiomeModifier> ADD_CENTAUR_CAMP = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_centaur_camp");
     public static final ResourceKey<BiomeModifier> ADD_STYMPHALIAN_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_stymphalian_nest");
+    public static final ResourceKey<BiomeModifier> ADD_HARPY_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_harpy_nest");
+    /** 哈耳庇厄崖巢的群系：风暴高地 + 爱琴海岸（T15 阶段 ③）。 */
+    public static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> HARPY_NEST_BIOMES =
+            io.github.happysnappingturtle.mythicage.content.ModTags.biome("wild/harpy_nest");
 
     private ModWorldGen() {
     }
@@ -122,6 +126,9 @@ public final class ModWorldGen {
         ctx.register(GreekTrees.LAUREL_TREE_CONFIGURED, GreekTrees.laurelConfigured());
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED, new ConfiguredFeature<>(
                 io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_FEATURE.get(),
+                net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE));
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_CONFIGURED, new ConfiguredFeature<>(
+                io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_FEATURE.get(),
                 net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_NEST_CONFIGURED, new ConfiguredFeature<>(
                 io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_NEST_FEATURE.get(),
@@ -155,6 +162,9 @@ public final class ModWorldGen {
                 LAUREL_RARITY));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED, new PlacedFeature(
                 cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_CONFIGURED), List.of(
+                InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
+        ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_PLACED, new PlacedFeature(
+                cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_CONFIGURED), List.of(
                 InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP_WORLD_SURFACE, BiomeFilter.biome())));
         ctx.register(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_NEST_PLACED, new PlacedFeature(
                 cf.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_NEST_CONFIGURED), List.of(
@@ -196,6 +206,9 @@ public final class ModWorldGen {
         ctx.register(ADD_CENTAUR_CAMP, new BiomeModifiers.AddFeaturesBiomeModifier(
                 biomes.getOrThrow(ModTags.subregion(Civilization.GREEK, "arcadia")),
                 HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED)),
+                GenerationStep.Decoration.SURFACE_STRUCTURES));
+        ctx.register(ADD_HARPY_NEST, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(HARPY_NEST_BIOMES),
+                HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_PLACED)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));
         ctx.register(ADD_STYMPHALIAN_NEST, new BiomeModifiers.AddFeaturesBiomeModifier(
                 biomes.getOrThrow(ModTags.subregion(Civilization.GREEK, "lerna")),

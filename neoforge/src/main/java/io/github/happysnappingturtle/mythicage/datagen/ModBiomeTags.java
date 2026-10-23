@@ -45,6 +45,9 @@ public final class ModBiomeTags extends BiomeTagsProvider {
         tag(ModTags.subregion(Civilization.GREEK, "highlands")).add(Biomes.WINDSWEPT_HILLS, Biomes.WINDSWEPT_GRAVELLY_HILLS,
                 Biomes.WINDSWEPT_FOREST);
         tag(ModTags.subregion(Civilization.GREEK, "olympus")).add(Biomes.JAGGED_PEAKS);
+        // 哈耳庇厄崖巢：风暴高地的崖壁与爱琴海岸的石岸（01_希腊 W2）
+        tag(ModWorldGen.HARPY_NEST_BIOMES).addTag(ModTags.subregion(Civilization.GREEK, "highlands"))
+                .addTag(ModTags.subregion(Civilization.GREEK, "aegean"));
         tag(ModTags.subregion(Civilization.GREEK, "nemea")).add(Biomes.SAVANNA);
         tag(ModWorldGen.GRAPEVINE_BIOMES).addTag(ModTags.region(Civilization.GREEK)).add(Biomes.FLOWER_FOREST);
     }

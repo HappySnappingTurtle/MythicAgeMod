@@ -1,0 +1,10 @@
+{
+  "_note": "哈耳庇厄（01_希腊 W2）：生命 20、爪 4；24 格内发现玩家；两次俯冲间隔 120 刻（雷雨天减半）；抓举规则见 core GrabRules",
+  "max_health": 20,
+  "flying_speed": 0.5,
+  "special": {
+    "claw_damage": 4,
+    "attack_cooldown": 120,
+    "aggro_range": 24
+  }
+}

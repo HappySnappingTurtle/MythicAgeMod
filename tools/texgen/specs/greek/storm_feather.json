@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/storm_feather",
+  "size": 16,
+  "palette": {
+    "o": "#15161b",
+    "d": "#2c2e35",
+    "m": "#4c515b",
+    "b": "#9ea4ac",
+    "s": "#c8ccd2",
+    "l": "#9fd8ff",
+    "L": "#e6f6ff"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "...........oLo..",
+      "..........olmdo.",
+      ".........olmbdo.",
+      "........olmmddo.",
+      ".......olbbsddo.",
+      "......olmmsddo..",
+      ".....olmmsdbdo..",
+      "....olbbsdddo...",
+      "....olmsddbo....",
+      "...olmsdddo.....",
+      "...olsbbdo......",
+      "..olsddoo.......",
+      "..oso.oo........",
+      ".os.............",
+      "os.............."
+    ]
+  }
+}

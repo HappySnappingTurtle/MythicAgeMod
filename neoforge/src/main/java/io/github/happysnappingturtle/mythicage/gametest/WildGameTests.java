@@ -3,12 +3,15 @@ package io.github.happysnappingturtle.mythicage.gametest;
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.wild.WildCreatureCard;
+import io.github.happysnappingturtle.mythicage.core.wild.GrabRules;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.StymphalianBirdEntity;
 import io.github.happysnappingturtle.mythicage.wild.WildSpawning;
 import io.github.happysnappingturtle.mythicage.wild.greek.CentaurCampFeature;
 import io.github.happysnappingturtle.mythicage.wild.greek.GreekWild;
+import io.github.happysnappingturtle.mythicage.wild.greek.HarpyNestFeature;
 import io.github.happysnappingturtle.mythicage.wild.greek.StymphalianNestFeature;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -45,7 +48,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * T15 野外神话生物（TC-T15-10～16、20～27）。场地 17 × 36，地面在 y = 1。
+ * T15 野外神话生物（TC-T15-10～16、20～27、30～38）。场地 17 × 36，地面在 y = 1。
  * 怪鸟用例要白天：批次 wild_bird 每个用例开头设成正午；夜晚用例单独一批（改的是整个世界的时间）。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
@@ -54,6 +57,7 @@ public final class WildGameTests {
     private static final String BATCH = "wild";
     private static final String BIRD = "wild_bird";
     private static final String BIRD_NIGHT = "wild_bird_night";
+    private static final String HARPY = "wild_harpy";
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
 
     private WildGameTests() {
@@ -478,5 +482,251 @@ public final class WildGameTests {
         h.assertTrue(drops.size() == 1 && drops.get(0).is(GreekWild.BRONZE_FEATHER.get()) && drops.get(0).getCount() == 1,
                 "插地青铜羽掉 1 根青铜羽毛，实际 " + drops);
         h.succeed();
+    }
+
+    // ───────────── 阶段 ③ 哈耳庇厄 ─────────────
+
+    /** 一只哈耳庇厄，巢在 nest（相对坐标，可为空）。 */
+    private static HarpyEntity harpy(GameTestHelper h, BlockPos at, @javax.annotation.Nullable BlockPos nest) {
+        HarpyEntity e = h.spawn(GreekWild.HARPY.get(), at);
+        e.finalizeSpawn(h.getLevel(), h.getLevel().getCurrentDifficultyAt(e.blockPosition()), MobSpawnType.STRUCTURE, null);
+        e.joinFlock(UUID.randomUUID(), nest == null ? null : h.absolutePos(nest));
+        return e;
+    }
+
+    /** 不会动、不怕晒的尸壳靶子。 */
+    private static net.minecraft.world.entity.monster.Husk husk(GameTestHelper h, BlockPos at) {
+        net.minecraft.world.entity.monster.Husk z = h.spawn(EntityType.HUSK, at);
+        z.setNoAi(true);
+        return z;
+    }
+
+    /** TC-T15-30：开阔地、目标无盾——尖啸 16 刻里不动手，之后俯冲抓起，升高不超过 3 格，20 刻后松手并记上免疫。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 200)
+    public static void harpy_grabs_on_open_ground(GameTestHelper h) {
+        floor(h);
+        var target = husk(h, new BlockPos(8, 2, 18));
+        HarpyEntity hp = harpy(h, new BlockPos(8, 8, 12), null);
+        double groundY = target.getY();
+        double[] maxY = {groundY};
+        long[] grabbedAt = {-1};
+        h.onEachTick(() -> {
+            maxY[0] = Math.max(maxY[0], target.getY());
+            if (grabbedAt[0] < 0 && target.getVehicle() == hp) {
+                grabbedAt[0] = h.getLevel().getGameTime();
+            }
+        });
+        hp.beginAttack(target);
+        h.startSequence()
+                .thenIdle(HarpyEntity.SCREECH_TICKS - 2)
+                .thenExecute(() -> {
+                    h.assertTrue(hp.state() == HarpyEntity.State.SCREECH, "尖啸中，实际 " + hp.state());
+                    h.assertTrue(!target.isPassenger(), "预警期间不抓");
+                })
+                .thenWaitUntil(() -> h.assertTrue(target.getVehicle() == hp, "抓起目标"))
+                .thenExecute(() -> {
+                    h.assertTrue(hp.state() == HarpyEntity.State.CARRY, "抓着飞");
+                    h.assertTrue(target.getY() >= groundY - 0.3, "没被按进地里：" + groundY + " → " + target.getY());
+                })
+                .thenWaitUntil(() -> h.assertTrue(!target.isPassenger(), "松手"))
+                .thenExecute(() -> {
+                    long held = h.getLevel().getGameTime() - grabbedAt[0];
+                    h.assertTrue(Math.abs(held - GrabRules.HOLD_TICKS) <= 2, "约 20 刻后松手，实际 " + held);
+                    h.assertTrue(maxY[0] - groundY <= GrabRules.MAX_LIFT + 0.3, "升高不超过 3 格，实际 " + (maxY[0] - groundY));
+                    h.assertTrue(maxY[0] - groundY >= 1.5, "确实被提起来了，实际 " + (maxY[0] - groundY));
+                    h.assertTrue(HarpyEntity.immuneUntil(target) >= grabbedAt[0] + GrabRules.IMMUNE_TICKS - 1, "记上 8 秒免疫");
+                    h.assertTrue(target.fallDistance >= GrabRules.RELEASE_FALL, "松手时记上已下落距离");
+                    hp.discard();
+                    target.discard();
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-31：目标还在免疫期——不抓，改爪击（受伤、被击退）。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 160)
+    public static void harpy_respects_grab_immunity(GameTestHelper h) {
+        floor(h);
+        var target = husk(h, new BlockPos(8, 2, 18));
+        target.getPersistentData().putLong(HarpyEntity.IMMUNE_KEY, h.getLevel().getGameTime() + GrabRules.IMMUNE_TICKS);
+        HarpyEntity hp = harpy(h, new BlockPos(8, 8, 12), null);
+        boolean[] carried = {false};
+        h.onEachTick(() -> carried[0] |= target.isPassenger());
+        hp.beginAttack(target);
+        h.succeedWhen(() -> {
+            h.assertTrue(target.getHealth() < target.getMaxHealth(), "挨了爪击");
+            h.assertTrue(!carried[0], "免疫期内从没被抓起");
+            hp.discard();
+            target.discard();
+        });
+    }
+
+    /** TC-T15-32：目标正面举盾——抓举失败，哈耳庇厄坠地眩晕 40 刻。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 160)
+    public static void harpy_blocked_by_shield(GameTestHelper h) {
+        floor(h);
+        Zombie target = dummy(h, new BlockPos(8, 2, 14));
+        target.setYRot(0);
+        target.setYHeadRot(0);
+        target.yBodyRot = 0;
+        target.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
+        target.startUsingItem(InteractionHand.OFF_HAND);
+        HarpyEntity hp = harpy(h, new BlockPos(8, 8, 22), null);
+        h.runAfterDelay(6, () -> hp.beginAttack(target));
+        long[] stunnedAt = {-1};
+        h.onEachTick(() -> {
+            if (stunnedAt[0] < 0 && hp.state() == HarpyEntity.State.STUNNED) {
+                stunnedAt[0] = h.getLevel().getGameTime();
+            }
+            h.assertTrue(!target.isPassenger(), "举盾时不能被抓起");
+        });
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(stunnedAt[0] >= 0, "坠地眩晕"))
+                .thenExecute(() -> h.assertTrue(target.getHealth() == target.getMaxHealth(), "举盾没受伤"))
+                .thenIdle(HarpyEntity.STUN_TICKS - 4)
+                .thenExecute(() -> h.assertTrue(hp.state() == HarpyEntity.State.STUNNED, "眩晕持续约 40 刻"))
+                .thenIdle(8)
+                .thenExecute(() -> {
+                    h.assertTrue(hp.state() != HarpyEntity.State.STUNNED, "40 刻后恢复");
+                    hp.discard();
+                    target.discard();
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-33：俯冲途中被击中——同样坠地眩晕，不抓。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 100)
+    public static void harpy_hit_during_dive(GameTestHelper h) {
+        floor(h);
+        var target = husk(h, new BlockPos(8, 2, 4));
+        HarpyEntity hp = harpy(h, new BlockPos(8, 12, 30), null);
+        FakePlayer p = player(h, "ma_wild_harpy_hit", new BlockPos(2, 2, 4));
+        hp.beginAttack(target);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(hp.state() == HarpyEntity.State.DIVE, "进入俯冲"))
+                .thenExecute(() -> hp.hurt(h.getLevel().damageSources().playerAttack(p), 1))
+                .thenExecute(() -> {
+                    h.assertTrue(hp.state() == HarpyEntity.State.STUNNED, "被击中后眩晕，实际 " + hp.state());
+                    h.assertTrue(!target.isPassenger(), "没有抓到");
+                    hp.discard();
+                    target.discard();
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-34：崖巢 24 格内——不抓举，改为爪击 + 击退。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 160)
+    public static void harpy_swipes_near_nest(GameTestHelper h) {
+        floor(h);
+        var target = husk(h, new BlockPos(8, 2, 18));
+        HarpyEntity hp = harpy(h, new BlockPos(8, 8, 12), new BlockPos(8, 2, 30));
+        boolean[] carried = {false};
+        h.onEachTick(() -> carried[0] |= target.isPassenger());
+        hp.beginAttack(target);
+        h.succeedWhen(() -> {
+            h.assertTrue(target.getHealth() < target.getMaxHealth(), "挨了爪击");
+            h.assertTrue(!carried[0], "巢边不抓举");
+            hp.discard();
+            target.discard();
+        });
+    }
+
+    /** TC-T15-35：目标站在悬崖边（落差 7 格）——不抓举，改为爪击。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 160)
+    public static void harpy_swipes_at_cliff_edge(GameTestHelper h) {
+        floor(h);
+        for (BlockPos q : BlockPos.betweenClosed(new BlockPos(2, 2, 15), new BlockPos(14, 8, 26))) {
+            h.setBlock(q, Blocks.STONE);
+        }
+        var target = husk(h, new BlockPos(8, 9, 16));
+        HarpyEntity hp = harpy(h, new BlockPos(8, 14, 22), null);
+        boolean[] carried = {false};
+        h.onEachTick(() -> carried[0] |= target.isPassenger());
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(HarpyEntity.maxDropNear(h.getLevel(), target.blockPosition()) > GrabRules.CLIFF_DROP, "附近有 > 4 格落差");
+            hp.beginAttack(target);
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(target.getHealth() < target.getMaxHealth(), "挨了爪击");
+            h.assertTrue(!carried[0], "悬崖边不抓举");
+            hp.discard();
+            target.discard();
+        });
+    }
+
+    /** TC-T15-36：崖巢生成——粗土巢台、骨块、骷髅头、崖面方解石白痕；2–4 只同群同巢。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 40)
+    public static void harpy_nest_generates(GameTestHelper h) {
+        floor(h);
+        for (BlockPos q : BlockPos.betweenClosed(new BlockPos(0, 2, 0), new BlockPos(16, 8, 14))) {
+            h.setBlock(q, Blocks.STONE);
+        }
+        BlockPos base = h.absolutePos(new BlockPos(8, 9, 12));
+        BlockPos nest = HarpyNestFeature.build(h.getLevel(), base, net.minecraft.core.Direction.SOUTH, h.getLevel().getRandom());
+        int n = HarpyNestFeature.spawnFlock(h.getLevel(), nest, h.getLevel().getRandom());
+        h.assertTrue(nest.equals(base), "落脚处就是巢台中心");
+        h.assertTrue(h.getLevel().getBlockState(base.below()).is(Blocks.COARSE_DIRT), "粗土巢台");
+        int calcite = 0;
+        int bones = 0;
+        int skulls = 0;
+        for (BlockPos q : BlockPos.betweenClosed(base.offset(-3, -8, -3), base.offset(3, 2, 4))) {
+            var st = h.getLevel().getBlockState(q);
+            calcite += st.is(Blocks.CALCITE) ? 1 : 0;
+            bones += st.is(Blocks.BONE_BLOCK) ? 1 : 0;
+            skulls += st.is(Blocks.SKELETON_SKULL) ? 1 : 0;
+        }
+        h.assertTrue(calcite >= 6, "三道白痕，每道至少 2 格，实际 " + calcite);
+        h.assertTrue(bones == 1 && skulls == 1, "骨块与骷髅头各一，实际 " + bones + " / " + skulls);
+        h.assertTrue(!h.getLevel().getBlockState(base.below()).is(Blocks.CALCITE), "巢台本身没被刷白");
+        List<HarpyEntity> hs = h.getLevel().getEntitiesOfClass(HarpyEntity.class, new AABB(nest).inflate(4));
+        h.assertTrue(n >= 2 && n <= 4 && hs.size() == n, "2–4 只，实际生成 " + n + "、找到 " + hs.size());
+        h.assertTrue(hs.stream().allMatch(e -> nest.equals(e.nest()) && e.groupId() != null && e.groupId().equals(hs.get(0).groupId())),
+                "同一群、同一个巢");
+        hs.forEach(e -> e.discard());
+        h.succeed();
+    }
+
+    /** TC-T15-37：战利品表每次 0–1 根风暴之羽，40 次里至少掉过一次。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 40)
+    public static void harpy_loot(GameTestHelper h) {
+        floor(h);
+        HarpyEntity e = h.spawn(GreekWild.HARPY.get(), new BlockPos(8, 4, 18));
+        LootTable table = h.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE,
+                ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "entities/harpy")));
+        int dropped = 0;
+        for (int i = 0; i < 40; i++) {
+            LootParams params = new LootParams.Builder(h.getLevel())
+                    .withParameter(LootContextParams.THIS_ENTITY, e)
+                    .withParameter(LootContextParams.ORIGIN, e.position())
+                    .withParameter(LootContextParams.DAMAGE_SOURCE, h.getLevel().damageSources().generic())
+                    .create(LootContextParamSets.ENTITY);
+            int count = 0;
+            for (ItemStack st : table.getRandomItems(params)) {
+                if (st.isEmpty()) {
+                    continue; // 数量抽到 0 时战利品表给出空堆，实际不掉
+                }
+                h.assertTrue(st.is(GreekWild.STORM_FEATHER.get()), "只掉风暴之羽，实际 " + st);
+                count += st.getCount();
+            }
+            h.assertTrue(count <= 1, "每次 0–1 根，实际 " + count);
+            dropped += count;
+        }
+        e.discard();
+        h.assertTrue(dropped > 0, "40 次里至少掉过一次");
+        h.succeed();
+    }
+
+    /** TC-T15-38：没有巢也没有目标（命令召唤的）——在出生点附近盘旋，不会一直往上飞。 */
+    @GameTest(template = T, batch = HARPY, timeoutTicks = 140)
+    public static void harpy_without_nest_circles_in_place(GameTestHelper h) {
+        floor(h);
+        HarpyEntity e = h.spawn(GreekWild.HARPY.get(), new BlockPos(8, 4, 18));
+        double y0 = e.getY();
+        h.runAfterDelay(120, () -> {
+            h.assertTrue(e.getY() - y0 <= 8.0, "盘旋高度不超过出生点上方 8 格，实际 +" + (e.getY() - y0));
+            h.assertTrue(e.position().subtract(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(8, 4, 18)))).horizontalDistance() <= 8,
+                    "水平不离开出生点 8 格");
+            e.discard();
+            h.succeed();
+        });
     }
 }

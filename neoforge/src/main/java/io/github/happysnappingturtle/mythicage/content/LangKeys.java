@@ -270,6 +270,7 @@ public final class LangKeys {
         add("entity.mythic_age.centaur", "半人马", "Centaur", "ケンタウロス");
         add("entity.mythic_age.centaur.leader", "喀戎的后裔", "Scion of Chiron", "ケイローンの末裔");
         add("entity.mythic_age.stymphalian_bird", "斯廷法利斯怪鸟", "Stymphalian Bird", "ステュムパーロスの怪鳥");
+        add("entity.mythic_age.harpy", "哈耳庇厄", "Harpy", "ハルピュイア");
         add("entity.mythic_age.bronze_feather", "青铜羽", "Bronze Feather", "青銅の羽根");
         add("item.mythic_age.krotala.tip", "右键摇响：24 格内的斯廷法利斯怪鸟受惊高飞 4 秒，不能齐射；冷却 6 秒", "Use to rattle: Stymphalian Birds within 24 blocks take fright and fly high for 4 seconds, unable to volley; 6 s cooldown", "使用で鳴らす：24 ブロック以内のステュムパーロスの怪鳥が驚いて 4 秒間高く飛び、一斉射撃できない；クールダウン 6 秒");
         add("mythic_age.summon.not_your_mount", "%s只让它的主人骑", "%s lets only its master ride", "%sは主人しか乗せない");

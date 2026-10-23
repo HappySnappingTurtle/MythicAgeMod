@@ -5,6 +5,7 @@ import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.content.BlockModelSpec;
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
+import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.StymphalianBirdEntity;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
@@ -103,6 +104,27 @@ public final class GreekWild {
     public static final ResourceKey<PlacedFeature> STYMPHALIAN_NEST_PLACED =
             ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "stymphalian_nest"));
 
+    /** 哈耳庇厄（W2）：敌对、群居 2–4、只随崖巢生成（风暴高地、爱琴海岸）。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<HarpyEntity>> HARPY =
+            ModRegistries.ENTITY_TYPES.register("harpy",
+                    () -> EntityType.Builder.of(HarpyEntity::new, MobCategory.MONSTER)
+                            .sized(0.8F, 1.7F)
+                            .eyeHeight(1.5F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:harpy"));
+
+    /** 风暴之羽：哈耳庇厄掉落（→ 飞翼凉鞋、哈耳珀，T16 / T17）。 */
+    public static final DeferredItem<Item> STORM_FEATHER = Content.item("storm_feather", GREEK)
+            .lang("风暴之羽", "Storm Feather", "嵐の羽根")
+            .register();
+
+    public static final DeferredHolder<Feature<?>, HarpyNestFeature> HARPY_NEST_FEATURE =
+            ModRegistries.FEATURES.register("harpy_nest", () -> new HarpyNestFeature(NoneFeatureConfiguration.CODEC));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> HARPY_NEST_CONFIGURED =
+            ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "harpy_nest"));
+    public static final ResourceKey<PlacedFeature> HARPY_NEST_PLACED =
+            ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "harpy_nest"));
+
     private GreekWild() {
     }
 
@@ -110,6 +132,7 @@ public final class GreekWild {
         modBus.addListener((EntityAttributeCreationEvent e) -> {
             e.put(CENTAUR.get(), WildCentaurEntity.createWildAttributes().build());
             e.put(STYMPHALIAN_BIRD.get(), StymphalianBirdEntity.createAttributes().build());
+            e.put(HARPY.get(), HarpyEntity.createAttributes().build());
         });
     }
 }

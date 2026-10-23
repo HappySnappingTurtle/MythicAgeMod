@@ -1,0 +1,11 @@
+{
+  "_note": "W2 哈耳庇厄（01_希腊 §6、T15 §4）：敌对群居，只随崖巢生成（风暴高地、爱琴海岸），群 2–4；每 256 格见方最多 2 巢；村庄 64 格内不生成",
+  "entity": "mythic_age:harpy",
+  "attitude": "hostile",
+  "spawn": "structure",
+  "biomes": ["#mythic_age:region/greek/highlands", "#mythic_age:region/greek/aegean"],
+  "weight": 5,
+  "group": [2, 4],
+  "density": {"area": 256, "max": 2},
+  "avoid_villages": 64
+}
