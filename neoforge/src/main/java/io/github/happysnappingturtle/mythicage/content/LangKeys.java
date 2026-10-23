@@ -297,11 +297,11 @@ public final class LangKeys {
         add("mythic_age.relic.not_owner", "只有神庙的主人能供奉或取出圣物", "Only the temple's owner can offer or retrieve relics", "聖遺物を奉納・取り出しできるのは神殿の所有者だけです");
         add("mythic_age.relic.wrong_civ", "这件圣物只能供奉在%s的神庙", "This relic can only be offered at a %s temple", "この聖遺物は%sの神殿にしか奉納できません");
         add("mythic_age.relic.full", "供奉位已满（%s / %s，含其他神庙）", "Offering places are full (%s / %s, including your other temples)", "奉納枠がいっぱいです（%s / %s、他の神殿を含む）");
-        add("mythic_age.relic.shelf_full", "这座神庙的供奉架已满", "This temple's offering shelf is full", "この神殿の奉納台はいっぱいです");
+        add("mythic_age.relic.shelf_full", "这座神坛上已经供奉了圣物；一座神坛只放一件", "A relic is already offered here; each altar holds one", "この祭壇にはすでに聖遺物が奉納されています（1 基に 1 つ）");
         add("mythic_age.relic.offered", "已供奉%s", "Offered %s", "%sを奉納しました");
         add("mythic_age.relic.retrieved", "已取出%s", "Retrieved %s", "%sを取り出しました");
         add("mythic_age.altar.relics", "供奉位 %s / %s（含其他神庙）", "Offerings %s / %s (incl. other temples)", "奉納枠 %s / %s（他の神殿を含む）");
-        add("mythic_age.altar.relics.how", "手持圣物潜行右键神坛放入", "Sneak-use a relic on the altar to offer", "聖遺物を持ってスニーク右クリックで奉納");
+        add("mythic_age.altar.relics.how", "手持圣物潜行右键放入（一座神坛一件）", "Sneak-use a relic to offer (one per altar)", "スニーク右クリックで奉納（祭壇 1 基に 1 つ）");
         add("mythic_age.altar.relics.empty", "（没有供奉圣物）", "(no relics offered)", "（奉納された聖遺物なし）");
         add("mythic_age.altar.relics.take", "取出", "Take", "取出");
         add("commands.mythic_age.relic.unknown", "未知圣物：%s", "Unknown relic: %s", "不明な聖遺物：%s");

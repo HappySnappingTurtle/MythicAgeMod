@@ -12,7 +12,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * 希腊的圣物锚点：奥林匹斯祭坛；供奉范围 = 同维度、到神坛中心的三维距离 ≤ 48 格（01_希腊 §9，D6）；
+ * 希腊的圣物锚点：奥林匹斯祭坛，每座放一件；供奉范围 = 同维度、到神坛中心的三维距离 ≤ 48 格（01_希腊 §9，D6）；
  * 信徒 = 已登记希腊村庄里的成年村民（D5）。
  */
 public final class GreekRelicAnchor implements RelicAnchor {
@@ -31,6 +31,12 @@ public final class GreekRelicAnchor implements RelicAnchor {
     @Override
     public boolean inRange(ServerLevel level, BlockPos anchor, Entity target) {
         return target.level() == level && target.position().distanceToSqr(Vec3.atCenterOf(anchor)) <= RADIUS * RADIUS;
+    }
+
+    /** 一座神坛只放一件（2026-10-23 用户决定）；神坛数量上限 1 / 2 / 3 / 3 不少于供奉位 1 / 2 / 2 / 3。 */
+    @Override
+    public int shelfSize() {
+        return 1;
     }
 
     @Override

@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 神庙的供奉架（T16 设计文档 §2.3）：最多 3 件（供奉位全局上限是 3）。实际能放几件由主人的供奉位决定，
- * 那是 {@link RelicService} 的事；这里只存物品。存档键 {@code Relics}。
+ * 神庙的供奉架（T16 设计文档 §2.3）：存储上最多 3 件（供奉位全局上限是 3）。一座神庙实际能放几件由
+ * {@link RelicAnchor#shelfSize()} 决定（希腊 1 件），总数受主人的供奉位限制，那是 {@link RelicService} 的事；这里只存物品。
+ * 存档键 {@code Relics}。
  */
 public final class RelicShelf {
     public static final int MAX = 3;

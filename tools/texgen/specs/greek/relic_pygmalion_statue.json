@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "relic/relic_pygmalion_statue",
+  "size": 16,
+  "palette": {
+    "w": "#e3ded0",
+    "W": "#f6f3ea",
+    "s": "#bdb6a4",
+    "y": "#d6b45a",
+    "Y": "#efd889"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wwwwWWWWssssyyyy",
+      "wwwwWWWWssssyyyy",
+      "wwwwWWWWssssyyyy",
+      "wwwwWWWWssssyyyy",
+      "YYYYwwwwwwwwwwww",
+      "YYYYwwwwwwwwwwww",
+      "YYYYwwwwwwwwwwww",
+      "YYYYwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww"
+    ]
+  }
+}

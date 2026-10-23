@@ -193,6 +193,11 @@ public final class RelicService {
             return true;
         }
         held.shrink(1);
+        // 生效时亮一次（06 号卡片的「供奉表现」）
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1.2,
+                pos.getZ() + 0.5, 16, 0.35, 0.15, 0.35, 0.01);
+        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE,
+                net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.2F);
         OfferedIndex.update(level, be);
         changed(player);
         player.displayClientMessage(Component.translatable("mythic_age.relic.offered", be.relics().stacks()
@@ -221,7 +226,8 @@ public final class RelicService {
         if (used >= cap) {
             return Optional.of(Component.translatable("mythic_age.relic.full", used, cap));
         }
-        if (be.relics().isFull()) {
+        int size = RelicAnchor.Registry.forKind(be.kind()).map(RelicAnchor::shelfSize).orElse(0);
+        if (be.relics().stacks().size() >= Math.min(size, RelicShelf.MAX)) {
             return Optional.of(Component.translatable("mythic_age.relic.shelf_full"));
         }
         return Optional.empty();

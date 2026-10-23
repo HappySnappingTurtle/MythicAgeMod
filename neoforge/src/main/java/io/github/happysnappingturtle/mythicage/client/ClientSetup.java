@@ -75,6 +75,14 @@ public final class ClientSetup {
         // 主神像（T11a）
         event.registerBlockEntityRenderer(io.github.happysnappingturtle.mythicage.statue.PatronStatues.CORE_BE.get(),
                 StatueCoreRenderer::new);
+        // 神坛上的圣物陈列（T16）
+        event.registerBlockEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple.GREEK_ALTAR_BE.get(),
+                ctx -> new ShrineRelicRenderer<>(ctx, 15 / 16F, 1.0F));
+    }
+
+    @SubscribeEvent
+    static void onRegisterModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) {
+        ShrineRelicRenderer.registerModels(event);
     }
 
     @SubscribeEvent

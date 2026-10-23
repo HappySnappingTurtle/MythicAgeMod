@@ -171,6 +171,11 @@
       "permutations": {
         "mythic_age_raw_tin": "mythic_age:palettes/raw_tin"
       }
+    },
+    {
+      "type": "directory",
+      "source": "relic",
+      "prefix": "relic/"
     }
   ]
 }

@@ -72,7 +72,7 @@ public class GreekAltarScreen extends Screen {
     }
 
     private int relicX(int i) {
-        return left + 8 + 150 + i * 84;
+        return left + 8 + i * 84;
     }
 
     @Override
@@ -193,13 +193,17 @@ public class GreekAltarScreen extends Screen {
         if (shelf == null) {
             return;
         }
-        g.drawString(font, Component.translatable("mythic_age.altar.relics", shelf.used(), shelf.cap()), left + 8, y + 4, BORDER, false);
-        g.drawString(font, Component.translatable("mythic_age.altar.relics.how"), left + 8, y + 24, DIM, false);
+        Component usage = Component.translatable("mythic_age.altar.relics", shelf.used(), shelf.cap());
+        g.drawString(font, usage, left + 8, y + 4, BORDER, false);
+        g.drawString(font, Component.translatable("mythic_age.altar.relics.how"), left + 20 + font.width(usage), y + 4, DIM, false);
         if (shelf.relics().isEmpty()) {
-            g.drawString(font, Component.translatable("mythic_age.altar.relics.empty"), relicX(0), y + 22, DIM, false);
+            g.drawString(font, Component.translatable("mythic_age.altar.relics.empty"), relicX(0), y + 24, DIM, false);
         }
         for (int i = 0; i < shelf.relics().size(); i++) {
             g.renderItem(shelf.relics().get(i), relicX(i), y + 19);
+        }
+        if (shelf.relics().size() == 1) {
+            g.drawString(font, shelf.relics().get(0).getHoverName(), relicX(0) + 74, y + 24, TEXT, false);
         }
     }
 

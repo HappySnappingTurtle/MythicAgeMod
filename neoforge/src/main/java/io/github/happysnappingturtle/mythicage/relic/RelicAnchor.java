@@ -24,6 +24,9 @@ public interface RelicAnchor {
     /** 目标是否在供奉范围内（神庙所在区块已加载时才会被调用）。 */
     boolean inRange(ServerLevel level, BlockPos anchor, Entity target);
 
+    /** 每座神庙能放几件圣物（希腊：一座神坛一件；供奉位多于 1 时要建多座神坛）。 */
+    int shelfSize();
+
     /** 范围搜索用的外包半径（格）：{@link #inRange} 为真的目标都在神庙这么远以内。 */
     double searchRadius();
 

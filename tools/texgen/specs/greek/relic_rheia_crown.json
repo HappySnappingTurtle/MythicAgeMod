@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "relic/relic_rheia_crown",
+  "size": 16,
+  "palette": {
+    "w": "#e6e1d3",
+    "W": "#f6f3ea",
+    "b": "#9a6a32",
+    "B": "#c99446",
+    "g": "#56722e",
+    "G": "#7a9a3c",
+    "L": "#a2bf58"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wwwwWWWWbbbbBBBB",
+      "wwwwWWWWbbbbBBBB",
+      "wwwwWWWWbbbbBBBB",
+      "wwwwWWWWbbbbBBBB",
+      "ggggGGGGLLLLwwww",
+      "ggggGGGGLLLLwwww",
+      "ggggGGGGLLLLwwww",
+      "ggggGGGGLLLLwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww"
+    ]
+  }
+}

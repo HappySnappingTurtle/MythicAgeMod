@@ -23,7 +23,7 @@ public abstract class ShrineBlockEntity extends BlockEntity {
     private String ownerName = "";
     private Age ownerAge = Age.NONE;
     /** 供奉架（T16）：各文明通用，能不能供奉由 {@link io.github.happysnappingturtle.mythicage.relic.RelicAnchor} 决定。 */
-    private final RelicShelf relics = new RelicShelf(this::setChanged);
+    private final RelicShelf relics = new RelicShelf(this::relicsChanged);
 
     protected ShrineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -46,6 +46,39 @@ public abstract class ShrineBlockEntity extends BlockEntity {
 
     public RelicShelf relics() {
         return relics;
+    }
+
+    /** 供奉架变化：存档，并把架上的圣物同步给客户端（神坛上的陈列）。 */
+    private void relicsChanged() {
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    /** 客户端只需要供奉架（陈列用）。 */
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        relics.save(tag, registries);
+        return tag;
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        relics.load(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(net.minecraft.network.Connection net,
+                             net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt,
+                             HolderLookup.Provider registries) {
+        relics.load(pkt.getTag(), registries);
     }
 
     public void bind(UUID owner, String name, Age age) {

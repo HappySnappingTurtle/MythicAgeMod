@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "relic/relic_armor_of_achilles",
+  "size": 16,
+  "palette": {
+    "d": "#6e4520",
+    "m": "#8f5c2c",
+    "h": "#b47c3e",
+    "l": "#5c3c24",
+    "L": "#7a5434",
+    "i": "#e6dcc0",
+    "s": "#3a2a1c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ddddmmmmhhhhllll",
+      "ddddmmmmhhhhllll",
+      "ddddmmmmhhhhllll",
+      "ddddmmmmhhhhllll",
+      "LLLLiiiissssdddd",
+      "LLLLiiiissssdddd",
+      "LLLLiiiissssdddd",
+      "LLLLiiiissssdddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd"
+    ]
+  }
+}

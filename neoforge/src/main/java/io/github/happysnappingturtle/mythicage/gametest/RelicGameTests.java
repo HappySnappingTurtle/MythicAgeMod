@@ -78,6 +78,8 @@ public final class RelicGameTests {
     private static final String T = GameTestTemplates.EMPTY_17X16X20;
     private static final BlockPos ALTAR = new BlockPos(8, 2, 8);
     private static final BlockPos ALTAR_B = new BlockPos(3, 2, 3);
+    private static final BlockPos ALTAR_C = new BlockPos(13, 2, 3);
+    private static final BlockPos ALTAR_D = new BlockPos(3, 2, 14);
     private static final String RHEIA = "greek:rheia_crown";
     private static final String STATUE = "greek:pygmalion_statue";
 
@@ -379,19 +381,33 @@ public final class RelicGameTests {
         h.succeed();
     }
 
-    /** TC-T16-37：神话时代供奉 3 件后降到古典：3 件保持，第 4 件被拒（D7）。 */
+    /** TC-T16-37：神话时代在 3 座神坛各供奉 1 件后降到古典：3 件保持，第 4 件被拒（D7）。 */
     @GameTest(template = T, batch = PYGMALION)
     public static void tc37_age_drop_keeps(GameTestHelper h) {
         FakePlayer p = player(h, "rl_drop", Age.MYTHIC);
         BlockPos a = altar(h, ALTAR, p);
-        h.assertTrue(offer(h, p, a, rheia()) && offer(h, p, a, armor()) && offer(h, p, a, statue()), "神话时代可放 3 件");
+        BlockPos b = altar(h, ALTAR_B, p);
+        BlockPos c = altar(h, ALTAR_C, p);
+        h.assertTrue(offer(h, p, a, rheia()) && offer(h, p, b, armor()) && offer(h, p, c, statue()), "神话时代可放 3 件");
         age(p, Age.CLASSICAL);
         h.assertTrue(RelicService.offerUsage(p, Civilization.GREEK)[0] == 3, "3 件仍是供奉状态");
         close(h, 0.15, RelicService.prayerR(p.getUUID()), "R 仍生效");
-        BlockPos b = altar(h, ALTAR_B, p);
-        h.assertTrue(RelicService.offerError(p, shrine(h, b), RelicCards.byId(RHEIA).orElseThrow(), rheia()).isPresent(),
+        BlockPos d = altar(h, ALTAR_D, p);
+        h.assertTrue(RelicService.offerError(p, shrine(h, d), RelicCards.byId(RHEIA).orElseThrow(), rheia()).isPresent(),
                 "第 4 件被拒");
-        cleanup(h, List.of(p), a, b);
+        cleanup(h, List.of(p), a, b, c, d);
+        h.succeed();
+    }
+
+    /** TC-T16-38：一座神坛只放一件；供奉位还有空也不行。 */
+    @GameTest(template = T, batch = BATCH)
+    public static void tc38_one_per_altar(GameTestHelper h) {
+        FakePlayer p = player(h, "rl_one", Age.MYTHIC);
+        BlockPos a = altar(h, ALTAR, p);
+        h.assertTrue(offer(h, p, a, rheia()), "第一件");
+        h.assertFalse(offer(h, p, a, statue()), "同一座神坛放第二件被拒");
+        h.assertTrue(shrine(h, a).relics().stacks().size() == 1 && state(p, STATUE) == RelicState.INACTIVE, "架上仍只有一件");
+        cleanup(h, List.of(p), a);
         h.succeed();
     }
 
