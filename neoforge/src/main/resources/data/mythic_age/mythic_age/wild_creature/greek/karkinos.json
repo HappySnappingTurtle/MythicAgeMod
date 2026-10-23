@@ -1,0 +1,11 @@
+{
+  "_note": "W4 卡尔基诺斯（01_希腊 §6、T15 §5）：领地型独居，随群系自然刷新（勒拿沼泽、爱琴海石岸）；权重 4；每 256 格见方最多 3 只；村庄 64 格内不刷新",
+  "entity": "mythic_age:karkinos",
+  "attitude": "territorial",
+  "spawn": "natural",
+  "biomes": ["#mythic_age:region/greek/lerna", "#mythic_age:region/greek/aegean"],
+  "weight": 4,
+  "group": [1, 1],
+  "density": {"area": 256, "max": 3},
+  "avoid_villages": 64
+}

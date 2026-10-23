@@ -5,6 +5,7 @@
   - 青铜响板 krotala：两片长条青铜拍板，下端用皮绳连在一起（V 形张开）。
   - 插地青铜羽 stuck_bronze_feather（方块，十字模型）：一根竖插的青铜羽，羽根没入地里。
   - 风暴之羽 storm_feather：一根宽大的炭黑飞羽，浅灰横斑，羽轴浅色，前缘一道蓝白闪电光。
+  - 巨蟹甲壳 crab_shell：一块前宽后窄的橄榄青铜绿头胸甲，前侧缘锯齿，甲面深斑与亮点。
 运行：python3 tools/models/greek_wild.py && python3 tools/texgen/texgen.py --force tools/texgen/specs/greek/<名>.json
 """
 from __future__ import annotations
@@ -100,6 +101,24 @@ STORM = ["................",
          ".os.............",
          "os.............."]
 
+SHELL_PAL = {"o": "#1f2614", "d": "#3b4526", "m": "#556236", "h": "#77854a", "k": "#a3b06a", "t": "#2a221c"}
+SHELL = ["................",
+         "................",
+         "..o.o.oooo.o.o..",
+         ".otohommmmohoto.",
+         ".odmmhmmmmhmmdo.",
+         "odmmdmmhkmmdmmdo",
+         "odmhmmdmmmmhmmdo",
+         "odmmmmmdmmmmmhdo",
+         ".odmmhmmmdmmmdo.",
+         ".odmmmmmmmmhmdo.",
+         "..odmmdmmmmmdo..",
+         "...oddmmmmddo...",
+         "....ooddddoo....",
+         "......oooo......",
+         "................",
+         "................"]
+
 
 def main():
     spec("centaur_sinew", SINEW, SINEW_PAL, 16, "item/")
@@ -107,7 +126,8 @@ def main():
     spec("krotala", KROTALA, BRONZE_PAL, 16, "item/")
     spec("stuck_bronze_feather", STUCK, BRONZE_PAL, 16, "block/")
     spec("storm_feather", STORM, STORM_PAL, 16, "item/")
-    print("centaur_sinew bronze_feather krotala stuck_bronze_feather storm_feather")
+    spec("crab_shell", SHELL, SHELL_PAL, 16, "item/")
+    print("centaur_sinew bronze_feather krotala stuck_bronze_feather storm_feather crab_shell")
 
 
 if __name__ == "__main__":

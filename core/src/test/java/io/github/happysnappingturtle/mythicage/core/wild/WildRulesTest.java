@@ -111,6 +111,16 @@ class WildRulesTest {
         assertTrue(GroupAggro.retaliates(GroupAggro.Source.OTHER_MOB));
     }
 
+    /** TC-T15-08：掀翻条件——满蓄力且（暴击 / 疾跑 / 斧头）。 */
+    @Test
+    void tc08_flips() {
+        assertTrue(WildCombatRules.flips(true, true, false, false), "暴击");
+        assertTrue(WildCombatRules.flips(true, false, true, false), "疾跑攻击");
+        assertTrue(WildCombatRules.flips(true, false, false, true), "斧头满蓄力");
+        assertFalse(WildCombatRules.flips(true, false, false, false), "普通满蓄力剑击");
+        assertFalse(WildCombatRules.flips(false, true, true, true), "没蓄满力一律不算");
+    }
+
     @Test
     void tc05_frontalArmor() {
         // 朝向 0° = 面朝 +Z

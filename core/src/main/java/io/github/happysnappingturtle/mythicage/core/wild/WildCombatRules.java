@@ -27,4 +27,15 @@ public final class WildCombatRules {
         double half = Math.toRadians(arcDeg / 2.0);
         return cos >= Math.cos(half) - 1.0E-9 ? 1.0 - reduction : 1.0;
     }
+
+    /**
+     * 掀翻（卡尔基诺斯，01_希腊 W4、T15 §5）：玩家满蓄力的近战攻击里，暴击（下落中）、疾跑攻击、或用斧头，都会把它掀翻。
+     * 没蓄满力的连点不算。
+     */
+    public static boolean flips(boolean fullStrength, boolean critical, boolean sprinting, boolean axe) {
+        return fullStrength && (critical || sprinting || axe);
+    }
+
+    /** 翻倒期间受到的伤害倍率（不再有正面减伤）。 */
+    public static final double FLIPPED_MULTIPLIER = 2.0;
 }

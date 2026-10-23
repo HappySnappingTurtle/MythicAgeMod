@@ -54,4 +54,32 @@ public final class WildSpawning {
         int max = card != null ? card.densityMax() : 1;
         return WildSpawnRules.isAreaSite(level.getSeed(), key, origin.getX() >> 4, origin.getZ() >> 4, area, max);
     }
+
+    /**
+     * 自然刷新的条件（生物卡 spawn = natural）：非和平难度、方块可站（原版 Mob 规则，不要求黑暗）、村庄排除、
+     * 区域密度（这一 area × area 区域里已加载的同类不超过 max × 群上限）。命令、刷怪蛋等非自然方式不受限。
+     */
+    public static <T extends net.minecraft.world.entity.Mob> net.minecraft.world.entity.SpawnPlacements.SpawnPredicate<T> natural(String key) {
+        return (type, level, reason, pos, random) -> {
+            if (reason != net.minecraft.world.entity.MobSpawnType.NATURAL && reason != net.minecraft.world.entity.MobSpawnType.CHUNK_GENERATION) {
+                return true;
+            }
+            WildCreatureCard card = WildCreatures.card(key).orElse(null);
+            if (card == null || level.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL
+                    || !net.minecraft.world.entity.Mob.checkMobSpawnRules(type, level, reason, pos, random)) {
+                return false;
+            }
+            ServerLevel sl = level.getLevel();
+            return villageAllows(sl, pos, card) && WildSpawnRules.densityAllows(countInArea(sl, type, pos, card.densityArea()),
+                    card.densityMax() * card.maxGroup());
+        };
+    }
+
+    /** pos 所在 area × area 区域里已加载的 type 实体数。 */
+    public static int countInArea(ServerLevel level, net.minecraft.world.entity.EntityType<?> type, BlockPos pos, int area) {
+        int x0 = Math.floorDiv(pos.getX(), area) * area;
+        int z0 = Math.floorDiv(pos.getZ(), area) * area;
+        var box = new net.minecraft.world.phys.AABB(x0, level.getMinBuildHeight(), z0, x0 + area, level.getMaxBuildHeight(), z0 + area);
+        return level.getEntities(type, box, e -> e.isAlive()).size();
+    }
 }

@@ -6,6 +6,7 @@ import io.github.happysnappingturtle.mythicage.core.wild.WildCreatureCard;
 import io.github.happysnappingturtle.mythicage.core.wild.GrabRules;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
 import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
+import io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.StymphalianBirdEntity;
 import io.github.happysnappingturtle.mythicage.wild.WildSpawning;
@@ -48,7 +49,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * T15 野外神话生物（TC-T15-10～16、20～27、30～38）。场地 17 × 36，地面在 y = 1。
+ * T15 野外神话生物（TC-T15-10～16、20～27、30～38、40～46）。场地 17 × 36，地面在 y = 1。
  * 怪鸟用例要白天：批次 wild_bird 每个用例开头设成正午；夜晚用例单独一批（改的是整个世界的时间）。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
@@ -58,6 +59,8 @@ public final class WildGameTests {
     private static final String BIRD = "wild_bird";
     private static final String BIRD_NIGHT = "wild_bird_night";
     private static final String HARPY = "wild_harpy";
+    private static final String CRAB = "wild_crab";
+    private static final String CRAB_DAY = "wild_crab_day";
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
 
     private WildGameTests() {
@@ -728,5 +731,221 @@ public final class WildGameTests {
             e.discard();
             h.succeed();
         });
+    }
+
+    // ───────────── 阶段 ④ 卡尔基诺斯 ─────────────
+
+    /** 一只卡尔基诺斯，面朝 +Z（领地中心 = 出生点）。 */
+    private static KarkinosEntity crab(GameTestHelper h, BlockPos at) {
+        KarkinosEntity k = h.spawn(GreekWild.KARKINOS.get(), at);
+        k.finalizeSpawn(h.getLevel(), h.getLevel().getCurrentDifficultyAt(k.blockPosition()), MobSpawnType.SPAWN_EGG, null);
+        k.setYRot(0);
+        k.yBodyRot = 0;
+        k.yHeadRot = 0;
+        return k;
+    }
+
+    private static net.minecraft.world.entity.animal.Chicken chicken(GameTestHelper h, BlockPos at) {
+        var c = h.spawn(EntityType.CHICKEN, at);
+        c.setNoAi(true);
+        return c;
+    }
+
+    /** TC-T15-40：正面挨 10 点只掉 2 点，背后挨 10 点掉 10 点。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 40)
+    public static void karkinos_frontal_shell(GameTestHelper h) {
+        timeOfDay(h, 18000);
+        floor(h);
+        KarkinosEntity k = crab(h, new BlockPos(8, 2, 18));
+        Zombie front = dummy(h, new BlockPos(8, 2, 23));
+        Zombie back = dummy(h, new BlockPos(8, 2, 13));
+        float hp0 = k.getHealth();
+        k.hurt(h.getLevel().damageSources().mobAttack(front), 10);
+        float afterFront = k.getHealth();
+        k.invulnerableTime = 0;
+        k.hurt(h.getLevel().damageSources().mobAttack(back), 10);
+        float afterBack = k.getHealth();
+        h.assertTrue(Math.abs(hp0 - afterFront - 2.0F) < 0.01F, "正面 10 → 2，实际 " + (hp0 - afterFront));
+        h.assertTrue(Math.abs(afterFront - afterBack - 10.0F) < 0.01F, "背后 10 → 10，实际 " + (afterFront - afterBack));
+        k.discard();
+        h.succeed();
+    }
+
+    /** TC-T15-41：掀翻——翻倒 60 刻，期间受伤 ×2（正面也是）、不夹击，之后恢复；别的玩家打的、或隔了几刻的不算。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 120)
+    public static void karkinos_flip(GameTestHelper h) {
+        timeOfDay(h, 18000);
+        floor(h);
+        KarkinosEntity k = crab(h, new BlockPos(8, 2, 18));
+        FakePlayer p = player(h, "ma_wild_crab_flip", new BlockPos(8, 2, 22));
+        FakePlayer other = player(h, "ma_wild_crab_other", new BlockPos(9, 2, 22));
+        Zombie front = dummy(h, new BlockPos(8, 2, 23));
+        // 别的玩家的伤害不触发
+        k.armFlip(p);
+        k.hurt(h.getLevel().damageSources().playerAttack(other), 1);
+        h.assertTrue(!k.flipped(), "另一名玩家打的不翻");
+        k.invulnerableTime = 0;
+        k.armFlip(p);
+        k.hurt(h.getLevel().damageSources().playerAttack(p), 1);
+        h.assertTrue(k.flipped(), "满足条件的这一下把它掀翻");
+        k.invulnerableTime = 0;
+        float before = k.getHealth();
+        k.hurt(h.getLevel().damageSources().mobAttack(front), 5);
+        h.assertTrue(Math.abs(before - k.getHealth() - 10.0F) < 0.01F, "翻倒时正面 5 → 10，实际 " + (before - k.getHealth()));
+        var prey = chicken(h, new BlockPos(8, 2, 20));
+        h.runAfterDelay(50, () -> {
+            h.assertTrue(k.flipped(), "60 刻内仍翻倒");
+            h.assertTrue(prey.isAlive() && prey.getHealth() == prey.getMaxHealth(), "翻倒时不夹击");
+        });
+        h.runAfterDelay(64, () -> {
+            h.assertTrue(!k.flipped(), "60 刻后翻回来");
+            k.discard();
+            prey.discard();
+            h.succeed();
+        });
+    }
+
+    /** TC-T15-41b：掀翻预约只管紧接着的那一下（隔了几刻再打不翻）。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 40)
+    public static void karkinos_flip_window(GameTestHelper h) {
+        timeOfDay(h, 18000);
+        floor(h);
+        KarkinosEntity k = crab(h, new BlockPos(8, 2, 18));
+        FakePlayer p = player(h, "ma_wild_crab_late", new BlockPos(8, 2, 22));
+        k.armFlip(p);
+        h.runAfterDelay(4, () -> {
+            k.hurt(h.getLevel().damageSources().playerAttack(p), 1);
+            h.assertTrue(!k.flipped(), "隔 4 刻不翻");
+            k.discard();
+            h.succeed();
+        });
+    }
+
+    /** TC-T15-42：领地 8 格内的猎物会被盯上，12 格外的不会；目标跑出 16 格就放弃，回领地中心。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 200)
+    public static void karkinos_territory(GameTestHelper h) {
+        timeOfDay(h, 18000);
+        floor(h);
+        KarkinosEntity k = crab(h, new BlockPos(8, 2, 4));
+        var far = chicken(h, new BlockPos(8, 2, 17));
+        h.runAfterDelay(25, () -> h.assertTrue(k.getTarget() == null, "13 格外的不理，实际 " + k.getTarget()));
+        h.runAfterDelay(26, () -> chicken(h, new BlockPos(8, 2, 10)));
+        h.startSequence()
+                .thenIdle(27)
+                .thenWaitUntil(() -> h.assertTrue(k.getTarget() instanceof net.minecraft.world.entity.animal.Chicken c && c != far, "6 格内的被盯上"))
+                .thenExecute(() -> {
+                    var t = k.getTarget();
+                    Vec3 v = Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(8, 2, 22)));
+                    t.teleportTo(v.x, v.y, v.z);
+                })
+                .thenWaitUntil(() -> h.assertTrue(k.getTarget() == null, "目标离领地中心 18 格：放弃"))
+                .thenWaitUntil(() -> h.assertTrue(k.position().distanceTo(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(8, 2, 4)))) < 2.5,
+                        "回到领地中心"))
+                .thenExecute(() -> {
+                    k.discard();
+                    h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.animal.Chicken.class, h.getBounds().inflate(4)).forEach(e -> e.discard());
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-44：张钳 14 刻里目标不受伤，之后夹击（鸡一下就死）。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 120)
+    public static void karkinos_pinch_windup(GameTestHelper h) {
+        timeOfDay(h, 18000);
+        floor(h);
+        KarkinosEntity k = crab(h, new BlockPos(8, 2, 16));
+        var prey = chicken(h, new BlockPos(8, 2, 18));
+        long[] windupAt = {-1};
+        h.onEachTick(() -> {
+            if (windupAt[0] < 0 && k.state() == KarkinosEntity.State.WINDUP) {
+                windupAt[0] = h.getLevel().getGameTime();
+            }
+        });
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(windupAt[0] >= 0, "开始张钳"))
+                .thenIdle(KarkinosEntity.WINDUP_TICKS - 3)
+                .thenExecute(() -> h.assertTrue(prey.isAlive(), "张钳期间没受伤"))
+                .thenWaitUntil(() -> h.assertTrue(!prey.isAlive(), "夹击"))
+                .thenExecute(() -> k.discard())
+                .thenSucceed();
+    }
+
+    /** TC-T15-43：白天回领地中心埋进泥里（碰撞箱变矮）；受伤或被踩就钻出来。 */
+    @GameTest(template = T, batch = CRAB_DAY, timeoutTicks = 200)
+    public static void karkinos_buries_by_day(GameTestHelper h) {
+        timeOfDay(h, 6000);
+        floor(h);
+        KarkinosEntity hit = crab(h, new BlockPos(4, 2, 10));
+        KarkinosEntity stepped = crab(h, new BlockPos(12, 2, 24));
+        Zombie z = dummy(h, new BlockPos(8, 2, 2));
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(hit.buried() && stepped.buried(), "白天都埋起来"))
+                .thenExecute(() -> {
+                    h.assertTrue(hit.getBbHeight() < 0.4F, "埋着时碰撞箱变矮，实际 " + hit.getBbHeight());
+                    hit.hurt(h.getLevel().damageSources().mobAttack(z), 1);
+                    h.assertTrue(hit.state() == KarkinosEntity.State.EMERGE, "受伤钻出");
+                    var husk = h.spawn(EntityType.HUSK, new BlockPos(12, 3, 24));
+                    husk.setNoAi(false);
+                })
+                .thenWaitUntil(() -> h.assertTrue(stepped.state() != KarkinosEntity.State.BURIED, "被踩钻出"))
+                .thenExecute(() -> {
+                    hit.discard();
+                    stepped.discard();
+                    h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.monster.Husk.class, h.getBounds().inflate(4)).forEach(e -> e.discard());
+                    timeOfDay(h, 18000);
+                })
+                .thenSucceed();
+    }
+
+    /** TC-T15-45：自然刷新条件——钟 28 格内不刷；区域里已有 3 只不刷；区域空时可以；刷怪蛋不受限。单独一批（别的用例里的蟹会算进区域密度）。 */
+    @GameTest(template = T, batch = "wild_crab_spawn", timeoutTicks = 40)
+    public static void karkinos_natural_spawn_rule(GameTestHelper h) {
+        floor(h);
+        h.setBlock(new BlockPos(8, 2, 2), Blocks.BELL);
+        var pred = io.github.happysnappingturtle.mythicage.wild.WildSpawning.<KarkinosEntity>natural("greek:karkinos");
+        var level = h.getLevel();
+        var prev = level.getDifficulty();
+        BlockPos spot = h.absolutePos(new BlockPos(8, 2, 30));
+        h.runAfterDelay(5, () -> {
+            level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
+            h.assertTrue(!pred.test(GreekWild.KARKINOS.get(), level, MobSpawnType.NATURAL, spot, level.getRandom()), "钟 28 格内不刷");
+        });
+        // 区域密度与「可以刷」用一张不排除村庄的测试卡：GameTest 世界里别的用例登记的村庄可能就在 64 格内（村庄排除见 TC-T15-10）
+        WildCreatureCard real = io.github.happysnappingturtle.mythicage.wild.WildCreatures.card("greek:karkinos").orElseThrow();
+        io.github.happysnappingturtle.mythicage.wild.WildCreatures.putForTest(new WildCreatureCard("greek", "test_karkinos",
+                real.entity(), real.attitude(), real.spawn(), real.biomes(), real.weight(), real.minGroup(), real.maxGroup(),
+                real.densityArea(), real.densityMax(), 0));
+        var open = io.github.happysnappingturtle.mythicage.wild.WildSpawning.<KarkinosEntity>natural("greek:test_karkinos");
+        h.runAfterDelay(10, () -> {
+            h.assertTrue(open.test(GreekWild.KARKINOS.get(), level, MobSpawnType.NATURAL, spot, level.getRandom()), "区域空：可以");
+            List<KarkinosEntity> three = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                three.add(crab(h, new BlockPos(3 + i * 4, 2, 14)));
+            }
+            h.assertTrue(!open.test(GreekWild.KARKINOS.get(), level, MobSpawnType.NATURAL, spot, level.getRandom()), "区域里已有 3 只：不刷");
+            h.assertTrue(pred.test(GreekWild.KARKINOS.get(), level, MobSpawnType.SPAWN_EGG, spot, level.getRandom()), "刷怪蛋不受限");
+            three.forEach(e -> e.discard());
+            level.getServer().setDifficulty(prev, true);
+            h.succeed();
+        });
+    }
+
+    /** TC-T15-46：掉 1 块巨蟹甲壳。 */
+    @GameTest(template = T, batch = CRAB, timeoutTicks = 40)
+    public static void karkinos_loot(GameTestHelper h) {
+        floor(h);
+        KarkinosEntity e = h.spawn(GreekWild.KARKINOS.get(), new BlockPos(8, 2, 18));
+        LootTable table = h.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE,
+                ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "entities/karkinos")));
+        LootParams params = new LootParams.Builder(h.getLevel())
+                .withParameter(LootContextParams.THIS_ENTITY, e)
+                .withParameter(LootContextParams.ORIGIN, e.position())
+                .withParameter(LootContextParams.DAMAGE_SOURCE, h.getLevel().damageSources().generic())
+                .create(LootContextParamSets.ENTITY);
+        List<ItemStack> drops = table.getRandomItems(params);
+        e.discard();
+        h.assertTrue(drops.size() == 1 && drops.get(0).is(GreekWild.CRAB_SHELL.get()) && drops.get(0).getCount() == 1,
+                "掉 1 块巨蟹甲壳，实际 " + drops);
+        h.succeed();
     }
 }

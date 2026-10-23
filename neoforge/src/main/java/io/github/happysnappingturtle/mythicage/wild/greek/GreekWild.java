@@ -6,6 +6,7 @@ import io.github.happysnappingturtle.mythicage.content.BlockModelSpec;
 import io.github.happysnappingturtle.mythicage.content.LootSpec;
 import io.github.happysnappingturtle.mythicage.entity.centaur.WildCentaurEntity;
 import io.github.happysnappingturtle.mythicage.entity.harpy.HarpyEntity;
+import io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.BronzeFeatherEntity;
 import io.github.happysnappingturtle.mythicage.entity.stymphalian.StymphalianBirdEntity;
 import io.github.happysnappingturtle.mythicage.registry.ModRegistries;
@@ -125,6 +126,20 @@ public final class GreekWild {
     public static final ResourceKey<PlacedFeature> HARPY_NEST_PLACED =
             ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "harpy_nest"));
 
+    /** 卡尔基诺斯（W4）：独居、领地型，随群系自然刷新（勒拿沼泽、爱琴海石岸）。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<KarkinosEntity>> KARKINOS =
+            ModRegistries.ENTITY_TYPES.register("karkinos",
+                    () -> EntityType.Builder.of(KarkinosEntity::new, MobCategory.MONSTER)
+                            .sized(1.4F, 0.8F)
+                            .eyeHeight(0.7F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:karkinos"));
+
+    /** 巨蟹甲壳：卡尔基诺斯掉落（→ 抛光镜盾、青铜圆盾强化，T17）。 */
+    public static final DeferredItem<Item> CRAB_SHELL = Content.item("crab_shell", GREEK)
+            .lang("巨蟹甲壳", "Giant Crab Shell", "大蟹の甲羅")
+            .register();
+
     private GreekWild() {
     }
 
@@ -133,6 +148,13 @@ public final class GreekWild {
             e.put(CENTAUR.get(), WildCentaurEntity.createWildAttributes().build());
             e.put(STYMPHALIAN_BIRD.get(), StymphalianBirdEntity.createAttributes().build());
             e.put(HARPY.get(), HarpyEntity.createAttributes().build());
+            e.put(KARKINOS.get(), KarkinosEntity.createAttributes().build());
         });
+        // 自然刷新的野外神话生物：刷新条件由生物卡决定（村庄排除、区域密度），不要求黑暗
+        modBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent e) ->
+                e.register(KARKINOS.get(), net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                        net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                        io.github.happysnappingturtle.mythicage.wild.WildSpawning.natural("greek:karkinos"),
+                        net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE));
     }
 }

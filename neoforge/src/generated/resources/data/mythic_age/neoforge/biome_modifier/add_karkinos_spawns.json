@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#mythic_age:wild/karkinos",
+  "spawners": {
+    "type": "mythic_age:karkinos",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 4
+  }
+}

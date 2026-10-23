@@ -1,0 +1,11 @@
+{
+  "_note": "卡尔基诺斯（01_希腊 W4）：生命 60、钳 9；领地 8 格、追击不出 16 格；张钳 14 刻后夹击，两次夹击间隔 30 刻；掀翻 60 刻",
+  "max_health": 60,
+  "special": {
+    "claw_damage": 9,
+    "territory": 8,
+    "chase": 16,
+    "pinch_cooldown": 30,
+    "flip_ticks": 60
+  }
+}

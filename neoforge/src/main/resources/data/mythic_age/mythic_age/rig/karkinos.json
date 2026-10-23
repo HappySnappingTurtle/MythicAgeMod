@@ -1,0 +1,30 @@
+{
+  "model": "mythic_age:karkinos",
+  "collision": {
+    "width": 1.4,
+    "height": 0.8
+  },
+  "locators": {
+    "eye_l": [
+      2.2,
+      12.9,
+      6.3
+    ],
+    "eye_r": [
+      -2.2,
+      12.9,
+      6.3
+    ],
+    "pinch": [
+      0,
+      8,
+      20
+    ],
+    "belly": [
+      0,
+      6,
+      0
+    ]
+  },
+  "variants": {}
+}

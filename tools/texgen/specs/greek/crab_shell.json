@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/crab_shell",
+  "size": 16,
+  "palette": {
+    "o": "#1f2614",
+    "d": "#3b4526",
+    "m": "#556236",
+    "h": "#77854a",
+    "k": "#a3b06a",
+    "t": "#2a221c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "................",
+      "..o.o.oooo.o.o..",
+      ".otohommmmohoto.",
+      ".odmmhmmmmhmmdo.",
+      "odmmdmmhkmmdmmdo",
+      "odmhmmdmmmmhmmdo",
+      "odmmmmmdmmmmmhdo",
+      ".odmmhmmmdmmmdo.",
+      ".odmmmmmmmmhmdo.",
+      "..odmmdmmmmmdo..",
+      "...oddmmmmddo...",
+      "....ooddddoo....",
+      "......oooo......",
+      "................",
+      "................"
+    ]
+  }
+}

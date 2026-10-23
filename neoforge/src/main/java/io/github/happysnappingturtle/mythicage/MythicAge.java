@@ -189,6 +189,7 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerStopping);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
+        game.addListener(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEvents::onPlayerAttack);
 
         // 希腊恩宠来源：信徒祈祷（T10）
         GreekPrayer.init(modBus, game);

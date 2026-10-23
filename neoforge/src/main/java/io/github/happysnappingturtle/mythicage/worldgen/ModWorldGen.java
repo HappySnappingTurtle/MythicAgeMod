@@ -100,6 +100,10 @@ public final class ModWorldGen {
     public static final ResourceKey<BiomeModifier> ADD_CENTAUR_CAMP = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_centaur_camp");
     public static final ResourceKey<BiomeModifier> ADD_STYMPHALIAN_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_stymphalian_nest");
     public static final ResourceKey<BiomeModifier> ADD_HARPY_NEST = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_harpy_nest");
+    public static final ResourceKey<BiomeModifier> ADD_KARKINOS_SPAWNS = key(NeoForgeRegistries.Keys.BIOME_MODIFIERS, "add_karkinos_spawns");
+    /** 卡尔基诺斯自然刷新的群系：勒拿沼泽 + 爱琴海石岸（T15 阶段 ④）。 */
+    public static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> KARKINOS_BIOMES =
+            io.github.happysnappingturtle.mythicage.content.ModTags.biome("wild/karkinos");
     /** 哈耳庇厄崖巢的群系：风暴高地 + 爱琴海岸（T15 阶段 ③）。 */
     public static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> HARPY_NEST_BIOMES =
             io.github.happysnappingturtle.mythicage.content.ModTags.biome("wild/harpy_nest");
@@ -207,6 +211,10 @@ public final class ModWorldGen {
                 biomes.getOrThrow(ModTags.subregion(Civilization.GREEK, "arcadia")),
                 HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.CENTAUR_CAMP_PLACED)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));
+        // 卡尔基诺斯：权重 4、每次 1 只（生物卡 greek:karkinos）；刷新条件见 WildSpawning.natural
+        ctx.register(ADD_KARKINOS_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(biomes.getOrThrow(KARKINOS_BIOMES),
+                new net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData(
+                        io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.KARKINOS.get(), 4, 1, 1)));
         ctx.register(ADD_HARPY_NEST, new BiomeModifiers.AddFeaturesBiomeModifier(biomes.getOrThrow(HARPY_NEST_BIOMES),
                 HolderSet.direct(placed.getOrThrow(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.HARPY_NEST_PLACED)),
                 GenerationStep.Decoration.SURFACE_STRUCTURES));
