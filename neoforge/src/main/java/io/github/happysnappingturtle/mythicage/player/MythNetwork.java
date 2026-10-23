@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "13";
+    private static final String PROTOCOL_VERSION = "14";
 
     private MythNetwork() {
     }
@@ -82,6 +82,10 @@ public final class MythNetwork {
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientRelics.accept(payload))
                 .playToServer(io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.TYPE,
                         io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.STREAM_CODEC,
-                        io.github.happysnappingturtle.mythicage.relic.RelicPayloads::handleRetrieve);
+                        io.github.happysnappingturtle.mythicage.relic.RelicPayloads::handleRetrieve)
+                // 举盾时攻击（T17）
+                .playToServer(io.github.happysnappingturtle.mythicage.equipment.ShieldAttack.Payload.TYPE,
+                        io.github.happysnappingturtle.mythicage.equipment.ShieldAttack.Payload.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.equipment.ShieldAttack::handle);
     }
 }

@@ -1,0 +1,27 @@
+{
+  "armor": {
+    "bronze": {
+      "source": "EQ-GR-08",
+      "points": [2, 7, 5, 3],
+      "toughness": 1,
+      "durability": [248, 360, 338, 293],
+      "enchantability": 12,
+      "decided": "T17 D1、D2：分配按 10 号提案；附魔能力合同没写，取 12"
+    }
+  },
+  "weapons": {
+    "xiphos": {"source": "EQ-GR-09", "damage": 6, "speed": 1.8, "durability": 375, "sweep": false,
+               "decided": "T17 D3、D4：耐久 = 铁剑 250 × 1.5；不横扫"},
+    "dory": {"source": "EQ-GR-10", "damage": 7, "speed": 1.1, "reach": 1, "durability": 375, "thrust_multiplier": 0.6,
+             "decided": "T17 D3、D8：耐久 = 铁剑 250 × 1.5；刺击与普通攻击共用冷却"},
+    "aspis": {"source": "EQ-GR-11", "durability": 500, "counter_ticks": 10, "counter_bonus": 2},
+    "composite_bow": {"source": "EQ-GR-12", "draw_ticks": 18, "durability": 384,
+                      "decided": "T17 D3：耐久沿用原版弓"},
+    "olive_club": {"source": "EQ-GR-13", "damage": 7, "speed": 0.9, "durability": 200, "sweep": false, "blunt": true,
+                   "decided": "T17 D3：木质，取石剑 131 与铁剑 250 之间"}
+  },
+  "sets": {
+    "phalanx": {"source": "EQ-GR-08", "armor": "bronze", "pieces": 4, "radius": 4, "per_ally": 1, "max": 3,
+                "decided": "T17 D7：四件全套触发"}
+  }
+}

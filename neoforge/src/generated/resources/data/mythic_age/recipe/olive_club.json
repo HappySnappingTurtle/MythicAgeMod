@@ -1,0 +1,26 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shaped",
+    "category": "equipment",
+    "key": {
+      "L": {
+        "tag": "mythic_age:olive_logs"
+      },
+      "S": {
+        "tag": "c:rods/wooden"
+      }
+    },
+    "pattern": [
+      "L",
+      "L",
+      "S"
+    ],
+    "result": {
+      "count": 1,
+      "id": "mythic_age:olive_club"
+    }
+  }
+}

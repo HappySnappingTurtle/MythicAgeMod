@@ -1,0 +1,35 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shaped",
+    "category": "equipment",
+    "key": {
+      "B": {
+        "tag": "c:ingots/bronze"
+      },
+      "C": {
+        "item": "mythic_age:centaur_sinew"
+      },
+      "P": {
+        "tag": "minecraft:planks"
+      },
+      "S": {
+        "tag": "c:rods/wooden"
+      },
+      "T": {
+        "tag": "c:strings"
+      }
+    },
+    "pattern": [
+      "PSC",
+      "B T",
+      "PSC"
+    ],
+    "result": {
+      "count": 1,
+      "id": "mythic_age:composite_bow"
+    }
+  }
+}

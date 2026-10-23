@@ -27,7 +27,10 @@ public final class ClientSetup {
 
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> Sheets.addWoodType(ModWoodTypes.OLIVE));
+        event.enqueueWork(() -> {
+            Sheets.addWoodType(ModWoodTypes.OLIVE);
+            EquipmentItemProperties.register();
+        });
     }
 
     @SubscribeEvent

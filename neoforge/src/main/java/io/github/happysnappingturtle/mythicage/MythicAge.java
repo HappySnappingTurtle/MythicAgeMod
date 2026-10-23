@@ -69,6 +69,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.init(modBus);
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
+        io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment.init(modBus);
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
         GreekAgricultureEvents.register(modBus);
@@ -198,6 +199,9 @@ public final class MythicAge {
         // 圣物框架（T16）
         io.github.happysnappingturtle.mythicage.relic.RelicService.init();
         io.github.happysnappingturtle.mythicage.relic.RelicEvents.register(game);
+
+        // 文明装备（T17）
+        io.github.happysnappingturtle.mythicage.equipment.EquipmentEvents.register(game);
 
         // 希腊恩宠来源：信徒祈祷（T10）
         GreekPrayer.init(modBus, game);

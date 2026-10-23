@@ -371,8 +371,8 @@ def check_textures(paths: Paths, report: Report) -> None:
         return
     for f in sorted(folder.rglob("*.png")):
         rel = f.relative_to(folder)
-        if rel.parts[0] in ("palettes", "entity", "gui", "statue", "fx", "particle", "mob_effect"):
-            continue  # 调色板是 N×1；实体、主神像（GeckoLib 模型）与界面贴图的尺寸由模型 UV / 界面布局决定
+        if rel.parts[0] in ("palettes", "entity", "gui", "statue", "fx", "particle", "mob_effect", "models"):
+            continue  # 调色板是 N×1；实体、主神像（GeckoLib 模型）、界面与护甲层（models/armor，64×32）的尺寸由模型 UV / 界面布局决定
         with Image.open(f) as img:
             w, h = img.size
         if rel.parts[:2] in (("block", "power"), ("block", "village")):
@@ -445,8 +445,22 @@ def run(root: Path, design: Path | None) -> Report:
     check_textures(paths, report)
     check_recolor(paths, report)
     check_relics(paths, report)
+    check_equipment(root, report)
     check_rigs(root, report)
     return report
+
+
+def check_equipment(root: Path, report: Report) -> None:
+    """装备数值表与 10 号合同 json（T17），见 tools/check_equipment.py。"""
+    import check_equipment as ce  # noqa: E402
+    if not (root / ce.CONTRACT).exists():
+        report.note("没有 10 号合同 json，跳过装备数值校验")
+        return
+    errors, notes = ce.check(root)
+    for e in errors:
+        report.error(e)
+    for n in notes:
+        report.note(n)
 
 
 def check_rigs(root: Path, report: Report) -> None:

@@ -1,0 +1,6 @@
+{
+  "parent": "mythic_age:item/composite_bow",
+  "textures": {
+    "layer0": "mythic_age:item/composite_bow_pulling_1"
+  }
+}

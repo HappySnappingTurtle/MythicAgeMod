@@ -279,6 +279,12 @@ public final class LangKeys {
         add("mythic_age.hamadryad.cursed", "你毁了宁芙的树——双手变得沉重", "You destroyed a nymph's tree — your hands grow heavy", "ニンフの木を倒した——手が重くなる");
         add("mythic_age.hamadryad.dew_given", "树仙女赠你一瓶宁芙之露", "The hamadryad gives you a vial of Nymph's Dew", "ハマドリュアスがニンフの露をくれた");
         add("mythic_age.hamadryad.dew_resting", "她不久前才赠过露水", "She gave her dew not long ago", "少し前に露をくれたばかりだ");
+        // 青铜装备（T17）
+        add("item.mythic_age.bronze_armor.tip", "方阵：四件全套并手持青铜圆盾时，4 格内每名友方（同队玩家、你的召唤单位、铁傀儡）护甲 +1，最多 +3", "Phalanx: with the full set and an aspis in hand, +1 armor per ally within 4 blocks (teammates, your summons, iron golems), up to +3", "ファランクス：4 部位そろえてアスピスを持つと、4 ブロック以内の味方（同じチームのプレイヤー・自分の召喚ユニット・アイアンゴーレム）1 体ごとに防御 +1（最大 +3）");
+        add("item.mythic_age.dory.tip", "触及 +1 格；副手举盾时按攻击可刺击（伤害 ×0.6），不放下盾", "+1 reach; while blocking with an off-hand shield, attack to thrust (×0.6 damage) without lowering it", "リーチ +1；オフハンドの盾で防御中に攻撃すると突きを放つ（ダメージ ×0.6、盾は下ろさない）");
+        add("item.mythic_age.aspis.tip", "格挡后 0.5 秒内的下一次近战攻击 +2 伤害", "After a block, your next melee hit within 0.5 s deals +2 damage", "防御後 0.5 秒以内の次の近接攻撃 +2 ダメージ");
+        add("item.mythic_age.composite_bow.tip", "拉弓时间 −10%", "Draw time −10%", "引き絞り時間 −10%");
+        add("item.mythic_age.olive_club.tip", "钝器", "Blunt weapon", "鈍器");
         // 圣物（T16）
         add("curios.identifier.mythic_relic", "圣物", "Relic", "聖遺物");
         add("mythic_age.relic.tooltip.worn", "佩戴：%s", "Worn: %s", "装備：%s");

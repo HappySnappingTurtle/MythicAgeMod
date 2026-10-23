@@ -216,7 +216,10 @@ public final class GreekPromotionGameTests {
         h.assertTrue(data(p).age() == Age.CLASSICAL && p.getInventory().countItem(Items.COPPER_INGOT) == 0, "古典、供品已扣");
         var classical = UnlockService.summary(p, GR, Age.CLASSICAL);
         h.assertTrue(recipeIds(classical).equals(Set.of("mythic_age:bronze_mix", "mythic_age:ionic_capital",
-                "mythic_age:greek_pediment", "mythic_age:greek_statue", "mythic_age:krotala")), "古典配方（TC-T11b-25，T15 加青铜响板）：" + recipeIds(classical));
+                "mythic_age:greek_pediment", "mythic_age:greek_statue", "mythic_age:krotala",
+                "mythic_age:bronze_helmet", "mythic_age:bronze_chestplate", "mythic_age:bronze_leggings", "mythic_age:bronze_boots",
+                "mythic_age:xiphos", "mythic_age:dory", "mythic_age:aspis", "mythic_age:composite_bow", "mythic_age:olive_club")),
+                "古典配方（TC-T11b-25，T15 加青铜响板，T17 加青铜装备）：" + recipeIds(classical));
         h.assertTrue(classical.extras().size() == 1 && classical.extras().getFirst().key()
                 .equals("mythic_age.unlock.greek.temple_prostylos"), "额外项：中神庙");
         // TC-T11b-22：英雄供品齐、神庙 2 级，但没有凭证

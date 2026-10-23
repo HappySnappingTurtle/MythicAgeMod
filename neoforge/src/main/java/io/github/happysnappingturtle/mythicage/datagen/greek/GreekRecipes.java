@@ -4,7 +4,9 @@ import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekArchitecture;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekFoods;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekWood;
+import io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
+import io.github.happysnappingturtle.mythicage.wild.greek.GreekWild;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
@@ -63,6 +65,7 @@ public final class GreekRecipes {
                 .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
                 .save(AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL), id("krotala"));
 
+        equipment(out);
         pottery(out);
         marble(out);
         village(out);
@@ -544,6 +547,42 @@ public final class GreekRecipes {
                 .requires(Items.PRISMARINE_SHARD)
                 .unlockedBy("has_smooth_marble", has(SMOOTH_MARBLE))
                 .save(out, id("pediment_trident"));
+    }
+
+    /** 青铜装备（T17 §5，D5；希腊古典时代）：护甲与原版铁甲同形，B 青铜锭、S 木棍、P 木板、C 半人马鬃弦、T 线、L 橄榄原木。 */
+    private static void equipment(RecipeOutput out) {
+        RecipeOutput gated = AgeGatedOutput.of(out, Civilization.GREEK, Age.CLASSICAL);
+        var bronze = ModTags.cItem("ingots/bronze");
+        String[][] armor = {{"BBB", "B B"}, {"B B", "BBB", "BBB"}, {"BBB", "B B", "B B"}, {"B B", "B B"}};
+        ItemLike[] pieces = {GreekEquipment.BRONZE_HELMET,
+                GreekEquipment.BRONZE_CHESTPLATE,
+                GreekEquipment.BRONZE_LEGGINGS,
+                GreekEquipment.BRONZE_BOOTS};
+        for (int i = 0; i < 4; i++) {
+            ShapedRecipeBuilder b = ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, pieces[i]).define('B', bronze);
+            for (String row : armor[i]) {
+                b.pattern(row);
+            }
+            b.unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
+                    .save(gated, id(BuiltInRegistries.ITEM.getKey(pieces[i].asItem()).getPath()));
+        }
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GreekEquipment.XIPHOS).pattern("B").pattern("B").pattern("S")
+                .define('B', bronze).define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT)).save(gated, id("xiphos"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GreekEquipment.DORY).pattern("  B").pattern(" S ").pattern("S  ")
+                .define('B', bronze).define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT)).save(gated, id("dory"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GreekEquipment.ASPIS).pattern("PBP").pattern("BBB").pattern("P P")
+                .define('B', bronze).define('P', ItemTags.PLANKS)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT)).save(gated, id("aspis"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GreekEquipment.COMPOSITE_BOW).pattern("PSC").pattern("B T").pattern("PSC")
+                .define('B', bronze).define('P', ItemTags.PLANKS).define('S', Tags.Items.RODS_WOODEN)
+                .define('C', GreekWild.CENTAUR_SINEW).define('T', Tags.Items.STRINGS)
+                .unlockedBy("has_centaur_sinew", has(GreekWild.CENTAUR_SINEW))
+                .save(gated, id("composite_bow"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, GreekEquipment.OLIVE_CLUB).pattern("L").pattern("L").pattern("S")
+                .define('L', GreekAgriculture.OLIVE_LOGS_ITEM).define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_olive_log", has(GreekAgriculture.OLIVE_LOG)).save(gated, id("olive_club"));
     }
 
     public static ResourceLocation id(String path) {

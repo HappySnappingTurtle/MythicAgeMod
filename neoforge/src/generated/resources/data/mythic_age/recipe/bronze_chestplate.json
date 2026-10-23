@@ -1,0 +1,23 @@
+{
+  "type": "mythic_age:age_gated",
+  "age": "classical",
+  "civilization": "greek",
+  "recipe": {
+    "type": "minecraft:crafting_shaped",
+    "category": "equipment",
+    "key": {
+      "B": {
+        "tag": "c:ingots/bronze"
+      }
+    },
+    "pattern": [
+      "B B",
+      "BBB",
+      "BBB"
+    ],
+    "result": {
+      "count": 1,
+      "id": "mythic_age:bronze_chestplate"
+    }
+  }
+}
