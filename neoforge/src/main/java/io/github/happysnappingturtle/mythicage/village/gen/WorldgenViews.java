@@ -51,6 +51,7 @@ public final class WorldgenViews {
         int offset = Math.round((float) sum / CALIBRATION.length);
         int sea = gen.getSeaLevel();
         java.util.Map<Long, Boolean> wetCache = new java.util.HashMap<>();
+        java.util.Map<Long, Integer> groundCache = new java.util.HashMap<>();
         return new TerrainSampler() {
             @Override
             public int surface(int x, int z) {
@@ -72,10 +73,24 @@ public final class WorldgenViews {
 
             @Override
             public int ground(int x, int z) {
-                return precise(gen, height, rs, x, z, floor(x, z));
+                return groundCache.computeIfAbsent(net.minecraft.world.level.ChunkPos.asLong(x, z),
+                        k -> precise(gen, height, rs, x, z, floor(x, z)));
+            }
+
+            /** 估算地面离海平面不到 {@link #WET_CHECK} 格（估算误差 p90 约 4 格）时用较准地面再判：地面上第一格 ≤ 海平面就是水。 */
+            @Override
+            public boolean wet(int x, int z) {
+                if (water(x, z)) {
+                    return true;
+                }
+                int f = floor(x, z);
+                return f <= sea + WET_CHECK && ground(x, z) <= sea;
             }
         };
     }
+
+    /** 判水时要用较准地面复核的高度带（海平面以上这么多格内）。 */
+    static final int WET_CHECK = 6;
 
     /**
      * 较准的地面（地面上第一格）：从估算值上方 6 格往下，用最终密度（含锯齿与洞穴）按 2 格一步扫到实心，再细化 1 格。

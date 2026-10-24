@@ -307,17 +307,46 @@ public final class HillsidePlanner {
         confirmRejects = 0;
     }
 
-    /** 选中的位置用较准地面复核坡度（估算会在几十格内起伏，坡度可能被低估）。 */
+    /** 每次规划最多做这么多次较准判水（较准地面贵；超过后不再复核，只靠高度网格判水）。 */
+    public static final int MAX_WET_CHECKS = 400;
+    private final Map<Box, Boolean> dryCache = new java.util.HashMap<>();
+    private int wetChecks;
+
+    /**
+     * 占地的中心与四角用较准判水复核（T19 实机：世界生成的估算地面在海平面附近差几格，湖岸会被估成陆地，
+     * 卫城前半截和工坊地块压进了湖里）。同一块地只查一次。
+     */
+    private boolean dry(Box foot) {
+        return dryCache.computeIfAbsent(new Box(foot.minX(), 0, foot.minZ(), foot.maxX(), 0, foot.maxZ()), k -> {
+            int[][] pts = {{foot.centerX(), foot.centerZ()}, {foot.minX(), foot.minZ()}, {foot.maxX(), foot.minZ()},
+                    {foot.minX(), foot.maxZ()}, {foot.maxX(), foot.maxZ()}};
+            for (int[] pt : pts) {
+                if (wetChecks >= MAX_WET_CHECKS) {
+                    return true;
+                }
+                wetChecks++;
+                if (terrain.wet(pt[0], pt[1])) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    /**
+     * 选中的位置复核：用较准地面复核坡度（估算会在几十格内起伏，坡度可能被低估；每步最多换 {@link #MAX_CONFIRM_REJECTS} 次位置），
+     * 再查占地的中心与四角是不是水（每块都查，不受换位次数上限影响）。
+     */
     private boolean confirm(Box foot, int maxRelief) {
         if (confirmRejects >= MAX_CONFIRM_REJECTS) {
-            return true;
+            return dry(foot);
         }
         int[] hs = precise(foot);
-        if (hs[4] - hs[0] <= maxRelief + 2) {
-            return true;
+        if (hs[4] - hs[0] > maxRelief + 2) {
+            confirmRejects++;
+            return false;
         }
-        confirmRejects++;
-        return false;
+        return dry(foot);
     }
 
     /** 落位地面：占地中心与四角较准地面的中位数（较准扫描误差 p90 2 格；估算只用来挑地方）。 */
@@ -730,7 +759,7 @@ public final class HillsidePlanner {
                 Box foot = new Box(x - w / 2, 0, z - d / 2, x - w / 2 + w - 1, 0, z - d / 2 + d - 1);
                 if (slope) {
                     HeightGrid.Footprint f = grid.footprint(foot);
-                    if (f.relief() < 3 || !fits(foot, 10)) {
+                    if (f.relief() < 3 || !fits(foot, 10) || !dry(foot)) {
                         continue;
                     }
                 } else if (!fits(foot, maxRelief) || !confirm(foot, maxRelief)) {

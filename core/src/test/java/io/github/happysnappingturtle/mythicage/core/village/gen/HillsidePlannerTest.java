@@ -103,6 +103,50 @@ class HillsidePlannerTest {
         }
     }
 
+    /**
+     * 估算看是平地、较准看是湖：每 96 格一个 30 × 30 的湖（模拟世界生成里海平面附近估算地面偏高、湖岸被估成陆地）。
+     * 湖比任何建筑和地块都大，所以只要压上湖，占地的四角或中心总有一点在湖里。
+     */
+    static final TerrainSampler SHORE = new TerrainSampler() {
+        @Override
+        public int surface(int x, int z) {
+            return 65;
+        }
+
+        @Override
+        public int floor(int x, int z) {
+            return 65;
+        }
+
+        @Override
+        public boolean wet(int x, int z) {
+            return lake(x, z);
+        }
+    };
+
+    static boolean lake(int x, int z) {
+        return Math.floorMod(x, 96) >= 40 && Math.floorMod(x, 96) < 70 && Math.floorMod(z, 96) >= 40 && Math.floorMod(z, 96) < 70;
+    }
+
+    /** TC-T19-96（T13b 补）：估算漏掉的湖不能压在建筑与地块下面（实机：卫城前半截、工坊地块落在湖里）。 */
+    @Test
+    void tc96_lakesMissedByEstimateAvoided() throws IOException {
+        List<String> problems = new ArrayList<>();
+        VillagePlan p = HillsidePlanner.plan(0, 0, SHORE, specs(), "greek", "zeus", problems)
+                .orElseThrow(() -> new AssertionError("规划失败：" + problems));
+        List<Box> all = new ArrayList<>();
+        p.buildings().stream().filter(b -> !b.building().contains("bridge") && !b.building().contains("harbor"))
+                .forEach(b -> all.add(b.box()));
+        p.plots().forEach(x -> all.add(x.box()));
+        for (Box b : all) {
+            for (int x = b.minX(); x <= b.maxX(); x++) {
+                for (int z = b.minZ(); z <= b.maxZ(); z++) {
+                    assertFalse(lake(x, z), "压在湖上：" + b + " @ " + x + "," + z);
+                }
+            }
+        }
+    }
+
     @Test
     void tc22_rangeAndOverlap() throws IOException {
         for (VillageGenTest.Terrain t : List.of(FLAT, CONE, SLOPE)) {
@@ -141,7 +185,8 @@ class HillsidePlannerTest {
     void sampleBudget() throws IOException {
         VillageGenTest.Terrain.calls = 0;
         plan(CONE, 0, 0, "zeus");
-        assertTrue(VillageGenTest.Terrain.calls <= 1400, "规划采样 " + VillageGenTest.Terrain.calls); // 网格 19 × 19 × 2 + 候选位置的较准检查（每块地 5 点）
+        // 网格 19 × 19 × 2 + 候选位置的较准检查（每块地 5 点）+ 落位判水（T19 补：每块地 5 点，测试地形里每点 2 次）
+        assertTrue(VillageGenTest.Terrain.calls <= 1800, "规划采样 " + VillageGenTest.Terrain.calls);
     }
 
     @Test
