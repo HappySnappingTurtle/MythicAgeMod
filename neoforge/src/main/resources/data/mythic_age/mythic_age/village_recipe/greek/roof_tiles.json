@@ -1,0 +1,20 @@
+{
+  "station": "mythic_age:pottery_wheel",
+  "professions": [
+    "greek:potter"
+  ],
+  "inputs": {
+    "mythic_age:ceramic_component": 4
+  },
+  "outputs": {
+    "mythic_age:terracotta_roof_tiles": 4
+  },
+  "stages": [
+    {
+      "anim": "pottery_throw",
+      "ticks": 120
+    }
+  ],
+  "stockTarget": 16,
+  "weight": 0.5
+}

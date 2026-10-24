@@ -123,7 +123,7 @@ def house_small() -> Building:
     b.fill(x0 + 1, -1, z0 + 1, x1 - 1, -1, z1 - 1, "mythic_age:polygonal_marble")
     # 隔墙：西间卧房、东间炉灶间，中间门洞
     b.fill(3, 0, z0 + 1, 3, 2, z1 - 1, "plaster")
-    b.clear(3, 0, 2, 3, 1, 2)
+    b.clear(3, 0, 3, 3, 1, 3)  # 门洞开在床尾后面一排（T19：原先开在床尾旁，只能斜着翻过床，寻路走不出去）
     # 梁圈 + 顶棚
     for x in range(x0, x1 + 1):
         for z in (z0, z1):

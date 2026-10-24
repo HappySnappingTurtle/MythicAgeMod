@@ -1,0 +1,21 @@
+{
+  "station": "mythic_age:bronze_furnace",
+  "professions": [
+    "greek:bronzesmith"
+  ],
+  "inputs": {
+    "mythic_age:bronze_mix": 1
+  },
+  "fuel": 1,
+  "outputs": {
+    "mythic_age:bronze_ingot": 1
+  },
+  "stages": [
+    {
+      "anim": "bellows",
+      "ticks": 120
+    }
+  ],
+  "stage": "heroic",
+  "stockTarget": 32
+}

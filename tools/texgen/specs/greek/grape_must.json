@@ -1,0 +1,23 @@
+{
+  "template": "pixels",
+  "out": "item/grape_must",
+  "size": 16,
+  "palette": {"o": "#2a0f16", "d": "#6a2a20", "m": "#9b4a2c", "l": "#c46d42", "h": "#e39466", "p": "#5a1e3c", "P": "#8a3a62", "f": "#b46a8c"},
+  "params": {"kind": "item", "rows": [
+    "................",
+    "....oooooooo....",
+    "...opPfPPPpPo...",
+    "...oppPPpPppo...",
+    "....oooooooo....",
+    "....ohllmmdo....",
+    "...ohllmmmmdo...",
+    "..ohlllmmmmddo..",
+    "..ohllmmmmmddo..",
+    "..olllmmmmmddo..",
+    "..olllmmmmdddo..",
+    "...olmmmmmddo...",
+    "...oommmmdddo...",
+    "....oommmddo....",
+    "......oooo......",
+    "................"]}
+}

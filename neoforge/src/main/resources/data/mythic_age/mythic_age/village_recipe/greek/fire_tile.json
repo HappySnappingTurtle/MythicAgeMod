@@ -1,3 +1,24 @@
-{"station": "mythic_age:pottery_kiln", "professions": ["greek:potter"],
- "inputs": {"mythic_age:raw_roof_tile": 4}, "fuel": 1, "outputs": {"mythic_age:ceramic_component": 4},
- "stages": [{"anim": "kiln_load", "ticks": 80}, {"anim": "kiln_unload", "ticks": 160}], "stage": "archaic"}
+{
+  "station": "mythic_age:pottery_kiln",
+  "professions": [
+    "greek:potter"
+  ],
+  "inputs": {
+    "mythic_age:raw_roof_tile": 4
+  },
+  "fuel": 1,
+  "outputs": {
+    "mythic_age:ceramic_component": 4
+  },
+  "stages": [
+    {
+      "anim": "kiln_load",
+      "ticks": 80
+    },
+    {
+      "anim": "kiln_unload",
+      "ticks": 160
+    }
+  ],
+  "stockTarget": 32
+}

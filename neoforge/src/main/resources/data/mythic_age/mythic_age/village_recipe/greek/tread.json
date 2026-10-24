@@ -1,0 +1,20 @@
+{
+  "station": "mythic_age:treading_vat",
+  "professions": [
+    "greek:farmer"
+  ],
+  "inputs": {
+    "mythic_age:grape": 8
+  },
+  "outputs": {
+    "mythic_age:grape_must": 1
+  },
+  "stages": [
+    {
+      "anim": "tread_grapes",
+      "ticks": 200
+    }
+  ],
+  "stage": "classical",
+  "stockTarget": 8
+}

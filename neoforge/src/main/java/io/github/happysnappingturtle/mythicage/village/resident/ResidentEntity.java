@@ -52,6 +52,8 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     public static final double WALK_SPEED = 0.55;
     /** 连续这么多次算不出路（起点四周都走不通）就回床位锚点脱困。 */
     public static final int STUCK_LIMIT = 3;
+    /** 走路时多久没进展就挪一步、多久就直接到位或放弃（刻）。 */
+    public static final int UNSTUCK_HOP_TICKS = 200, UNSTUCK_JUMP_TICKS = 400;
 
     private static final EntityDataAccessor<String> CIV = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<String> PROFESSION = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
@@ -82,6 +84,12 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private long jobStart;
     private int repathIn;
     private int stuckTries;
+    private double bestDist = Double.MAX_VALUE;
+    private long lastProgress;
+    /** 当前 MOVE 目标与为它找到的落脚点（目标在方块里时，走到旁边能站的地方）。 */
+    @Nullable
+    private BlockPos standFor;
+    private BlockPos stand = BlockPos.ZERO;
 
     public ResidentEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -199,6 +207,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
             stopSleeping();
         }
         job = j;
+        standFor = null;
         step = 0;
         stepTicks = 0;
         jobStart = level().getGameTime();
@@ -244,6 +253,66 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         return true;
     }
 
+    /** 能站人：脚下这格与头顶一格没有碰撞，脚下有能踩的地面。 */
+    private boolean standable(BlockPos p) {
+        return level().getBlockState(p).getCollisionShape(level(), p).isEmpty()
+                && level().getBlockState(p.above()).getCollisionShape(level(), p.above()).isEmpty()
+                && !level().getBlockState(p.below()).getCollisionShape(level(), p.below()).isEmpty();
+    }
+
+    /**
+     * 目标本身能站就用它；否则（树干、钟、工作站方块、树冠上的果子）在 3 格内找离目标最近、离自己也近的落脚点。
+     * 都找不到就照旧走向目标（寻路会尽量靠近）。
+     */
+    BlockPos standSpot(BlockPos t) {
+        if (standable(t)) {
+            return t;
+        }
+        BlockPos best = null;
+        double bestD = Double.MAX_VALUE;
+        for (BlockPos p : BlockPos.betweenClosed(t.offset(-3, -5, -3), t.offset(3, 2, 3))) {
+            if (!standable(p)) {
+                continue;
+            }
+            double d = p.distSqr(t) * 4 + p.distSqr(blockPosition()) * 0.01;
+            if (d < bestD) {
+                bestD = d;
+                best = p.immutable();
+            }
+        }
+        return best != null ? best : t;
+    }
+
+    /**
+     * 走不动的兜底（参考 MineColonies 的做法）：10 秒没有更靠近目标，先往旁边空地挪一步再重新寻路；
+     * 20 秒还没进展：附近 16 格没有玩家就直接到目标旁的落脚点，有玩家在看就放弃这单（记一次失败）。
+     * 返回 false 表示工作单已经作废。
+     */
+    private boolean unstuck(long still) {
+        if (still < UNSTUCK_JUMP_TICKS) {
+            if (still % UNSTUCK_HOP_TICKS == 0) {
+                BlockPos here = blockPosition();
+                for (int i = 0; i < 8; i++) {
+                    BlockPos p = here.offset(random.nextInt(5) - 2, random.nextInt(3) - 1, random.nextInt(5) - 2);
+                    if (standable(p)) {
+                        getNavigation().moveTo(p.getX() + 0.5, p.getY(), p.getZ() + 0.5, 1.0);
+                        break;
+                    }
+                }
+                repathIn = 30;
+            }
+            return true;
+        }
+        if (level().getNearestPlayer(this, 16) == null && standable(stand)) {
+            moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, getYRot(), getXRot());
+            getNavigation().stop();
+            lastProgress = level().getGameTime();
+            return true;
+        }
+        abortJob(true);
+        return false;
+    }
+
     /** 卡住时回到自己的床位锚点（床位锚点是生成时就能站的地面）。 */
     void returnHome() {
         if (home != null && !blockPosition().equals(home)) {
@@ -271,13 +340,33 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         JobStep s = job.steps().get(step);
         switch (s.kind()) {
             case MOVE -> {
-                BlockPos t = new BlockPos(job.target().x(), job.target().y(), job.target().z());
-                if (reached(t)) {
+                var tp = s.target() != null ? s.target() : job.target();
+                BlockPos t = new BlockPos(tp.x(), tp.y(), tp.z());
+                if (!s.carry().equals(carrying())) {
+                    setCarrying(s.carry());
+                }
+                if (standFor == null || !standFor.equals(t)) {
+                    standFor = t;
+                    stand = standSpot(t);
+                    bestDist = Double.MAX_VALUE;
+                    lastProgress = level().getGameTime();
+                }
+                double dist = distanceToSqr(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5);
+                if (dist < bestDist - 1) {
+                    bestDist = dist;
+                    lastProgress = level().getGameTime();
+                }
+                long still = level().getGameTime() - lastProgress;
+                if (reached(t) || reached(stand)) {
                     getNavigation().stop();
                     next();
+                } else if (still >= UNSTUCK_HOP_TICKS) {
+                    if (!unstuck(still)) {
+                        return;
+                    }
                 } else if (--repathIn <= 0 || getNavigation().isDone()) {
                     repathIn = 40;
-                    boolean moving = getNavigation().moveTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5, WALK_SPEED / 0.5);
+                    boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, WALK_SPEED / 0.5);
                     net.minecraft.world.level.pathfinder.Path p = getNavigation().getPath();
                     if (!moving || p == null || p.getNodeCount() <= 1) {
                         if (++stuckTries >= STUCK_LIMIT) {
@@ -294,10 +383,14 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                     entityData.set(ANIM, s.anim());
                     getNavigation().stop();
                 }
-                getLookControl().setLookAt(job.target().x() + 0.5, job.target().y() + 0.5, job.target().z() + 0.5);
+                var look = lastMoveTarget();
+                getLookControl().setLookAt(look.x() + 0.5, look.y() + 0.5, look.z() + 0.5);
                 if (++stepTicks >= s.ticks()) {
                     entityData.set(ANIM, "");
+                    int done = step;
+                    Job j = job;
                     next();
+                    VillageScheduler.onActDone(sl, this, j, done);
                 }
             }
             case SETTLE -> {
@@ -308,6 +401,17 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         }
     }
 
+    /** 当前步骤之前最近一次 MOVE 的目标（动作时朝向它）。 */
+    private io.github.happysnappingturtle.mythicage.core.village.gen.Pos lastMoveTarget() {
+        for (int i = Math.min(step, job.steps().size() - 1); i >= 0; i--) {
+            JobStep s = job.steps().get(i);
+            if (s.kind() == JobStep.Kind.MOVE && s.target() != null) {
+                return s.target();
+            }
+        }
+        return job.target();
+    }
+
     private void next() {
         step++;
         stepTicks = 0;
@@ -316,14 +420,18 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     public boolean reached(BlockPos t) {
         double dx = getX() - (t.getX() + 0.5);
         double dz = getZ() - (t.getZ() + 0.5);
-        return dx * dx + dz * dz <= REACH * REACH && Math.abs(getY() - t.getY()) <= 2.5;
+        return dx * dx + dz * dz <= REACH * REACH && Math.abs(getY() - t.getY()) <= 3.5;
     }
 
     /** 只供 GameTest：把当前步骤推进到结算前（不走路、不等动作）。 */
     public void fastForwardForTest() {
         if (job != null) {
-            while (step < job.steps().size() && job.steps().get(step).kind() != JobStep.Kind.SETTLE) {
-                step++;
+            Job j = job;
+            while (step < j.steps().size() && j.steps().get(step).kind() != JobStep.Kind.SETTLE) {
+                int done = step++;
+                if (j.steps().get(done).kind() == JobStep.Kind.ACT && level() instanceof ServerLevel sl) {
+                    VillageScheduler.onActDone(sl, this, j, done);
+                }
             }
             stepTicks = 0;
         }
@@ -410,6 +518,14 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
             abortJob(false);
         }
         super.remove(reason);
+    }
+
+    /** 居民之间不互相推挤：葡萄架之间、门口都只有一格宽，互相推会把彼此卡住。 */
+    @Override
+    protected void doPush(net.minecraft.world.entity.Entity other) {
+        if (!(other instanceof ResidentEntity)) {
+            super.doPush(other);
+        }
     }
 
     @Override

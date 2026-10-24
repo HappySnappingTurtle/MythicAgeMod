@@ -1,0 +1,21 @@
+{
+  "station": "mythic_age:bronze_furnace",
+  "professions": [
+    "greek:bronzesmith"
+  ],
+  "inputs": {
+    "minecraft:copper_ingot": 3,
+    "mythic_age:tin_ingot": 1
+  },
+  "outputs": {
+    "mythic_age:bronze_mix": 4
+  },
+  "stages": [
+    {
+      "anim": "bronze_mix",
+      "ticks": 20
+    }
+  ],
+  "stage": "heroic",
+  "stockTarget": 16
+}

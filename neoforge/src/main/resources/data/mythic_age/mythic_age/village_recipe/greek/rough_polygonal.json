@@ -1,0 +1,22 @@
+{
+  "station": "point:quarry",
+  "professions": [
+    "greek:laborer",
+    "greek:mason"
+  ],
+  "inputs": {
+    "mythic_age:marble": 1
+  },
+  "outputs": {
+    "mythic_age:polygonal_marble": 1
+  },
+  "stages": [
+    {
+      "anim": "chisel_strike",
+      "ticks": 60
+    }
+  ],
+  "stockTarget": 32,
+  "outdoor": true,
+  "weight": 0.6
+}

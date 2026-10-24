@@ -1,3 +1,23 @@
-{"station": "mythic_age:pottery_wheel", "professions": ["greek:potter"],
- "inputs": {"minecraft:clay_ball": 4}, "outputs": {"mythic_age:raw_roof_tile": 4},
- "stages": [{"anim": "pottery_knead", "ticks": 40}, {"anim": "pottery_throw", "ticks": 80}], "stage": "archaic"}
+{
+  "station": "mythic_age:pottery_wheel",
+  "professions": [
+    "greek:potter"
+  ],
+  "inputs": {
+    "minecraft:clay_ball": 4
+  },
+  "outputs": {
+    "mythic_age:raw_roof_tile": 4
+  },
+  "stages": [
+    {
+      "anim": "pottery_knead",
+      "ticks": 40
+    },
+    {
+      "anim": "pottery_throw",
+      "ticks": 80
+    }
+  ],
+  "stockTarget": 16
+}

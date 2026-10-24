@@ -55,6 +55,7 @@ public final class VillageDevCommand {
                             s.stock.total(), s.stock.capacity(), s.roster.size(), s.points.size(),
                             s.stock.items().toString(), s.stock.escrows().size()), false);
                     VillageScheduler.Runtime rt = VillageScheduler.runtime(v.id());
+                    c.getSource().sendSuccess(() -> Component.literal("完成/失败/作废：" + rt.counts()), false);
                     c.getSource().sendSuccess(() -> Component.literal("调度：" + rt.lastStats() + " · 已加载 "
                             + VillageScheduler.loaded(v.id()).size() + " · 进行中 " + rt.activeJobs().stream()
                             .map(j -> j.type() + "@" + j.target().x() + "," + j.target().y() + "," + j.target().z()).toList()), false);

@@ -1,0 +1,18 @@
+{
+  "station": "minecraft:campfire",
+  "inputs": {
+    "minecraft:wheat": 3,
+    "mythic_age:olive": 1
+  },
+  "outputs": {
+    "mythic_age:olive_flatbread": 1
+  },
+  "stages": [
+    {
+      "anim": "bake",
+      "ticks": 100
+    }
+  ],
+  "stockTarget": 64,
+  "weight": 1.5
+}

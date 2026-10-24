@@ -1,0 +1,19 @@
+{
+  "station": "anchor:storage_keeper",
+  "professions": [
+    "greek:laborer"
+  ],
+  "inputs": {
+    "minecraft:acacia_log": 1
+  },
+  "outputs": {
+    "minecraft:acacia_planks": 4
+  },
+  "stages": [
+    {
+      "anim": "saw",
+      "ticks": 60
+    }
+  ],
+  "stockTarget": 96
+}

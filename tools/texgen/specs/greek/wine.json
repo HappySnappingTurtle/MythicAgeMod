@@ -1,0 +1,23 @@
+{
+  "template": "pixels",
+  "out": "item/wine",
+  "size": 16,
+  "palette": {"o": "#1e0a10", "d": "#3a1420", "m": "#5e1f30", "l": "#82304a", "h": "#b0566e", "c": "#d9c39a", "C": "#a8916a", "b": "#2b2017"},
+  "params": {"kind": "item", "rows": [
+    "................",
+    "......occo......",
+    "......oCCo......",
+    ".......oo.......",
+    "......olmo......",
+    ".....ohlmmo.....",
+    "....ohllmmdo....",
+    "...ohlllmmmdo...",
+    "...obbbbbbbbo...",
+    "...ohlllmmmdo...",
+    "...ohllmmmmdo...",
+    "....ohlmmmdo....",
+    ".....olmmdo.....",
+    "......omdo......",
+    ".....oooooo.....",
+    "................"]}
+}

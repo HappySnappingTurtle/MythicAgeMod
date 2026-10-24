@@ -1,0 +1,19 @@
+{
+  "station": "anchor:storage_keeper",
+  "professions": [
+    "greek:laborer"
+  ],
+  "inputs": {
+    "mythic_age:olive_log": 1
+  },
+  "outputs": {
+    "mythic_age:olive_planks": 4
+  },
+  "stages": [
+    {
+      "anim": "saw",
+      "ticks": 60
+    }
+  ],
+  "stockTarget": 96
+}

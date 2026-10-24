@@ -146,6 +146,7 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
         // 居民框架（T19）
         io.github.happysnappingturtle.mythicage.village.work.BasicJobTypes.registerAll();
+        io.github.happysnappingturtle.mythicage.content.greek.village.GreekVillageWork.init();
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageData::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);

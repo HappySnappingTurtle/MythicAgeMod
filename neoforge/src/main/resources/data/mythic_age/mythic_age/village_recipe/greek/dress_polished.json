@@ -1,0 +1,20 @@
+{
+  "station": "mythic_age:mason_bench",
+  "professions": [
+    "greek:mason"
+  ],
+  "inputs": {
+    "mythic_age:marble": 1
+  },
+  "outputs": {
+    "mythic_age:polished_marble": 1
+  },
+  "stages": [
+    {
+      "anim": "chisel_strike",
+      "ticks": 80
+    }
+  ],
+  "stage": "classical",
+  "stockTarget": 32
+}

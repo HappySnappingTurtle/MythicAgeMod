@@ -1,0 +1,20 @@
+{
+  "station": "mythic_age:olive_press",
+  "professions": [
+    "greek:farmer"
+  ],
+  "inputs": {
+    "mythic_age:olive": 4,
+    "mythic_age:ceramic_component": 1
+  },
+  "outputs": {
+    "mythic_age:olive_oil": 1
+  },
+  "stages": [
+    {
+      "anim": "press_turn",
+      "ticks": 40
+    }
+  ],
+  "stockTarget": 16
+}

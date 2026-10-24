@@ -28,12 +28,19 @@ public final class CatchUpPlanner {
      * @param cyclesPerDay 每 MC 日循环次数（由资源工作区与配方算出，不是看动画）
      * @param point        采集点 id（为空表示不取资源点）
      * @param pointPerCycle 每循环消耗的资源点余量
+     * @param caps         产物在库存里最多到这么多就不再做（配方的库存目标）
      */
     public record Producer(String id, Map<String, Integer> inputs, Map<String, Integer> outputs, double cyclesPerDay,
-                           String point, int pointPerCycle) {
+                           String point, int pointPerCycle, Map<String, Integer> caps) {
         public Producer {
             inputs = Map.copyOf(inputs);
             outputs = Map.copyOf(outputs);
+            caps = Map.copyOf(caps);
+        }
+
+        public Producer(String id, Map<String, Integer> inputs, Map<String, Integer> outputs, double cyclesPerDay,
+                        String point, int pointPerCycle) {
+            this(id, inputs, outputs, cyclesPerDay, point, pointPerCycle, Map.of());
         }
     }
 
@@ -57,6 +64,12 @@ public final class CatchUpPlanner {
                 for (Map.Entry<String, Integer> in : p.inputs().entrySet()) {
                     if (in.getValue() > 0) {
                         cycles = Math.min(cycles, stock.count(in.getKey()) / in.getValue());
+                    }
+                }
+                for (Map.Entry<String, Integer> cap : p.caps().entrySet()) {
+                    int per = p.outputs().getOrDefault(cap.getKey(), 0);
+                    if (per > 0) {
+                        cycles = Math.min(cycles, (int) Math.ceil(Math.max(0, cap.getValue() - stock.count(cap.getKey())) / (double) per));
                     }
                 }
                 if (p.point() != null && !p.point().isEmpty()) {

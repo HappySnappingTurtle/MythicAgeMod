@@ -87,7 +87,7 @@ public final class VillageWorkGameTests {
                 "archaic", false)), Map.of(brick.id(), brick));
     }
 
-    private static void floor(GameTestHelper h) {
+    static void floor(GameTestHelper h) {
         for (int x = 0; x < 17; x++) {
             for (int z = 0; z < 36; z++) {
                 h.setBlock(new BlockPos(x, 1, z), Blocks.STONE);
@@ -95,7 +95,7 @@ public final class VillageWorkGameTests {
         }
     }
 
-    private static Pos abs(GameTestHelper h, int x, int y, int z) {
+    static Pos abs(GameTestHelper h, int x, int y, int z) {
         BlockPos b = h.absolutePos(new BlockPos(x, y, z));
         return new Pos(b.getX(), b.getY(), b.getZ());
     }
@@ -106,19 +106,23 @@ public final class VillageWorkGameTests {
         }
     }
 
-    /** 测试文明的生成村庄：中心 (8, 2, 2)；锚点按相对坐标给。 */
+    /** 测试文明的生成村庄：中心 (8, 2, 2)；锚点按相对坐标给；已建范围覆盖整个场地。 */
     static TV village(GameTestHelper h, Map<String, List<Pos>> anchors) {
         VillageData.overrideForTest(CIV, testCiv());
         floor(h);
         BlockPos o = h.absolutePos(BlockPos.ZERO);
-        Box built = new Box(o.getX(), o.getY(), o.getZ(), o.getX() + 16, o.getY() + 15, o.getZ() + 35);
+        return village(h, CIV, anchors, new Box(o.getX(), o.getY(), o.getZ(), o.getX() + 16, o.getY() + 15, o.getZ() + 35));
+    }
+
+    /** 任意文明的生成村庄（不铺地面）：中心 (8, 2, 2)。 */
+    static TV village(GameTestHelper h, String civ, Map<String, List<Pos>> anchors, Box built) {
         Pos center = abs(h, 8, 2, 2);
         Map<String, List<Pos>> a = new LinkedHashMap<>(anchors);
         a.put("center", List.of(center));
-        VillageInfoPiece.Info info = new VillageInfoPiece.Info(CIV, "", "test", 1, "test", center, a, List.of(built), List.of());
+        VillageInfoPiece.Info info = new VillageInfoPiece.Info(civ, "zeus", "test", 1, "test", center, a, List.of(built), List.of());
         UUID id = UUID.randomUUID();
         VillageRegistry.Village v = new VillageRegistry.Village(id, GlobalPos.of(h.getLevel().dimension(),
-                VillageInfoPiece.block(center)), CIV, "", VillageRegistry.Origin.GENERATED, null, "", -1);
+                VillageInfoPiece.block(center)), civ, "zeus", VillageRegistry.Origin.GENERATED, null, "", -1);
         VillageRegistry.get(h.getLevel().getServer()).add(v);
         VillagePlans.Plan p = new VillagePlans.Plan(id, h.getLevel().dimension(), "test", h.getLevel().getRandom().nextLong(),
                 info, true);
@@ -130,6 +134,12 @@ public final class VillageWorkGameTests {
     static ResidentEntity resident(GameTestHelper h, TV tv, int x, int z) {
         BlockPos at = h.absolutePos(new BlockPos(x, 2, z));
         return Residents.spawn(h.getLevel(), tv.village(), testCiv(), WORKER, at, at, false).orElseThrow();
+    }
+
+    static ResidentEntity resident(GameTestHelper h, TV tv, String profession, int x, int z) {
+        BlockPos at = h.absolutePos(new BlockPos(x, 2, z));
+        return Residents.spawn(h.getLevel(), tv.village(), VillageData.civ(tv.village().civ()).orElseThrow(), profession, at, at,
+                false).orElseThrow();
     }
 
     static VillageEconomy.State state(GameTestHelper h, TV tv) {

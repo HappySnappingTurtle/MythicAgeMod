@@ -28,6 +28,14 @@ public interface JobType {
      */
     boolean settle(VillageContext ctx, ResidentEntity resident, Job job);
 
+    /** 第 {@code step} 步（一段动作）刚做完：少数类型在这里改世界（收麦：割完作物回到幼苗）。默认什么都不做。 */
+    default void onActDone(VillageContext ctx, ResidentEntity resident, Job job, int step) {
+    }
+
+    /** 工作单作废（打断、超时）：清掉类型自己挂着的中间数据。默认什么都不做。 */
+    default void onAbort(VillageScheduler.Runtime rt, Job job) {
+    }
+
     Map<String, JobType> REGISTRY = new LinkedHashMap<>();
 
     static void register(JobType t) {

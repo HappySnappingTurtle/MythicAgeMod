@@ -1,0 +1,12 @@
+{
+  "station": "mythic_age:pithos",
+  "inputs": {
+    "mythic_age:grape_must": 1
+  },
+  "outputs": {
+    "mythic_age:wine": 2
+  },
+  "unattendedDays": 2,
+  "stage": "classical",
+  "stockTarget": 24
+}

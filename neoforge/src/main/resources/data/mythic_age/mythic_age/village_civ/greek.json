@@ -3,27 +3,83 @@
   "behavior": "greek",
   "schedule": {
     "segments": [
-      {"id": "dawn", "from": 23000, "to": 24000},
-      {"id": "work", "from": 0, "to": 6000},
-      {"id": "lunch", "from": 6000, "to": 6400},
-      {"id": "work", "from": 6400, "to": 11000},
-      {"id": "evening", "from": 11000, "to": 12000},
-      {"id": "supper", "from": 12000, "to": 13000},
-      {"id": "sleep", "from": 13000, "to": 23000}
+      {
+        "id": "dawn",
+        "from": 23000,
+        "to": 24000
+      },
+      {
+        "id": "work",
+        "from": 0,
+        "to": 6000
+      },
+      {
+        "id": "lunch",
+        "from": 6000,
+        "to": 6400
+      },
+      {
+        "id": "work",
+        "from": 6400,
+        "to": 11000
+      },
+      {
+        "id": "evening",
+        "from": 11000,
+        "to": 12000
+      },
+      {
+        "id": "supper",
+        "from": 12000,
+        "to": 13000
+      },
+      {
+        "id": "sleep",
+        "from": 13000,
+        "to": 23000
+      }
     ],
-    "overlays": [{"id": "ritual", "from": 2000, "to": 9000}]
+    "overlays": [
+      {
+        "id": "ritual",
+        "from": 2000,
+        "to": 9000
+      }
+    ]
   },
   "calendar": {
     "yearDays": 12,
     "periods": [
-      {"id": "sowing", "days": 3},
-      {"id": "growing", "days": 3},
-      {"id": "harvest", "days": 3},
-      {"id": "vintage", "days": 3}
+      {
+        "id": "sowing",
+        "days": 3
+      },
+      {
+        "id": "growing",
+        "days": 3
+      },
+      {
+        "id": "harvest",
+        "days": 3
+      },
+      {
+        "id": "vintage",
+        "days": 3
+      }
     ],
-    "special": {"2": "genesia", "5": "oracle", "8": "oracle", "9": "polis_festival", "11": "oracle", "12": "rural_dionysia"}
+    "special": {
+      "2": "genesia",
+      "5": "oracle",
+      "8": "oracle",
+      "9": "polis_festival",
+      "11": "oracle",
+      "12": "rural_dionysia"
+    }
   },
-  "storage": {"base": 256, "unit": 512},
+  "storage": {
+    "base": 256,
+    "unit": 512
+  },
   "rations": {
     "floor": 24,
     "portions": {
@@ -40,34 +96,183 @@
     "mythic_age:olive_log": 1,
     "minecraft:oak_log": 1,
     "minecraft:birch_log": 1,
-    "minecraft:spruce_log": 1
+    "minecraft:spruce_log": 1,
+    "minecraft:acacia_log": 1,
+    "mythic_age:olive_stick": 4
   },
   "points": {
     "clay": {
-      "outputs": {"minecraft:clay_ball": 4}, "take": 4, "max": 48, "recover": 4,
-      "anim": "dig", "ticks": 30, "professions": ["greek:potter", "greek:laborer"], "perDay": 3
+      "outputs": {
+        "minecraft:clay_ball": 4
+      },
+      "take": 4,
+      "max": 48,
+      "recover": 4,
+      "anim": "dig",
+      "ticks": 30,
+      "professions": [
+        "greek:potter",
+        "greek:laborer"
+      ],
+      "perDay": 3
+    },
+    "quarry": {
+      "outputs": {
+        "mythic_age:marble": 2
+      },
+      "take": 2,
+      "max": 96,
+      "recover": 0,
+      "anim": "quarry_wedge",
+      "ticks": 60,
+      "professions": [
+        "greek:mason",
+        "greek:laborer"
+      ],
+      "perDay": 4
+    },
+    "prune": {
+      "anchor": "fruit_tree",
+      "outputs": {
+        "mythic_age:olive_stick": 2
+      },
+      "take": 12,
+      "max": 12,
+      "recover": 1,
+      "anim": "prune",
+      "ticks": 30,
+      "professions": [
+        "greek:farmer"
+      ],
+      "perDay": 1
+    },
+    "pen": {
+      "outputs": {
+        "minecraft:white_wool": 1
+      },
+      "take": 4,
+      "max": 8,
+      "recover": 2,
+      "anim": "shear",
+      "ticks": 20,
+      "professions": [
+        "greek:farmer"
+      ],
+      "perDay": 1
     }
   },
   "crops": {
     "crop": {
-      "anim": "scythe_harvest", "ticks": 10, "batch": 8, "replant": "minecraft:wheat_seeds",
-      "expected": {"minecraft:wheat": 1, "minecraft:wheat_seeds": 1}, "perAnchorPerDay": 0.5,
-      "professions": ["greek:farmer", "greek:laborer"]
+      "anim": "scythe_harvest",
+      "ticks": 10,
+      "batch": 8,
+      "replant": "minecraft:wheat_seeds",
+      "expected": {
+        "minecraft:wheat": 1,
+        "minecraft:wheat_seeds": 1
+      },
+      "perAnchorPerDay": 0.5,
+      "professions": [
+        "greek:farmer",
+        "greek:laborer"
+      ],
+      "thresh": "thresh",
+      "threshAnim": "winnow",
+      "threshTicks": 200
     }
   },
   "residents": {
-    "initial": {"greek:farmer": 2, "greek:potter": 1},
+    "initial": {
+      "greek:farmer": 2,
+      "greek:potter": 1
+    },
     "fallback": "greek:laborer",
     "keeper": "greek:laborer",
     "_sources": "人名都是古希腊有实据的人名：男名多见于雅典的史家与演说家记载（修昔底德、色诺芬、吕西阿斯），女名取自雅典墓碑（凯拉米克斯的赫革索碑、谟涅萨瑞忒碑、安法瑞忒碑、法诺斯特拉忒碑）与女诗人（科林娜、埃林娜、阿妮忒、普拉克西拉、忒勒西拉）。参见 Lexicon of Greek Personal Names（Oxford，lgpn.ox.ac.uk）。",
-    "male": ["Nikias", "Kleon", "Theron", "Lysias", "Demetrios", "Philon", "Kallias", "Ariston", "Hippias", "Timon",
-             "Glaukos", "Menon", "Phaidros", "Kritias", "Xenon", "Dion", "Agathon", "Euthymos", "Charmides", "Lykon",
-             "Nikomachos", "Sosias", "Thrasyllos", "Polemon", "Alkimos", "Antiphon", "Diokles", "Eukleides", "Hermon", "Kephalos",
-             "Lamachos", "Meidias", "Nikostratos", "Pasion", "Sostratos", "Teisias", "Chares", "Archias", "Epikrates", "Phormion"],
-    "female": ["Hegeso", "Mnesarete", "Ampharete", "Phanostrate", "Archippe", "Myrrhine", "Nikarete", "Glykera", "Theodote", "Aspasia",
-               "Agariste", "Elpinike", "Timarete", "Kallisto", "Thaleia", "Chrysis", "Malthake", "Hedyle", "Erinna", "Anyte",
-               "Korinna", "Melissa", "Phaidra", "Damarete", "Lampito", "Gorgo", "Kyniska", "Melitta", "Nikippe", "Phila",
-               "Rhodope", "Theano", "Xenokleia", "Praxilla", "Telesilla", "Myrtis", "Kleino", "Arete", "Habrotonon", "Philinna"]
+    "male": [
+      "Nikias",
+      "Kleon",
+      "Theron",
+      "Lysias",
+      "Demetrios",
+      "Philon",
+      "Kallias",
+      "Ariston",
+      "Hippias",
+      "Timon",
+      "Glaukos",
+      "Menon",
+      "Phaidros",
+      "Kritias",
+      "Xenon",
+      "Dion",
+      "Agathon",
+      "Euthymos",
+      "Charmides",
+      "Lykon",
+      "Nikomachos",
+      "Sosias",
+      "Thrasyllos",
+      "Polemon",
+      "Alkimos",
+      "Antiphon",
+      "Diokles",
+      "Eukleides",
+      "Hermon",
+      "Kephalos",
+      "Lamachos",
+      "Meidias",
+      "Nikostratos",
+      "Pasion",
+      "Sostratos",
+      "Teisias",
+      "Chares",
+      "Archias",
+      "Epikrates",
+      "Phormion"
+    ],
+    "female": [
+      "Hegeso",
+      "Mnesarete",
+      "Ampharete",
+      "Phanostrate",
+      "Archippe",
+      "Myrrhine",
+      "Nikarete",
+      "Glykera",
+      "Theodote",
+      "Aspasia",
+      "Agariste",
+      "Elpinike",
+      "Timarete",
+      "Kallisto",
+      "Thaleia",
+      "Chrysis",
+      "Malthake",
+      "Hedyle",
+      "Erinna",
+      "Anyte",
+      "Korinna",
+      "Melissa",
+      "Phaidra",
+      "Damarete",
+      "Lampito",
+      "Gorgo",
+      "Kyniska",
+      "Melitta",
+      "Nikippe",
+      "Phila",
+      "Rhodope",
+      "Theano",
+      "Xenokleia",
+      "Praxilla",
+      "Telesilla",
+      "Myrtis",
+      "Kleino",
+      "Arete",
+      "Habrotonon",
+      "Philinna"
+    ]
   },
   "initialStock": {
     "mythic_age:olive_planks": 16,
@@ -75,5 +280,66 @@
     "minecraft:clay_ball": 8,
     "mythic_age:olive_flatbread": 32,
     "mythic_age:ceramic_component": 4
+  },
+  "stations": [
+    {
+      "anchor": "workstation",
+      "radius": 1
+    },
+    {
+      "anchor": "home",
+      "radius": 5,
+      "blocks": [
+        "minecraft:campfire"
+      ]
+    }
+  ],
+  "naturalPoints": {
+    "quarry": {
+      "block": "mythic_age:marble",
+      "radius": 48,
+      "outcrop": true
+    }
+  },
+  "woodland": {
+    "radius": 48,
+    "max": 24,
+    "anim": "chop",
+    "ticks": 80,
+    "professions": [
+      "greek:laborer"
+    ],
+    "perDay": 2,
+    "logsPerTree": 5
+  },
+  "fruits": {
+    "fruit_tree": {
+      "harvester": "olive",
+      "anim": "olive_beat",
+      "ticks": 60,
+      "professions": [
+        "greek:farmer",
+        "greek:laborer"
+      ],
+      "expected": {
+        "mythic_age:olive": 4
+      },
+      "perAnchorPerDay": 0.5,
+      "carry": "basket"
+    },
+    "trellis": {
+      "harvester": "grape",
+      "anim": "vine_pick",
+      "ticks": 20,
+      "professions": [
+        "greek:farmer",
+        "greek:laborer"
+      ],
+      "expected": {
+        "mythic_age:grape": 2
+      },
+      "perAnchorPerDay": 0.25,
+      "carry": "basket"
+    }
   }
 }

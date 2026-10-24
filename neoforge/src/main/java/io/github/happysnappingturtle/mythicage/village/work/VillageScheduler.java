@@ -68,11 +68,25 @@ public final class VillageScheduler {
     public static final class Runtime {
         final FailureBook failures = new FailureBook();
         final Map<UUID, Job> active = new LinkedHashMap<>();
+        /** 工作单途中的中间产物（收麦：割下来、还没打谷的麦子），工作单 id → 物品。作废时丢掉。 */
+        final Map<Long, Map<String, Integer>> pending = new HashMap<>();
+        /** 工作站缓存（每 MC 日或村庄重新运行时刷新）。 */
+        List<Workstations.Station> stations = List.of();
+        long stationsDay = Long.MIN_VALUE;
+        long stationsTick = Long.MIN_VALUE / 2;
         long lastPlan = Long.MIN_VALUE / 2;
         long alarmUntil = Long.MIN_VALUE / 2;
         boolean wasRunning;
         Boolean forceRunning;
         private long jobIds = 1;
+
+        public Map<Long, Map<String, Integer>> pending() {
+            return pending;
+        }
+
+        public List<Workstations.Station> stations() {
+            return stations;
+        }
 
         public long nextJobId() {
             return jobIds++;
@@ -100,6 +114,18 @@ public final class VillageScheduler {
         }
 
         String lastStats = "";
+        /** 各类工作单的完成 / 失败 / 作废次数（调试命令看）。 */
+        final Map<String, int[]> counts = new LinkedHashMap<>();
+
+        public String counts() {
+            StringBuilder b = new StringBuilder();
+            counts.forEach((k, v) -> b.append(k).append(' ').append(v[0]).append('/').append(v[1]).append('/').append(v[2]).append("  "));
+            return b.toString();
+        }
+
+        void count(String type, int which) {
+            counts.computeIfAbsent(type, k -> new int[3])[which]++;
+        }
     }
 
     private static final Map<UUID, Runtime> RUNTIMES = new HashMap<>();
@@ -216,6 +242,7 @@ public final class VillageScheduler {
         }
         rt.wasRunning = true;
         state.lastRealTick = now;
+        refreshStations(ctx);
         dayStart(ctx);
         rations(ctx);
         sleepAndWake(ctx);
@@ -258,17 +285,42 @@ public final class VillageScheduler {
         if (s.initialized) {
             return;
         }
-        for (CivVillageData.PointKind k : ctx.data().points().values()) {
-            List<Pos> at = ctx.anchors(k.id());
-            for (int i = 0; i < at.size(); i++) {
-                String id = k.id() + "_" + i;
-                s.points.putIfAbsent(id, ResourcePoint.fresh(id, k.id(), at.get(i), k.max(), k.recover(), ctx.today()));
-            }
-        }
+        anchoredPoints(ctx);
         ctx.data().initialStock().forEach(s.stock::deposit);
+        natural(ctx);
         s.initialized = true;
         s.lastDay = ctx.today();
         s.log(ctx.today(), "mythic_age.village.log.founded");
+    }
+
+    /** 按建筑锚点登记采集点（已有的不动；数据里新加的种类在下一个 MC 日补上）。 */
+    static void anchoredPoints(VillageContext ctx) {
+        for (CivVillageData.PointKind k : ctx.data().points().values()) {
+            List<Pos> at = ctx.anchors(k.anchor());
+            for (int i = 0; i < at.size(); i++) {
+                String id = k.id() + "_" + i;
+                ctx.state().points.putIfAbsent(id, ResourcePoint.fresh(id, k.id(), at.get(i), k.max(), k.recover(), ctx.today()));
+            }
+        }
+    }
+
+    /** 天然资源：补登记林地、长回来的树恢复、缺采石点就去找（都只看已加载的格子）。 */
+    static void natural(VillageContext ctx) {
+        NaturalResources.refreshWoodland(ctx);
+        NaturalResources.registerWoodland(ctx);
+        for (CivVillageData.NaturalPoint np : ctx.data().naturalPoints().values()) {
+            NaturalResources.registerNatural(ctx, np);
+        }
+    }
+
+    /** 工作站缓存：每 MC 日、或缓存为空时每 200 刻重扫一次。 */
+    static void refreshStations(VillageContext ctx) {
+        Runtime rt = ctx.rt();
+        if (rt.stationsDay != ctx.today() || (rt.stations.isEmpty() && ctx.now() - rt.stationsTick >= 200)) {
+            rt.stations = Workstations.scan(ctx);
+            rt.stationsDay = ctx.today();
+            rt.stationsTick = ctx.now();
+        }
     }
 
     static void dayStart(VillageContext ctx) {
@@ -278,6 +330,8 @@ public final class VillageScheduler {
         }
         s.lastDay = ctx.today();
         s.points.replaceAll((id, p) -> p.recover(ctx.today()));
+        anchoredPoints(ctx);
+        natural(ctx);
         ctx.behavior().onDayStart(ctx);
     }
 
@@ -387,7 +441,9 @@ public final class VillageScheduler {
         ctx.get().rt().active.remove(resident.getUUID());
         JobType type = JobType.REGISTRY.get(job.type());
         boolean ok = type == null || type.settle(ctx.get(), resident, job);
+        ctx.get().rt().pending.remove(job.id());
         VillageEconomy.State s = ctx.get().state();
+        ctx.get().rt().count(job.type(), ok ? 0 : 1);
         if (ok) {
             s.stock.consume(job.escrowId());
         } else {
@@ -397,11 +453,25 @@ public final class VillageScheduler {
         VillageEconomy.get(level.getServer()).setDirty();
     }
 
+    /** 一段动作做完：交给类型处理中间效果。 */
+    public static void onActDone(ServerLevel level, ResidentEntity resident, Job job, int step) {
+        JobType type = JobType.REGISTRY.get(job.type());
+        if (type != null) {
+            contextOf(level, resident).ifPresent(ctx -> type.onActDone(ctx, resident, job, step));
+        }
+    }
+
     /** 工作单被打断：托管退回，不产出。 */
     public static void onJobAborted(ServerLevel level, ResidentEntity resident, Job job, boolean countFailure) {
         resident.village().ifPresent(v -> {
             Runtime rt = runtime(v);
             rt.active.remove(resident.getUUID());
+            rt.count(job.type(), 2);
+            JobType type = JobType.REGISTRY.get(job.type());
+            if (type != null) {
+                type.onAbort(rt, job);
+            }
+            rt.pending.remove(job.id());
             VillageEconomy.get(level.getServer()).peek(v).ifPresent(s -> s.stock.release(job.escrowId()));
             VillageEconomy.get(level.getServer()).setDirty();
             if (countFailure) {
@@ -477,20 +547,45 @@ public final class VillageScheduler {
                 out.add(new CatchUpPlanner.Producer("crop:" + k.id(), Map.of(), k.expected(), n * k.perAnchorPerDay(), null, 0));
             }
         }
-        Map<String, Integer> stationsByKind = new LinkedHashMap<>();
-        for (Pos sp : ctx.anchors(BasicJobTypes.STATION_ANCHOR)) {
-            BlockPos b = VillageContext.block(sp);
-            if (ctx.loaded(b)) {
-                stationsByKind.merge(BasicJobTypes.stationId(ctx.level().getBlockState(b)), 1, Integer::sum);
+        for (CivVillageData.FruitKind k : ctx.data().fruits().values()) {
+            int n = ctx.anchors(k.id()).size();
+            if (n > 0 && staffed(k.professions(), professions)) {
+                out.add(new CatchUpPlanner.Producer("fruit:" + k.id(), Map.of(), k.expected(), n * k.perAnchorPerDay(), null, 0));
             }
+        }
+        CivVillageData.Woodland w = ctx.data().woodland();
+        if (w != null && staffed(w.professions(), professions)) {
+            long trees = ctx.state().points.values().stream()
+                    .filter(p -> p.kind().equals(NaturalResources.WOODLAND) && p.remaining() > 0).count();
+            String log = woodlandLog(ctx);
+            if (trees > 0 && log != null) {
+                // 补算不改方块：按「每日能伐几棵 × 每棵几块原木」估，不超过登记的株数
+                out.add(new CatchUpPlanner.Producer("woodland", Map.of(), Map.of(log, w.logsPerTree()),
+                        Math.min(trees, w.perDay()), null, 0));
+            }
+        }
+        Map<String, Integer> stationsByKind = new LinkedHashMap<>();
+        for (Workstations.Station st : BasicJobTypes.stations(ctx)) {
+            stationsByKind.merge(st.id(), 1, Integer::sum);
         }
         String fuelItem = ctx.data().fuel().perUnit().entrySet().stream()
                 .max(java.util.Comparator.comparingInt(e -> ctx.state().stock.count(e.getKey()) / Math.max(1, e.getValue())))
                 .map(Map.Entry::getKey).orElse(null);
+        // 能开工的原料：库存里有的，加上采集、收割、采果、伐木会产出的
+        Set<String> available = new LinkedHashSet<>();
+        ctx.state().stock.items().forEach((k, v) -> {
+            if (v > 0) {
+                available.add(k);
+            }
+        });
+        out.forEach(pr -> available.addAll(pr.outputs().keySet()));
+        List<CatchUpPlanner.Producer> recipes = new ArrayList<>();
         for (Map.Entry<String, Integer> st : stationsByKind.entrySet()) {
             List<VillageRecipe> rs = ctx.data().recipes().values().stream()
                     .filter(r -> r.station().equals(st.getKey()) && !r.unattended() && BasicJobTypes.stageOpen(ctx, r.stage())
-                            && staffed(r.professions(), professions))
+                            && staffed(r.professions(), professions)
+                            && (available.containsAll(r.inputs().keySet()) || ctx.data().recipes().values().stream()
+                                    .anyMatch(o -> o != r && r.inputs().keySet().stream().anyMatch(o.outputs()::containsKey))))
                     .toList();
             for (VillageRecipe r : rs) {
                 Map<String, Integer> in = new LinkedHashMap<>(r.inputs());
@@ -501,10 +596,31 @@ public final class VillageScheduler {
                     in.merge(fuelItem, r.fuel() * ctx.data().fuel().perUnit().get(fuelItem), Integer::sum);
                 }
                 double perDay = Math.min(8, 11000 * 0.6 / Math.max(20, r.totalTicks())) * st.getValue() / rs.size();
-                out.add(new CatchUpPlanner.Producer("recipe:" + r.id(), in, r.outputs(), perDay, null, 0));
+                Map<String, Integer> caps = r.stockTarget() > 0 ? Map.of(r.mainOutput(), r.stockTarget()) : Map.of();
+                recipes.add(new CatchUpPlanner.Producer("recipe:" + r.id(), in, r.outputs(), perDay, null, 0, caps));
             }
         }
+        // 口粮先做：同一种原料（橄榄）先给烤饼，再给压榨（V1 §3：恢复口粮优先于其他生产）
+        recipes.sort(java.util.Comparator.comparingInt(pr -> pr.outputs().keySet().stream()
+                .anyMatch(ctx.data().rations()::isFood) ? 0 : 1));
+        out.addAll(recipes);
         return out;
+    }
+
+    /** 登记林地里最常见的原木（补算产物用）。 */
+    static String woodlandLog(VillageContext ctx) {
+        Map<String, Integer> count = new LinkedHashMap<>();
+        for (ResourcePoint p : ctx.state().points.values()) {
+            BlockPos b = VillageContext.block(p.pos());
+            if (p.kind().equals(NaturalResources.WOODLAND) && ctx.loaded(b)) {
+                var st = ctx.level().getBlockState(b);
+                if (st.is(net.minecraft.tags.BlockTags.LOGS)) {
+                    count.merge(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(st.getBlock().asItem()).toString(), 1,
+                            Integer::sum);
+                }
+            }
+        }
+        return count.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
     }
 
     private static boolean staffed(Set<String> need, Set<String> have) {
@@ -524,6 +640,18 @@ public final class VillageScheduler {
         runtime(village).lastPlan = level.getServer().overworld().getGameTime();
         newPathsThisTick = 0;
         return p.isPresent() && process(level, p.get());
+    }
+
+    /** 只供 GameTest：当前的村庄上下文。 */
+    public static Optional<VillageContext> contextForTest(ServerLevel level, UUID village) {
+        Optional<VillagePlans.Plan> p = VillagePlans.get(level.getServer()).byVillage(village);
+        Optional<VillageRegistry.Village> v = VillageRegistry.get(level.getServer()).byId(village);
+        Optional<CivVillageData> d = v.flatMap(x -> VillageData.civ(x.civ()));
+        if (p.isEmpty() || d.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(context(level, v.get(), p.get(), VillageEconomy.get(level.getServer()).state(village), d.get(),
+                runtime(village), WorldClock.now(level.getServer())));
     }
 
     /** 只供 GameTest（TC-T19-53）：按晚饭段扣一次口粮。 */

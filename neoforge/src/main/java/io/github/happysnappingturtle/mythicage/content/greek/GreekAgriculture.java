@@ -267,6 +267,25 @@ public final class GreekAgriculture {
             .lang("橄榄油", "Olive Oil", "オリーブオイル")
             .register();
 
+    // ---- 村庄产出链补的三件（T19 阶段 ②，H8；补进 08 号）----
+
+    /** 踩葡萄得到的葡萄浆：进酒瓮发酵 2 个 MC 日成葡萄酒。 */
+    public static final DeferredItem<Item> GRAPE_MUST = Content.item("grape_must", GREEK)
+            .properties(p -> p.stacksTo(16))
+            .lang("葡萄浆", "Grape Must", "ブドウ果汁")
+            .register();
+
+    /** 葡萄酒：村庄交易、节庆宴饮与奠酒。 */
+    public static final DeferredItem<Item> WINE = Content.item("wine", GREEK)
+            .properties(p -> p.stacksTo(16))
+            .lang("葡萄酒", "Wine", "ワイン")
+            .register();
+
+    /** 橄榄修枝剪下的木棍：燃料（4 根 = 1 根原木）。 */
+    public static final DeferredItem<Item> OLIVE_STICK = Content.item("olive_stick", GREEK)
+            .lang("橄榄木棍", "Olive Twigs", "オリーブの小枝")
+            .register();
+
     public static final DeferredBlock<OilLampBlock> GREEK_OIL_LAMP = Content.block("greek_oil_lamp", GREEK,
                     OilLampBlock::new)
             .properties(() -> BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_ORANGE).strength(0.3f)
