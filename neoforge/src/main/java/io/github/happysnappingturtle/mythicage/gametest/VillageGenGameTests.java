@@ -2,7 +2,6 @@ package io.github.happysnappingturtle.mythicage.gametest;
 
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
-import io.github.happysnappingturtle.mythicage.content.greek.prayer.BelieverEvents;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigHolder;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigLoader;
@@ -113,7 +112,8 @@ public final class VillageGenGameTests {
         BoundingBox bb = p.start().getBoundingBox();
         AABB box = new AABB(bb.minX() - 16, bb.minY() - 16, bb.minZ() - 16, bb.maxX() + 16, bb.maxY() + 16, bb.maxZ() + 16);
         GuardianRegistry gr = GuardianRegistry.get(level.getServer());
-        for (Entity e : level.getEntitiesOfClass(Entity.class, box, e -> e instanceof Villager || e instanceof GuardianEntity)) {
+        for (Entity e : level.getEntitiesOfClass(Entity.class, box, e -> e instanceof Villager || e instanceof GuardianEntity
+                || e instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity)) {
             if (e instanceof GuardianEntity g && g.guardianId() != null) {
                 gr.remove(g.guardianId());
             }
@@ -121,6 +121,8 @@ public final class VillageGenGameTests {
         }
         VillagePlans.get(level.getServer()).remove(p.village().id());
         VillageRegistry.get(level.getServer()).remove(p.village().bell());
+        io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(level.getServer()).clearForTest(p.village().id());
+        io.github.happysnappingturtle.mythicage.village.work.VillageScheduler.clearForTest(p.village().id());
     }
 
     private static BlockPos block(Pos p) {
@@ -148,17 +150,20 @@ public final class VillageGenGameTests {
             BlockPos g = block(p.plan().anchors("guardian").get(0));
             List<GuardianEntity> guardians = h.getLevel().getEntitiesOfClass(GuardianEntity.class, new AABB(g).inflate(2));
             h.assertTrue(guardians.size() == 1, "祭司在神庙锚点 2 格内：" + guardians.size());
-            int near = 0;
-            for (Pos home : homes) {
-                List<Villager> vs = h.getLevel().getEntitiesOfClass(Villager.class, new AABB(block(home)).inflate(1));
-                near += vs.isEmpty() ? 0 : 1;
-                for (Villager villager : vs) {
-                    h.assertTrue(VillageResolver.villageOf(villager).map(x -> x.id().equals(v.id())).orElse(false),
-                            "村民归属本村");
-                    h.assertTrue(BelieverEvents.isBeliever(villager), "希腊村庄的村民是信徒");
+            // T19：生成的是本模组居民（每个床位 1 名），不再是原版无业村民
+            List<io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity> rs = h.getLevel().getEntitiesOfClass(
+                    io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity.class,
+                    new AABB(v.bell().pos()).inflate(128));
+            int mine = 0;
+            for (io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity r : rs) {
+                if (r.village().map(x -> x.equals(v.id())).orElse(false)) {
+                    mine++;
+                    h.assertTrue(homes.stream().anyMatch(home -> block(home).equals(r.home())), "居民的床位是床位锚点");
                 }
             }
-            h.assertTrue(near == homes.size(), "每个床位一名村民：" + near);
+            h.assertTrue(mine == homes.size(), "每个床位一名居民：" + mine + " / " + homes.size());
+            h.assertTrue(h.getLevel().getEntitiesOfClass(Villager.class, new AABB(v.bell().pos()).inflate(128),
+                    x -> VillageResolver.villageOf(x).map(y -> y.id().equals(v.id())).orElse(false)).isEmpty(), "没有原版村民");
             VillageRegistration.populateDue(h.getLevel());
             h.assertTrue(h.getLevel().getEntitiesOfClass(GuardianEntity.class, new AABB(g).inflate(2)).size() == 1,
                     "不重复生成");

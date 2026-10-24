@@ -1,0 +1,544 @@
+package io.github.happysnappingturtle.mythicage.village.work;
+
+import io.github.happysnappingturtle.mythicage.MythicAge;
+import io.github.happysnappingturtle.mythicage.config.ModConfigs;
+import io.github.happysnappingturtle.mythicage.core.config.runtime.RuntimeConfig;
+import io.github.happysnappingturtle.mythicage.core.runtime.PublicCatchUp;
+import io.github.happysnappingturtle.mythicage.core.runtime.VillageRunCondition;
+import io.github.happysnappingturtle.mythicage.core.village.CivVillageData;
+import io.github.happysnappingturtle.mythicage.core.village.economy.CatchUpPlanner;
+import io.github.happysnappingturtle.mythicage.core.village.gen.Pos;
+import io.github.happysnappingturtle.mythicage.core.village.recipe.VillageRecipe;
+import io.github.happysnappingturtle.mythicage.core.village.resource.ResourcePoint;
+import io.github.happysnappingturtle.mythicage.core.village.time.Schedule;
+import io.github.happysnappingturtle.mythicage.core.village.work.FailureBook;
+import io.github.happysnappingturtle.mythicage.core.village.work.Job;
+import io.github.happysnappingturtle.mythicage.core.village.work.Scheduler;
+import io.github.happysnappingturtle.mythicage.guardian.MythDays;
+import io.github.happysnappingturtle.mythicage.runtime.WorldClock;
+import io.github.happysnappingturtle.mythicage.village.VillagePlans;
+import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
+import io.github.happysnappingturtle.mythicage.village.behavior.VillageBehavior;
+import io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs;
+import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
+import io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity;
+import io.github.happysnappingturtle.mythicage.village.resident.Residents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * 村庄调度驱动（T19 设计文档 §5.3、§7、§9、§14）：每村一个调度器，统一决定谁去做什么，居民实体只执行（V1 R2）。
+ * <ul>
+ *   <li>全服每刻最多处理 {@link #VILLAGES_PER_TICK} 个村庄（轮转），每村每 {@link #PLAN_INTERVAL} 刻规划一次；</li>
+ *   <li>只在村庄<b>真实运行</b>时规划（{@link VillageRunCondition}）；从未运行回到运行时做一次离线补算（≤ 3 个 MC 日）；</li>
+ *   <li>每 MC 日开始：资源点恢复、行为模块 onDayStart；晚饭段开始时扣口粮（同一 MC 日只扣一次）；</li>
+ *   <li>派单前托管材料；结算成功消耗托管，失败或打断退回托管。</li>
+ * </ul>
+ */
+public final class VillageScheduler {
+    public static final int PLAN_INTERVAL = 20;
+    public static final int VILLAGES_PER_TICK = 4;
+    /** 全服每刻新发起的居民寻路上限（V1 §11）。 */
+    public static final int NEW_PATHS_PER_TICK = 8;
+    public static final double ALARM_RADIUS = 12;
+    public static final int ALARM_TICKS = 200;
+    /** 离开超过这么久才算「回来」，触发补算。 */
+    public static final long CATCH_UP_MIN_TICKS = 200;
+
+    /** 每村的内存状态（不存档）。 */
+    public static final class Runtime {
+        final FailureBook failures = new FailureBook();
+        final Map<UUID, Job> active = new LinkedHashMap<>();
+        long lastPlan = Long.MIN_VALUE / 2;
+        long alarmUntil = Long.MIN_VALUE / 2;
+        boolean wasRunning;
+        Boolean forceRunning;
+        private long jobIds = 1;
+
+        public long nextJobId() {
+            return jobIds++;
+        }
+
+        public List<Job> activeJobs() {
+            return List.copyOf(active.values());
+        }
+
+        public boolean alarmed(long now) {
+            return now < alarmUntil;
+        }
+
+        public FailureBook failures() {
+            return failures;
+        }
+
+        public long lastPlan() {
+            return lastPlan;
+        }
+
+        /** 最近一次规划的统计（调试与 GameTest 用）：居民数、空闲数、候选数、派出数。 */
+        public String lastStats() {
+            return lastStats;
+        }
+
+        String lastStats = "";
+    }
+
+    private static final Map<UUID, Runtime> RUNTIMES = new HashMap<>();
+    /** 已加载的居民：村庄 → 居民。 */
+    private static final Map<UUID, Set<ResidentEntity>> LOADED = new HashMap<>();
+    private static int cursor;
+    private static int newPathsThisTick;
+
+    private VillageScheduler() {
+    }
+
+    public static Runtime runtime(UUID village) {
+        return RUNTIMES.computeIfAbsent(village, k -> new Runtime());
+    }
+
+    // ───────────── 事件 ─────────────
+
+    public static void onServerTickPost(ServerTickEvent.Post event) {
+        tick(event.getServer());
+    }
+
+    public static void onServerStopped(ServerStoppedEvent event) {
+        RUNTIMES.clear();
+        LOADED.clear();
+        Residents.clearQueue();
+    }
+
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) {
+            return;
+        }
+        if (event.getEntity() instanceof ResidentEntity r) {
+            r.village().ifPresent(v -> LOADED.computeIfAbsent(v, k -> new LinkedHashSet<>()).add(r));
+        } else if (event.getLevel() instanceof ServerLevel sl
+                && event.getEntity() instanceof net.minecraft.world.entity.npc.Villager villager) {
+            Residents.maybeQueueConversion(sl, villager);
+        }
+    }
+
+    public static void onEntityLeave(EntityLeaveLevelEvent event) {
+        if (!event.getLevel().isClientSide() && event.getEntity() instanceof ResidentEntity r) {
+            r.village().ifPresent(v -> {
+                Set<ResidentEntity> s = LOADED.get(v);
+                if (s != null) {
+                    s.remove(r);
+                }
+            });
+        }
+    }
+
+    public static List<ResidentEntity> loaded(UUID village) {
+        Set<ResidentEntity> s = LOADED.get(village);
+        if (s == null) {
+            return List.of();
+        }
+        return s.stream().filter(r -> r.isAlive() && !r.isRemoved()).toList();
+    }
+
+    // ───────────── 主循环 ─────────────
+
+    static void tick(MinecraftServer server) {
+        newPathsThisTick = 0;
+        Residents.drainQueue(server);
+        List<VillagePlans.Plan> plans = VillagePlans.get(server).all();
+        if (plans.isEmpty()) {
+            return;
+        }
+        long now = server.overworld().getGameTime();
+        int processed = 0;
+        for (int i = 0; i < plans.size() && processed < VILLAGES_PER_TICK; i++) {
+            VillagePlans.Plan p = plans.get(Math.floorMod(cursor + i, plans.size()));
+            Runtime rt = runtime(p.village());
+            if (now - rt.lastPlan < PLAN_INTERVAL) {
+                continue;
+            }
+            rt.lastPlan = now;
+            processed++;
+            ServerLevel level = server.getLevel(p.dim());
+            if (level != null) {
+                try {
+                    process(level, p);
+                } catch (RuntimeException e) {
+                    MythicAge.LOGGER.error("村庄 {} 调度出错", p.village(), e);
+                }
+            }
+        }
+        cursor = Math.floorMod(cursor + Math.max(1, processed), plans.size());
+    }
+
+    /** 处理一座村庄（GameTest 也直接调用）。返回是否真实运行。 */
+    public static boolean process(ServerLevel level, VillagePlans.Plan plan) {
+        MinecraftServer server = level.getServer();
+        Optional<VillageRegistry.Village> vo = VillageRegistry.get(server).byId(plan.village());
+        if (vo.isEmpty()) {
+            return false;
+        }
+        VillageRegistry.Village village = vo.get();
+        Optional<CivVillageData> data = VillageData.civ(village.civ());
+        if (data.isEmpty()) {
+            return false;
+        }
+        Runtime rt = runtime(village.id());
+        VillageEconomy.State state = VillageEconomy.get(server).state(village.id());
+        long now = WorldClock.now(server);
+        boolean running = running(level, village, rt);
+        if (!running) {
+            rt.wasRunning = false;
+            return false;
+        }
+        VillageContext ctx = context(level, village, plan, state, data.get(), rt, now);
+        initialize(ctx);
+        if (!rt.wasRunning && state.lastRealTick != VillageEconomy.NEVER && now - state.lastRealTick >= CATCH_UP_MIN_TICKS) {
+            catchUp(ctx, now - state.lastRealTick);
+        }
+        rt.wasRunning = true;
+        state.lastRealTick = now;
+        dayStart(ctx);
+        rations(ctx);
+        sleepAndWake(ctx);
+        plan(ctx);
+        return true;
+    }
+
+    static VillageContext context(ServerLevel level, VillageRegistry.Village village, VillagePlans.Plan plan,
+                                  VillageEconomy.State state, CivVillageData data, Runtime rt, long now) {
+        int tod = Schedule.timeOfDay(level.getDayTime());
+        long today = MythDays.today(level.getServer());
+        int offset = data.calendar().offset(village.id());
+        return new VillageContext(level, village, plan, state, data, rt, VillageBehavior.byId(data.behavior()), now, tod,
+                data.schedule().segmentAt(tod), today, data.calendar().date(today, offset), loaded(village.id()));
+    }
+
+    /** 当前（或测试指定的）真实运行状态。 */
+    static boolean running(ServerLevel level, VillageRegistry.Village village, Runtime rt) {
+        if (rt.forceRunning != null) {
+            return rt.forceRunning;
+        }
+        BlockPos c = village.bell().pos();
+        if (!level.isLoaded(c)) {
+            return false;
+        }
+        double nearest = Double.MAX_VALUE;
+        for (Player p : level.players()) {
+            if (!p.isSpectator()) {
+                nearest = Math.min(nearest, Math.sqrt(p.distanceToSqr(c.getX() + 0.5, c.getY(), c.getZ() + 0.5)));
+            }
+        }
+        RuntimeConfig.PublicResources cfg = ModConfigs.runtime().current().village().publicResources();
+        return VillageRunCondition.realRunning(level.isPositionEntityTicking(c), nearest, cfg.realRunRadius());
+    }
+
+    /** 接管：S0 库存、登记采集点（只登记一次）；容量每次重算。 */
+    static void initialize(VillageContext ctx) {
+        VillageEconomy.State s = ctx.state();
+        s.stock.setCapacity(ctx.data().capacity(ctx.anchors(Residents.KEEPER_ANCHOR).size()));
+        if (s.initialized) {
+            return;
+        }
+        for (CivVillageData.PointKind k : ctx.data().points().values()) {
+            List<Pos> at = ctx.anchors(k.id());
+            for (int i = 0; i < at.size(); i++) {
+                String id = k.id() + "_" + i;
+                s.points.putIfAbsent(id, ResourcePoint.fresh(id, k.id(), at.get(i), k.max(), k.recover(), ctx.today()));
+            }
+        }
+        ctx.data().initialStock().forEach(s.stock::deposit);
+        s.initialized = true;
+        s.lastDay = ctx.today();
+        s.log(ctx.today(), "mythic_age.village.log.founded");
+    }
+
+    static void dayStart(VillageContext ctx) {
+        VillageEconomy.State s = ctx.state();
+        if (s.lastDay == ctx.today()) {
+            return;
+        }
+        s.lastDay = ctx.today();
+        s.points.replaceAll((id, p) -> p.recover(ctx.today()));
+        ctx.behavior().onDayStart(ctx);
+    }
+
+    /** 晚饭段：每人 1 份（行为模块可在节庆日改为 2 份，见 {@link #rationsPerPerson}）。同一 MC 日只扣一次。 */
+    static void rations(VillageContext ctx) {
+        VillageEconomy.State s = ctx.state();
+        if (!Schedule.SUPPER.equals(ctx.segment()) || s.rationsDay == ctx.today() || s.roster.isEmpty()) {
+            return;
+        }
+        s.rationsDay = ctx.today();
+        double shortage = ctx.data().rations().consume(s.stock, s.roster.size() * rationsPerPerson(ctx));
+        if (shortage > 0) {
+            s.log(ctx.today(), "mythic_age.village.log.hungry", String.valueOf((int) Math.ceil(shortage)));
+        }
+    }
+
+    static double rationsPerPerson(VillageContext ctx) {
+        return 1;
+    }
+
+    static void sleepAndWake(VillageContext ctx) {
+        boolean night = Schedule.SLEEP.equals(ctx.segment());
+        for (ResidentEntity r : ctx.residents()) {
+            if (night && r.idle()) {
+                r.trySleepAtHome();
+            } else if (!night && r.resting()) {
+                r.wakeUp();
+            }
+        }
+    }
+
+    // ───────────── 派单 ─────────────
+
+    static void plan(VillageContext ctx) {
+        Runtime rt = ctx.rt();
+        // 已不在的居民：放掉他们的工作单记录
+        Set<UUID> present = new LinkedHashSet<>();
+        ctx.residents().forEach(r -> present.add(r.getUUID()));
+        rt.active.keySet().removeIf(id -> !present.contains(id));
+        for (ResidentEntity r : ctx.residents()) {
+            if (alarmNear(r)) {
+                rt.alarmUntil = ctx.now() + ALARM_TICKS;
+                break;
+            }
+        }
+        List<Scheduler.ResidentView> views = new ArrayList<>();
+        Map<UUID, ResidentEntity> byId = new HashMap<>();
+        for (ResidentEntity r : ctx.residents()) {
+            byId.put(r.getUUID(), r);
+            views.add(new Scheduler.ResidentView(r.getUUID(), r.profession(), VillageContext.pos(r.blockPosition()),
+                    r.home() == null ? VillageContext.pos(r.blockPosition()) : VillageContext.pos(r.home()), r.idle(),
+                    r.walking()));
+        }
+        if (views.stream().noneMatch(Scheduler.ResidentView::idle)) {
+            rt.lastStats = "residents=" + views.size() + " idle=0";
+            return;
+        }
+        List<Job> candidates = new ArrayList<>();
+        for (JobType t : JobType.REGISTRY.values()) {
+            candidates.addAll(t.candidates(ctx));
+        }
+        candidates.addAll(ctx.behavior().jobs(ctx));
+        Set<String> busy = new LinkedHashSet<>();
+        rt.active.values().forEach(j -> busy.add(j.targetKey()));
+        Scheduler.Snapshot snap = Scheduler.Snapshot.of(views, candidates)
+                .withAlarm(rt.alarmed(ctx.now()))
+                .withRaining(ctx.raining())
+                .withFoodShort(ctx.data().rations().belowFloor(ctx.state().stock))
+                .withFailures(rt.failures, ctx.today())
+                .withBusy(busy)
+                .withBehavior((r, j) -> ctx.behavior().available(ctx, r, j), j -> ctx.behavior().modify(ctx, j));
+        List<Scheduler.Assignment> plan = Scheduler.plan(snap);
+        int assigned = 0;
+        for (Scheduler.Assignment a : plan) {
+            ResidentEntity r = byId.get(a.resident());
+            Job j = a.job();
+            if (r == null || (j.needsWalk() && newPathsThisTick >= NEW_PATHS_PER_TICK)) {
+                continue;
+            }
+            JobType type = JobType.REGISTRY.get(j.type());
+            Optional<Map<String, Integer>> escrow = type == null ? Optional.of(Map.of()) : type.escrow(ctx, j);
+            if (escrow.isEmpty() || !ctx.state().stock.reserve(j.escrowId(), escrow.get())) {
+                continue;
+            }
+            r.assign(j);
+            rt.active.put(r.getUUID(), j);
+            assigned++;
+            if (j.needsWalk()) {
+                newPathsThisTick++;
+            }
+        }
+        rt.lastStats = "residents=" + views.size() + " candidates=" + candidates.size() + " planned=" + plan.size()
+                + " assigned=" + assigned + " alarm=" + rt.alarmed(ctx.now()) + " segment=" + ctx.segment();
+    }
+
+    private static boolean alarmNear(ResidentEntity r) {
+        return !r.level().getEntitiesOfClass(LivingEntity.class, r.getBoundingBox().inflate(ALARM_RADIUS),
+                e -> e instanceof Enemy && e.isAlive()).isEmpty();
+    }
+
+    /** 居民走完最后一步：按类型结算；成功消耗托管，失败退回并记目标失败。 */
+    public static void onJobSettle(ServerLevel level, ResidentEntity resident, Job job) {
+        Optional<VillageContext> ctx = contextOf(level, resident);
+        if (ctx.isEmpty()) {
+            return;
+        }
+        ctx.get().rt().active.remove(resident.getUUID());
+        JobType type = JobType.REGISTRY.get(job.type());
+        boolean ok = type == null || type.settle(ctx.get(), resident, job);
+        VillageEconomy.State s = ctx.get().state();
+        if (ok) {
+            s.stock.consume(job.escrowId());
+        } else {
+            s.stock.release(job.escrowId());
+            ctx.get().rt().failures.fail(job.targetKey(), ctx.get().today());
+        }
+        VillageEconomy.get(level.getServer()).setDirty();
+    }
+
+    /** 工作单被打断：托管退回，不产出。 */
+    public static void onJobAborted(ServerLevel level, ResidentEntity resident, Job job, boolean countFailure) {
+        resident.village().ifPresent(v -> {
+            Runtime rt = runtime(v);
+            rt.active.remove(resident.getUUID());
+            VillageEconomy.get(level.getServer()).peek(v).ifPresent(s -> s.stock.release(job.escrowId()));
+            VillageEconomy.get(level.getServer()).setDirty();
+            if (countFailure) {
+                rt.failures.fail(job.targetKey(), MythDays.today(level.getServer()));
+            }
+        });
+    }
+
+    public static void onResidentDied(ServerLevel level, ResidentEntity resident) {
+        resident.village().ifPresent(v -> VillageEconomy.get(level.getServer()).peek(v).ifPresent(s -> {
+            s.roster.remove(resident.getUUID());
+            VillageEconomy.get(level.getServer()).setDirty();
+        }));
+    }
+
+    public static void onInteract(ServerPlayer player, ResidentEntity resident) {
+        VillageAffairs.onResidentInteract(player, resident);
+    }
+
+    static Optional<VillageContext> contextOf(ServerLevel level, ResidentEntity resident) {
+        Optional<UUID> v = resident.village();
+        if (v.isEmpty()) {
+            return Optional.empty();
+        }
+        MinecraftServer server = level.getServer();
+        Optional<VillageRegistry.Village> village = VillageRegistry.get(server).byId(v.get());
+        Optional<VillagePlans.Plan> plan = VillagePlans.get(server).byVillage(v.get());
+        if (village.isEmpty() || plan.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<CivVillageData> data = VillageData.civ(village.get().civ());
+        if (data.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(context(level, village.get(), plan.get(), VillageEconomy.get(server).state(v.get()), data.get(),
+                runtime(v.get()), WorldClock.now(server)));
+    }
+
+    // ───────────── 离线补算 ─────────────
+
+    /** 回到真实运行时的一次补算（T19 设计文档 §7）。 */
+    static void catchUp(VillageContext ctx, long awayTicks) {
+        RuntimeConfig.PublicResources cfg = ModConfigs.runtime().current().village().publicResources();
+        long ticks = PublicCatchUp.ticksToSimulate(ctx.now() - awayTicks, ctx.now(), true, cfg);
+        if (ticks <= 0) {
+            return;
+        }
+        VillageEconomy.State s = ctx.state();
+        CatchUpPlanner.Result r = CatchUpPlanner.plan(s.stock, s.points, producers(ctx), ticks / 24000.0,
+                cfg.maxCatchUpTicks() / 24000.0, ctx.today(), s.roster.size(), 1, ctx.data().rations());
+        s.points.clear();
+        s.points.putAll(r.points());
+        StringBuilder sb = new StringBuilder();
+        r.gained().forEach((k, v) -> sb.append(sb.isEmpty() ? "" : "、").append(k).append(" +").append(v));
+        s.log(ctx.today(), "mythic_age.village.log.catch_up", String.format("%.1f", r.days()), sb.toString());
+        MythicAge.LOGGER.debug("村庄 {} 离线补算 {} 日：{}", ctx.village().id(), r.days(), r.gained());
+    }
+
+    /** 岗位的日产率：采集点、作物、工作站配方。只算名册里有人能做的。 */
+    static List<CatchUpPlanner.Producer> producers(VillageContext ctx) {
+        Set<String> professions = new LinkedHashSet<>();
+        ctx.state().roster.values().forEach(m -> professions.add(m.profession()));
+        List<CatchUpPlanner.Producer> out = new ArrayList<>();
+        for (ResourcePoint p : ctx.state().points.values()) {
+            CivVillageData.PointKind k = ctx.data().points().get(p.kind());
+            if (k != null && staffed(k.professions(), professions)) {
+                out.add(new CatchUpPlanner.Producer("point:" + p.id(), Map.of(), k.outputs(), k.perDay(), p.id(), k.take()));
+            }
+        }
+        for (CivVillageData.CropKind k : ctx.data().crops().values()) {
+            int n = ctx.anchors(k.id()).size();
+            if (n > 0 && staffed(k.professions(), professions)) {
+                out.add(new CatchUpPlanner.Producer("crop:" + k.id(), Map.of(), k.expected(), n * k.perAnchorPerDay(), null, 0));
+            }
+        }
+        Map<String, Integer> stationsByKind = new LinkedHashMap<>();
+        for (Pos sp : ctx.anchors(BasicJobTypes.STATION_ANCHOR)) {
+            BlockPos b = VillageContext.block(sp);
+            if (ctx.loaded(b)) {
+                stationsByKind.merge(BasicJobTypes.stationId(ctx.level().getBlockState(b)), 1, Integer::sum);
+            }
+        }
+        String fuelItem = ctx.data().fuel().perUnit().entrySet().stream()
+                .max(java.util.Comparator.comparingInt(e -> ctx.state().stock.count(e.getKey()) / Math.max(1, e.getValue())))
+                .map(Map.Entry::getKey).orElse(null);
+        for (Map.Entry<String, Integer> st : stationsByKind.entrySet()) {
+            List<VillageRecipe> rs = ctx.data().recipes().values().stream()
+                    .filter(r -> r.station().equals(st.getKey()) && !r.unattended() && BasicJobTypes.stageOpen(ctx, r.stage())
+                            && staffed(r.professions(), professions))
+                    .toList();
+            for (VillageRecipe r : rs) {
+                Map<String, Integer> in = new LinkedHashMap<>(r.inputs());
+                if (r.fuel() > 0) {
+                    if (fuelItem == null) {
+                        continue;
+                    }
+                    in.merge(fuelItem, r.fuel() * ctx.data().fuel().perUnit().get(fuelItem), Integer::sum);
+                }
+                double perDay = Math.min(8, 11000 * 0.6 / Math.max(20, r.totalTicks())) * st.getValue() / rs.size();
+                out.add(new CatchUpPlanner.Producer("recipe:" + r.id(), in, r.outputs(), perDay, null, 0));
+            }
+        }
+        return out;
+    }
+
+    private static boolean staffed(Set<String> need, Set<String> have) {
+        return need.isEmpty() ? !have.isEmpty() : need.stream().anyMatch(have::contains);
+    }
+
+    // ───────────── 测试 ─────────────
+
+    /** 只供 GameTest：指定村庄是否真实运行（null 恢复按世界判断）。 */
+    public static void forceRunningForTest(UUID village, Boolean running) {
+        runtime(village).forceRunning = running;
+    }
+
+    /** 只供 GameTest：立刻处理一次（不等轮转）。 */
+    public static boolean processNowForTest(ServerLevel level, UUID village) {
+        Optional<VillagePlans.Plan> p = VillagePlans.get(level.getServer()).byVillage(village);
+        runtime(village).lastPlan = level.getServer().overworld().getGameTime();
+        newPathsThisTick = 0;
+        return p.isPresent() && process(level, p.get());
+    }
+
+    /** 只供 GameTest（TC-T19-53）：按晚饭段扣一次口粮。 */
+    public static void supperForTest(ServerLevel level, UUID village) {
+        VillagePlans.Plan p = VillagePlans.get(level.getServer()).byVillage(village).orElseThrow();
+        VillageRegistry.Village v = VillageRegistry.get(level.getServer()).byId(village).orElseThrow();
+        CivVillageData data = VillageData.civ(v.civ()).orElseThrow();
+        VillageContext c = context(level, v, p, VillageEconomy.get(level.getServer()).state(village), data, runtime(village),
+                WorldClock.now(level.getServer()));
+        rations(new VillageContext(c.level(), c.village(), c.plan(), c.state(), c.data(), c.rt(), c.behavior(), c.now(),
+                12000, Schedule.SUPPER, c.today(), c.date(), c.residents()));
+    }
+
+    public static void clearForTest(UUID village) {
+        RUNTIMES.remove(village);
+        LOADED.remove(village);
+    }
+}

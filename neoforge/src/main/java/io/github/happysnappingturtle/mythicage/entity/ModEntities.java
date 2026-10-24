@@ -25,6 +25,15 @@ public final class ModEntities {
                             .clientTrackingRange(10)
                             .build("mythic_age:greek_guardian"));
 
+    /** 文明村庄的居民（T19）：人形，碰撞同原版村民 0.6 × 1.95。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity>> RESIDENT =
+            ModRegistries.ENTITY_TYPES.register("resident",
+                    () -> EntityType.Builder.of(io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity::new, MobCategory.MISC)
+                            .sized(0.6F, 1.95F)
+                            .eyeHeight(1.62F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:resident"));
+
     private ModEntities() {
     }
 
@@ -35,5 +44,6 @@ public final class ModEntities {
     private static void onAttributes(EntityAttributeCreationEvent event) {
         event.put(MINOTAUR.get(), MinotaurEntity.createAttributes().build());
         event.put(GREEK_GUARDIAN.get(), GreekGuardianEntity.createAttributes().build());
+        event.put(RESIDENT.get(), io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity.createAttributes().build());
     }
 }

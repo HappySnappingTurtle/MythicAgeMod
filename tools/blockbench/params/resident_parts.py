@@ -1,0 +1,253 @@
+"""希腊居民（T19 阶段 ①）通用身体部件表。
+
+生成 art/blockbench/greek/resident/resident.params.json。
+坐标为设计卡模型空间：+X 角色左、+Y 上、+Z 前，单位 u（16u = 1 格）。左右对称的部件只写左侧（x > 0）。
+身体沿用陶工 VI-GR-POT-01 的骨架（与神庙祭司同一套比例）；服装分两组，靠骨骼显隐二选一（V3-希腊-居民 H3）：
+  outfit_male_*   男装：及膝短希顿（chiton）、腰绳、深色短发与短须
+  outfit_female_* 女装：及踝希顿 + 胸前折返（apoptygma）、披巾（himation）、盘发（krobylos）与发带
+搬运附件 carry_*（篮、木料、石料、黏土）挂在躯干前方，只显示正在搬的那一个（V1 §4.3：手上的东西只是外观）。
+服色在这里是第 0 号配色；其余配色由 resident_palettes.py 从贴图换色生成。
+出处见 docs/重构/开发/T19/美术/居民_白模卡.md。
+运行：python3 tools/blockbench/params/resident_parts.py
+"""
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / "art/blockbench/greek/resident/resident.params.json"
+
+SKIN_M = "#AE7656"
+SKIN_F = "#C48F6D"
+HAIR = "#3B2B20"
+TUNIC = "#D6C7A6"        # 男装：本色羊毛
+TUNIC_SHADE = "#BDAE8E"
+CORD = "#6B4A2E"
+DRESS = "#D2AC58"        # 女装：番红花黄长袍（krokotos）
+DRESS_LIGHT = "#DDBB6C"  # 折返略浅
+DRESS_SHADE = "#B48F42"
+SHAWL = "#7C3A2F"        # 披巾：深红
+FILLET = "#2F4F6E"       # 发带：靛蓝
+LEATHER = "#5A3B26"
+WICKER = "#A07A44"
+RIM = "#8A6638"
+WOOD = "#7A5A36"
+WOOD_END = "#B89466"
+MARBLE = "#E6E1D6"
+CLAY = "#9C8B7C"
+OLIVE = "#4E5A2C"
+
+BONES = [
+    ("root", None, [0, 0, 0]),
+    ("pelvis", "root", [0, 14, 0]),
+    ("torso", "pelvis", [0, 16, 0]),
+    ("head", "torso", [0, 22, 0]),
+    ("outfit_male_hair", "head", [0, 22, 0]),
+    ("outfit_female_hair", "head", [0, 22, 0]),
+    ("outfit_male_top", "torso", [0, 16, 0]),
+    ("outfit_female_top", "torso", [0, 16, 0]),
+    ("carry_basket", "torso", [0, 15, 5]),
+    ("carry_wood", "torso", [0, 15, 5]),
+    ("carry_stone", "torso", [0, 15, 5]),
+    ("carry_clay", "torso", [0, 15, 5]),
+    ("outfit_male_skirt", "pelvis", [0, 14, 0]),
+    ("outfit_female_skirt", "pelvis", [0, 14, 0]),
+    ("hem_front", "pelvis", [0, 10, 0]),
+    ("hem_back", "pelvis", [0, 10, 0]),
+    ("outfit_male_hem_front", "hem_front", [0, 10, 0]),
+    ("outfit_female_hem_front", "hem_front", [0, 10, 0]),
+    ("outfit_male_hem_back", "hem_back", [0, 10, 0]),
+    ("outfit_female_hem_back", "hem_back", [0, 10, 0]),
+    ("upper_arm_r", "torso", [-5.5, 21.5, 0]),
+    ("outfit_male_sleeve_r", "upper_arm_r", [-5.5, 21.5, 0]),
+    ("outfit_female_sleeve_r", "upper_arm_r", [-5.5, 21.5, 0]),
+    ("forearm_r", "upper_arm_r", [-5.5, 15.5, 0]),
+    ("hand_r", "forearm_r", [-5.5, 11.5, 0]),
+    ("thigh_r", "pelvis", [-2, 14, 0]),
+    ("shin_r", "thigh_r", [-2, 8, 0]),
+    ("foot_r", "shin_r", [-2, 2, 0]),
+    ("upper_arm_l", "torso", [5.5, 21.5, 0]),
+    ("outfit_male_sleeve_l", "upper_arm_l", [5.5, 21.5, 0]),
+    ("outfit_female_sleeve_l", "upper_arm_l", [5.5, 21.5, 0]),
+    ("forearm_l", "upper_arm_l", [5.5, 15.5, 0]),
+    ("hand_l", "forearm_l", [5.5, 11.5, 0]),
+    ("thigh_l", "pelvis", [2, 14, 0]),
+    ("shin_l", "thigh_l", [2, 8, 0]),
+    ("foot_l", "shin_l", [2, 2, 0]),
+]
+
+ATTACHMENTS = [
+    ("hand_r_grip", "hand_r", [-5.5, 10.0, 0]),
+    ("hand_l_grip", "hand_l", [5.5, 10.0, 0]),
+    ("carry_center", "torso", [0, 15, 5]),
+]
+
+
+def part(pid, bone, center, size, color, rot=(0, 0, 0), group=None, kind="cuboid", normal=None):
+    p = {"id": pid, "bone": bone, "center_model_units": list(center), "size_model_units": list(size),
+         "rotation_degrees_model_axes": list(rot), "color": color, "uv_group": group or pid,
+         "uv_share": None, "surface_kind": kind}
+    if normal:
+        p["plane_normal_model_axes"] = list(normal)
+    return p
+
+
+def side_bone(bone_l):
+    if bone_l.endswith("_l"):
+        return bone_l[:-2] + "_r"
+    return bone_l
+
+
+def mirrored(pid_l, bone_l, center, size, color, rot=(0, 0, 0), group=None, kind="cuboid", normal=None):
+    """左侧部件 + 镜像的右侧部件，两侧共用 UV 组。"""
+    g = group or pid_l.removesuffix("_l")
+    left = part(pid_l, bone_l, center, size, color, rot, g, kind, normal)
+    right = part(pid_l[:-2] + "_r", side_bone(bone_l), [-center[0], center[1], center[2]], size, color,
+                 (rot[0], -rot[1], -rot[2]), g, kind, normal)
+    left["uv_share"] = right["uv_share"] = g
+    return [left, right]
+
+
+def rounded(pid, bone, center, size, color, bevel=0.5):
+    """倒角体块：一窄一宽两个方块交叉。主块前后全深，侧块左右全宽。"""
+    w, h, d = size
+    return [part(pid, bone, center, [w - 2 * bevel, h, d], color),
+            part(pid + "_side", bone, center, [w, h, d - 2 * bevel], color)]
+
+
+PARTS = []
+add = PARTS.append
+ext = PARTS.extend
+
+# ── 头（共用）：方头、方鼻、耳 ──
+add(part("head", "head", [0, 26, 0], [8, 8, 8], SKIN_M))
+add(part("nose", "head", [0, 24.75, 5], [2, 3.5, 2], SKIN_M))
+ext(mirrored("ear_l", "head", [4.2, 25.6, 0.0], [0.6, 1.8, 1.4], SKIN_M))
+
+# ── 男：深色卷曲短发、短须（雅典成年男子多蓄须）──
+MH = "outfit_male_hair"
+add(part("m_hair_cap", MH, [0, 30.25, 0], [8.6, 1.5, 8.6], HAIR))
+add(part("m_hair_back", MH, [0, 27.6, -4.3], [8.6, 4.3, 0.6], HAIR))
+ext(mirrored("m_hair_side_l", MH, [4.3, 28.25, -1.2], [0.6, 2.5, 5.6], HAIR))
+add(part("m_hair_fringe", MH, [0, 29.3, 4.25], [8.2, 0.9, 0.5], HAIR))
+add(part("m_beard_front", MH, [0, 22.85, 4.3], [6.0, 2.1, 0.6], HAIR))
+add(part("m_beard_chin", MH, [0, 21.6, 3.9], [3.6, 1.0, 1.4], HAIR))
+ext(mirrored("m_beard_side_l", MH, [4.15, 23.4, 1.8], [0.6, 2.6, 4.2], HAIR))
+
+# ── 女：中分长发收到脑后盘成发髻，额上一道发带 ──
+FH = "outfit_female_hair"
+add(part("f_hair_cap", FH, [0, 30.25, 0], [8.6, 1.5, 8.6], HAIR))
+add(part("f_hair_back", FH, [0, 26.75, -4.3], [8.6, 6.0, 0.6], HAIR))
+ext(mirrored("f_hair_side_l", FH, [4.3, 27.75, -0.6], [0.6, 3.5, 6.8], HAIR))
+add(part("f_hair_fringe", FH, [0, 29.2, 4.25], [8.2, 1.1, 0.5], HAIR))
+add(part("f_bun", FH, [0, 29.3, -5.6], [3.8, 3.4, 2.6], HAIR))
+add(part("f_bun_top", FH, [0, 31.0, -4.8], [2.6, 1.2, 2.2], HAIR))
+add(part("f_fillet", FH, [0, 30.0, 0], [9.1, 0.6, 9.1], FILLET))
+
+# ── 躯干（共用）：颈 ──
+add(part("neck", "torso", [0, 22, 0], [2, 2, 2], SKIN_M))
+
+# ── 男上身：短希顿（倒角）、领口、斜褶 ──
+MT = "outfit_male_top"
+ext(rounded("m_chiton", MT, [0, 18, 0], [8, 9, 4], TUNIC, 0.4))
+add(part("m_overfold", MT, [0, 19.9, 0], [8.4, 2.6, 4.4], TUNIC))
+ext(mirrored("m_shoulder_l", MT, [3.4, 21.75, 0], [2.4, 0.6, 4.2], TUNIC_SHADE, group="m_shoulder"))
+
+# ── 女上身：希顿 + 折返、披巾（背后一片、搭肩、前襟两条下垂）──
+FT = "outfit_female_top"
+ext(rounded("f_chiton", FT, [0, 18, 0], [8, 9, 4], DRESS, 0.4))
+add(part("f_overfold", FT, [0, 19.2, 0], [8.6, 4.4, 4.6], DRESS_LIGHT))
+add(part("f_shawl_back", FT, [0, 18.4, -2.6], [8.8, 7.6, 0.5], SHAWL))
+ext(mirrored("f_shawl_shoulder_l", FT, [3.5, 21.8, -0.5], [3.0, 0.8, 4.6], SHAWL))
+# 披巾从左肩斜披到右腰（前后各一条），不是两条直垂的背带
+add(part("f_shawl_drape_front", FT, [0.4, 18.2, 2.55], [2.8, 11.0, 0.5], SHAWL, (0, 0, -36), group="f_shawl_drape"))
+add(part("f_shawl_drape_back", FT, [0.4, 18.2, -2.85], [2.8, 11.0, 0.5], SHAWL, (0, 0, -36), group="f_shawl_drape"))
+add(part("f_girdle", FT, [0, 16.75, 0], [8.4, 0.5, 4.4], CORD))
+
+# ── 男：腰绳（打结）、短裙上段（倒角）──
+MS = "outfit_male_skirt"
+add(part("m_girdle", MS, [0, 15.2, 0], [8.4, 0.8, 4.4], CORD))
+add(part("m_knot", MS, [0, 15.0, 2.45], [1.2, 1.2, 0.5], CORD))
+ext(rounded("m_skirt", MS, [0, 12.75, 0], [8.6, 4.5, 4.6], TUNIC, 0.4))
+
+# ── 女：长裙上段（倒角）──
+FS = "outfit_female_skirt"
+ext(rounded("f_skirt", FS, [0, 12.25, 0], [8.6, 5.5, 4.6], DRESS, 0.4))
+
+# ── 下摆：男到膝上（y 8–10.5），女到踝（y 2.5–10）；前后两片可摆动，带竖褶 ──
+for side, sz in (("front", 1), ("back", -1)):
+    add(part(f"m_hem_{side}", f"outfit_male_hem_{side}", [0, 9.25, 1.2 * sz], [8.8, 2.5, 2.4], TUNIC, group="m_hem"))
+    add(part(f"f_hem_{side}", f"outfit_female_hem_{side}", [0, 6.25, 1.2 * sz], [8.8, 7.5, 2.4], DRESS, group="f_hem"))
+for i, x in enumerate((-2.6, 0, 2.6)):
+    add(part(f"m_pleat_{i}", "outfit_male_hem_front", [x, 9.25, 2.55], [0.7, 2.2, 0.3], TUNIC_SHADE, group="m_pleat"))
+    add(part(f"f_pleat_{i}", "outfit_female_hem_front", [x, 6.5, 2.55], [0.7, 6.6, 0.3], DRESS_SHADE, group="f_pleat"))
+for i, x in enumerate((-1.8, 1.8)):
+    add(part(f"f_pleat_back_{i}", "outfit_female_hem_back", [x, 6.5, -2.55], [0.7, 6.6, 0.3], DRESS_SHADE,
+             group="f_pleat"))
+
+# ── 腿脚（共用）：小腿、膝、踝带、脚、鞋底、趾带 ──
+ext(mirrored("knee_l", "thigh_l", [2, 9, 0], [3.0, 2, 3.0], SKIN_M))
+ext(mirrored("shin_l", "shin_l", [2, 5, 0], [2.8, 6, 2.8], SKIN_M))
+ext(mirrored("ankle_strap_l", "shin_l", [2, 2.6, 0], [3.1, 0.6, 3.1], LEATHER))
+ext(mirrored("foot_l", "foot_l", [2, 1.25, 0.8], [3, 1.5, 4.4], SKIN_M))
+ext(mirrored("sole_l", "foot_l", [2, 0.3, 0.9], [3.4, 0.6, 5.0], LEATHER))
+ext(mirrored("toe_strap_l", "foot_l", [2, 2.05, 1.6], [3.2, 0.4, 0.8], LEATHER))
+
+# ── 手臂（共用）：上臂、前臂、手与拇指；袖子分男女 ──
+ext(mirrored("upper_arm_l", "upper_arm_l", [5.5, 16.5, 0], [3, 3, 3], SKIN_M))
+ext(mirrored("m_sleeve_l", "outfit_male_sleeve_l", [5.6, 19.6, 0], [3.6, 4.2, 4.4], TUNIC, group="m_sleeve"))
+ext(mirrored("f_sleeve_l", "outfit_female_sleeve_l", [5.6, 18.9, 0], [3.6, 5.6, 4.4], DRESS, group="f_sleeve"))
+ext(mirrored("forearm_l", "forearm_l", [5.5, 13.5, 0], [3, 4, 3], SKIN_M))
+ext(mirrored("hand_l", "hand_l", [5.5, 10.5, 0], [3, 2, 3], SKIN_M, group="hand"))
+add(part("thumb_l", "hand_l", [3.75, 10.9, 0.9], [0.6, 1.4, 1.0], SKIN_M, group="thumb"))
+add(part("thumb_r", "hand_r", [-3.75, 10.9, 0.9], [0.6, 1.4, 1.0], SKIN_M, group="thumb"))
+
+# ── 搬运附件（躯干前方，双手从两侧托住；只显示正在搬的那个）──
+EXTRA = [
+    # 果篮：编织篮身、篮沿、篮里的橄榄
+    part("basket_body", "carry_basket", [0, 14.4, 5.4], [6.0, 3.2, 4.0], WICKER),
+    part("basket_rim", "carry_basket", [0, 16.15, 5.4], [6.4, 0.5, 4.4], RIM),
+    part("basket_olives", "carry_basket", [0, 16.0, 5.4], [5.4, 0, 3.4], OLIVE, kind="single_plane", normal=[0, 1, 0]),
+    # 木料：两根原木横担
+    part("wood_log_low", "carry_wood", [0, 14.0, 5.2], [8.6, 2.2, 2.2], WOOD, group="wood_log"),
+    part("wood_log_high", "carry_wood", [0.4, 16.1, 5.0], [8.6, 2.2, 2.2], WOOD, group="wood_log"),
+    # 石料：一块方石
+    part("stone_block", "carry_stone", [0, 14.8, 5.4], [5.0, 4.0, 4.2], MARBLE),
+    # 黏土：一团湿黏土
+    part("clay_lump", "carry_clay", [0, 14.6, 5.4], [4.4, 3.2, 3.8], CLAY),
+    part("clay_lump_top", "carry_clay", [0.3, 16.5, 5.3], [3.0, 0.8, 2.8], CLAY),
+]
+
+
+def main():
+    pivots = {b[0]: b[2] for b in BONES}
+    d = {
+        "id": "VI-GR-RES-01",
+        "name": "希腊居民（通用身体）",
+        "model": "resident",
+        "height_limit_u": 31.6,
+        "atlas": 256,
+        "texels_per_unit": 2,
+        "collision_proposal_blocks": [0.6, 1.95, 0.6],
+        "coordinate_system": "X anatomical left; Y up; Z forward; model rest coordinates; 16 units per block",
+        "bones": [],
+        "extra_bones": [],
+        "parts": PARTS,
+        "extra_parts": EXTRA,
+        "skin_female": SKIN_F,
+    }
+    for bid, parent, pivot in BONES:
+        pp = pivots[parent] if parent else [0, 0, 0]
+        d["bones"].append({"id": bid, "parent": parent, "pivot_model_units": pivot,
+                           "pivot_parent_local_units": [round(pivot[i] - pp[i], 4) for i in range(3)]})
+    d["attachments"] = [{"id": a, "bone": b, "position_model_units": p,
+                         "position_bone_local_units": [round(p[i] - pivots[b][i], 4) for i in range(3)]}
+                        for a, b, p in ATTACHMENTS]
+    d["revisions"] = ["T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
+                      "女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"]
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"部件 {len(PARTS)} + 附加 {len(EXTRA)} = {len(PARTS) + len(EXTRA)} 个方块")
+
+
+if __name__ == "__main__":
+    main()

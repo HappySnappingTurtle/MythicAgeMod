@@ -144,6 +144,16 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
+        // 居民框架（T19）
+        io.github.happysnappingturtle.mythicage.village.work.BasicJobTypes.registerAll();
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageData::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityJoin);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityLeave);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.resident.ResidentHostility::onEntityJoin);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.work.PointEvents::onBreak);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.VillageDevCommand::onRegisterCommands);
 
         // 晋升、立祀、改奉与主神像（T11a）
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteTables::onAddReloadListeners);

@@ -71,6 +71,9 @@ public final class VillagePopulation {
             return;
         }
         for (VillageRegistry.Village v : VillageRegistry.get(server).all()) {
+            if (residentFramework(v)) {
+                continue;
+            }
             ServerLevel level = server.getLevel(v.bell().dimension());
             if (level != null && level.isLoaded(v.bell().pos())) {
                 step(level, v, playerNear(level, v.bell().pos()), level.getRandom(), SPAWN_MIN, SPAWN_MAX);
@@ -96,6 +99,12 @@ public final class VillagePopulation {
             }
             return false;
         });
+    }
+
+    /** 生成的文明村庄由居民框架管人口（T19），这里不再往里放原版无业村民。 */
+    public static boolean residentFramework(VillageRegistry.Village v) {
+        return v.origin() == VillageRegistry.Origin.GENERATED
+                && io.github.happysnappingturtle.mythicage.village.work.VillageData.civ(v.civ()).isPresent();
     }
 
     /** 一次检查：必要时补记基线、更新「需要更多住居」、按判定生成移民。返回判定。 */

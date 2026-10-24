@@ -1,0 +1,79 @@
+{
+  "_doc": "希腊城邦村的经济数据（T19 设计文档 §11.1；V3-希腊-居民 §2、§4、§8）。配方在 village_recipe/greek/，职业在 village_profession/greek/。",
+  "behavior": "greek",
+  "schedule": {
+    "segments": [
+      {"id": "dawn", "from": 23000, "to": 24000},
+      {"id": "work", "from": 0, "to": 6000},
+      {"id": "lunch", "from": 6000, "to": 6400},
+      {"id": "work", "from": 6400, "to": 11000},
+      {"id": "evening", "from": 11000, "to": 12000},
+      {"id": "supper", "from": 12000, "to": 13000},
+      {"id": "sleep", "from": 13000, "to": 23000}
+    ],
+    "overlays": [{"id": "ritual", "from": 2000, "to": 9000}]
+  },
+  "calendar": {
+    "yearDays": 12,
+    "periods": [
+      {"id": "sowing", "days": 3},
+      {"id": "growing", "days": 3},
+      {"id": "harvest", "days": 3},
+      {"id": "vintage", "days": 3}
+    ],
+    "special": {"2": "genesia", "5": "oracle", "8": "oracle", "9": "polis_festival", "11": "oracle", "12": "rural_dionysia"}
+  },
+  "storage": {"base": 256, "unit": 512},
+  "rations": {
+    "floor": 24,
+    "portions": {
+      "mythic_age:olive_flatbread": 1.0,
+      "mythic_age:greek_travel_meal": 1.5,
+      "mythic_age:grape_platter": 0.5,
+      "minecraft:bread": 1.0,
+      "minecraft:cooked_cod": 0.5,
+      "minecraft:cooked_salmon": 0.5
+    }
+  },
+  "fuel": {
+    "minecraft:charcoal": 1,
+    "mythic_age:olive_log": 1,
+    "minecraft:oak_log": 1,
+    "minecraft:birch_log": 1,
+    "minecraft:spruce_log": 1
+  },
+  "points": {
+    "clay": {
+      "outputs": {"minecraft:clay_ball": 4}, "take": 4, "max": 48, "recover": 4,
+      "anim": "dig", "ticks": 30, "professions": ["greek:potter", "greek:laborer"], "perDay": 3
+    }
+  },
+  "crops": {
+    "crop": {
+      "anim": "scythe_harvest", "ticks": 10, "batch": 8, "replant": "minecraft:wheat_seeds",
+      "expected": {"minecraft:wheat": 1, "minecraft:wheat_seeds": 1}, "perAnchorPerDay": 0.5,
+      "professions": ["greek:farmer", "greek:laborer"]
+    }
+  },
+  "residents": {
+    "initial": {"greek:farmer": 2, "greek:potter": 1},
+    "fallback": "greek:laborer",
+    "keeper": "greek:laborer",
+    "_sources": "人名都是古希腊有实据的人名：男名多见于雅典的史家与演说家记载（修昔底德、色诺芬、吕西阿斯），女名取自雅典墓碑（凯拉米克斯的赫革索碑、谟涅萨瑞忒碑、安法瑞忒碑、法诺斯特拉忒碑）与女诗人（科林娜、埃林娜、阿妮忒、普拉克西拉、忒勒西拉）。参见 Lexicon of Greek Personal Names（Oxford，lgpn.ox.ac.uk）。",
+    "male": ["Nikias", "Kleon", "Theron", "Lysias", "Demetrios", "Philon", "Kallias", "Ariston", "Hippias", "Timon",
+             "Glaukos", "Menon", "Phaidros", "Kritias", "Xenon", "Dion", "Agathon", "Euthymos", "Charmides", "Lykon",
+             "Nikomachos", "Sosias", "Thrasyllos", "Polemon", "Alkimos", "Antiphon", "Diokles", "Eukleides", "Hermon", "Kephalos",
+             "Lamachos", "Meidias", "Nikostratos", "Pasion", "Sostratos", "Teisias", "Chares", "Archias", "Epikrates", "Phormion"],
+    "female": ["Hegeso", "Mnesarete", "Ampharete", "Phanostrate", "Archippe", "Myrrhine", "Nikarete", "Glykera", "Theodote", "Aspasia",
+               "Agariste", "Elpinike", "Timarete", "Kallisto", "Thaleia", "Chrysis", "Malthake", "Hedyle", "Erinna", "Anyte",
+               "Korinna", "Melissa", "Phaidra", "Damarete", "Lampito", "Gorgo", "Kyniska", "Melitta", "Nikippe", "Phila",
+               "Rhodope", "Theano", "Xenokleia", "Praxilla", "Telesilla", "Myrtis", "Kleino", "Arete", "Habrotonon", "Philinna"]
+  },
+  "initialStock": {
+    "mythic_age:olive_planks": 16,
+    "mythic_age:marble": 16,
+    "minecraft:clay_ball": 8,
+    "mythic_age:olive_flatbread": 32,
+    "mythic_age:ceramic_component": 4
+  }
+}

@@ -153,7 +153,10 @@ public final class VillageRegistration {
         return all.stream().allMatch(a -> level.isLoaded(VillageInfoPiece.block(a)));
     }
 
-    /** 生成祭司（若该钟还没有祭司）与每个床位一名原版无业村民。返回生成的村民数。 */
+    /**
+     * 生成祭司（若该钟还没有祭司）与每个床位一名居民（T19：有本框架数据的文明生成居民；没有数据的文明仍是过渡用的原版无业村民）。
+     * 返回生成的人数。
+     */
     public static int populate(ServerLevel level, VillagePlans.Plan p) {
         BlockPos bell = VillageInfoPiece.block(p.info().center());
         Optional<Civilization> civ = Civilization.byId(p.info().civ());
@@ -161,6 +164,13 @@ public final class VillageRegistration {
         if (civ.isPresent() && !guardian.isEmpty() && GuardianSpawner.hasGuardian(civ.get())
                 && GuardianRegistry.get(level.getServer()).byBell(level.dimension(), bell).isEmpty()) {
             GuardianSpawner.spawnNew(level, VillageInfoPiece.block(guardian.get(0)), Optional.of(bell), civ.get());
+        }
+        Optional<VillageRegistry.Village> village = VillageRegistry.get(level.getServer()).byId(p.village());
+        Optional<io.github.happysnappingturtle.mythicage.core.village.CivVillageData> data =
+                io.github.happysnappingturtle.mythicage.village.work.VillageData.civ(p.info().civ());
+        if (village.isPresent() && data.isPresent()) {
+            return io.github.happysnappingturtle.mythicage.village.resident.Residents.spawnInitial(level, village.get(), p,
+                    data.get());
         }
         int n = 0;
         for (Pos home : p.anchors("home")) {

@@ -115,7 +115,7 @@ public final class ConductEvents {
         if (victim instanceof GuardianEntity) {
             return Category.GUARDIAN;
         }
-        if (victim instanceof Villager) {
+        if (victim instanceof Villager || victim instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity) {
             return Category.VILLAGER;
         }
         if (victim instanceof VillageDefender) {

@@ -83,6 +83,16 @@ public final class ClientHooks {
         io.github.happysnappingturtle.mythicage.client.power.ClientAuras.accept(payload);
     }
 
+    /** 村务界面（T19）：已开着就刷新。 */
+    public static void villageAffairs(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.VillageAffairsScreen open) {
+            open.update(payload.view());
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.VillageAffairsScreen(payload.view()));
+        }
+    }
+
     /** 天马天眼（T14 阶段 ②）。 */
     public static void skyEye(io.github.happysnappingturtle.mythicage.summon.SkyEyePayload payload) {
         ClientSkyEye.accept(payload);
