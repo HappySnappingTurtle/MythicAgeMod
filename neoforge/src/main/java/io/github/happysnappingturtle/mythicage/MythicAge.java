@@ -150,6 +150,7 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageData::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.build.Construction::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityJoin);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityLeave);
         game.addListener(io.github.happysnappingturtle.mythicage.village.resident.ResidentHostility::onEntityJoin);

@@ -35,6 +35,17 @@ public final class VillageBuildings extends SimpleJsonResourceReloadListener {
         return specs;
     }
 
+    /** 只供 GameTest：加上（或去掉，spec 为 null 时按 id）一份建筑数据。 */
+    public static synchronized void putForTest(String id, BuildingSpec spec) {
+        Map<String, BuildingSpec> next = new HashMap<>(specs);
+        if (spec == null) {
+            next.remove(id);
+        } else {
+            next.put(id, spec);
+        }
+        specs = Map.copyOf(next);
+    }
+
     /** 已有正式模板的文明（有核心建筑「广场」）。 */
     public static Set<String> civsWithTemplates() {
         return specs.values().stream().filter(s -> s.id().endsWith(":agora")).map(BuildingSpec::civ)
@@ -53,6 +64,7 @@ public final class VillageBuildings extends SimpleJsonResourceReloadListener {
             }
         });
         specs = Map.copyOf(next);
+        io.github.happysnappingturtle.mythicage.village.build.Blueprint.clear();
         MythicAge.LOGGER.info("村庄建筑数据：{} 份", next.size());
     }
 }

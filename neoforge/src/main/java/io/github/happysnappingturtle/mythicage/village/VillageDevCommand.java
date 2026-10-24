@@ -3,9 +3,12 @@ package io.github.happysnappingturtle.mythicage.village;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import io.github.happysnappingturtle.mythicage.village.build.Construction;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
+import io.github.happysnappingturtle.mythicage.village.work.VillageContext;
 import io.github.happysnappingturtle.mythicage.village.work.VillageScheduler;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -28,6 +31,9 @@ import java.util.Optional;
  * /mythicage dev village add &lt;物品&gt; &lt;数量&gt;   往村库里加（开发环境）
  * /mythicage dev village run &lt;true|false&gt;     强制真实运行 / 未运行（开发环境；用来测离线补算）
  * /mythicage dev village process              立刻调度一次
+ * /mythicage dev village project status|pick|cancel        施工项目（T19 阶段 ③）
+ * /mythicage dev village project start &lt;建筑&gt; [地块]     开指定建筑的项目
+ * /mythicage dev village project drop &lt;段数&gt;             不等居民，直接落段（拍图用）
  * </pre>
  */
 public final class VillageDevCommand {
@@ -45,6 +51,33 @@ public final class VillageDevCommand {
             c.getSource().sendFailure(Component.translatable("commands.mythic_age.village.none"));
         }
         return v;
+    }
+
+    private static int withCtx(CommandContext<CommandSourceStack> c, java.util.function.Consumer<VillageContext> run) {
+        return here(c).flatMap(v -> VillageScheduler.contextOf(c.getSource().getLevel(), v.id())).map(ctx -> {
+            run.accept(ctx);
+            return 1;
+        }).orElse(0);
+    }
+
+    /** 开一个指定建筑的项目：替换类找可替换的旧建筑；否则用给定的地块，或第一块放得下的空地块。 */
+    private static void start(CommandContext<CommandSourceStack> c, VillageContext ctx, String building, String plot) {
+        var spec = io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(building);
+        if (spec == null) {
+            c.getSource().sendFailure(Component.literal("没有建筑 " + building));
+            return;
+        }
+        String replaces = "";
+        String plotId = plot == null ? "" : plot;
+        if (!spec.replace().isEmpty()) {
+            replaces = Construction.replaceableForCommand(ctx, spec).orElse("");
+        } else if (plotId.isEmpty()) {
+            plotId = Construction.firstPlotFor(ctx, spec).orElse("");
+        }
+        var p = Construction.start(ctx, new io.github.happysnappingturtle.mythicage.core.village.build.ProjectPicker.Pick(building,
+                plotId, spec.god().equals("*") ? "apollo" : spec.god(), replaces));
+        c.getSource().sendSuccess(() -> Component.literal(p.map(x -> "开工：" + x.building + " @ " + x.origin + " " + x.turn
+                + " 段 " + x.segments + " 账单 " + x.bill()).orElse("开不了工")), false);
     }
 
     static void register(CommandDispatcher<CommandSourceStack> d, CommandBuildContext build) {
@@ -102,6 +135,49 @@ public final class VillageDevCommand {
                             boolean r = VillageScheduler.processNowForTest(c.getSource().getLevel(), v.id());
                             c.getSource().sendSuccess(() -> Component.literal("processed, running = " + r), false);
                             return 1;
-                        }).orElse(0))))));
+                        }).orElse(0)))
+                        .then(Commands.literal("project")
+                                .then(Commands.literal("status").executes(c -> withCtx(c, ctx -> {
+                                    String msg = ctx.state().activeProject().map(p -> p.building + " " + p.state + " 段 "
+                                            + p.placed.cardinality() + "/" + p.segments + " 缺 " + p.missing() + " 账单 " + p.bill()
+                                            + (p.blockedAt == null ? "" : " 停工 " + p.blockedAt)).orElse("没有进行中的项目");
+                                    c.getSource().sendSuccess(() -> Component.literal(msg + " · 已建 " + ctx.state().constructed.size()
+                                            + " · 储备 " + ctx.state().constructionBank), false);
+                                })))
+                                .then(Commands.literal("pick").executes(c -> withCtx(c, ctx -> {
+                                    var p = Construction.daily(ctx);
+                                    c.getSource().sendSuccess(() -> Component.literal(p.map(x -> "开工：" + x.building + " @ " + x.origin)
+                                            .orElse("没有可选的项目")), false);
+                                })))
+                                .then(Commands.literal("start").then(Commands.argument("building", StringArgumentType.string())
+                                        .executes(c -> withCtx(c, ctx -> start(c, ctx, StringArgumentType.getString(c, "building"), null)))
+                                        .then(Commands.argument("plot", StringArgumentType.string()).executes(c -> withCtx(c, ctx ->
+                                                start(c, ctx, StringArgumentType.getString(c, "building"), StringArgumentType.getString(c, "plot")))))))
+                                .then(Commands.literal("drop").then(Commands.argument("count", IntegerArgumentType.integer(1, 10000))
+                                        .executes(c -> withCtx(c, ctx -> ctx.state().activeProject().ifPresent(p -> {
+                                            int n = IntegerArgumentType.getInteger(c, "count");
+                                            int done = 0;
+                                            Construction.Result last = null;
+                                            for (int i = 0; i < p.segments && done < n && p.active(); i++) {
+                                                if (p.placed.get(i)) {
+                                                    continue;
+                                                }
+                                                if (p.state == io.github.happysnappingturtle.mythicage.core.village.build.BuildProject.State.STOCKING) {
+                                                    Construction.tick(ctx);
+                                                }
+                                                last = Construction.drop(ctx, p, i);
+                                                if (last != Construction.Result.PLACED) {
+                                                    break;
+                                                }
+                                                done++;
+                                            }
+                                            int fd = done;
+                                            Construction.Result fl = last;
+                                            c.getSource().sendSuccess(() -> Component.literal("落了 " + fd + " 段，最后 " + fl), false);
+                                        }))))))
+                                .then(Commands.literal("cancel").executes(c -> withCtx(c, ctx -> ctx.state().activeProject().ifPresent(p -> {
+                                    var back = Construction.cancel(ctx, p);
+                                    c.getSource().sendSuccess(() -> Component.literal("取消，退回 " + back), false);
+                                })))))));
     }
 }

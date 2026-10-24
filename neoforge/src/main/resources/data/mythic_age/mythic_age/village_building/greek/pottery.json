@@ -8,6 +8,11 @@
     9
   ],
   "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    0
+  ],
   "category": "profession",
   "stage": "archaic",
   "generated": true,

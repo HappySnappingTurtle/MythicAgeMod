@@ -1,0 +1,77 @@
+{
+  "id": "greek:stoa",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/stoa",
+  "size": [
+    23,
+    9,
+    9
+  ],
+  "floor_y": 0,
+  "frame": [
+    -1,
+    0,
+    -1
+  ],
+  "category": "stage",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "market"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "merchant": 4
+  },
+  "priority": 40,
+  "anchors": {
+    "merchant": [
+      [
+        3,
+        1,
+        3
+      ],
+      [
+        8,
+        1,
+        3
+      ],
+      [
+        13,
+        1,
+        3
+      ],
+      [
+        18,
+        1,
+        3
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:smooth_marble": 190,
+    "mythic_age:terracotta_roof_slab": 168,
+    "mythic_age:polished_marble": 147,
+    "mythic_age:smooth_marble_slab": 111,
+    "mythic_age:greek_pediment": 30,
+    "mythic_age:marble_architrave": 21,
+    "mythic_age:terracotta_ridge": 21,
+    "mythic_age:marble_column": 20,
+    "mythic_age:marble_column_base": 10,
+    "mythic_age:doric_capital": 10,
+    "mythic_age:pithos": 6,
+    "mythic_age:greek_oil_lamp": 4,
+    "minecraft:barrel": 1,
+    "minecraft:hay_block": 1
+  },
+  "door": {
+    "pos": [
+      11,
+      0,
+      7
+    ],
+    "facing": "south"
+  }
+}

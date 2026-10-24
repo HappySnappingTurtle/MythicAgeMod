@@ -400,6 +400,7 @@ def export_template(b: Building, short: str, meta: dict, civ="greek"):
         "template": f"mythic_age:village/{civ}/{short}",
         "size": list(size),
         "floor_y": -y0,
+        "frame": [x0, y0, z0],
         **{k: v for k, v in meta.items() if k != "door"},
         "anchors": {name: [rel(p) for p in pts] for name, pts in sorted(b.anchors.items())},
         "materials": dict(sorted(materials.items(), key=lambda kv: -kv[1])),

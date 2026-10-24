@@ -8,6 +8,11 @@
     7
   ],
   "floor_y": 4,
+  "frame": [
+    1,
+    -4,
+    2
+  ],
   "category": "terrain",
   "stage": "archaic",
   "generated": true,

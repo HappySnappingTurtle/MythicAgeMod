@@ -1,0 +1,63 @@
+{
+  "id": "greek:bronze_workshop",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/bronze_workshop",
+  "size": [
+    11,
+    9,
+    12
+  ],
+  "floor_y": 4,
+  "frame": [
+    -1,
+    -4,
+    -1
+  ],
+  "category": "profession",
+  "stage": "heroic",
+  "generated": false,
+  "plot_kinds": [
+    "workshop"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "priority": 20,
+  "anchors": {
+    "workstation": [
+      [
+        3,
+        4,
+        3
+      ],
+      [
+        5,
+        2,
+        9
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:packed_mud": 351,
+    "mythic_age:terracotta_roof_slab": 52,
+    "mythic_age:mudbrick": 30,
+    "mythic_age:terracotta_ridge": 14,
+    "mythic_age:olive_log": 9,
+    "mythic_age:bronze_furnace": 6,
+    "minecraft:clay": 3,
+    "minecraft:campfire": 3,
+    "mythic_age:greek_anvil": 1,
+    "minecraft:water_cauldron": 1,
+    "mythic_age:greek_oil_lamp": 1
+  },
+  "door": {
+    "pos": [
+      5,
+      4,
+      11
+    ],
+    "facing": "south"
+  }
+}

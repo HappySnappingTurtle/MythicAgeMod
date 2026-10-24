@@ -26,6 +26,13 @@ public final class OnlinePlayers {
         return p != null ? p : TEST.get(id);
     }
 
+    /** 这个维度里的在线玩家（含 GameTest 登记的 FakePlayer）。 */
+    public static java.util.List<ServerPlayer> in(net.minecraft.server.level.ServerLevel level) {
+        java.util.List<ServerPlayer> out = new java.util.ArrayList<>(level.players());
+        TEST.values().stream().filter(p -> p.level() == level && !out.contains(p)).forEach(out::add);
+        return out;
+    }
+
     public static void forTest(ServerPlayer player, boolean online) {
         if (online) {
             TEST.put(player.getUUID(), player);

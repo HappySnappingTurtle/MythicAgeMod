@@ -1,0 +1,140 @@
+{
+  "id": "greek:storehouse",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/storehouse",
+  "size": [
+    13,
+    9,
+    11
+  ],
+  "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    -1
+  ],
+  "category": "basic",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "storage"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "storage": 2
+  },
+  "priority": 20,
+  "anchors": {
+    "goods": [
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        2,
+        1,
+        8
+      ],
+      [
+        3,
+        1,
+        2
+      ],
+      [
+        3,
+        1,
+        8
+      ],
+      [
+        4,
+        1,
+        2
+      ],
+      [
+        4,
+        1,
+        8
+      ],
+      [
+        5,
+        1,
+        2
+      ],
+      [
+        5,
+        1,
+        8
+      ],
+      [
+        6,
+        1,
+        2
+      ],
+      [
+        6,
+        1,
+        8
+      ],
+      [
+        7,
+        1,
+        2
+      ],
+      [
+        7,
+        1,
+        8
+      ],
+      [
+        8,
+        1,
+        2
+      ],
+      [
+        8,
+        1,
+        8
+      ],
+      [
+        9,
+        1,
+        2
+      ],
+      [
+        9,
+        1,
+        8
+      ]
+    ],
+    "storage_keeper": [
+      [
+        9,
+        1,
+        5
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:marble_ashlar": 199,
+    "mythic_age:terracotta_roof_slab": 140,
+    "mythic_age:olive_slab": 63,
+    "mythic_age:olive_log": 36,
+    "mythic_age:polygonal_marble": 34,
+    "mythic_age:pithos": 24,
+    "minecraft:barrel": 12,
+    "mythic_age:olive_door": 4,
+    "mythic_age:olive_trapdoor": 4,
+    "mythic_age:terracotta_ridge": 3
+  },
+  "door": {
+    "pos": [
+      11,
+      1,
+      5
+    ],
+    "facing": "east"
+  }
+}

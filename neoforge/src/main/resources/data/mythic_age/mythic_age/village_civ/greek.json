@@ -100,6 +100,287 @@
     "minecraft:acacia_log": 1,
     "mythic_age:olive_stick": 4
   },
+  "buildCosts": {
+    "_doc": "施工折算（T19 设计文档 §1.4 E1）：方块 → 村库成品建材，按顺序第一条命中生效；大宗方块 8 块 = 1 件成品，特殊件单算；#组 = 组内任意物品。",
+    "free": [
+      "minecraft:air",
+      "minecraft:gravel",
+      "minecraft:sand",
+      "minecraft:water",
+      "minecraft:dirt*",
+      "minecraft:grass_block",
+      "*_leaves",
+      "minecraft:potted_*",
+      "minecraft:water_cauldron",
+      "minecraft:chain"
+    ],
+    "groups": {
+      "planks": [
+        "mythic_age:olive_planks",
+        "minecraft:oak_planks",
+        "minecraft:birch_planks",
+        "minecraft:spruce_planks",
+        "minecraft:acacia_planks"
+      ],
+      "logs": [
+        "mythic_age:olive_log",
+        "minecraft:oak_log",
+        "minecraft:birch_log",
+        "minecraft:spruce_log",
+        "minecraft:acacia_log"
+      ]
+    },
+    "rules": [
+      {
+        "match": "minecraft:white_bed",
+        "cost": {
+          "minecraft:white_wool": 0.5,
+          "#planks": 0.5
+        }
+      },
+      {
+        "match": "mythic_age:greek_statue",
+        "cost": {
+          "mythic_age:polished_marble": 2
+        }
+      },
+      {
+        "match": "*_capital",
+        "cost": {
+          "mythic_age:marble_column": 0.5
+        }
+      },
+      {
+        "match": "mythic_age:marble_column*",
+        "cost": {
+          "mythic_age:marble_column": 0.25
+        }
+      },
+      {
+        "match": "mythic_age:polygonal_marble*",
+        "cost": {
+          "mythic_age:polygonal_marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:polished_marble*",
+        "cost": {
+          "mythic_age:polished_marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:smooth_marble*",
+        "cost": {
+          "mythic_age:polished_marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:blue_meander_marble",
+        "cost": {
+          "mythic_age:polished_marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:pebble_mosaic",
+        "cost": {
+          "mythic_age:polished_marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:marble",
+        "cost": {
+          "mythic_age:marble": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:pediment_*",
+        "cost": {
+          "mythic_age:marble_ashlar": 0.5
+        }
+      },
+      {
+        "match": "mythic_age:marble_*",
+        "cost": {
+          "mythic_age:marble_ashlar": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:greek_pediment",
+        "cost": {
+          "mythic_age:marble_ashlar": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:triglyph_frieze",
+        "cost": {
+          "mythic_age:marble_ashlar": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:terracotta_*",
+        "cost": {
+          "mythic_age:terracotta_roof_tiles": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:plaster*",
+        "cost": {
+          "minecraft:clay_ball": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:mudbrick",
+        "cost": {
+          "minecraft:clay_ball": 0.125
+        }
+      },
+      {
+        "match": "minecraft:packed_mud",
+        "cost": {
+          "minecraft:clay_ball": 0.125
+        }
+      },
+      {
+        "match": "minecraft:clay",
+        "cost": {
+          "minecraft:clay_ball": 1
+        }
+      },
+      {
+        "match": "mythic_age:olive_log",
+        "cost": {
+          "#logs": 0.125
+        }
+      },
+      {
+        "match": "mythic_age:olive_door",
+        "cost": {
+          "#planks": 1
+        }
+      },
+      {
+        "match": "mythic_age:olive_*",
+        "cost": {
+          "#planks": 0.125
+        }
+      },
+      {
+        "match": "minecraft:barrel",
+        "cost": {
+          "#planks": 1
+        }
+      },
+      {
+        "match": "mythic_age:pithos",
+        "cost": {
+          "mythic_age:ceramic_component": 1
+        }
+      },
+      {
+        "match": "minecraft:decorated_pot",
+        "cost": {
+          "mythic_age:ceramic_component": 1
+        }
+      },
+      {
+        "match": "mythic_age:greek_oil_lamp",
+        "cost": {
+          "mythic_age:ceramic_component": 0.5
+        }
+      },
+      {
+        "match": "mythic_age:greek_brazier",
+        "cost": {
+          "mythic_age:marble_ashlar": 1
+        }
+      },
+      {
+        "match": "mythic_age:village_altar",
+        "cost": {
+          "mythic_age:marble_ashlar": 2
+        }
+      },
+      {
+        "match": "mythic_age:mason_bench",
+        "cost": {
+          "mythic_age:marble": 2
+        }
+      },
+      {
+        "match": "mythic_age:greek_anvil",
+        "cost": {
+          "mythic_age:marble_ashlar": 2
+        }
+      },
+      {
+        "match": "mythic_age:treading_vat",
+        "cost": {
+          "mythic_age:marble_ashlar": 1
+        }
+      },
+      {
+        "match": "mythic_age:bronze_furnace",
+        "cost": {
+          "minecraft:clay_ball": 2,
+          "mythic_age:ceramic_component": 1
+        }
+      },
+      {
+        "match": "mythic_age:herm_head",
+        "cost": {
+          "mythic_age:polished_marble": 1
+        }
+      },
+      {
+        "match": "mythic_age:omphalos",
+        "cost": {
+          "mythic_age:polished_marble": 1
+        }
+      },
+      {
+        "match": "mythic_age:oracle_tripod",
+        "cost": {
+          "mythic_age:ceramic_component": 2
+        }
+      },
+      {
+        "match": "minecraft:cobblestone*",
+        "cost": {
+          "mythic_age:polygonal_marble": 0.125
+        }
+      },
+      {
+        "match": "minecraft:polished_blackstone_bricks",
+        "cost": {
+          "mythic_age:polygonal_marble": 0.125
+        }
+      },
+      {
+        "match": "minecraft:*_carpet",
+        "cost": {
+          "minecraft:white_wool": 0.25
+        }
+      },
+      {
+        "match": "minecraft:*_wool",
+        "cost": {
+          "minecraft:white_wool": 1
+        }
+      },
+      {
+        "match": "minecraft:campfire",
+        "cost": {
+          "#logs": 0.5
+        }
+      },
+      {
+        "match": "minecraft:hay_block",
+        "cost": {
+          "minecraft:wheat": 1
+        }
+      }
+    ]
+  },
   "points": {
     "clay": {
       "outputs": {

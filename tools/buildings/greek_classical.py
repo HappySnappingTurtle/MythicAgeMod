@@ -39,7 +39,8 @@ def minor_shrine(god: str) -> Building:
     雅典娜圣橄榄与树下祭坛——Wikipedia「Pandroseion」；赫尔墨斯路口石堆——Wikipedia「Herm」、theoi.com「Hermes Cult」；
     阿瑞斯战利品纪念柱——Wikipedia「Tropaion」；还愿盾牌——Wikipedia「Votive offering」。
     """
-    titles = {"athena": "次神祠·雅典娜", "hermes": "次神祠·赫尔墨斯", "ares": "次神祠·阿瑞斯"}
+    titles = {"athena": "次神祠·雅典娜", "hermes": "次神祠·赫尔墨斯", "ares": "次神祠·阿瑞斯",
+              "generic": "次神祠（通用，英雄 / 神话次神用）"}
     b = Building(f"greek_shrine_{god}", titles[god])
     n = 10
     # 圣域：地面、矮围墙（peribolos），东面正中开门，门旁界石（horos）
@@ -106,10 +107,10 @@ def minor_shrine(god: str) -> Building:
         hx, hz = n + 1, 2
         b.set(hx, 0, hz, "mythic_age:marble_wall")
         b.set(hx, 1, hz, "mythic_age:marble_wall")
-        b.set(hx, 2, hz, "minecraft:chiseled_quartz_block")  # 界柱顶端的胸像（正式版做专门方块）
+        b.set(hx, 2, hz, "mythic_age:herm_head", facing="east")  # 界柱顶端的胸像
         item_frame(b, 6, 2, 2, "north", "golden_boots")
         item_frame(b, 6, 2, 8, "south", "golden_boots")
-    else:
+    elif god == "ares":
         # 圣域西北角的战利品纪念柱（tropaion）：木桩 + 横杆，挂盔、甲、盾、矛；脚下堆着缴获的兵器
         b.fill(8, 0, 2, 8, 1, 2, "beam", axis="y")
         b.commands.append('summon armor_stand ~8.5 ~2 ~2.5 {ShowArms:1b,NoBasePlate:1b,Invulnerable:1b,Rotation:[90f,0f],'
@@ -228,8 +229,8 @@ def stoneworks() -> Building:
         b.fill(3, 0, z, 3, 2, z, "beam", axis="y")
     b.fill(1, 0, 1, 1, 2, 7, "plaster")
     b.hip_roof(0, 4, 0, 8, 3)
-    b.set(2, 0, 3, "minecraft:smithing_table")  # 石作台（替身）
-    b.set(2, 0, 5, "minecraft:stonecutter")
+    b.set(2, 0, 3, "mythic_age:mason_bench", facing="east")  # 石作台 × 2（T19 换装：原为锻造台、切石机替身）
+    b.set(2, 0, 5, "mythic_age:mason_bench", facing="east")
     b.anchor("workstation", 2, 0, 4)
     # 院里：石料、半成品柱段、待运的构件
     for (x, z, h) in ((5, 2, 2), (6, 2, 1), (5, 3, 1)):
@@ -298,6 +299,9 @@ def winery() -> Building:
                 b.set(x, 1, z, "smooth_slab", type="bottom")
             else:
                 b.set(x, 1, z, "minecraft:purple_carpet")
+    # 池中央的踩葡萄池方块（T19 换装：工作站，前格朝南对着出口）
+    b.set(3, 1, 3, "mythic_age:treading_vat", facing="south", part="head")
+    b.set(3, 1, 4, "mythic_age:treading_vat", facing="south", part="foot")
     b.anchor("workstation", 3, 1, 3)
     # 出口：池南沿开口，下面接酒的陶瓮
     b.set(3, 1, 5, "minecraft:air")

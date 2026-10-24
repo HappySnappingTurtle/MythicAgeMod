@@ -1,0 +1,65 @@
+{
+  "id": "greek:oracle",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/oracle",
+  "size": [
+    11,
+    10,
+    11
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "feature",
+  "stage": "mythic",
+  "generated": false,
+  "plot_kinds": [
+    "feature"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {
+    "oracle": 1
+  },
+  "priority": 30,
+  "anchors": {
+    "oracle": [
+      [
+        4,
+        3,
+        5
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:gravel": 115,
+    "mythic_age:smooth_marble": 98,
+    "mythic_age:polished_marble": 81,
+    "mythic_age:terracotta_roof_slab": 48,
+    "mythic_age:greek_pediment": 20,
+    "mythic_age:marble_architrave": 19,
+    "mythic_age:terracotta_ridge": 8,
+    "mythic_age:marble_ashlar": 6,
+    "minecraft:water": 6,
+    "mythic_age:marble_column": 4,
+    "mythic_age:greek_oil_lamp": 2,
+    "mythic_age:marble_column_base": 2,
+    "mythic_age:ionic_capital": 2,
+    "mythic_age:marble_wall": 1,
+    "mythic_age:omphalos": 1,
+    "mythic_age:oracle_tripod": 1
+  },
+  "door": {
+    "pos": [
+      10,
+      2,
+      5
+    ],
+    "facing": "east"
+  }
+}

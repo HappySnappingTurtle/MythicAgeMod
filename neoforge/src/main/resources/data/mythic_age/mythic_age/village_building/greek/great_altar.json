@@ -1,0 +1,59 @@
+{
+  "id": "greek:great_altar",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/great_altar",
+  "size": [
+    13,
+    10,
+    13
+  ],
+  "floor_y": 0,
+  "frame": [
+    0,
+    0,
+    0
+  ],
+  "category": "stage",
+  "stage": "mythic",
+  "generated": false,
+  "plot_kinds": [
+    "altar"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "flame": 1
+  },
+  "priority": 10,
+  "anchors": {
+    "ritual": [
+      [
+        8,
+        4,
+        6
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:polished_marble": 150,
+    "mythic_age:marble_ashlar": 124,
+    "mythic_age:smooth_marble_slab": 62,
+    "mythic_age:triglyph_frieze": 41,
+    "mythic_age:marble_column": 38,
+    "mythic_age:marble_architrave": 37,
+    "mythic_age:marble_cornice": 37,
+    "mythic_age:marble_ashlar_stairs": 32,
+    "mythic_age:marble_column_base": 19,
+    "mythic_age:ionic_capital": 19,
+    "mythic_age:greek_brazier": 3
+  },
+  "door": {
+    "pos": [
+      12,
+      0,
+      6
+    ],
+    "facing": "east"
+  }
+}

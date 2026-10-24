@@ -1,0 +1,88 @@
+{
+  "id": "greek:house_court",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/house_court",
+  "size": [
+    13,
+    6,
+    13
+  ],
+  "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    -1
+  ],
+  "category": "basic",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "house"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {
+    "beds": 4
+  },
+  "priority": 30,
+  "unique": false,
+  "anchors": {
+    "home": [
+      [
+        2,
+        1,
+        4
+      ],
+      [
+        10,
+        1,
+        4
+      ],
+      [
+        2,
+        1,
+        8
+      ],
+      [
+        10,
+        1,
+        8
+      ]
+    ],
+    "yard_gate": [
+      [
+        6,
+        1,
+        11
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:plaster": 137,
+    "mythic_age:marble_ashlar": 96,
+    "mythic_age:terracotta_roof_slab": 72,
+    "mythic_age:terracotta_ridge": 72,
+    "mythic_age:olive_log": 64,
+    "mythic_age:plaster_dado": 38,
+    "mythic_age:olive_slab": 32,
+    "mythic_age:pebble_mosaic": 25,
+    "minecraft:white_bed": 12,
+    "mythic_age:olive_fence": 9,
+    "mythic_age:pithos": 3,
+    "mythic_age:olive_door": 2,
+    "minecraft:campfire": 1,
+    "mythic_age:marble_ashlar_slab": 1,
+    "minecraft:water_cauldron": 1,
+    "mythic_age:greek_oil_lamp": 1
+  },
+  "door": {
+    "pos": [
+      6,
+      1,
+      11
+    ],
+    "facing": "south"
+  }
+}

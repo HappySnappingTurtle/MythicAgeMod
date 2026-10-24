@@ -1,0 +1,95 @@
+{
+  "id": "greek:acropolis_classical_poseidon",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/acropolis_classical_poseidon",
+  "size": [
+    25,
+    13,
+    24
+  ],
+  "floor_y": 0,
+  "frame": [
+    4,
+    0,
+    -11
+  ],
+  "category": "core",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "temple_ext"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {
+    "guardian": 1
+  },
+  "priority": 50,
+  "replace": [
+    "greek:acropolis_archaic"
+  ],
+  "patron": "poseidon",
+  "anchors": {
+    "guardian": [
+      [
+        14,
+        2,
+        18
+      ]
+    ],
+    "priest_home": [
+      [
+        11,
+        0,
+        3
+      ]
+    ],
+    "ritual": [
+      [
+        25,
+        0,
+        18
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:polished_marble": 275,
+    "mythic_age:terracotta_roof_slab": 216,
+    "mythic_age:marble_ashlar": 209,
+    "mythic_age:smooth_marble": 146,
+    "mythic_age:smooth_marble_slab": 77,
+    "mythic_age:marble_cornice": 52,
+    "mythic_age:plaster": 45,
+    "mythic_age:marble_architrave": 44,
+    "mythic_age:triglyph_frieze": 44,
+    "mythic_age:greek_pediment": 30,
+    "mythic_age:olive_slab": 25,
+    "mythic_age:marble_column": 24,
+    "mythic_age:olive_log": 24,
+    "mythic_age:plaster_dado": 23,
+    "mythic_age:blue_meander_marble": 22,
+    "mythic_age:terracotta_ridge": 18,
+    "mythic_age:terracotta_antefix": 18,
+    "mythic_age:marble_column_base": 8,
+    "mythic_age:ionic_capital": 8,
+    "mythic_age:pediment_trident": 8,
+    "mythic_age:pithos": 3,
+    "minecraft:white_bed": 2,
+    "mythic_age:olive_door": 2,
+    "mythic_age:greek_statue": 2,
+    "mythic_age:olive_trapdoor": 2,
+    "mythic_age:greek_brazier": 2,
+    "mythic_age:greek_oil_lamp": 1,
+    "mythic_age:village_altar": 1
+  },
+  "door": {
+    "pos": [
+      25,
+      0,
+      18
+    ],
+    "facing": "east"
+  }
+}

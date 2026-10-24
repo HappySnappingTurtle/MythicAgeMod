@@ -2,6 +2,7 @@ package io.github.happysnappingturtle.mythicage.core.village;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.happysnappingturtle.mythicage.core.village.build.BuildCosts;
 import io.github.happysnappingturtle.mythicage.core.village.economy.Rations;
 import io.github.happysnappingturtle.mythicage.core.village.recipe.FuelTable;
 import io.github.happysnappingturtle.mythicage.core.village.recipe.VillageRecipe;
@@ -17,7 +18,7 @@ import java.util.TreeSet;
 
 /**
  * 一个文明的村庄经济数据 {@code village_civ/<civ>.json}（T19 设计文档 §2、§6、§9、§10.1）：
- * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存。
+ * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存、施工折算表（§1.4 E1）。
  * 职业与配方另有文件（{@code village_profession/<civ>/*}、{@code village_recipe/<civ>/*}）。
  */
 public record CivVillageData(String civ, String behavior, Schedule schedule, VillageCalendar calendar, int baseCapacity,
@@ -25,7 +26,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Map<String, CropKind> crops, Map<String, FruitKind> fruits, List<StationSearch> stations,
                              Woodland woodland, Map<String, NaturalPoint> naturalPoints, Residents residents,
                              Map<String, Integer> initialStock, Map<String, Profession> professions,
-                             Map<String, VillageRecipe> recipes) {
+                             Map<String, VillageRecipe> recipes, BuildCosts buildCosts) {
     /**
      * 采集点种类（建筑锚点同名）。
      *
@@ -110,7 +111,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
-                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r);
+                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts);
     }
 
     /** 生成时 {@code homes} 张床的职业分配：先按 {@code initial} 的顺序，床不够就截断，多出来的是 {@code fallback}。 */
@@ -195,7 +196,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                 integer(storage, "base", 256), integer(storage, "unit", 512),
                 o.has("rations") ? Rations.parse(o.getAsJsonObject("rations")) : Rations.none(),
                 new FuelTable(VillageRecipe.items(o, "fuel")), points, crops, fruits, stations, woodland, natural, residents,
-                VillageRecipe.items(o, "initialStock"), Map.of(), Map.of());
+                VillageRecipe.items(o, "initialStock"), Map.of(), Map.of(),
+                o.has("buildCosts") ? BuildCosts.parse(o.getAsJsonObject("buildCosts")) : BuildCosts.none());
     }
 
     public static Profession parseProfession(String id, JsonObject o) {

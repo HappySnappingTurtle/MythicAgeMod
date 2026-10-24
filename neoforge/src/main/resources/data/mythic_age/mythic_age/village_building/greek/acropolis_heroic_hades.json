@@ -1,0 +1,96 @@
+{
+  "id": "greek:acropolis_heroic_hades",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/acropolis_heroic_hades",
+  "size": [
+    29,
+    15,
+    26
+  ],
+  "floor_y": 0,
+  "frame": [
+    0,
+    0,
+    -11
+  ],
+  "category": "core",
+  "stage": "heroic",
+  "generated": false,
+  "plot_kinds": [
+    "temple_ext"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {
+    "guardian": 1
+  },
+  "priority": 40,
+  "replace": [
+    "greek:acropolis_classical"
+  ],
+  "patron": "hades",
+  "anchors": {
+    "guardian": [
+      [
+        17,
+        2,
+        18
+      ]
+    ],
+    "priest_home": [
+      [
+        15,
+        0,
+        3
+      ]
+    ],
+    "ritual": [
+      [
+        29,
+        0,
+        18
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:polished_marble": 533,
+    "mythic_age:terracotta_roof_slab": 332,
+    "mythic_age:marble_ashlar": 299,
+    "mythic_age:smooth_marble": 199,
+    "mythic_age:smooth_marble_slab": 173,
+    "mythic_age:marble_column": 150,
+    "minecraft:polished_blackstone_bricks": 76,
+    "mythic_age:marble_cornice": 68,
+    "mythic_age:marble_architrave": 60,
+    "mythic_age:triglyph_frieze": 60,
+    "mythic_age:greek_pediment": 56,
+    "mythic_age:plaster": 45,
+    "mythic_age:marble_column_base": 40,
+    "mythic_age:corinthian_capital": 30,
+    "mythic_age:blue_meander_marble": 26,
+    "mythic_age:olive_slab": 25,
+    "mythic_age:olive_log": 24,
+    "mythic_age:plaster_dado": 23,
+    "mythic_age:terracotta_ridge": 22,
+    "mythic_age:terracotta_antefix": 22,
+    "mythic_age:doric_capital": 10,
+    "mythic_age:greek_brazier": 4,
+    "mythic_age:pithos": 3,
+    "minecraft:white_bed": 2,
+    "mythic_age:olive_door": 2,
+    "mythic_age:greek_statue": 2,
+    "mythic_age:olive_trapdoor": 2,
+    "mythic_age:greek_oil_lamp": 1,
+    "mythic_age:village_altar": 1
+  },
+  "door": {
+    "pos": [
+      29,
+      0,
+      18
+    ],
+    "facing": "east"
+  }
+}

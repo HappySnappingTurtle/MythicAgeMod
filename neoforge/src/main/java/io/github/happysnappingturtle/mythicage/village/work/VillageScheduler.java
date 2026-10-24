@@ -19,6 +19,7 @@ import io.github.happysnappingturtle.mythicage.runtime.WorldClock;
 import io.github.happysnappingturtle.mythicage.village.VillagePlans;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import io.github.happysnappingturtle.mythicage.village.behavior.VillageBehavior;
+import io.github.happysnappingturtle.mythicage.village.build.Construction;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
 import io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity;
@@ -102,6 +103,11 @@ public final class VillageScheduler {
 
         public FailureBook failures() {
             return failures;
+        }
+
+        /** 下一次调度重扫工作站（施工落成后）。 */
+        public void invalidateStations() {
+            stationsDay = Long.MIN_VALUE;
         }
 
         public long lastPlan() {
@@ -189,6 +195,7 @@ public final class VillageScheduler {
     static void tick(MinecraftServer server) {
         newPathsThisTick = 0;
         Residents.drainQueue(server);
+        Construction.drain(server);
         List<VillagePlans.Plan> plans = VillagePlans.get(server).all();
         if (plans.isEmpty()) {
             return;
@@ -239,12 +246,14 @@ public final class VillageScheduler {
         initialize(ctx);
         if (!rt.wasRunning && state.lastRealTick != VillageEconomy.NEVER && now - state.lastRealTick >= CATCH_UP_MIN_TICKS) {
             catchUp(ctx, now - state.lastRealTick);
+            Construction.accrue(ctx, now - state.lastRealTick);
         }
         rt.wasRunning = true;
         state.lastRealTick = now;
         refreshStations(ctx);
         dayStart(ctx);
         rations(ctx);
+        Construction.tick(ctx);
         sleepAndWake(ctx);
         plan(ctx);
         return true;
@@ -281,7 +290,7 @@ public final class VillageScheduler {
     /** 接管：S0 库存、登记采集点（只登记一次）；容量每次重算。 */
     static void initialize(VillageContext ctx) {
         VillageEconomy.State s = ctx.state();
-        s.stock.setCapacity(ctx.data().capacity(ctx.anchors(Residents.KEEPER_ANCHOR).size()));
+        s.stock.setCapacity(ctx.data().capacity(storageUnits(ctx)));
         if (s.initialized) {
             return;
         }
@@ -291,6 +300,22 @@ public final class VillageScheduler {
         s.initialized = true;
         s.lastDay = ctx.today();
         s.log(ctx.today(), "mythic_age.village.log.founded");
+    }
+
+    /**
+     * 仓储单位：每个谷仓管事位算 1（生成的谷仓）；施工建成的建筑按 {@code provides.storage} 算（大仓库 2），
+     * 它自己带来的管事位不重复计（T19 §1.1 的过渡算法到阶段 ③ 改成这样）。
+     */
+    static int storageUnits(VillageContext ctx) {
+        int units = ctx.anchors(Residents.KEEPER_ANCHOR).size();
+        for (VillageEconomy.Built b : ctx.state().constructed) {
+            io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spec =
+                    io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(b.building());
+            if (spec != null) {
+                units += spec.provides().getOrDefault("storage", 0) - spec.anchors(Residents.KEEPER_ANCHOR).size();
+            }
+        }
+        return Math.max(0, units);
     }
 
     /** 按建筑锚点登记采集点（已有的不动；数据里新加的种类在下一个 MC 日补上）。 */
@@ -333,6 +358,7 @@ public final class VillageScheduler {
         anchoredPoints(ctx);
         natural(ctx);
         ctx.behavior().onDayStart(ctx);
+        Construction.daily(ctx);
     }
 
     /** 晚饭段：每人 1 份（行为模块可在节庆日改为 2 份，见 {@link #rationsPerPerson}）。同一 MC 日只扣一次。 */
@@ -416,6 +442,7 @@ public final class VillageScheduler {
             if (escrow.isEmpty() || !ctx.state().stock.reserve(j.escrowId(), escrow.get())) {
                 continue;
             }
+            j = io.github.happysnappingturtle.mythicage.village.build.BuildJob.withBankedTicks(ctx, j);
             r.assign(j);
             rt.active.put(r.getUUID(), j);
             assigned++;
@@ -489,6 +516,11 @@ public final class VillageScheduler {
 
     public static void onInteract(ServerPlayer player, ResidentEntity resident) {
         VillageAffairs.onResidentInteract(player, resident);
+    }
+
+    /** 村庄此刻的上下文（施工落段用）。 */
+    public static Optional<VillageContext> contextOf(ServerLevel level, UUID village) {
+        return contextForTest(level, village);
     }
 
     static Optional<VillageContext> contextOf(ServerLevel level, ResidentEntity resident) {

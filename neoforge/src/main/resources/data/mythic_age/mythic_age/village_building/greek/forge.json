@@ -1,0 +1,65 @@
+{
+  "id": "greek:forge",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/forge",
+  "size": [
+    11,
+    9,
+    11
+  ],
+  "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    -1
+  ],
+  "category": "profession",
+  "stage": "mythic",
+  "generated": false,
+  "plot_kinds": [
+    "workshop"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "priority": 20,
+  "anchors": {
+    "workstation": [
+      [
+        5,
+        1,
+        3
+      ],
+      [
+        7,
+        1,
+        5
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:terracotta_roof_slab": 119,
+    "mythic_age:mudbrick": 87,
+    "mythic_age:marble_ashlar": 81,
+    "mythic_age:olive_log": 32,
+    "mythic_age:plaster_dado": 29,
+    "mythic_age:bronze_furnace": 2,
+    "mythic_age:greek_anvil": 2,
+    "minecraft:water_cauldron": 1,
+    "minecraft:clay": 1,
+    "mythic_age:smooth_marble_slab": 1,
+    "mythic_age:greek_oil_lamp": 1,
+    "mythic_age:terracotta_ridge": 1,
+    "minecraft:campfire": 1
+  },
+  "door": {
+    "pos": [
+      9,
+      1,
+      5
+    ],
+    "facing": "east"
+  }
+}

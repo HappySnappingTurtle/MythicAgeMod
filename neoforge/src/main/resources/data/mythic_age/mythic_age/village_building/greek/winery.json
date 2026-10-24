@@ -1,0 +1,66 @@
+{
+  "id": "greek:winery",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/winery",
+  "size": [
+    11,
+    7,
+    11
+  ],
+  "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    -1
+  ],
+  "category": "feature",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "workshop"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "priority": 60,
+  "requires": [
+    "anchor:trellis"
+  ],
+  "anchors": {
+    "workstation": [
+      [
+        4,
+        2,
+        4
+      ],
+      [
+        4,
+        1,
+        8
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:terracotta_roof_slab": 120,
+    "mythic_age:marble_ashlar": 81,
+    "mythic_age:plaster": 34,
+    "mythic_age:polished_marble": 25,
+    "mythic_age:plaster_dado": 17,
+    "mythic_age:smooth_marble_slab": 15,
+    "mythic_age:pithos": 12,
+    "mythic_age:olive_log": 9,
+    "minecraft:purple_carpet": 7,
+    "mythic_age:treading_vat": 2,
+    "mythic_age:greek_oil_lamp": 1,
+    "mythic_age:terracotta_ridge": 1
+  },
+  "door": {
+    "pos": [
+      5,
+      1,
+      9
+    ],
+    "facing": "south"
+  }
+}

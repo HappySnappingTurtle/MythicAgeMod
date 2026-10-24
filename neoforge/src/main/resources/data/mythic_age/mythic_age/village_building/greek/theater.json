@@ -1,0 +1,59 @@
+{
+  "id": "greek:theater",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/theater",
+  "size": [
+    21,
+    8,
+    18
+  ],
+  "floor_y": 1,
+  "frame": [
+    0,
+    -1,
+    0
+  ],
+  "category": "feature",
+  "stage": "heroic",
+  "generated": false,
+  "plot_kinds": [
+    "theater"
+  ],
+  "terrain": [
+    "slope"
+  ],
+  "provides": {
+    "festival": 1
+  },
+  "priority": 50,
+  "anchors": {
+    "festival": [
+      [
+        10,
+        1,
+        11
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:marble_ashlar": 597,
+    "mythic_age:marble_stairs": 192,
+    "mythic_age:smooth_marble": 114,
+    "mythic_age:polished_marble": 86,
+    "mythic_age:terracotta_roof_slab": 38,
+    "mythic_age:terracotta_ridge": 30,
+    "mythic_age:smooth_marble_slab": 15,
+    "mythic_age:marble_column_base": 7,
+    "mythic_age:marble_column": 7,
+    "mythic_age:doric_capital": 7,
+    "mythic_age:greek_brazier": 1
+  },
+  "door": {
+    "pos": [
+      10,
+      1,
+      16
+    ],
+    "facing": "south"
+  }
+}

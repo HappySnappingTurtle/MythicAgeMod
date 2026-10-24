@@ -1,0 +1,66 @@
+{
+  "id": "greek:shrine_ares",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/shrine_ares",
+  "size": [
+    11,
+    9,
+    11
+  ],
+  "floor_y": 1,
+  "frame": [
+    0,
+    -1,
+    0
+  ],
+  "category": "stage",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "shrine"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "priority": 0,
+  "god": "ares",
+  "anchors": {
+    "shrine": [
+      [
+        9,
+        1,
+        5
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:gravel": 72,
+    "mythic_age:smooth_marble": 72,
+    "mythic_age:marble_ashlar": 49,
+    "mythic_age:polished_marble": 46,
+    "mythic_age:polygonal_marble_wall": 36,
+    "mythic_age:terracotta_roof_slab": 36,
+    "mythic_age:greek_pediment": 20,
+    "mythic_age:marble_architrave": 15,
+    "mythic_age:terracotta_ridge": 6,
+    "mythic_age:marble_column": 4,
+    "mythic_age:smooth_marble_slab": 3,
+    "minecraft:barrel": 2,
+    "mythic_age:olive_log": 2,
+    "mythic_age:greek_statue": 2,
+    "mythic_age:greek_oil_lamp": 2,
+    "mythic_age:marble_column_base": 2,
+    "mythic_age:doric_capital": 2,
+    "mythic_age:greek_brazier": 1
+  },
+  "door": {
+    "pos": [
+      10,
+      1,
+      5
+    ],
+    "facing": "east"
+  }
+}

@@ -53,6 +53,7 @@ public final class BasicJobTypes {
         JobType.register(new Leisure());
         JobType.register(new GoHome());
         LandJobTypes.registerAll();
+        JobType.register(new io.github.happysnappingturtle.mythicage.village.build.BuildJob());
     }
 
     static boolean working(VillageContext ctx) {

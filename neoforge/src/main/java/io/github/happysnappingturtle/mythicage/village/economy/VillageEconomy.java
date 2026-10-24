@@ -1,6 +1,10 @@
 package io.github.happysnappingturtle.mythicage.village.economy;
 
 import io.github.happysnappingturtle.mythicage.MythicAge;
+import io.github.happysnappingturtle.mythicage.core.village.build.BuildPlacement;
+import io.github.happysnappingturtle.mythicage.core.village.build.BuildProject;
+import io.github.happysnappingturtle.mythicage.core.village.gen.Box;
+import io.github.happysnappingturtle.mythicage.core.village.gen.Turn;
 import io.github.happysnappingturtle.mythicage.core.village.economy.VillageStock;
 import io.github.happysnappingturtle.mythicage.core.village.gen.Pos;
 import io.github.happysnappingturtle.mythicage.core.village.resource.ResourcePoint;
@@ -24,8 +28,8 @@ import java.util.UUID;
 
 /**
  * 村庄运行数据（T19 设计文档 §2.2，D2）：SavedData {@code mythic_age_village_economy}，按村庄 id 存一份 {@link State}。
- * 和村庄规划分开：规划是生成时定下的结构，这里是每刻都在变的库存、名册、资源点。
- * 读档时所有工作单的托管退回库存（工作单不存进度，V1 §4.3）。
+ * 和村庄规划分开：规划是生成时定下的结构，这里是每刻都在变的库存、名册、资源点、施工项目（阶段 ③）。
+ * 读档时所有工作单的托管退回库存（工作单不存进度，V1 §4.3）；施工项目的托管（{@code project:}）保留，项目按段续上。
  */
 public final class VillageEconomy extends SavedData {
     public static final String NAME = "mythic_age_village_economy";
@@ -51,6 +55,17 @@ public final class VillageEconomy extends SavedData {
     public record LogEntry(long day, String key, List<String> args) {
     }
 
+    /** 施工建成的建筑（T19 阶段 ③）：原地替换时按它找旧建筑；容量、次神祠、唯一建筑都看它。 */
+    public record Built(String building, Pos origin, Turn turn, Box box, String plot, String god, long day) {
+        public BuildPlacement.Placed placed() {
+            return new BuildPlacement.Placed(building, origin, turn, box);
+        }
+    }
+
+    /** 落成通告（§1.4 E7）：{@code sent} 里是已经看过的玩家。 */
+    public record Notice(long day, String building, String god, Set<UUID> sent) {
+    }
+
     public static final class State {
         public final UUID village;
         public final VillageStock stock = new VillageStock(0);
@@ -66,6 +81,13 @@ public final class VillageEconomy extends SavedData {
         public long rationsDay = -1;
         /** 最近一次「每日开始」处理的 MC 日。 */
         public long lastDay = -1;
+        /** 施工项目（进行中的；建成或取消后移走）。 */
+        public final List<BuildProject> projects = new ArrayList<>();
+        public final List<Built> constructed = new ArrayList<>();
+        /** 建成的地块（PlotWatch 不再检查）。 */
+        public final Set<String> builtPlots = new LinkedHashSet<>();
+        public final List<Notice> notices = new ArrayList<>();
+        public long nextProjectId = 1;
 
         State(UUID village) {
             this.village = village;
@@ -80,6 +102,10 @@ public final class VillageEconomy extends SavedData {
 
         public Optional<Member> keeper() {
             return roster.values().stream().filter(Member::keeper).findFirst();
+        }
+
+        public Optional<BuildProject> activeProject() {
+            return projects.stream().filter(BuildProject::active).findFirst();
         }
     }
 
@@ -168,6 +194,17 @@ public final class VillageEconomy extends SavedData {
                 s.constructionBank = c.getLong("constructionBank");
                 s.rationsDay = c.getLong("rationsDay");
                 s.lastDay = c.getLong("lastDay");
+                for (Tag t2 : c.getList("projects", Tag.TAG_COMPOUND)) {
+                    s.projects.add(ProjectNbt.read((CompoundTag) t2));
+                }
+                for (Tag t2 : c.getList("constructed", Tag.TAG_COMPOUND)) {
+                    s.constructed.add(ProjectNbt.readBuilt((CompoundTag) t2));
+                }
+                c.getList("builtPlots", Tag.TAG_STRING).forEach(t2 -> s.builtPlots.add(t2.getAsString()));
+                for (Tag t2 : c.getList("notices", Tag.TAG_COMPOUND)) {
+                    s.notices.add(ProjectNbt.readNotice((CompoundTag) t2));
+                }
+                s.nextProjectId = Math.max(1, c.getLong("nextProjectId"));
                 e.states.put(s.village, s);
             } catch (RuntimeException ex) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄运行数据：{}", ex.getMessage());
@@ -244,6 +281,19 @@ public final class VillageEconomy extends SavedData {
             c.putLong("constructionBank", s.constructionBank);
             c.putLong("rationsDay", s.rationsDay);
             c.putLong("lastDay", s.lastDay);
+            ListTag projects = new ListTag();
+            s.projects.forEach(pr -> projects.add(ProjectNbt.write(pr)));
+            c.put("projects", projects);
+            ListTag built = new ListTag();
+            s.constructed.forEach(b -> built.add(ProjectNbt.writeBuilt(b)));
+            c.put("constructed", built);
+            ListTag plots = new ListTag();
+            s.builtPlots.forEach(pl -> plots.add(StringTag.valueOf(pl)));
+            c.put("builtPlots", plots);
+            ListTag notices = new ListTag();
+            s.notices.forEach(n -> notices.add(ProjectNbt.writeNotice(n)));
+            c.put("notices", notices);
+            c.putLong("nextProjectId", s.nextProjectId);
             list.add(c);
         }
         tag.put("villages", list);

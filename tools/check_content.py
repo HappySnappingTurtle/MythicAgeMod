@@ -8,7 +8,9 @@
   4. 物品与方块贴图是 16×16（带 .mcmeta 的动画贴图允许高度为宽度的整数倍；神力展示方块 block/power/ 允许 32×32；
      实体、主神像、神力表现、粒子、药水效果图标另行规定）；
   5. 原版造型换色：模型引用的换色贴图都在 assets/minecraft/atlases/blocks.json 中登记；
-     调色板键与色阶长度一致；换色结果与原版底图、以及同一底图的其他换色之间色差（CIE76 ΔE）≥ 15。
+     调色板键与色阶长度一致；换色结果与原版底图、以及同一底图的其他换色之间色差（CIE76 ΔE）≥ 15；
+  6. 村庄施工建筑（village_building 里 generated = false）：用到的方块都被文明折算表（village_civ 的 buildCosts）
+     或本建筑的 buildCosts 覆盖，折算出的物品都已实现，模板文件存在（T19 设计文档 §1.4 E1）。
 
 用法：
   python3 tools/check_content.py [--root 仓库根目录] [--design 设计 json 路径]
@@ -436,6 +438,50 @@ def check_relics(paths: Paths, report: Report) -> None:
                         report.error(f"圣物卡 {card}：{loc} 缺少 item.{MOD}.{name}.{mode}")
 
 
+def glob_match(pattern: str, block: str) -> bool:
+    """与 core BuildCosts.matches 相同：只支持 *。"""
+    import fnmatch
+    return fnmatch.fnmatchcase(block, pattern.replace("[", "[[]"))
+
+
+def check_village_buildings(paths: Paths, report: Report) -> None:
+    items = implemented_items(paths)
+    for d in paths.data():
+        civ_root = d / MOD / MOD / "village_civ"
+        bld_root = d / MOD / MOD / "village_building"
+        if not bld_root.exists():
+            continue
+        for civ_dir in sorted(p for p in bld_root.iterdir() if p.is_dir()):
+            civ_file = civ_root / f"{civ_dir.name}.json"
+            costs = json.loads(civ_file.read_text(encoding="utf-8")).get("buildCosts", {}) if civ_file.exists() else {}
+            groups = costs.get("groups", {})
+            for key, members in groups.items():
+                for it in members:
+                    if it.startswith(MOD + ":") and it not in items:
+                        report.error(f"折算表 {civ_dir.name} 组 #{key}：物品 {it} 未实现")
+            for f in sorted(civ_dir.glob("*.json")):
+                data = json.loads(f.read_text(encoding="utf-8"))
+                if data.get("generated", False):
+                    continue
+                rules = data.get("buildCosts", []) + costs.get("rules", [])
+                tpl = data["template"].split(":", 1)
+                if not (d / tpl[0] / "structure" / f"{tpl[1]}.nbt").exists():
+                    report.error(f"施工建筑 {data['id']}：模板 {data['template']} 不存在")
+                for block in data.get("materials", {}):
+                    if any(glob_match(p, block) for p in costs.get("free", [])):
+                        continue
+                    rule = next((r for r in rules if glob_match(r["match"], block)), None)
+                    if rule is None:
+                        report.error(f"施工建筑 {data['id']}：方块 {block} 没有被折算表覆盖")
+                        continue
+                    for k in rule["cost"]:
+                        if k.startswith("#"):
+                            if k[1:] not in groups:
+                                report.error(f"施工建筑 {data['id']}：折算用到未定义的物品组 {k}")
+                        elif k.startswith(MOD + ":") and k not in items:
+                            report.error(f"施工建筑 {data['id']}：折算物品 {k} 未实现")
+
+
 def run(root: Path, design: Path | None) -> Report:
     paths = Paths(root)
     report = Report()
@@ -445,6 +491,7 @@ def run(root: Path, design: Path | None) -> Report:
     check_textures(paths, report)
     check_recolor(paths, report)
     check_relics(paths, report)
+    check_village_buildings(paths, report)
     check_equipment(root, report)
     check_rigs(root, report)
     return report

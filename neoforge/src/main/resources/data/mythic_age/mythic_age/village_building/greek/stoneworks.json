@@ -1,0 +1,79 @@
+{
+  "id": "greek:stoneworks",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/stoneworks",
+  "size": [
+    9,
+    6,
+    9
+  ],
+  "floor_y": 1,
+  "frame": [
+    0,
+    -1,
+    0
+  ],
+  "category": "profession",
+  "stage": "classical",
+  "generated": false,
+  "plot_kinds": [
+    "workshop"
+  ],
+  "terrain": [
+    "flat",
+    "slope"
+  ],
+  "provides": {},
+  "priority": 10,
+  "buildCosts": [
+    {
+      "match": "mythic_age:marble_column*",
+      "cost": {
+        "mythic_age:marble": 0.25
+      }
+    },
+    {
+      "match": "*_capital",
+      "cost": {
+        "mythic_age:marble": 0.5
+      }
+    }
+  ],
+  "anchors": {
+    "quarry": [
+      [
+        6,
+        1,
+        2
+      ]
+    ],
+    "workstation": [
+      [
+        2,
+        1,
+        4
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:gravel": 83,
+    "mythic_age:terracotta_roof_slab": 40,
+    "mythic_age:polygonal_marble_wall": 31,
+    "mythic_age:plaster": 21,
+    "mythic_age:olive_log": 9,
+    "mythic_age:marble": 5,
+    "mythic_age:terracotta_ridge": 5,
+    "mythic_age:mason_bench": 2,
+    "mythic_age:marble_column": 2,
+    "mythic_age:marble_column_base": 1,
+    "mythic_age:doric_capital": 1
+  },
+  "door": {
+    "pos": [
+      4,
+      1,
+      8
+    ],
+    "facing": "south"
+  }
+}

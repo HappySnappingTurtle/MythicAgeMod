@@ -93,6 +93,7 @@ public final class VillageAffairs {
         if (s.stock.free() == 0) {
             shortages.add(AffairsView.Line.of("mythic_age.village.short.full"));
         }
+        shortages.addAll(0, projectLines(s));
         List<AffairsView.Line> log = new ArrayList<>();
         for (int i = s.log.size() - 1; i >= 0 && log.size() < 8; i--) {
             VillageEconomy.LogEntry e = s.log.get(i);
@@ -111,6 +112,41 @@ public final class VillageAffairs {
                     String.valueOf(dt.dayInPeriod()));
         }).orElse(AffairsView.Line.of("mythic_age.village.date.plain", "?"));
         return Optional.of(new AffairsView(village, title, date, s.stock.total(), s.stock.capacity(), stock, shortages, log));
+    }
+
+    /** 施工项目（T19 §1.4 E7）：进度、缺料、停工坐标。 */
+    public static List<AffairsView.Line> projectLines(VillageEconomy.State s) {
+        List<AffairsView.Line> out = new ArrayList<>();
+        s.activeProject().ifPresent(p -> {
+            io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spec =
+                    io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(p.building);
+            if (spec == null) {
+                return;
+            }
+            String name = io.github.happysnappingturtle.mythicage.village.build.Construction.nameArg(spec, p.god);
+            switch (p.state) {
+                case STOCKING -> {
+                    out.add(AffairsView.Line.of("mythic_age.village.project.stocking", name));
+                    p.missing().forEach((k, n) -> out.add(AffairsView.Line.of("mythic_age.village.project.missing",
+                            "@" + itemKey(k), String.valueOf(n))));
+                }
+                case BUILDING -> out.add(AffairsView.Line.of("mythic_age.village.project.building", name,
+                        String.valueOf(p.placed.cardinality()), String.valueOf(p.segments)));
+                case BLOCKED -> out.add(AffairsView.Line.of("mythic_age.village.project.blocked_line", name,
+                        p.blockedAt.x() + ", " + p.blockedAt.y() + ", " + p.blockedAt.z()));
+                default -> {
+                }
+            }
+        });
+        return out;
+    }
+
+    /** 物品（或 {@code #组}）的语言键。 */
+    static String itemKey(String id) {
+        if (id.startsWith("#")) {
+            return "mythic_age.village.cost_group." + id.substring(1);
+        }
+        return BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse(id)).getDescriptionId();
     }
 
     /** 捐赠主手物品：容量够多少收多少，其余留在手上。 */

@@ -8,6 +8,11 @@
     9
   ],
   "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
   "category": "patron",
   "stage": "archaic",
   "generated": true,

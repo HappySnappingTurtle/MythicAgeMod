@@ -1,0 +1,70 @@
+{
+  "id": "greek:gymnasion",
+  "civ": "greek",
+  "template": "mythic_age:village/greek/gymnasion",
+  "size": [
+    27,
+    8,
+    12
+  ],
+  "floor_y": 1,
+  "frame": [
+    -1,
+    -1,
+    -1
+  ],
+  "category": "feature",
+  "stage": "heroic",
+  "generated": false,
+  "plot_kinds": [
+    "gymnasion"
+  ],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {
+    "training": 1
+  },
+  "priority": 60,
+  "requires": [
+    "building:greek:palaestra"
+  ],
+  "anchors": {
+    "festival": [
+      [
+        13,
+        1,
+        8
+      ]
+    ],
+    "training": [
+      [
+        4,
+        1,
+        8
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:sand": 217,
+    "mythic_age:terracotta_roof_slab": 150,
+    "mythic_age:smooth_marble": 125,
+    "mythic_age:smooth_marble_slab": 75,
+    "mythic_age:marble_ashlar": 50,
+    "mythic_age:marble_column": 26,
+    "mythic_age:marble_architrave": 25,
+    "mythic_age:terracotta_ridge": 25,
+    "mythic_age:greek_pediment": 20,
+    "mythic_age:marble_column_base": 13,
+    "mythic_age:doric_capital": 13,
+    "mythic_age:polished_marble": 8
+  },
+  "door": {
+    "pos": [
+      13,
+      1,
+      11
+    ],
+    "facing": "south"
+  }
+}

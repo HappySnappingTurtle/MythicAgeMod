@@ -98,7 +98,7 @@ def bronze_workshop() -> Building:
     for x in (0, 4, 8):
         b.fill(x, 0, 3, x, 2, 3, "beam", axis="y")
     b.hip_roof(-1, 9, -1, 4, 3)
-    b.set(2, 0, 1, "minecraft:anvil", facing="east")
+    b.set(2, 0, 1, "mythic_age:greek_anvil", facing="east")
     b.set(5, 0, 1, "minecraft:water_cauldron", level=3)  # 淬火水槽
     b.anchor("workstation", 2, 0, 2)
     item_frame(b, 3, 1, 1, "south", "iron_pickaxe")
@@ -110,15 +110,16 @@ def bronze_workshop() -> Building:
                 b.set(x, -1 - d, z, "minecraft:air")
             b.set(x, -1 - depth, z, "minecraft:packed_mud")
     for x in (2, 4, 6):
-        b.set(x, -3, 9, "minecraft:blast_furnace", facing="north", lit="true")
-        b.set(x, -2, 9, "mudbrick")
+        # 青铜熔炉（两格高，T19 换装：原为高炉替身）
+        b.set(x, -3, 9, "mythic_age:bronze_furnace", facing="north", half="lower", lit="true")
+        b.set(x, -2, 9, "mythic_age:bronze_furnace", facing="north", half="upper", lit="true")
         b.set(x, -1, 9, "mudbrick")
         b.set(x, 0, 9, "minecraft:campfire", lit="true", signal_fire="false")
     b.anchor("workstation", 4, -2, 8)
     # 晾放的黏土铸模
     for (x, z) in ((7, 5), (7, 6), (1, 6)):
         b.set(x, 0, z, "minecraft:clay")
-    b.set(7, 1, 5, "minecraft:decorated_pot")
+    b.set(7, 1, 5, "lamp")  # T19：原为饰纹陶罐替身，换成陶油灯
     return b
 
 
@@ -275,20 +276,21 @@ def forge() -> Building:
     b.hip_roof(-1, 9, -1, 9, 4)
     # 大熔炉：西北角泥砖炉身 + 炉口 + 穿出屋顶的烟囱
     b.fill(1, 0, 1, 3, 2, 3, "mudbrick")
-    b.set(3, 0, 2, "minecraft:blast_furnace", facing="east", lit="true")
+    b.set(3, 0, 2, "mythic_age:bronze_furnace", facing="east", half="lower", lit="true")  # T19 换装：原为高炉替身
+    b.set(3, 1, 2, "mythic_age:bronze_furnace", facing="east", half="upper", lit="true")
     for y in range(3, 7):
         b.set(2, y, 2, "mudbrick")
     b.set(2, 7, 2, "minecraft:campfire", lit="true", signal_fire="true")
     b.anchor("workstation", 4, 0, 2)
     for (x, z) in ((5, 3), (5, 6)):
-        b.set(x, 0, z, "minecraft:anvil", facing="north")
+        b.set(x, 0, z, "mythic_age:greek_anvil", facing="north")
     b.anchor("workstation", 6, 0, 4)
     b.set(2, 0, 6, "minecraft:water_cauldron", level=3)
     item_frame(b, 1, 2, 5, "east", "iron_axe")
     item_frame(b, 1, 2, 6, "east", "iron_shovel")
     # 门旁壁龛：工匠供奉的小件与铸模
     b.set(7, 1, 7, "smooth_slab", type="top")
-    b.set(7, 2, 7, "minecraft:decorated_pot")
+    b.set(7, 2, 7, "lamp")  # T19：原为饰纹陶罐替身，换成陶油灯（供奉的小件）
     b.set(6, 1, 7, "minecraft:clay")
     return b
 
@@ -318,10 +320,9 @@ def oracle() -> Building:
     b.gable_roof(1, 8, 2, 8, top + 5)
     b.pediment_gable(9, 2, 8, top + 5, "east")
     b.pediment_gable(0, 2, 8, top + 5, "west")
-    # 内室：三足鼎（白模用炼药台代替）、肚脐石（白模用錾制石英块）、月桂（盆栽）
-    b.set(2, top, 5, "minecraft:brewing_stand")
-    b.set(2, top, 4, "minecraft:chiseled_quartz_block")
-    b.set(2, top, 6, "minecraft:potted_azalea_bush")
+    # 内室：三足鼎、肚脐石（T19 换装：原为炼药台、錾制石英块替身）；月桂盆栽等月桂方块做好再放（原为盆栽杜鹃替身）
+    b.set(2, top, 5, "mythic_age:oracle_tripod", facing="east")
+    b.set(2, top, 4, "mythic_age:omphalos", facing="east")
     b.anchor("oracle", 4, top, 5)
     # 内殿：神像与油灯
     b.set(4, top, 4, "lamp")

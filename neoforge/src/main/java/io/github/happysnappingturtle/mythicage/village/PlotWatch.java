@@ -51,13 +51,38 @@ public final class PlotWatch {
     /** 检查全部预留地块（GameTest 直接调用）。返回被占用的数量。 */
     public static int check(ServerLevel level, VillagePlans.Plan p) {
         VillagePlans plans = VillagePlans.get(level.getServer());
+        java.util.Set<String> skip = ownPlots(level, p);
         int n = 0;
         for (VillagePlan.Plot plot : p.info().plots()) {
+            if (skip.contains(plot.id())) {
+                plans.setBlocked(p.village(), plot.id(), Optional.empty());
+                continue;
+            }
             Optional<BlockPos> conflict = conflict(level, plot.box());
             plans.setBlocked(p.village(), plot.id(), conflict);
             n += conflict.isPresent() ? 1 : 0;
         }
         return n;
+    }
+
+    /**
+     * 村庄自己占着的地块不检查（T19 §1.4 E3）：已建成、正在施工的地块，以及和施工建成的建筑重叠的地块（中、大神庙用的扩建台地）。
+     */
+    static java.util.Set<String> ownPlots(ServerLevel level, VillagePlans.Plan p) {
+        java.util.Set<String> out = new java.util.HashSet<>();
+        io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(level.getServer()).peek(p.village()).ifPresent(s -> {
+            out.addAll(s.builtPlots);
+            s.projects.stream().filter(io.github.happysnappingturtle.mythicage.core.village.build.BuildProject::active)
+                    .forEach(pr -> out.add(pr.plot));
+            for (VillagePlan.Plot plot : p.info().plots()) {
+                if (s.constructed.stream().anyMatch(b -> b.box().intersectsXZ(plot.box()))
+                        || s.projects.stream().anyMatch(pr -> pr.active() && !pr.replaces.isEmpty())
+                        && plot.kind().equals("temple_ext")) {
+                    out.add(plot.id());
+                }
+            }
+        });
+        return out;
     }
 
     static Optional<BlockPos> conflict(ServerLevel level, Box b) {

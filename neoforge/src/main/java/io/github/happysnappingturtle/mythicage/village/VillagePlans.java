@@ -73,6 +73,19 @@ public final class VillagePlans extends SavedData {
         setDirty();
     }
 
+    /** 施工落成（T19 §8.6）：换上新的规划信息（锚点、已建范围），空间索引随之更新；占地记录保留。 */
+    public void updateInfo(UUID village, VillageInfoPiece.Info info) {
+        Plan old = plans.get(village);
+        if (old == null) {
+            return;
+        }
+        Map<String, net.minecraft.core.BlockPos> keep = blocked.get(village);
+        put(new Plan(old.village(), old.dim(), old.structure(), old.start(), info, old.populated()));
+        if (keep != null) {
+            blocked.put(village, keep);
+        }
+    }
+
     public void remove(UUID village) {
         Plan old = plans.remove(village);
         blocked.remove(village);
