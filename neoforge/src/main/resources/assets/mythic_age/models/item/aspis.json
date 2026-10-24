@@ -1,0 +1,23 @@
+{
+  "__comment": "青铜圆盾（T17）：物品栏用平面图标；手持用 held/aspis，举盾时换 held/aspis_blocking（原版盾的视角变换）",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "mythic_age:item/held/aspis"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "mythic_age:item/aspis"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "blocking": 1
+      },
+      "model": "mythic_age:item/held/aspis_blocking"
+    }
+  ]
+}

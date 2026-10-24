@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "item/held/held_olive_club",
+  "size": 16,
+  "palette": {
+    "o": "#bfa470",
+    "O": "#d8c08a",
+    "w": "#8f7448",
+    "k": "#4e3c24",
+    "d": "#6b5434"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ooooOOOOwwwwkkkk",
+      "ooooOOOOwwwwkkkk",
+      "ooooOOOOwwwwkkkk",
+      "ooooOOOOwwwwkkkk",
+      "ddddoooooooooooo",
+      "ddddoooooooooooo",
+      "ddddoooooooooooo",
+      "ddddoooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo",
+      "oooooooooooooooo"
+    ]
+  }
+}

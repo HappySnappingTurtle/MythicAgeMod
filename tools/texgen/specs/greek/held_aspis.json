@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/held/held_aspis",
+  "size": 16,
+  "palette": {
+    "r": "#7a4e20",
+    "b": "#b07a36",
+    "h": "#e2b56a",
+    "k": "#2a1a10",
+    "w": "#6b4a2b",
+    "l": "#5a3a24"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "rrrrbbbbhhhhkkkk",
+      "rrrrbbbbhhhhkkkk",
+      "rrrrbbbbhhhhkkkk",
+      "rrrrbbbbhhhhkkkk",
+      "wwwwllllrrrrrrrr",
+      "wwwwllllrrrrrrrr",
+      "wwwwllllrrrrrrrr",
+      "wwwwllllrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr",
+      "rrrrrrrrrrrrrrrr"
+    ]
+  }
+}

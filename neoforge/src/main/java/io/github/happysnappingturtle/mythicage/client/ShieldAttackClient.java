@@ -29,9 +29,13 @@ public final class ShieldAttackClient {
         while (mc.options.keyAttack.consumeClick()) {
             clicked = true;
         }
-        if (clicked && mc.hitResult instanceof EntityHitResult hit) {
+        if (!clicked) {
+            return;
+        }
+        // 没对准实体也照样出手（播放越盾下刺的动作），只是不发包
+        mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        if (mc.hitResult instanceof EntityHitResult hit) {
             PacketDistributor.sendToServer(new ShieldAttack.Payload(hit.getEntity().getId()));
-            mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
         }
     }
 }

@@ -5,6 +5,7 @@ import io.github.happysnappingturtle.mythicage.content.ItemModelSpec;
 import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.equipment.EquipmentTable;
+import io.github.happysnappingturtle.mythicage.equipment.AttackStyle;
 import io.github.happysnappingturtle.mythicage.equipment.DrawBowItem;
 import io.github.happysnappingturtle.mythicage.equipment.EquipmentTables;
 import io.github.happysnappingturtle.mythicage.equipment.EquipmentTags;
@@ -72,8 +73,8 @@ public final class GreekEquipment {
     /** EQ-GR-09 希腊短剑：伤害 6、攻速 1.8，不横扫（D4）。 */
     public static final DeferredItem<MeleeWeaponItem> XIPHOS = Content.item("xiphos", GREEK,
                     p -> new MeleeWeaponItem(p, TABLE.weapon("xiphos").orElseThrow(), BRONZE.enchantability(), BRONZE_INGOTS, null))
-            .model(ItemModelSpec.HANDHELD)
-            .tags(ItemTags.SWORDS, ItemTags.SWORD_ENCHANTABLE, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
+            .model(ItemModelSpec.MANUAL)
+            .tags(AttackStyle.STAB.tag(), ItemTags.SWORDS, ItemTags.SWORD_ENCHANTABLE, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
                     ItemTags.FIRE_ASPECT_ENCHANTABLE, ItemTags.DURABILITY_ENCHANTABLE)
             .lang("希腊短剑", "Xiphos", "クシフォス")
             .register();
@@ -81,8 +82,8 @@ public final class GreekEquipment {
     public static final DeferredItem<MeleeWeaponItem> DORY = Content.item("dory", GREEK,
                     p -> new MeleeWeaponItem(p, TABLE.weapon("dory").orElseThrow(), BRONZE.enchantability(), BRONZE_INGOTS,
                             "item.mythic_age.dory.tip"))
-            .model(ItemModelSpec.HANDHELD)
-            .tags(EquipmentTags.SHIELD_THRUST, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
+            .model(ItemModelSpec.MANUAL)
+            .tags(AttackStyle.THRUST.tag(), EquipmentTags.SHIELD_THRUST, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
                     ItemTags.FIRE_ASPECT_ENCHANTABLE, ItemTags.DURABILITY_ENCHANTABLE)
             .lang("重装长矛", "Dory", "ドリュ")
             .register();
@@ -90,6 +91,7 @@ public final class GreekEquipment {
     public static final DeferredItem<ShieldWeaponItem> ASPIS = Content.item("aspis", GREEK,
                     p -> new ShieldWeaponItem(p, TABLE.weapon("aspis").orElseThrow(), BRONZE.enchantability(), BRONZE_INGOTS,
                             "item.mythic_age.aspis.tip"))
+            .model(ItemModelSpec.MANUAL)
             .tags(EquipmentTags.ASPIS_FAMILY, Tags.Items.TOOLS_SHIELD, ItemTags.DURABILITY_ENCHANTABLE)
             .lang("青铜圆盾", "Aspis", "アスピス")
             .register();
@@ -107,8 +109,8 @@ public final class GreekEquipment {
     public static final DeferredItem<MeleeWeaponItem> OLIVE_CLUB = Content.item("olive_club", GREEK,
                     p -> new MeleeWeaponItem(p, TABLE.weapon("olive_club").orElseThrow(), 5, ItemTags.PLANKS,
                             "item.mythic_age.olive_club.tip"))
-            .model(ItemModelSpec.HANDHELD)
-            .tags(EquipmentTags.BLUNT, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
+            .model(ItemModelSpec.MANUAL)
+            .tags(AttackStyle.SMASH.tag(), EquipmentTags.BLUNT, ItemTags.SHARP_WEAPON_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE,
                     ItemTags.FIRE_ASPECT_ENCHANTABLE, ItemTags.DURABILITY_ENCHANTABLE)
             .lang("橄榄木大棒", "Olive Club", "オリーブの棍棒")
             .register();

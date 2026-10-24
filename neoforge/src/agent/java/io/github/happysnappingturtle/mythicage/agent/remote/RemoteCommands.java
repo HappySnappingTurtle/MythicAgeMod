@@ -198,6 +198,12 @@ final class RemoteCommands {
         mc.player.xRotO = pitch;
         mc.player.yHeadRot = yaw;
         mc.player.yBodyRot = yaw;
+        if (a.has("body")) {
+            // 身体朝向与头分开（第三人称正面视角下看身体的斜侧面；原版站着不动时身体只在与头相差 > 50° 时才转）
+            float body = a.get("body").getAsFloat();
+            mc.player.yBodyRot = body;
+            mc.player.yBodyRotO = body;
+        }
         JsonObject o = new JsonObject();
         o.addProperty("yaw", yaw);
         o.addProperty("pitch", pitch);

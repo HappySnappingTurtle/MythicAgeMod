@@ -1,0 +1,15 @@
+{
+  "__comment": "橄榄木大棒（T17）：物品栏用平面图标，手持用 held/olive_club 3D 模型",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "mythic_age:item/held/olive_club"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "mythic_age:item/olive_club"
+      }
+    }
+  }
+}

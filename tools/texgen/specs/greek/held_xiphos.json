@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/held/held_xiphos",
+  "size": 16,
+  "palette": {
+    "b": "#b07a36",
+    "B": "#d9a24a",
+    "h": "#f6d68a",
+    "d": "#6e4518",
+    "g": "#2a1e16",
+    "G": "#8a5a24",
+    "p": "#a8742e"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "bbbbBBBBhhhhdddd",
+      "bbbbBBBBhhhhdddd",
+      "bbbbBBBBhhhhdddd",
+      "bbbbBBBBhhhhdddd",
+      "ggggGGGGppppbbbb",
+      "ggggGGGGppppbbbb",
+      "ggggGGGGppppbbbb",
+      "ggggGGGGppppbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb"
+    ]
+  }
+}

@@ -8,6 +8,33 @@
         "class": "io/github/happysnappingturtle/mythicage/content/wood/ModBoats",
         "field": "OLIVE_PROXY"
       }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "MYTHIC_AGE_STAB",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "io/github/happysnappingturtle/mythicage/client/equipment/WeaponPoses",
+        "field": "STAB_PROXY"
+      }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "MYTHIC_AGE_THRUST",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "io/github/happysnappingturtle/mythicage/client/equipment/WeaponPoses",
+        "field": "THRUST_PROXY"
+      }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "MYTHIC_AGE_SMASH",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "io/github/happysnappingturtle/mythicage/client/equipment/WeaponPoses",
+        "field": "SMASH_PROXY"
+      }
     }
   ]
 }

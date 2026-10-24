@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """T17 阶段 ① 希腊青铜装备的临时贴图（阶段 ② 换成正式图标、手持 3D 模型与 3D 护甲）。
 
-- 护甲件图标、短剑、护甲两层贴图：把原版铁制贴图按亮度映射到青铜色阶（低饱和暖铜）。
-- 复合弓：原版弓的四张贴图，弦（浅灰）改成半人马鬃的浅褐，木色压暗。
-- 长矛、圆盾、大棒：16 × 16 像素图。
+- 护腿、靴的图标：把原版铁制贴图按亮度映射到青铜色阶（低饱和暖铜）。
+- 复合弓：原版弓的四张贴图，弦改成半人马鬃的浅褐，弓臂分角片黄与深木两层。
+- 长矛、圆盾、大棒：16 × 16 像素图（短剑图标在 greek_weapons.py）。
 原版贴图从 NeoForge 的 client-extra 资源包里读：python3 tools/models/greek_equipment.py <解压后的 minecraft 资源目录>
 """
 from __future__ import annotations
@@ -45,7 +45,16 @@ def is_wood(rgb) -> bool:
     return r > g + 12 and g > b  # 原版剑柄的棕色木头不改
 
 
+HORN = (216, 180, 106)
+HORN_D = (176, 138, 72)
+WOOD = (90, 58, 32)
+WOOD_D = (58, 36, 20)
+SINEW = (196, 160, 112)
+
+
 def bow(src: Path, dst: Path) -> None:
+    """复合弓（10 号合同：角黄 / 深木 / 浅褐鬃弦）：原版弓的轮廓，弦（浅灰）改成鬃弦浅褐，
+    弓臂按亮度分两层：亮的是内侧角片（角黄），暗的是外侧筋木（深木）；箭（拉弓时）照原版不动。"""
     im = Image.open(src).convert("RGBA")
     px = im.load()
     for y in range(im.height):
@@ -53,10 +62,20 @@ def bow(src: Path, dst: Path) -> None:
             r, g, b, a = px[x, y]
             if a == 0:
                 continue
-            if abs(r - g) < 12 and abs(g - b) < 12 and r > 120:  # 弦：浅灰 → 鬃弦浅褐
-                px[x, y] = (196, 160, 112, a)
-            else:  # 木：压暗，偏角黄
-                px[x, y] = (int(r * 0.75 + 20), int(g * 0.7 + 10), int(b * 0.55), a)
+            sat = max(r, g, b) - min(r, g, b)
+            lum = 0.299 * r + 0.587 * g + 0.114 * b
+            if sat < 18 and lum > 110:  # 弦
+                px[x, y] = (*SINEW, a)
+            elif sat < 18:  # 箭杆、箭头的灰（拉弓贴图里），保持
+                continue
+            elif lum > 105:
+                px[x, y] = (*HORN, a)
+            elif lum > 80:
+                px[x, y] = (*HORN_D, a)
+            elif lum > 55:
+                px[x, y] = (*WOOD, a)
+            else:
+                px[x, y] = (*WOOD_D, a)
     dst.parent.mkdir(parents=True, exist_ok=True)
     im.save(dst)
 
@@ -126,14 +145,50 @@ CLUB = ["...........oo...",
 CLUB_PAL = {"o": "#3b2a1a", "W": "#bfa470", "w": "#8f7448", "k": "#5a4428"}
 
 
+HELMET = ["................",
+          "..rRrRrRrRrRr...",
+          "..rrrrrrrrrrr...",
+          "......oo........",
+          "...ooBBBBoo.....",
+          "..oBhBBBBBBo....",
+          "..oBhBBBBBBBo...",
+          "..oBBBBBBBBBo...",
+          "..oB..BB..BBo...",
+          "..oBB.BB.BBBo...",
+          "..oBBB..BBBdo...",
+          "..oBBB..BBdo....",
+          "...oBB..Bdo.....",
+          "....oo..oo......",
+          "................",
+          "................"]
+HELMET_PAL = {"o": "#3a2410", "B": "#b07a36", "h": "#e8c27a", "d": "#7a4e20", "r": "#8e3a24", "R": "#b0583a"}
+
+CHEST = ["................",
+         "..ll........ll..",
+         ".olllo....ollllo",
+         ".oBBBBooooBBBBo.",
+         ".oBhhhBBBBhhhBo.",
+         "..oBBdBBBBdBBo..",
+         "..oBBBdBBdBBBo..",
+         "..oBBBBdBBBBBo..",
+         "..oBBhBdBhBBBo..",
+         "..oBBBBdBBBBdo..",
+         "...oBBBdBBBdo...",
+         "...ollllllllo...",
+         "...wlwlwlwlwl...",
+         "...wlwlwlwlwl...",
+         "...wlwlwlwlwl...",
+         "................"]
+CHEST_PAL = {"o": "#3a2410", "B": "#b07a36", "h": "#e8c27a", "d": "#7a4e20", "l": "#5a3a24", "w": "#d8cfb4"}
+
+
 def main(mc: Path) -> None:
     item = mc / "assets/minecraft/textures/item"
-    armor = mc / "assets/minecraft/textures/models/armor"
-    for part in ("helmet", "chestplate", "leggings", "boots"):
+    for part in ("leggings", "boots"):
         bronze(item / f"iron_{part}.png", TEX / "item" / f"bronze_{part}.png")
-    bronze(item / "iron_sword.png", TEX / "item" / "xiphos.png", keep=is_wood)
-    for layer in (1, 2):
-        bronze(armor / f"iron_layer_{layer}.png", TEX / "models/armor" / f"bronze_layer_{layer}.png")
+    pixels("bronze_helmet", HELMET, HELMET_PAL)  # 科林斯盔：横冠、T 形开口
+    pixels("bronze_chestplate", CHEST, CHEST_PAL)  # 肌肉胸甲 + 垂条
+    # 护甲两层贴图改由 greek_armor.py 生成（阶段 ②，64 × 64，带 3D 部件）
     bow(item / "bow.png", TEX / "item" / "composite_bow.png")
     for i in range(3):
         bow(item / f"bow_pulling_{i}.png", TEX / "item" / f"composite_bow_pulling_{i}.png")

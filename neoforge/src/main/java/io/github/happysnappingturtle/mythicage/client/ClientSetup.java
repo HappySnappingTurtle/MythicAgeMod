@@ -91,6 +91,11 @@ public final class ClientSetup {
     @SubscribeEvent
     static void onLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(BelieverWreathLayer.LAYER, BelieverWreathLayer::createLayer);
+        // 青铜甲的 3D 部件（T17）
+        event.registerLayerDefinition(io.github.happysnappingturtle.mythicage.client.equipment.BronzeArmorModel.OUTER,
+                io.github.happysnappingturtle.mythicage.client.equipment.BronzeArmorModel::outerLayer);
+        event.registerLayerDefinition(io.github.happysnappingturtle.mythicage.client.equipment.BronzeArmorModel.INNER,
+                io.github.happysnappingturtle.mythicage.client.equipment.BronzeArmorModel::innerLayer);
     }
 
     /** 希腊信徒的橄榄枝饰（T10）。 */

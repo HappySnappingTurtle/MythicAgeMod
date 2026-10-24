@@ -1,0 +1,15 @@
+{
+  "__comment": "重装长矛（T17）：物品栏用平面图标，手持用 held/dory 3D 模型",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "mythic_age:item/held/dory"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "mythic_age:item/dory"
+      }
+    }
+  }
+}

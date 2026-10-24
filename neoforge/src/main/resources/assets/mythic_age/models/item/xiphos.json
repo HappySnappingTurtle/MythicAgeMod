@@ -1,0 +1,15 @@
+{
+  "__comment": "希腊短剑（T17）：物品栏用平面图标，手持用 held/xiphos 3D 模型",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "mythic_age:item/held/xiphos"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "mythic_age:item/xiphos"
+      }
+    }
+  }
+}

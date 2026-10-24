@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/held/held_dory",
+  "size": 16,
+  "palette": {
+    "w": "#c9a876",
+    "W": "#a68052",
+    "l": "#5a3a24",
+    "b": "#c98f3e",
+    "B": "#e8c27a",
+    "d": "#8a5a24"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wwwwWWWWllllbbbb",
+      "wwwwWWWWllllbbbb",
+      "wwwwWWWWllllbbbb",
+      "wwwwWWWWllllbbbb",
+      "BBBBddddwwwwwwww",
+      "BBBBddddwwwwwwww",
+      "BBBBddddwwwwwwww",
+      "BBBBddddwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww"
+    ]
+  }
+}

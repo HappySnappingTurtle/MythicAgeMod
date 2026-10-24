@@ -8,6 +8,7 @@
     "BellBlockMixin",
     "CraftingMenuMixin",
     "LivingEntityJumpingAccessor",
+    "LivingEntitySwingMixin",
     "ResultSlotMixin",
     "TrialSpawnerDataAccessor",
     "TrialSpawnerMixin",
@@ -15,6 +16,7 @@
     "VillagerRestockMixin"
   ],
   "client": [
+    "client.HumanoidModelAttackMixin",
     "client.MinecraftGlowMixin",
     "client.VillagerModelPrayMixin"
   ],
