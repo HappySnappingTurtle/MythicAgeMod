@@ -1,5 +1,6 @@
 package io.github.happysnappingturtle.mythicage.core.player;
 
+import io.github.happysnappingturtle.mythicage.core.conduct.ConductState;
 import io.github.happysnappingturtle.mythicage.core.relic.RelicBook;
 
 import java.util.ArrayDeque;
@@ -196,6 +197,8 @@ public final class PlayerMythData {
     private final DailyLedger tradeDaily = new DailyLedger();
     /** 圣物绑定表（T16）。 */
     private final RelicBook relics = new RelicBook();
+    /** 善恶值的事件账本、在线刻、治愈记录、当日正分（T18）。 */
+    private final ConductState conduct = new ConductState();
     private long dataVersion;
 
     public PlayerMythData() {
@@ -275,6 +278,11 @@ public final class PlayerMythData {
         return relics;
     }
 
+    /** 善恶值辅助状态（T18 设计文档 §4.2）。 */
+    public ConductState conduct() {
+        return conduct;
+    }
+
     public long dataVersion() {
         return dataVersion;
     }
@@ -310,6 +318,7 @@ public final class PlayerMythData {
         }
         c.tradeDaily.entriesFrom(tradeDaily);
         c.relics.copyFrom(relics);
+        c.conduct.copyFrom(conduct);
         c.dataVersion = dataVersion;
         return c;
     }
@@ -328,6 +337,7 @@ public final class PlayerMythData {
                 && receipts.equals(d.receipts)
                 && tradeDaily.equals(d.tradeDaily)
                 && relics.equals(d.relics)
+                && conduct.equals(d.conduct)
                 && dataVersion == d.dataVersion;
     }
 

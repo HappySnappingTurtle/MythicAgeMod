@@ -922,8 +922,9 @@ public final class WildGameTests {
         h.runAfterDelay(10, () -> {
             h.assertTrue(open.test(GreekWild.KARKINOS.get(), level, MobSpawnType.NATURAL, spot, level.getRandom()), "区域空：可以");
             List<KarkinosEntity> three = new ArrayList<>();
+            // 放在判定点同一格上：区域按 256 格网格划分，场地位置随机，分开放可能跨到相邻区域（偶发失败，2026-10-23 修）
             for (int i = 0; i < 3; i++) {
-                three.add(crab(h, new BlockPos(3 + i * 4, 2, 14)));
+                three.add(crab(h, new BlockPos(8, 2, 30)));
             }
             h.assertTrue(!open.test(GreekWild.KARKINOS.get(), level, MobSpawnType.NATURAL, spot, level.getRandom()), "区域里已有 3 只：不刷");
             h.assertTrue(pred.test(GreekWild.KARKINOS.get(), level, MobSpawnType.SPAWN_EGG, spot, level.getRandom()), "刷怪蛋不受限");

@@ -83,6 +83,11 @@ public final class VillageRegistry extends SavedData {
             return civ.isEmpty();
         }
 
+        /** 村庄锚点（T18）：位置就是 {@link #bell()}，种类由来源推出。 */
+        public VillageAnchor anchor() {
+            return new VillageAnchor(bell, VillageAnchor.kindOf(origin));
+        }
+
         public boolean hasShrine(String god) {
             return shrines.values().stream().anyMatch(l -> l.contains(god));
         }

@@ -55,25 +55,17 @@ public final class RelicService {
     /** 属性修饰按效果组使用固定 id（06 号 §0.4），重进或重复对账不会叠加。 */
     public static final ResourceLocation MAX_HEALTH_SELF = id("relic/" + EffectGroups.MAX_HEALTH_SELF_FLAT);
 
-    /** 只供 GameTest：FakePlayer 不在玩家列表里，登记后按「在线」处理。 */
-    private static final Map<UUID, ServerPlayer> TEST_ONLINE = new java.util.concurrent.ConcurrentHashMap<>();
-
     private RelicService() {
     }
 
     /** 在线的玩家（玩家列表里的，或测试登记的）；不在线为 null。 */
     @org.jetbrains.annotations.Nullable
     public static ServerPlayer online(MinecraftServer server, UUID id) {
-        ServerPlayer p = server.getPlayerList().getPlayer(id);
-        return p != null ? p : TEST_ONLINE.get(id);
+        return io.github.happysnappingturtle.mythicage.player.OnlinePlayers.find(server, id);
     }
 
     public static void onlineForTest(ServerPlayer player, boolean online) {
-        if (online) {
-            TEST_ONLINE.put(player.getUUID(), player);
-        } else {
-            TEST_ONLINE.remove(player.getUUID());
-        }
+        io.github.happysnappingturtle.mythicage.player.OnlinePlayers.forTest(player, online);
     }
 
     private static ResourceLocation id(String path) {

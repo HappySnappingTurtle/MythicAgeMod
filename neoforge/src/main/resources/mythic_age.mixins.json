@@ -13,7 +13,8 @@
     "TrialSpawnerDataAccessor",
     "TrialSpawnerMixin",
     "VillagerGoalPackagesMixin",
-    "VillagerRestockMixin"
+    "VillagerRestockMixin",
+    "ZombieVillagerAccessor"
   ],
   "client": [
     "client.HumanoidModelAttackMixin",

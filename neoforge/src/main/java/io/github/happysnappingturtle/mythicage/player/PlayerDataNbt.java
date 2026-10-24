@@ -22,9 +22,10 @@ import java.util.Optional;
  * 格式 1 的存档缺这些字段，读作空。
  * 格式 3（T12）：各文明加神力共享冷却到期刻，根加各神力长冷却到期刻；旧档缺省为 0。
  * 格式 4（T16）：根加圣物绑定表 {@code relics}；旧档没有这个键，读作空表。
+ * 格式 5（T18）：{@code conduct} 下加事件账本、在线刻、治愈记录、当日正分；旧档读作空 / 0。
  */
 public final class PlayerDataNbt {
-    public static final int FORMAT = 4;
+    public static final int FORMAT = 5;
 
     private PlayerDataNbt() {
     }
@@ -87,6 +88,22 @@ public final class PlayerDataNbt {
             recent.add(t);
         }
         conduct.put("recent", recent);
+        var cs = data.conduct();
+        ListTag incidents = new ListTag();
+        cs.incidents().view().forEach((key, en) -> {
+            CompoundTag t = new CompoundTag();
+            t.putString("key", key);
+            t.putInt("charged", en.charged());
+            t.putLong("start", en.start());
+            incidents.add(t);
+        });
+        conduct.put("incidents", incidents);
+        conduct.putLong("onlineTicks", cs.onlineTicks());
+        ListTag cured = new ListTag();
+        cs.cured().forEach(u -> cured.add(net.minecraft.nbt.NbtUtils.createUUID(u)));
+        conduct.put("cured", cured);
+        conduct.putLong("positiveDay", cs.positiveDay());
+        conduct.putInt("positiveGranted", cs.positiveGranted(cs.positiveDay()));
         root.put("conduct", conduct);
         CompoundTag receipts = new CompoundTag();
         receipts.put("unique", strings(data.receipts().list(ReceiptBook.Scope.UNIQUE)));
@@ -177,6 +194,17 @@ public final class PlayerDataNbt {
             CompoundTag e = (CompoundTag) t;
             data.addConductEntry(new PlayerMythData.ConductEntry(e.getString("reason"), e.getInt("delta"), e.getLong("time")));
         }
+        for (Tag t : conduct.getList("incidents", Tag.TAG_COMPOUND)) {
+            CompoundTag e = (CompoundTag) t;
+            data.conduct().incidents().restore(e.getString("key"),
+                    new io.github.happysnappingturtle.mythicage.core.conduct.IncidentLedger.Entry(e.getInt("charged"), e.getLong("start")));
+        }
+        java.util.Set<java.util.UUID> cured = new java.util.LinkedHashSet<>();
+        for (Tag t : conduct.getList("cured", Tag.TAG_INT_ARRAY)) {
+            cured.add(net.minecraft.nbt.NbtUtils.loadUUID(t));
+        }
+        data.conduct().restore(conduct.getLong("onlineTicks"), cured,
+                conduct.contains("positiveDay") ? conduct.getLong("positiveDay") : -1, conduct.getInt("positiveGranted"));
         CompoundTag receipts = root.getCompound("receipts");
         for (Tag t : receipts.getList("unique", Tag.TAG_STRING)) {
             data.receipts().record(ReceiptBook.Scope.UNIQUE, t.getAsString());

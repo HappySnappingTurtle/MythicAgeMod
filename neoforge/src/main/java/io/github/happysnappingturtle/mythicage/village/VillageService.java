@@ -173,12 +173,15 @@ public final class VillageService {
     public static void checkBells(ServerLevel level, BlockPos pos) {
         VillageRegistry reg = VillageRegistry.get(level.getServer());
         long today = MythDays.today(level.getServer());
+        VillagePlans plans = VillagePlans.get(level.getServer());
         for (VillageRegistry.Village v : reg.in(level.dimension())) {
             BlockPos b = v.bell().pos();
             if (b.distManhattan(pos) > LEAVE_RANGE * 2 || !level.isLoaded(b)) {
                 continue;
             }
-            boolean present = level.getPoiManager().existsAtPosition(PoiTypes.MEETING, b);
+            // 按锚点种类判断村庄还在不在（T18 §1）：生成村庄看规划数据，不要求中心有钟
+            boolean present = v.anchor().kind() == VillageAnchor.Kind.CENTER && plans.has(v.id())
+                    || level.getPoiManager().existsAtPosition(PoiTypes.MEETING, b);
             if (present) {
                 reg.setMissingSince(v, -1);
                 backfillPatron(level, reg.byBell(v.bell()).orElse(v));

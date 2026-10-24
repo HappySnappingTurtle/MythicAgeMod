@@ -279,6 +279,22 @@ public final class LangKeys {
         add("mythic_age.hamadryad.cursed", "你毁了宁芙的树——双手变得沉重", "You destroyed a nymph's tree — your hands grow heavy", "ニンフの木を倒した——手が重くなる");
         add("mythic_age.hamadryad.dew_given", "树仙女赠你一瓶宁芙之露", "The hamadryad gives you a vial of Nymph's Dew", "ハマドリュアスがニンフの露をくれた");
         add("mythic_age.hamadryad.dew_resting", "她不久前才赠过露水", "She gave her dew not long ago", "少し前に露をくれたばかりだ");
+        // 善恶值（T18）
+        add("mythic_age.conduct.changed", "善恶值 %s（%s）", "Conduct %s (%s)", "善悪値 %s（%s）");
+        add("mythic_age.conduct.reason.harm_villager", "伤害村民", "harmed a villager", "村人を傷つけた");
+        add("mythic_age.conduct.reason.kill_villager", "杀死村民", "killed a villager", "村人を殺した");
+        add("mythic_age.conduct.reason.harm_guardian", "伤害守护者", "harmed a guardian", "守護者を傷つけた");
+        add("mythic_age.conduct.reason.kill_guardian", "杀死守护者", "killed a guardian", "守護者を殺した");
+        add("mythic_age.conduct.reason.harm_defender", "伤害村庄防卫者", "harmed a village defender", "村の守り手を傷つけた");
+        add("mythic_age.conduct.reason.kill_defender", "杀死村庄防卫者", "killed a village defender", "村の守り手を殺した");
+        add("mythic_age.conduct.reason.harm_animal", "在村里伤害动物", "harmed an animal in a village", "村の中で動物を傷つけた");
+        add("mythic_age.conduct.reason.kill_animal", "在村里杀死动物", "killed an animal in a village", "村の中で動物を殺した");
+        add("mythic_age.conduct.reason.cure_zombie_villager", "治愈僵尸村民", "cured a zombie villager", "ゾンビ村人を治した");
+        add("mythic_age.conduct.reason.rescue_resident", "从敌袭中救出居民", "rescued a resident from a raid", "襲撃から住民を救った");
+        add("mythic_age.conduct.reason.rescue_escort", "完成护送救援", "completed an escort rescue", "護送救援を果たした");
+        add("mythic_age.conduct.reason.admin", "管理员调整", "adjusted by an operator", "管理者による調整");
+        add("commands.mythic_age.conduct.get", "%s 的善恶值：%s", "%s's conduct: %s", "%s の善悪値：%s");
+        add("commands.mythic_age.conduct.none", "%s 没有善恶记录", "%s has no conduct records", "%s に善悪の記録はありません");
         // 青铜装备（T17）
         add("item.mythic_age.bronze_armor.tip", "方阵：四件全套并手持青铜圆盾时，4 格内每名友方（同队玩家、你的召唤单位、铁傀儡）护甲 +1，最多 +3", "Phalanx: with the full set and an aspis in hand, +1 armor per ally within 4 blocks (teammates, your summons, iron golems), up to +3", "ファランクス：4 部位そろえてアスピスを持つと、4 ブロック以内の味方（同じチームのプレイヤー・自分の召喚ユニット・アイアンゴーレム）1 体ごとに防御 +1（最大 +3）");
         add("item.mythic_age.dory.tip", "触及 +1 格；副手举盾时按攻击可刺击（伤害 ×0.6），不放下盾", "+1 reach; while blocking with an off-hand shield, attack to thrust (×0.6 damage) without lowering it", "リーチ +1；オフハンドの盾で防御中に攻撃すると突きを放つ（ダメージ ×0.6、盾は下ろさない）");

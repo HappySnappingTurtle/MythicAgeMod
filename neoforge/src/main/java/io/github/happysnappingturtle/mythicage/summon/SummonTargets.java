@@ -27,14 +27,8 @@ public final class SummonTargets {
     }
 
     /** 只供 GameTest：FakePlayer 不在玩家列表里，测试把它登记成可查到的主人。 */
-    private static final Map<UUID, ServerPlayer> TEST_OWNERS = new java.util.concurrent.ConcurrentHashMap<>();
-
     public static void ownerForTest(ServerPlayer p, boolean add) {
-        if (add) {
-            TEST_OWNERS.put(p.getUUID(), p);
-        } else {
-            TEST_OWNERS.remove(p.getUUID());
-        }
+        io.github.happysnappingturtle.mythicage.player.OnlinePlayers.forTest(p, add);
     }
 
     @Nullable
@@ -42,8 +36,7 @@ public final class SummonTargets {
         if (!(summon instanceof MythSummon s) || s.link().owner == null || !(summon.level() instanceof ServerLevel sl)) {
             return null;
         }
-        ServerPlayer p = sl.getServer().getPlayerList().getPlayer(s.link().owner);
-        return p != null ? p : TEST_OWNERS.get(s.link().owner);
+        return io.github.happysnappingturtle.mythicage.player.OnlinePlayers.find(sl.getServer(), s.link().owner);
     }
 
     public static boolean canAttack(Entity summon, LivingEntity target) {

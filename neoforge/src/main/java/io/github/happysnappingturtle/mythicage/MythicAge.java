@@ -200,6 +200,9 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.relic.RelicService.init();
         io.github.happysnappingturtle.mythicage.relic.RelicEvents.register(game);
 
+        // 村庄范围与善恶值（T18）
+        io.github.happysnappingturtle.mythicage.conduct.ConductEventsRegistration.register(game);
+
         // 文明装备（T17）
         io.github.happysnappingturtle.mythicage.equipment.EquipmentEvents.register(game);
 
