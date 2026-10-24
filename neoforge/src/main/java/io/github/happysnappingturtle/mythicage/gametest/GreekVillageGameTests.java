@@ -391,10 +391,14 @@ public final class GreekVillageGameTests {
             // 没有露头：拆掉后清掉登记，再找一次 → 放一处 3×3×2
             h.setBlock(new BlockPos(14, 2, 28), Blocks.AIR);
             s.points.remove("quarry_0");
-            CivVillageData.NaturalPoint np = VillageData.civ(GREEK).orElseThrow().naturalPoints().get("quarry");
+            CivVillageData.NaturalPoint full = VillageData.civ(GREEK).orElseThrow().naturalPoints().get("quarry");
+            // 只在本场地附近找（20 格，露头从 14 格起放）：同一批并行的用例会在隔壁场地放露头，48 格的正式半径会找到别人的（场地排布变了才暴露）
+            CivVillageData.NaturalPoint np = new CivVillageData.NaturalPoint(full.kind(), full.block(), 20, full.outcrop());
             h.assertTrue(NaturalResources.registerNaturalForTest(h.getLevel(), tv.id(), np), "放了露头");
             ResourcePoint o = s.points.get("quarry" + NaturalResources.OUTCROP);
-            h.assertTrue(o != null, "露头登记了：" + s.points.keySet());
+            h.assertTrue(o != null, "露头登记了：" + s.points.keySet() + " " + s.points.values().stream()
+                    .map(x -> x.id() + "@" + x.pos() + "=" + h.getLevel().getBlockState(new BlockPos(x.pos().x(), x.pos().y(), x.pos().z())))
+                    .toList() + " 场地原点 " + h.absolutePos(BlockPos.ZERO));
             BlockPos top = new BlockPos(o.pos().x(), o.pos().y(), o.pos().z());
             int marble = 0;
             for (BlockPos p : BlockPos.betweenClosed(top.offset(-1, -1, -1), top.offset(1, 0, 1))) {

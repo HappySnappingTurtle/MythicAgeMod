@@ -359,6 +359,12 @@ public final class LangKeys {
         add("mythic_age.building.greek.oracle", "神谕所", "Oracle", "神託所");
         add("mythic_age.building.greek.acropolis_classical", "中神庙", "Prostyle Temple", "中神殿");
         add("mythic_age.building.greek.acropolis_heroic", "大神庙", "Peripteral Temple", "大神殿");
+        add("mythic_age.village.activity.pray", "我去神坛祈祷。", "I'm off to pray at the altar.", "祭壇へ祈りに行くところです。");
+        add("mythic_age.village.activity.arrive", "我是新来的，正找我住的地方。", "I'm new here, looking for my house.", "新しく来た者です。住む家を探しています。");
+        add("mythic_age.village.log.migrant_coming", "一名%s从村口来投奔", "A %s is coming in from the village entrance", "%sが村の入口からやって来る");
+        add("mythic_age.village.log.migrant_arrived", "%s（%s）住了下来", "%s (%s) has settled in", "%s（%s）が住み着いた");
+        add("mythic_age.village.log.migrant_lost", "来投奔的人没能走到村里", "The newcomer never made it into the village", "やって来るはずの者は村にたどり着けなかった");
+        add("mythic_age.village.short.housing", "没有空床了：要更多住居才会有人来", "No free beds: more houses are needed before anyone moves in", "空いた寝床がない：住まいが増えないと人は来ない");
         add("mythic_age.village.short.food", "口粮只剩 %s 份（底线 %s）：暂停扩建，先顾吃的", "Only %s rations left (minimum %s): building paused, food first", "食料は残り %s 食分（下限 %s）：増築を止めて食料を優先");
         add("mythic_age.village.short.point", "%s挖空了，要等它慢慢恢复", "The %s is exhausted and needs time to recover", "%sは掘り尽くされ、回復を待っている");
         add("mythic_age.village.short.full", "仓库满了：生产暂停，捐来的东西也收不下", "Storage is full: production paused, donations refused", "倉庫が満杯：生産停止、寄付も受け取れない");

@@ -39,6 +39,9 @@
       }
     }
   ],
+  "jobs": {
+    "greek:mason": 2
+  },
   "anchors": {
     "quarry": [
       [

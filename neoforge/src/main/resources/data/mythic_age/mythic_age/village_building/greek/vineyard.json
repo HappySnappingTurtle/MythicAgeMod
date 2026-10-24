@@ -24,6 +24,9 @@
     "slope"
   ],
   "provides": {},
+  "jobs": {
+    "greek:farmer": 1
+  },
   "anchors": {
     "trellis": [
       [

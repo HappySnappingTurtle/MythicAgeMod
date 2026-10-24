@@ -71,6 +71,23 @@ public final class Residents {
         return Optional.of(r);
     }
 
+    /** 生成一名在途移民（T19 §1.6 H4）：床位先分好，但不进名册，走到了才登记。 */
+    public static Optional<ResidentEntity> spawnMigrant(ServerLevel level, VillageRegistry.Village village, CivVillageData data,
+                                                        String profession, BlockPos home, BlockPos at) {
+        ResidentEntity r = ModEntities.RESIDENT.get().create(level);
+        if (r == null) {
+            return Optional.empty();
+        }
+        RandomSource rnd = level.getRandom();
+        boolean female = rnd.nextBoolean();
+        List<String> names = female ? data.residents().female() : data.residents().male();
+        String name = names.isEmpty() ? "" : names.get(rnd.nextInt(names.size()));
+        r.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, rnd.nextFloat() * 360, 0);
+        r.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null);
+        r.setup(village.id(), village.civ(), profession, home, name, female, rnd.nextInt(6));
+        return level.addFreshEntity(r) ? Optional.of(r) : Optional.empty();
+    }
+
     /** 生成村庄的初始居民：每个床位锚点 1 名。返回生成数。 */
     public static int spawnInitial(ServerLevel level, VillageRegistry.Village village, VillagePlans.Plan plan,
                                    CivVillageData data) {

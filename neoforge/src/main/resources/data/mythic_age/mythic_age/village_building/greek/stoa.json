@@ -26,6 +26,9 @@
     "merchant": 4
   },
   "priority": 40,
+  "jobs": {
+    "greek:merchant": 2
+  },
   "anchors": {
     "merchant": [
       [

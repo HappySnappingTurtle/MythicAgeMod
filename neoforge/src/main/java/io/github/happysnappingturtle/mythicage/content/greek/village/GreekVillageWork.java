@@ -122,6 +122,12 @@ public final class GreekVillageWork {
             return "greek";
         }
 
+        /** 祈祷（V3-希腊-居民 §5.1）：窗口内按祈祷位抽空闲的居民。 */
+        @Override
+        public List<Job> jobs(VillageContext ctx) {
+            return io.github.happysnappingturtle.mythicage.content.greek.prayer.ResidentPrayer.jobs(ctx);
+        }
+
         @Override
         public Optional<Job> modify(VillageContext ctx, Job job) {
             String period = ctx.date().period();

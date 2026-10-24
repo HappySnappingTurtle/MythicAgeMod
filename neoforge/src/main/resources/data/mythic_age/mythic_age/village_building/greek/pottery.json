@@ -24,6 +24,9 @@
     "slope"
   ],
   "provides": {},
+  "jobs": {
+    "greek:potter": 2
+  },
   "anchors": {
     "clay": [
       [

@@ -19,7 +19,7 @@ MASK = ROOT / "art/blockbench/greek/resident/resident_mask.png"
 BASE = {"skin": "#AE7656", "tunic": "#D6C7A6", "dress": "#D2AC58", "shawl": "#7C3A2F"}
 KEYS = {(255, 0, 0): "skin", (0, 255, 0): "tunic", (0, 0, 255): "dress", (255, 255, 0): "shawl"}
 SKIN_F = "#C79270"
-TUNICS = ["#D6C7A6", "#E6DFCC", "#A86A4A", "#7C8C9E", "#A39A6C", "#C49A5A"]
+TUNICS = ["#D6C7A6", "#E6DFCC", "#8C3B2B", "#7C8C9E", "#A39A6C", "#C49A5A"]
 DRESSES = ["#D2AC58", "#E6DFCC", "#A84A3A", "#6F86A6", "#9FAA7C", "#C4B08C"]
 SHAWLS = ["#7C3A2F", "#3F5A7A", "#8A6A2E", "#7C3A2F", "#5E4632", "#4E5E3A"]
 

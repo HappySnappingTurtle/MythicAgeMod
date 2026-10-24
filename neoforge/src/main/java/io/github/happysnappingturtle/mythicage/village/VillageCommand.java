@@ -40,7 +40,7 @@ public final class VillageCommand {
         int members = VillagePopulation.members(level, v.bell());
         return Component.translatable("commands.mythic_age.village.population",
                 Component.translatable("mythic_age.age." + v.stage().id()), members, VillagePopulation.target(v, members),
-                v.baseline(), VillagePopulation.freeBeds(level, v.bell().pos()),
+                v.baseline(), VillagePopulation.freeBeds(level, v),
                 VillagePopulation.guardCap(level, v, v.stage()), v.lastMigrationDay());
     }
 

@@ -153,14 +153,33 @@ public final class VillagePopulation {
                 .orElse(members);
     }
 
-    /** 成员：64 格内聚会点指向本钟的成年村民（只数已加载的）。 */
+    /**
+     * 成员：64 格内聚会点指向本钟的成年村民（只数已加载的）。居民框架的村庄（T19）是名册人数——
+     * 那里没有原版村民，数村民会得到 0，基线和人口目标就全错了（实机：古典村的目标只有 4）。
+     */
     public static int members(ServerLevel level, GlobalPos bell) {
+        Optional<VillageRegistry.Village> v = VillageRegistry.get(level.getServer()).byBell(bell);
+        if (v.isPresent() && residentFramework(v.get())) {
+            return io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(level.getServer())
+                    .peek(v.get().id()).map(st -> st.roster.size()).orElse(0);
+        }
         if (!bell.dimension().equals(level.dimension())) {
             return 0;
         }
         return level.getEntitiesOfClass(Villager.class, new AABB(bell.pos()).inflate(MEMBER_RANGE),
                 x -> x.isAlive() && !x.isBaby() && x.getBrain().getMemory(MemoryModuleType.MEETING_POINT)
                         .filter(bell::equals).isPresent()).size();
+    }
+
+    /** 空床：居民框架的村庄是名册没人占的床位锚点（T19），其他村庄是 48 格内还没有主人的床。 */
+    public static int freeBeds(ServerLevel level, VillageRegistry.Village v) {
+        if (residentFramework(v)) {
+            return VillagePlans.get(level.getServer()).byVillage(v.id())
+                    .map(p -> io.github.happysnappingturtle.mythicage.village.resident.Residents.freeHomes(p,
+                            io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(level.getServer()).state(v.id())).size())
+                    .orElse(0);
+        }
+        return freeBeds(level, v.bell().pos());
     }
 
     /** 48 格内还没有主人的床。 */
@@ -171,6 +190,15 @@ public final class VillagePopulation {
 
     public static boolean needsHousing(UUID village) {
         return NEEDS_HOUSING.contains(village);
+    }
+
+    /** 居民框架的村庄由 {@code ResidentMigration} 判定（T19 §1.6 H3）。 */
+    public static void setNeedsHousing(UUID village, boolean needs) {
+        if (needs) {
+            NEEDS_HOUSING.add(village);
+        } else {
+            NEEDS_HOUSING.remove(village);
+        }
     }
 
     /** 卫兵上限（T20 的士兵使用；T11a 只在晋升页显示）。 */

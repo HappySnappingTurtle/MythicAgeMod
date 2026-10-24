@@ -75,6 +75,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private UUID village;
     @Nullable
     private BlockPos home;
+    /** 在途移民（T19 §1.6 H4）：还没走到床位、没进名册；到了清空。 */
+    private boolean migrant;
+    private long migrantSince;
 
     // 当前工作单（不存档）
     @Nullable
@@ -144,6 +147,20 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
 
     public Optional<UUID> village() {
         return Optional.ofNullable(village);
+    }
+
+    /** 在途移民：还没走到床位登记。 */
+    public boolean inTransit() {
+        return migrant;
+    }
+
+    public long migrantSince() {
+        return migrantSince;
+    }
+
+    public void setMigrant(boolean m, long since) {
+        migrant = m;
+        migrantSince = since;
     }
 
     @Nullable
@@ -345,6 +362,12 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 if (!s.carry().equals(carrying())) {
                     setCarrying(s.carry());
                 }
+                if (tickCount % 20 == 0) {
+                    VillageScheduler.onWalkTick(sl, this, job, step);
+                    if (job == null) {
+                        return;
+                    }
+                }
                 if (standFor == null || !standFor.equals(t)) {
                     standFor = t;
                     stand = standSpot(t);
@@ -385,7 +408,12 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 }
                 var look = lastMoveTarget();
                 getLookControl().setLookAt(look.x() + 0.5, look.y() + 0.5, look.z() + 0.5);
-                if (++stepTicks >= s.ticks()) {
+                ++stepTicks;
+                VillageScheduler.onActTick(sl, this, job, step, stepTicks);
+                if (job == null) {
+                    return;
+                }
+                if (stepTicks >= s.ticks()) {
                     entityData.set(ANIM, "");
                     int done = step;
                     Job j = job;
@@ -560,6 +588,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         tag.putString("Civ", civ());
         tag.putString("Profession", profession());
         tag.putInt("Appearance", entityData.get(APPEARANCE));
+        if (migrant) {
+            tag.putLong("MigrantSince", migrantSince);
+        }
     }
 
     @Override
@@ -570,6 +601,8 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         entityData.set(CIV, tag.getString("Civ"));
         entityData.set(PROFESSION, tag.getString("Profession"));
         entityData.set(APPEARANCE, tag.getInt("Appearance"));
+        migrant = tag.contains("MigrantSince");
+        migrantSince = tag.getLong("MigrantSince");
     }
 
     // ───────────── 外观 ─────────────

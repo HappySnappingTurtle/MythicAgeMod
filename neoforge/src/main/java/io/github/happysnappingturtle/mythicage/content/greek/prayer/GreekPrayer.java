@@ -29,6 +29,7 @@ public final class GreekPrayer {
     public static void init(IEventBus modBus, IEventBus game) {
         ATTACHMENT_TYPES.register(modBus);
         PrayerService.init();
+        io.github.happysnappingturtle.mythicage.village.work.JobType.register(new ResidentPrayer());
         game.addListener(PrayerService::onServerTickPost);
         game.addListener(PrayerService::onServerStopped);
         game.addListener(BelieverEvents::onStartTracking);

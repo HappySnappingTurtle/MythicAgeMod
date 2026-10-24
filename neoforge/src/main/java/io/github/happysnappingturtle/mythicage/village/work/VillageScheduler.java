@@ -79,6 +79,16 @@ public final class VillageScheduler {
         long alarmUntil = Long.MIN_VALUE / 2;
         boolean wasRunning;
         Boolean forceRunning;
+        /** 性能统计（§1.6 H6，GameTest 用）：调度与居民执行累计耗时（纳秒）。 */
+        long perfNanos;
+
+        public long perfNanos() {
+            return perfNanos;
+        }
+
+        /** 本村的岗位（职业 → 人数）与算出它的 MC 日（§1.6 H1，每日重算）。 */
+        Map<String, Integer> jobs = Map.of();
+        long jobsDay = Long.MIN_VALUE;
         private long jobIds = 1;
 
         public Map<Long, Map<String, Integer>> pending() {
@@ -103,6 +113,15 @@ public final class VillageScheduler {
 
         public FailureBook failures() {
             return failures;
+        }
+
+        public Map<String, Integer> jobsCache(long day) {
+            return jobsDay == day ? jobs : null;
+        }
+
+        public void putJobs(long day, Map<String, Integer> j) {
+            jobs = Map.copyOf(j);
+            jobsDay = day;
         }
 
         /** 下一次调度重扫工作站（施工落成后）。 */
@@ -224,6 +243,23 @@ public final class VillageScheduler {
 
     /** 处理一座村庄（GameTest 也直接调用）。返回是否真实运行。 */
     public static boolean process(ServerLevel level, VillagePlans.Plan plan) {
+        long t0 = System.nanoTime();
+        try {
+            return processInner(level, plan);
+        } finally {
+            runtime(plan.village()).perfNanos += System.nanoTime() - t0;
+        }
+    }
+
+    /** 居民执行工作单的耗时记到村庄上（{@code ResidentJobGoal} 调用）。 */
+    public static void addPerf(UUID village, long nanos) {
+        Runtime rt = RUNTIMES.get(village);
+        if (rt != null) {
+            rt.perfNanos += nanos;
+        }
+    }
+
+    private static boolean processInner(ServerLevel level, VillagePlans.Plan plan) {
         MinecraftServer server = level.getServer();
         Optional<VillageRegistry.Village> vo = VillageRegistry.get(server).byId(plan.village());
         if (vo.isEmpty()) {
@@ -253,6 +289,7 @@ public final class VillageScheduler {
         refreshStations(ctx);
         dayStart(ctx);
         rations(ctx);
+        ResidentMigration.step(ctx);
         Construction.tick(ctx);
         sleepAndWake(ctx);
         plan(ctx);
@@ -406,6 +443,16 @@ public final class VillageScheduler {
         List<Scheduler.ResidentView> views = new ArrayList<>();
         Map<UUID, ResidentEntity> byId = new HashMap<>();
         for (ResidentEntity r : ctx.residents()) {
+            if (r.inTransit()) {
+                // 在途移民只做一件事：走到自己的床位（§1.6 H4），不进调度器
+                if (r.idle() && newPathsThisTick < NEW_PATHS_PER_TICK) {
+                    Job arrive = ResidentMigration.arriveJob(ctx, r);
+                    r.assign(arrive);
+                    rt.active.put(r.getUUID(), arrive);
+                    newPathsThisTick++;
+                }
+                continue;
+            }
             byId.put(r.getUUID(), r);
             views.add(new Scheduler.ResidentView(r.getUUID(), r.profession(), VillageContext.pos(r.blockPosition()),
                     r.home() == null ? VillageContext.pos(r.blockPosition()) : VillageContext.pos(r.home()), r.idle(),
@@ -480,6 +527,22 @@ public final class VillageScheduler {
         VillageEconomy.get(level.getServer()).setDirty();
     }
 
+    /** 动作进行中的每一刻：交给类型（祈祷按刻报到）。 */
+    public static void onActTick(ServerLevel level, ResidentEntity resident, Job job, int step, int ticks) {
+        JobType type = JobType.REGISTRY.get(job.type());
+        if (type != null) {
+            type.onActTick(level, resident, job, step, ticks);
+        }
+    }
+
+    /** 走路中每 20 刻：交给类型（祈祷续预留）。 */
+    public static void onWalkTick(ServerLevel level, ResidentEntity resident, Job job, int step) {
+        JobType type = JobType.REGISTRY.get(job.type());
+        if (type != null) {
+            type.onWalkTick(level, resident, job, step);
+        }
+    }
+
     /** 一段动作做完：交给类型处理中间效果。 */
     public static void onActDone(ServerLevel level, ResidentEntity resident, Job job, int step) {
         JobType type = JobType.REGISTRY.get(job.type());
@@ -510,6 +573,7 @@ public final class VillageScheduler {
     public static void onResidentDied(ServerLevel level, ResidentEntity resident) {
         resident.village().ifPresent(v -> VillageEconomy.get(level.getServer()).peek(v).ifPresent(s -> {
             s.roster.remove(resident.getUUID());
+            ResidentMigration.onDied(s, resident, MythDays.today(level.getServer()));
             VillageEconomy.get(level.getServer()).setDirty();
         }));
     }

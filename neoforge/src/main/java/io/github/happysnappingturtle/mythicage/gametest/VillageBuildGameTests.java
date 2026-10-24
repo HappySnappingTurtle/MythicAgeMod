@@ -642,6 +642,12 @@ public final class VillageBuildGameTests {
             h.assertTrue(level == 2, "中神庙满足 T8a 2 级，实际 " + level + "，统计 " + be.survey());
             VillageWorkGameTests.cleanup(h, tv);
             Construction.clearForTest(id);
+            // 神庙比场地宽：场地外建的部分要拆掉，否则会留在世界里干扰后面复用这块地的用例（如找露头大理石）
+            for (BlockPos q : BlockPos.betweenClosed(o.offset(-6, -1, -2), o.offset(30, 20, 30))) {
+                if (!h.getLevel().getBlockState(q).isAir()) {
+                    h.getLevel().setBlock(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+                }
+            }
         });
     }
 }

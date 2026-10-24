@@ -23,6 +23,9 @@
     "flat"
   ],
   "provides": {},
+  "jobs": {
+    "greek:farmer": 1
+  },
   "anchors": {
     "crop": [
       [

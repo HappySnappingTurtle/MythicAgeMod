@@ -88,6 +88,9 @@ public final class VillageEconomy extends SavedData {
         public final Set<String> builtPlots = new LinkedHashSet<>();
         public final List<Notice> notices = new ArrayList<>();
         public long nextProjectId = 1;
+        /** 在途移民（§1.6 H4，每村最多 1 名）：实体 UUID 与动身的世界刻；没有为 null。 */
+        public UUID migrant;
+        public long migrantSince;
 
         State(UUID village) {
             this.village = village;
@@ -205,6 +208,8 @@ public final class VillageEconomy extends SavedData {
                     s.notices.add(ProjectNbt.readNotice((CompoundTag) t2));
                 }
                 s.nextProjectId = Math.max(1, c.getLong("nextProjectId"));
+                s.migrant = c.hasUUID("migrant") ? c.getUUID("migrant") : null;
+                s.migrantSince = c.getLong("migrantSince");
                 e.states.put(s.village, s);
             } catch (RuntimeException ex) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄运行数据：{}", ex.getMessage());
@@ -294,6 +299,10 @@ public final class VillageEconomy extends SavedData {
             s.notices.forEach(n -> notices.add(ProjectNbt.writeNotice(n)));
             c.put("notices", notices);
             c.putLong("nextProjectId", s.nextProjectId);
+            if (s.migrant != null) {
+                c.putUUID("migrant", s.migrant);
+                c.putLong("migrantSince", s.migrantSince);
+            }
             list.add(c);
         }
         tag.put("villages", list);

@@ -32,6 +32,14 @@ public interface JobType {
     default void onActDone(VillageContext ctx, ResidentEntity resident, Job job, int step) {
     }
 
+    /** 一段动作进行中，每刻调用（{@code ticks} 是这一段已经做了几刻，从 1 开始）。祈祷要按刻向神坛报到。默认什么都不做。 */
+    default void onActTick(net.minecraft.server.level.ServerLevel level, ResidentEntity resident, Job job, int step, int ticks) {
+    }
+
+    /** 走路中，每 20 刻调用一次（祈祷要在路上续祈祷位预留，同原版信徒）。默认什么都不做。 */
+    default void onWalkTick(net.minecraft.server.level.ServerLevel level, ResidentEntity resident, Job job, int step) {
+    }
+
     /** 工作单作废（打断、超时）：清掉类型自己挂着的中间数据。默认什么都不做。 */
     default void onAbort(VillageScheduler.Runtime rt, Job job) {
     }

@@ -82,6 +82,9 @@
     "mythic_age:pithos": 2,
     "mythic_age:olive_press": 1
   },
+  "jobs": {
+    "greek:farmer": 2
+  },
   "door": {
     "pos": [
       7,

@@ -30,6 +30,9 @@ final class ResidentJobGoal extends Goal {
 
     @Override
     public void tick() {
+        long t0 = System.nanoTime();
         resident.tickJob();
+        resident.village().ifPresent(v -> io.github.happysnappingturtle.mythicage.village.work.VillageScheduler.addPerf(v,
+                System.nanoTime() - t0));
     }
 }

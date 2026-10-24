@@ -23,12 +23,13 @@ import java.util.Map;
  * @param requires  前置条件：{@code anchor:<锚点>}、{@code building:<建筑 id>}
  * @param patron    主神变体（不单独作为施工候选，按村庄主神挑）；空串表示通用
  * @param buildCosts 本建筑的折算规则（JSON 原样保留，排在文明折算表前面）
+ * @param jobs      本建筑提供的岗位：职业 → 人数（T19 §1.6 H1，移民按空缺分职业）
  */
 public record BuildingSpec(String id, String civ, String template, int sizeX, int sizeY, int sizeZ, int floorY,
                            String category, String stage, boolean generated, Pos door, String doorFacing,
                            Map<String, List<Pos>> anchors, Map<String, Integer> provides, List<String> plotKinds,
                            Pos frame, int priority, boolean unique, List<String> replace, String god, List<String> requires,
-                           String patron, JsonArray buildCosts) {
+                           String patron, JsonArray buildCosts, Map<String, Integer> jobs) {
     public BuildingSpec {
         Map<String, List<Pos>> a = new LinkedHashMap<>();
         anchors.forEach((k, v) -> a.put(k, List.copyOf(v)));
@@ -37,6 +38,7 @@ public record BuildingSpec(String id, String civ, String template, int sizeX, in
         plotKinds = List.copyOf(plotKinds);
         replace = List.copyOf(replace);
         requires = List.copyOf(requires);
+        jobs = Map.copyOf(jobs);
     }
 
     public static BuildingSpec parse(JsonObject o) {
@@ -73,11 +75,19 @@ public record BuildingSpec(String id, String civ, String template, int sizeX, in
                 !o.has("unique") || o.get("unique").getAsBoolean(), strings(o, "replace"),
                 o.has("god") ? o.get("god").getAsString() : "", strings(o, "requires"),
                 o.has("patron") ? o.get("patron").getAsString() : "",
-                o.has("buildCosts") ? o.getAsJsonArray("buildCosts") : new JsonArray());
+                o.has("buildCosts") ? o.getAsJsonArray("buildCosts") : new JsonArray(), counts(o, "jobs"));
     }
 
     private static Pos pos(JsonArray a) {
         return new Pos(a.get(0).getAsInt(), a.get(1).getAsInt(), a.get(2).getAsInt());
+    }
+
+    private static Map<String, Integer> counts(JsonObject o, String k) {
+        Map<String, Integer> out = new LinkedHashMap<>();
+        if (o.has(k)) {
+            o.getAsJsonObject(k).entrySet().forEach(e -> out.put(e.getKey(), e.getValue().getAsInt()));
+        }
+        return out;
     }
 
     private static List<String> strings(JsonObject o, String k) {

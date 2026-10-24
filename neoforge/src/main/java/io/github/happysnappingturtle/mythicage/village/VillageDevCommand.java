@@ -31,6 +31,8 @@ import java.util.Optional;
  * /mythicage dev village add &lt;物品&gt; &lt;数量&gt;   往村库里加（开发环境）
  * /mythicage dev village run &lt;true|false&gt;     强制真实运行 / 未运行（开发环境；用来测离线补算）
  * /mythicage dev village process              立刻调度一次
+ * /mythicage dev village nextday                       MC 日序号 +1（不改世界时钟，重启后还原；看第二天的祈祷、移民）
+ * /mythicage dev village migrate                       不等移民日，直接来一名在途移民（T19 阶段 ④）
  * /mythicage dev village project status|pick|cancel        施工项目（T19 阶段 ③）
  * /mythicage dev village project start &lt;建筑&gt; [地块]     开指定建筑的项目
  * /mythicage dev village project drop &lt;段数&gt;             不等居民，直接落段（拍图用）
@@ -136,6 +138,18 @@ public final class VillageDevCommand {
                             c.getSource().sendSuccess(() -> Component.literal("processed, running = " + r), false);
                             return 1;
                         }).orElse(0)))
+                        .then(Commands.literal("nextday").executes(c -> {
+                            io.github.happysnappingturtle.mythicage.guardian.MythDays.advanceForTest(1);
+                            c.getSource().sendSuccess(() -> Component.literal("MC 日 → "
+                                    + io.github.happysnappingturtle.mythicage.guardian.MythDays.today(c.getSource().getServer())), false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("migrate").executes(c -> withCtx(c, ctx -> {
+                            var m = io.github.happysnappingturtle.mythicage.village.work.ResidentMigration.forceForCommand(ctx);
+                            c.getSource().sendSuccess(() -> Component.literal(m.map(r -> "在途移民 " + r.getName().getString()
+                                    + " " + r.profession() + " @ " + r.blockPosition().toShortString() + " → 床 " + r.home().toShortString())
+                                    .orElse("来不了（没空床或找不到落脚地）")), false);
+                        })))
                         .then(Commands.literal("project")
                                 .then(Commands.literal("status").executes(c -> withCtx(c, ctx -> {
                                     String msg = ctx.state().activeProject().map(p -> p.building + " " + p.state + " 段 "

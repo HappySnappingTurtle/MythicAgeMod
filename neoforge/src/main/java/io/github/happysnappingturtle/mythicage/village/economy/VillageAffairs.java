@@ -93,6 +93,9 @@ public final class VillageAffairs {
         if (s.stock.free() == 0) {
             shortages.add(AffairsView.Line.of("mythic_age.village.short.full"));
         }
+        if (io.github.happysnappingturtle.mythicage.village.VillagePopulation.needsHousing(village)) {
+            shortages.add(AffairsView.Line.of("mythic_age.village.short.housing"));
+        }
         shortages.addAll(0, projectLines(s));
         List<AffairsView.Line> log = new ArrayList<>();
         for (int i = s.log.size() - 1; i >= 0 && log.size() < 8; i--) {

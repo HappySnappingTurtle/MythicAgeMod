@@ -25,6 +25,9 @@
   ],
   "provides": {},
   "priority": 20,
+  "jobs": {
+    "greek:bronzesmith": 1
+  },
   "anchors": {
     "workstation": [
       [
