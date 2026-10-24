@@ -20,7 +20,8 @@
         '#AE7656': 'skin', '#3B2B20': 'hair', '#D6C7A6': 'cloth', '#BDAE8E': 'cloth', '#D2AC58': 'cloth',
         '#DDBB6C': 'cloth', '#B48F42': 'cloth', '#7C3A2F': 'wool', '#6B4A2E': 'cord', '#2F4F6E': 'cord',
         '#5A3B26': 'leather', '#A07A44': 'wicker', '#8A6638': 'wicker', '#7A5A36': 'wood', '#E6E1D6': 'marble',
-        '#9C8B7C': 'clay', '#4E5A2C': 'olive',
+        '#9C8B7C': 'clay', '#4E5A2C': 'olive', '#8A6A44': 'wood', '#5E4630': 'wood', '#6E5236': 'wood', '#9C7A4E': 'wood',
+        '#8E9196': 'metal', '#B0813A': 'metal',
     };
 
     function makeHelpers(ctx, nets, P) {
@@ -85,6 +86,9 @@
                 } else if (mat === 'wood') {
                     modulate(r, (u, v) => (vertical && face !== 'left' && face !== 'right' ? (v % 3 === 0 ? 0.82 : 1.0) : 1.0)
                         * (0.92 + 0.12 * hash(u, v, seed)));
+                } else if (mat === 'metal') {
+                    // 金属：顶边一道亮、零星暗斑
+                    modulate(r, (u, v) => (v === 0 && vertical ? 1.18 : 1.0) * (0.9 + 0.14 * hash(u, v, seed)));
                 } else if (mat === 'marble') {
                     modulate(r, (u, v) => 0.97 + 0.05 * hash(u, v, seed) - ((u * 2 + v) % 9 === 0 ? 0.08 : 0));
                 } else if (mat === 'clay') {

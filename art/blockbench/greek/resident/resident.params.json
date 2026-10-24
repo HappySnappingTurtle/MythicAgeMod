@@ -475,6 +475,174 @@
    ]
   },
   {
+   "id": "tool_pole",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_hook",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_shears",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_sickle",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_fork",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_spade",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_mallet",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_hammer",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_axe",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_saw",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_wedge",
+   "parent": "hand_l",
+   "pivot_model_units": [
+    5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_chisel",
+   "parent": "hand_l",
+   "pivot_model_units": [
+    5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
    "id": "thigh_l",
    "parent": "pelvis",
    "pivot_model_units": [
@@ -2503,6 +2671,673 @@
    "uv_group": "clay_lump_top",
    "uv_share": null,
    "surface_kind": "cuboid"
+  },
+  {
+   "id": "pole_shaft",
+   "bone": "tool_pole",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    9
+   ],
+   "size_model_units": [
+    0.9,
+    0.9,
+    26
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "pole_shaft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "pole_tip",
+   "bone": "tool_pole",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    22.4
+   ],
+   "size_model_units": [
+    1.1,
+    1.1,
+    0.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#5E4630",
+   "uv_group": "pole_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hook_handle",
+   "bone": "tool_hook",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    1.5
+   ],
+   "size_model_units": [
+    1.0,
+    1.0,
+    4.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "hook_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hook_blade",
+   "bone": "tool_hook",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    5.2
+   ],
+   "size_model_units": [
+    0.4,
+    1.2,
+    3.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "hook_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hook_tip",
+   "bone": "tool_hook",
+   "center_model_units": [
+    -5.5,
+    9.4,
+    6.6
+   ],
+   "size_model_units": [
+    0.4,
+    1.4,
+    0.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "hook_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shears_bow",
+   "bone": "tool_shears",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    -0.6
+   ],
+   "size_model_units": [
+    1.6,
+    0.6,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "shears_bow",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shears_blade_a",
+   "bone": "tool_shears",
+   "center_model_units": [
+    -5.9,
+    10.5,
+    2.8
+   ],
+   "size_model_units": [
+    0.4,
+    0.8,
+    5.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "shears_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "shears_blade_b",
+   "bone": "tool_shears",
+   "center_model_units": [
+    -5.1,
+    10.5,
+    2.8
+   ],
+   "size_model_units": [
+    0.4,
+    0.8,
+    5.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "shears_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "sickle_handle",
+   "bone": "tool_sickle",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    1.5
+   ],
+   "size_model_units": [
+    1.0,
+    1.0,
+    4.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "sickle_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "sickle_blade_1",
+   "bone": "tool_sickle",
+   "center_model_units": [
+    -4.6,
+    10.5,
+    4.4
+   ],
+   "size_model_units": [
+    2.2,
+    0.4,
+    0.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B0813A",
+   "uv_group": "sickle_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "sickle_blade_2",
+   "bone": "tool_sickle",
+   "center_model_units": [
+    -3.1,
+    10.5,
+    5.6
+   ],
+   "size_model_units": [
+    0.8,
+    0.4,
+    2.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B0813A",
+   "uv_group": "sickle_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "sickle_blade_3",
+   "bone": "tool_sickle",
+   "center_model_units": [
+    -3.9,
+    10.5,
+    7.0
+   ],
+   "size_model_units": [
+    1.6,
+    0.4,
+    0.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B0813A",
+   "uv_group": "sickle_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fork_shaft",
+   "bone": "tool_fork",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    7.0
+   ],
+   "size_model_units": [
+    0.9,
+    0.9,
+    20
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "fork_shaft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fork_bar",
+   "bone": "tool_fork",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    17.2
+   ],
+   "size_model_units": [
+    3.2,
+    0.7,
+    0.7
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "fork_bar",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fork_tine_l",
+   "bone": "tool_fork",
+   "center_model_units": [
+    -6.7,
+    10.5,
+    19.0
+   ],
+   "size_model_units": [
+    0.5,
+    0.5,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "fork_tine",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fork_tine_m",
+   "bone": "tool_fork",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    19.0
+   ],
+   "size_model_units": [
+    0.5,
+    0.5,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "fork_tine",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fork_tine_r",
+   "bone": "tool_fork",
+   "center_model_units": [
+    -4.3,
+    10.5,
+    19.0
+   ],
+   "size_model_units": [
+    0.5,
+    0.5,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "fork_tine",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spade_shaft",
+   "bone": "tool_spade",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    5.0
+   ],
+   "size_model_units": [
+    0.9,
+    0.9,
+    13
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "spade_shaft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "spade_blade",
+   "bone": "tool_spade",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    13.2
+   ],
+   "size_model_units": [
+    3.0,
+    0.5,
+    3.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#9C7A4E",
+   "uv_group": "spade_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mallet_handle",
+   "bone": "tool_mallet",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    2.5
+   ],
+   "size_model_units": [
+    0.9,
+    0.9,
+    6.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "mallet_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mallet_head",
+   "bone": "tool_mallet",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    6.2
+   ],
+   "size_model_units": [
+    2.2,
+    3.2,
+    2.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#6E5236",
+   "uv_group": "mallet_head",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hammer_handle",
+   "bone": "tool_hammer",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    2.0
+   ],
+   "size_model_units": [
+    0.8,
+    0.8,
+    5.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "hammer_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hammer_head",
+   "bone": "tool_hammer",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    4.9
+   ],
+   "size_model_units": [
+    1.4,
+    2.6,
+    1.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "hammer_head",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_handle",
+   "bone": "tool_axe",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    2.25
+   ],
+   "size_model_units": [
+    0.9,
+    0.9,
+    14.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "axe_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "axe_head",
+   "bone": "tool_axe",
+   "center_model_units": [
+    -5.5,
+    9.5,
+    9.2
+   ],
+   "size_model_units": [
+    0.6,
+    3.4,
+    2.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "axe_head",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "saw_grip",
+   "bone": "tool_saw",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    0.2
+   ],
+   "size_model_units": [
+    1.0,
+    2.0,
+    2.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6A44",
+   "uv_group": "saw_grip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "saw_blade",
+   "bone": "tool_saw",
+   "center_model_units": [
+    -5.5,
+    10.1,
+    6.4
+   ],
+   "size_model_units": [
+    0.3,
+    2.4,
+    10.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "saw_blade",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wedge",
+   "bone": "tool_wedge",
+   "center_model_units": [
+    5.5,
+    10.5,
+    1.6
+   ],
+   "size_model_units": [
+    1.0,
+    1.4,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "wedge",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "chisel",
+   "bone": "tool_chisel",
+   "center_model_units": [
+    5.5,
+    10.5,
+    1.8
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    4.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8E9196",
+   "uv_group": "chisel",
+   "uv_share": null,
+   "surface_kind": "cuboid"
   }
  ],
  "skin_female": "#C48F6D",
@@ -2551,6 +3386,7 @@
   }
  ],
  "revisions": [
+  "T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。",
   "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。",
   "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"
  ]

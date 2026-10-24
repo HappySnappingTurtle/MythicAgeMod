@@ -35,6 +35,9 @@ WOOD_END = "#B89466"
 MARBLE = "#E6E1D6"
 CLAY = "#9C8B7C"
 OLIVE = "#4E5A2C"
+HAFT = "#8A6A44"         # 工具木柄
+IRON = "#8E9196"         # 铁刃
+BRONZE = "#B0813A"       # 青铜刃
 
 BONES = [
     ("root", None, [0, 0, 0]),
@@ -70,6 +73,19 @@ BONES = [
     ("outfit_female_sleeve_l", "upper_arm_l", [5.5, 21.5, 0]),
     ("forearm_l", "upper_arm_l", [5.5, 15.5, 0]),
     ("hand_l", "forearm_l", [5.5, 11.5, 0]),
+    # 工具（T19 阶段 ②b）：柄沿拳头握孔（+Z，前方）穿过手心；只按动作名显示（ResidentGeoModel）
+    ("tool_pole", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_hook", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_shears", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_sickle", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_fork", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_spade", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_mallet", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_hammer", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_axe", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_saw", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_wedge", "hand_l", [5.5, 10.5, 0]),
+    ("tool_chisel", "hand_l", [5.5, 10.5, 0]),
     ("thigh_l", "pelvis", [2, 14, 0]),
     ("shin_l", "thigh_l", [2, 8, 0]),
     ("foot_l", "shin_l", [2, 2, 0]),
@@ -201,6 +217,53 @@ ext(mirrored("hand_l", "hand_l", [5.5, 10.5, 0], [3, 2, 3], SKIN_M, group="hand"
 add(part("thumb_l", "hand_l", [3.75, 10.9, 0.9], [0.6, 1.4, 1.0], SKIN_M, group="thumb"))
 add(part("thumb_r", "hand_r", [-3.75, 10.9, 0.9], [0.6, 1.4, 1.0], SKIN_M, group="thumb"))
 
+# ── 工具：右手柄心在 (-5.5, 10.5, 0)，左手在 (5.5, 10.5, 0)；柄沿 +Z ──
+R = -5.5
+L = 5.5
+Y = 10.5
+TOOLS = [
+    # 打橄榄的长杆：握在后段，杆身向前伸 1.4 格
+    part("pole_shaft", "tool_pole", [R, Y, 9], [0.9, 0.9, 26], HAFT),
+    part("pole_tip", "tool_pole", [R, Y, 22.4], [1.1, 1.1, 0.8], "#5E4630"),
+    # 修枝钩刀：短柄 + 前端向下弯的刃
+    part("hook_handle", "tool_hook", [R, Y, 1.5], [1.0, 1.0, 4.0], HAFT),
+    part("hook_blade", "tool_hook", [R, Y, 5.2], [0.4, 1.2, 3.4], IRON),
+    part("hook_tip", "tool_hook", [R, Y - 1.1, 6.6], [0.4, 1.4, 0.8], IRON),
+    # 剪羊毛的弹簧剪：两片刃 + 弓背
+    part("shears_bow", "tool_shears", [R, Y, -0.6], [1.6, 0.6, 1.2], IRON),
+    part("shears_blade_a", "tool_shears", [R - 0.4, Y, 2.8], [0.4, 0.8, 5.0], IRON, group="shears_blade"),
+    part("shears_blade_b", "tool_shears", [R + 0.4, Y, 2.8], [0.4, 0.8, 5.0], IRON, group="shears_blade"),
+    # 镰刀：短柄 + 向内弯的弧形刃（三段）
+    part("sickle_handle", "tool_sickle", [R, Y, 1.5], [1.0, 1.0, 4.0], HAFT),
+    part("sickle_blade_1", "tool_sickle", [R + 0.9, Y, 4.4], [2.2, 0.4, 0.8], BRONZE, group="sickle_blade"),
+    part("sickle_blade_2", "tool_sickle", [R + 2.4, Y, 5.6], [0.8, 0.4, 2.4], BRONZE, group="sickle_blade"),
+    part("sickle_blade_3", "tool_sickle", [R + 1.6, Y, 7.0], [1.6, 0.4, 0.8], BRONZE, group="sickle_blade"),
+    # 扬场木叉：长柄 + 三根叉齿
+    part("fork_shaft", "tool_fork", [R, Y, 7.0], [0.9, 0.9, 20], HAFT),
+    part("fork_bar", "tool_fork", [R, Y, 17.2], [3.2, 0.7, 0.7], HAFT),
+    part("fork_tine_l", "tool_fork", [R - 1.2, Y, 19.0], [0.5, 0.5, 3.2], HAFT, group="fork_tine"),
+    part("fork_tine_m", "tool_fork", [R, Y, 19.0], [0.5, 0.5, 3.2], HAFT, group="fork_tine"),
+    part("fork_tine_r", "tool_fork", [R + 1.2, Y, 19.0], [0.5, 0.5, 3.2], HAFT, group="fork_tine"),
+    # 木铲（挖黏土）：柄 + 前端铲面
+    part("spade_shaft", "tool_spade", [R, Y, 5.0], [0.9, 0.9, 13], HAFT),
+    part("spade_blade", "tool_spade", [R, Y, 13.2], [3.0, 0.5, 3.6], "#9C7A4E"),
+    # 木槌（打楔）：柄 + 横置的槌头
+    part("mallet_handle", "tool_mallet", [R, Y, 2.5], [0.9, 0.9, 6.0], HAFT),
+    part("mallet_head", "tool_mallet", [R, Y, 6.2], [2.2, 3.2, 2.4], "#6E5236"),
+    # 锤：柄 + 铁锤头
+    part("hammer_handle", "tool_hammer", [R, Y, 2.0], [0.8, 0.8, 5.0], HAFT),
+    part("hammer_head", "tool_hammer", [R, Y, 4.9], [1.4, 2.6, 1.4], IRON),
+    # 斧：柄 + 斧头（刃朝下）
+    part("axe_handle", "tool_axe", [R, Y, 2.25], [0.9, 0.9, 14.5], HAFT),  # 柄尾留 5 格给左手
+    part("axe_head", "tool_axe", [R, Y - 1.0, 9.2], [0.6, 3.4, 2.0], IRON),
+    # 手锯：把手 + 锯条
+    part("saw_grip", "tool_saw", [R, Y, 0.2], [1.0, 2.0, 2.0], HAFT),
+    part("saw_blade", "tool_saw", [R, Y - 0.4, 6.4], [0.3, 2.4, 10.4], IRON),
+    # 左手：铁楔（打楔时扶住）、凿子
+    part("wedge", "tool_wedge", [L, Y, 1.6], [1.0, 1.4, 3.2], IRON),
+    part("chisel", "tool_chisel", [L, Y, 1.8], [0.6, 0.6, 4.6], IRON),
+]
+
 # ── 搬运附件（躯干前方，双手从两侧托住；只显示正在搬的那个）──
 EXTRA = [
     # 果篮：编织篮身、篮沿、篮里的橄榄
@@ -215,7 +278,7 @@ EXTRA = [
     # 黏土：一团湿黏土
     part("clay_lump", "carry_clay", [0, 14.6, 5.4], [4.4, 3.2, 3.8], CLAY),
     part("clay_lump_top", "carry_clay", [0.3, 16.5, 5.3], [3.0, 0.8, 2.8], CLAY),
-]
+] + TOOLS
 
 
 def main():
@@ -242,7 +305,7 @@ def main():
     d["attachments"] = [{"id": a, "bone": b, "position_model_units": p,
                          "position_bone_local_units": [round(p[i] - pivots[b][i], 4) for i in range(3)]}
                         for a, b, p in ATTACHMENTS]
-    d["revisions"] = ["T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
+    d["revisions"] = ["T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。", "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
                       "女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"]
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
