@@ -22,7 +22,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 村务（T19 设计文档 §4.3，D4）：右键居民先说一句话；右键谷仓管事打开村务界面（库存、缺口、记录、捐赠）。
+ * 村务（T19 设计文档 §4.3，D4）：右键居民先说一句话（{@link ResidentDialogue}）；谷仓管事接着打开村务界面（库存、缺口、记录、捐赠），
+ * 有交易表的职业接着打开交易界面（{@link ResidentTrade}）。
  * 捐赠是真实转移：满仓退回、记贡献（{@code seenBy}），<b>不加善恶、不加恩宠</b>（11 号 §8）。
  * 文本行的参数以 {@code @} 开头时，客户端把它当语言键翻译。
  */
@@ -35,28 +36,22 @@ public final class VillageAffairs {
     public static void onResidentInteract(ServerPlayer player, ResidentEntity r) {
         player.sendSystemMessage(Component.translatable("mythic_age.village.resident.says",
                 r.getCustomName() == null ? Component.empty() : r.getCustomName(),
-                Component.translatable(professionKey(r.profession())), Component.translatable(activityKey(r))));
+                Component.translatable(professionKey(r.profession())), ResidentDialogue.line(player.server, r)));
         Optional<UUID> v = r.village();
-        if (v.isEmpty()) {
+        if (v.isEmpty() || r.inTransit()) {
             return;
         }
-        VillageEconomy.get(player.server).peek(v.get()).ifPresent(s -> {
-            VillageEconomy.Member m = s.roster.get(r.getUUID());
-            if (m != null && m.keeper()) {
-                open(player, v.get());
-            }
-        });
+        boolean keeper = VillageEconomy.get(player.server).peek(v.get())
+                .map(s -> s.roster.get(r.getUUID())).map(VillageEconomy.Member::keeper).orElse(false);
+        if (keeper) {
+            open(player, v.get());
+        } else if (ResidentTrade.trades(r)) {
+            ResidentTrade.open(player, r);
+        }
     }
 
     public static String professionKey(String profession) {
         return "mythic_age.profession." + profession.replace(':', '.');
-    }
-
-    static String activityKey(ResidentEntity r) {
-        if (r.resting()) {
-            return "mythic_age.village.activity.sleep";
-        }
-        return r.job().map(j -> "mythic_age.village.activity." + j.type()).orElse("mythic_age.village.activity.idle");
     }
 
     public static void open(ServerPlayer player, UUID village) {

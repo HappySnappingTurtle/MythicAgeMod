@@ -39,4 +39,31 @@ public final class AffairsPayloads {
             return TYPE;
         }
     }
+
+    /** 服务端 → 客户端：打开或刷新居民交易界面（§1.8 I7）。 */
+    public record Trade(ResidentTradeView view) implements CustomPacketPayload {
+        public static final Type<Trade> TYPE = payloadType("resident_trade_view");
+        public static final StreamCodec<FriendlyByteBuf, Trade> STREAM_CODEC = ResidentTradeView.STREAM_CODEC.map(Trade::new,
+                Trade::view);
+
+        @Override
+        public Type<Trade> type() {
+            return TYPE;
+        }
+    }
+
+    /** 客户端 → 服务端：做一份交易。 */
+    public record Deal(int resident, String offer) implements CustomPacketPayload {
+        public static final Type<Deal> TYPE = payloadType("resident_trade_deal");
+        public static final StreamCodec<FriendlyByteBuf, Deal> STREAM_CODEC = StreamCodec.of(
+                (buf, d) -> {
+                    buf.writeVarInt(d.resident);
+                    buf.writeUtf(d.offer);
+                }, buf -> new Deal(buf.readVarInt(), buf.readUtf()));
+
+        @Override
+        public Type<Deal> type() {
+            return TYPE;
+        }
+    }
 }

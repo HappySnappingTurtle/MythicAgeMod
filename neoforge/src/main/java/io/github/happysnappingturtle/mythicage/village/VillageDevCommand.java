@@ -31,6 +31,7 @@ import java.util.Optional;
  * /mythicage dev village add &lt;物品&gt; &lt;数量&gt;   往村库里加（开发环境）
  * /mythicage dev village run &lt;true|false&gt;     强制真实运行 / 未运行（开发环境；用来测离线补算）
  * /mythicage dev village process              立刻调度一次
+ * /mythicage dev village talk                          对最近的居民右键（说话、打开交易或村务界面），不用对准
  * /mythicage dev village nextday                       MC 日序号 +1（不改世界时钟，重启后还原；看第二天的祈祷、移民）
  * /mythicage dev village migrate                       不等移民日，直接来一名在途移民（T19 阶段 ④）
  * /mythicage dev village project status|pick|cancel        施工项目（T19 阶段 ③）
@@ -138,6 +139,17 @@ public final class VillageDevCommand {
                             c.getSource().sendSuccess(() -> Component.literal("processed, running = " + r), false);
                             return 1;
                         }).orElse(0)))
+                        .then(Commands.literal("talk").executes(c -> {
+                            // 不用对准：对最近的居民「右键」（说一句话，有交易表的打开交易界面）
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            return p.serverLevel().getEntitiesOfClass(io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity.class,
+                                            p.getBoundingBox().inflate(32)).stream()
+                                    .min(java.util.Comparator.comparingDouble(r -> r.distanceToSqr(p)))
+                                    .map(r -> {
+                                        VillageScheduler.onInteract(p, r);
+                                        return 1;
+                                    }).orElse(0);
+                        }))
                         .then(Commands.literal("nextday").executes(c -> {
                             io.github.happysnappingturtle.mythicage.guardian.MythDays.advanceForTest(1);
                             c.getSource().sendSuccess(() -> Component.literal("MC 日 → "

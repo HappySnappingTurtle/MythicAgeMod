@@ -381,6 +381,14 @@
       }
     ]
   },
+  "trade": {
+    "_doc": "居民交易（T19 §1.8 I4–I5，17 号 §7.3）：次神特色商品对供奉者九折；供奉赫尔墨斯全场九五折；供奉赫拉不受 F7 减半。",
+    "devoteeDiscount": 0.9,
+    "godDiscounts": {
+      "hermes": 0.95
+    },
+    "f7ExemptGod": "hera"
+  },
   "points": {
     "clay": {
       "outputs": {

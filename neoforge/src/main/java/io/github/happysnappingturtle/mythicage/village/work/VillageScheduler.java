@@ -725,6 +725,11 @@ public final class VillageScheduler {
 
     // ───────────── 测试 ─────────────
 
+    /** 只供 GameTest：让村庄警戒到某一刻（对话优先级）。 */
+    public static void alarmForTest(UUID village, long until) {
+        runtime(village).alarmUntil = until;
+    }
+
     /** 只供 GameTest：指定村庄是否真实运行（null 恢复按世界判断）。 */
     public static void forceRunningForTest(UUID village, Boolean running) {
         runtime(village).forceRunning = running;

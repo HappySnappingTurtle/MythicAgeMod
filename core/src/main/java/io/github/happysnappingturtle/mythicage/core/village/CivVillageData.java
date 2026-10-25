@@ -26,7 +26,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Map<String, CropKind> crops, Map<String, FruitKind> fruits, List<StationSearch> stations,
                              Woodland woodland, Map<String, NaturalPoint> naturalPoints, Residents residents,
                              Map<String, Integer> initialStock, Map<String, Profession> professions,
-                             Map<String, VillageRecipe> recipes, BuildCosts buildCosts) {
+                             Map<String, VillageRecipe> recipes, BuildCosts buildCosts,
+                             io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade) {
     /**
      * 采集点种类（建筑锚点同名）。
      *
@@ -94,8 +95,36 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                             List<String> female) {
     }
 
-    /** @param jobs 能做的工作单类型（基础工作另外任何人都能做） */
-    public record Profession(String id, Set<String> jobs, String stage, boolean special) {
+    /**
+     * @param jobs   能做的工作单类型（基础工作另外任何人都能做）
+     * @param trades 交易表（T19 §1.8 I1）；空表示这个职业不交易
+     */
+    public record Profession(String id, Set<String> jobs, String stage, boolean special,
+                             List<io.github.happysnappingturtle.mythicage.core.village.trade.ResidentOffer> trades, ShortWhen shortWhen) {
+        public Profession(String id, Set<String> jobs, String stage, boolean special) {
+            this(id, jobs, stage, special, List.of(), ShortWhen.NONE);
+        }
+
+        public Profession {
+            trades = List.copyOf(trades);
+        }
+    }
+
+    /**
+     * 「本职缺料」的判断（对话用，T19 §1.8 I6）：这种采集点都挖空了，或这些物品村库里一件都没有，或口粮跌破底线。
+     *
+     * @param point 采集点种类；空串不看
+     */
+    public record ShortWhen(String point, List<String> items, boolean food) {
+        public static final ShortWhen NONE = new ShortWhen("", List.of(), false);
+
+        public ShortWhen {
+            items = List.copyOf(items);
+        }
+
+        static ShortWhen parse(JsonObject o) {
+            return new ShortWhen(str(o, "point", ""), list(o, "items"), o.has("food") && o.get("food").getAsBoolean());
+        }
     }
 
     public CivVillageData {
@@ -111,7 +140,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
-                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts);
+                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade);
     }
 
     /** 生成时 {@code homes} 张床的职业分配：先按 {@code initial} 的顺序，床不够就截断，多出来的是 {@code fallback}。 */
@@ -197,11 +226,16 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                 o.has("rations") ? Rations.parse(o.getAsJsonObject("rations")) : Rations.none(),
                 new FuelTable(VillageRecipe.items(o, "fuel")), points, crops, fruits, stations, woodland, natural, residents,
                 VillageRecipe.items(o, "initialStock"), Map.of(), Map.of(),
-                o.has("buildCosts") ? BuildCosts.parse(o.getAsJsonObject("buildCosts")) : BuildCosts.none());
+                o.has("buildCosts") ? BuildCosts.parse(o.getAsJsonObject("buildCosts")) : BuildCosts.none(),
+                o.has("trade") ? io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.parse(o.getAsJsonObject("trade"))
+                        : io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.none());
     }
 
     public static Profession parseProfession(String id, JsonObject o) {
-        return new Profession(id, set(o, "jobs"), str(o, "stage", "archaic"), o.has("special") && o.get("special").getAsBoolean());
+        return new Profession(id, set(o, "jobs"), str(o, "stage", "archaic"), o.has("special") && o.get("special").getAsBoolean(),
+                o.has("trades") ? io.github.happysnappingturtle.mythicage.core.village.trade.ResidentOffer.parse(o.getAsJsonObject("trades"))
+                        : List.of(),
+                o.has("shortWhen") ? ShortWhen.parse(o.getAsJsonObject("shortWhen")) : ShortWhen.NONE);
     }
 
     private static int integer(JsonObject o, String k, int d) {

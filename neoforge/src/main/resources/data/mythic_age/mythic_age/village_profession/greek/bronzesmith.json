@@ -1,1 +1,38 @@
-{"jobs": ["craft"], "stage": "heroic"}
+{
+  "jobs": [
+    "craft"
+  ],
+  "stage": "heroic",
+  "shortWhen": {
+    "items": [
+      "mythic_age:tin_ingot"
+    ]
+  },
+  "trades": {
+    "sell": [
+      {
+        "id": "bronze",
+        "item": "mythic_age:bronze_ingot",
+        "count": 1,
+        "price": 3,
+        "daily": 4
+      }
+    ],
+    "buy": [
+      {
+        "id": "copper",
+        "item": "minecraft:copper_ingot",
+        "count": 6,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "tin",
+        "item": "mythic_age:tin_ingot",
+        "count": 3,
+        "price": 1,
+        "daily": 6
+      }
+    ]
+  }
+}

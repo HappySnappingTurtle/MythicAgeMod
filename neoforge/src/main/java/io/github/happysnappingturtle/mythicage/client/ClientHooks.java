@@ -83,6 +83,16 @@ public final class ClientHooks {
         io.github.happysnappingturtle.mythicage.client.power.ClientAuras.accept(payload);
     }
 
+    /** 居民交易界面（T19 阶段 ④b）：已开着就刷新。 */
+    public static void residentTrade(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Trade payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.ResidentTradeScreen open) {
+            open.update(payload.view());
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.ResidentTradeScreen(payload.view()));
+        }
+    }
+
     /** 村务界面（T19）：已开着就刷新。 */
     public static void villageAffairs(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View payload) {
         Minecraft mc = Minecraft.getInstance();

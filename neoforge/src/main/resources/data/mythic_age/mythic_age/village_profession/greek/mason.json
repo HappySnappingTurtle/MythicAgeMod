@@ -1,1 +1,54 @@
-{"jobs": ["gather_point", "craft"], "stage": "classical"}
+{
+  "jobs": [
+    "gather_point",
+    "craft"
+  ],
+  "stage": "classical",
+  "shortWhen": {
+    "point": "quarry",
+    "items": [
+      "mythic_age:marble"
+    ]
+  },
+  "trades": {
+    "sell": [
+      {
+        "id": "ashlar",
+        "item": "mythic_age:marble_ashlar",
+        "count": 8,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "polished",
+        "item": "mythic_age:polished_marble",
+        "count": 8,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "column",
+        "item": "mythic_age:marble_column",
+        "count": 4,
+        "price": 1,
+        "daily": 4
+      },
+      {
+        "id": "polygonal",
+        "item": "mythic_age:polygonal_marble",
+        "count": 16,
+        "price": 1,
+        "daily": 6
+      }
+    ],
+    "buy": [
+      {
+        "id": "marble",
+        "item": "mythic_age:marble",
+        "count": 16,
+        "price": 1,
+        "daily": 8
+      }
+    ]
+  }
+}

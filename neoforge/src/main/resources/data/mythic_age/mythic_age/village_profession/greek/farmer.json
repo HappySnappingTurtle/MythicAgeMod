@@ -1,1 +1,108 @@
-{"jobs": ["harvest_crop", "pick_fruit", "tend", "craft"], "stage": "archaic"}
+{
+  "jobs": [
+    "harvest_crop",
+    "pick_fruit",
+    "tend",
+    "craft"
+  ],
+  "stage": "archaic",
+  "shortWhen": {
+    "food": true
+  },
+  "trades": {
+    "sell": [
+      {
+        "id": "olive",
+        "item": "mythic_age:olive",
+        "count": 12,
+        "price": 1,
+        "daily": 8
+      },
+      {
+        "id": "grape",
+        "item": "mythic_age:grape",
+        "count": 10,
+        "price": 1,
+        "daily": 8
+      },
+      {
+        "id": "wheat",
+        "item": "minecraft:wheat",
+        "count": 20,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "olive_oil",
+        "item": "mythic_age:olive_oil",
+        "count": 1,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "flatbread",
+        "item": "mythic_age:olive_flatbread",
+        "count": 6,
+        "price": 1,
+        "daily": 8
+      },
+      {
+        "id": "wool",
+        "item": "minecraft:white_wool",
+        "count": 4,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "wine",
+        "item": "mythic_age:wine",
+        "count": 1,
+        "price": 2,
+        "daily": 4,
+        "minAge": "classical"
+      },
+      {
+        "id": "athena_oil",
+        "item": "mythic_age:olive_oil",
+        "count": 3,
+        "price": 2,
+        "daily": 4,
+        "minAge": "classical",
+        "minorGod": "athena"
+      },
+      {
+        "id": "dionysus_wine",
+        "item": "mythic_age:wine",
+        "count": 2,
+        "price": 3,
+        "daily": 4,
+        "minAge": "classical",
+        "minorGod": "dionysus"
+      },
+      {
+        "id": "dionysus_platter",
+        "item": "mythic_age:grape_platter",
+        "count": 2,
+        "price": 1,
+        "daily": 4,
+        "minorGod": "dionysus"
+      }
+    ],
+    "buy": [
+      {
+        "id": "seeds",
+        "item": "minecraft:wheat_seeds",
+        "count": 24,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "bone_meal",
+        "item": "minecraft:bone_meal",
+        "count": 16,
+        "price": 1,
+        "daily": 6
+      }
+    ]
+  }
+}

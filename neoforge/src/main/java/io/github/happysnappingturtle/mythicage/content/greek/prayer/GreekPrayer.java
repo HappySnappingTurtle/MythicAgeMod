@@ -30,6 +30,9 @@ public final class GreekPrayer {
         ATTACHMENT_TYPES.register(modBus);
         PrayerService.init();
         io.github.happysnappingturtle.mythicage.village.work.JobType.register(new ResidentPrayer());
+        // F7：当天祈祷过的居民交易额度减半（T19 §1.8 I4）
+        io.github.happysnappingturtle.mythicage.village.economy.ResidentTrade.setPrayedToday(
+                (r, day) -> r.getData(RECORD).prayedOn(day));
         game.addListener(PrayerService::onServerTickPost);
         game.addListener(PrayerService::onServerStopped);
         game.addListener(BelieverEvents::onStartTracking);

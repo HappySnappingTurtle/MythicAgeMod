@@ -75,6 +75,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private UUID village;
     @Nullable
     private BlockPos home;
+    /** 今天（MC 日）各条交易已做的份数（T19 §1.8 I4，每日清零）。 */
+    private long tradeDay = -1;
+    private final java.util.Map<String, Integer> traded = new java.util.HashMap<>();
     /** 在途移民（T19 §1.6 H4）：还没走到床位、没进名册；到了清空。 */
     private boolean migrant;
     private long migrantSince;
@@ -156,6 +159,19 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
 
     public long migrantSince() {
         return migrantSince;
+    }
+
+    /** 今天这条交易已做了几份。 */
+    public int tradedToday(String offer, long day) {
+        return tradeDay == day ? traded.getOrDefault(offer, 0) : 0;
+    }
+
+    public void addTraded(String offer, long day) {
+        if (tradeDay != day) {
+            tradeDay = day;
+            traded.clear();
+        }
+        traded.merge(offer, 1, Integer::sum);
     }
 
     public void setMigrant(boolean m, long since) {
@@ -591,6 +607,10 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         if (migrant) {
             tag.putLong("MigrantSince", migrantSince);
         }
+        tag.putLong("TradeDay", tradeDay);
+        CompoundTag t = new CompoundTag();
+        traded.forEach(t::putInt);
+        tag.put("Traded", t);
     }
 
     @Override
@@ -603,6 +623,10 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         entityData.set(APPEARANCE, tag.getInt("Appearance"));
         migrant = tag.contains("MigrantSince");
         migrantSince = tag.getLong("MigrantSince");
+        tradeDay = tag.contains("TradeDay") ? tag.getLong("TradeDay") : -1;
+        traded.clear();
+        CompoundTag t = tag.getCompound("Traded");
+        t.getAllKeys().forEach(k -> traded.put(k, t.getInt(k)));
     }
 
     // ───────────── 外观 ─────────────

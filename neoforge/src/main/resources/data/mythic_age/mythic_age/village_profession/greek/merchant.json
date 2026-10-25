@@ -1,1 +1,50 @@
-{"jobs": ["haul"], "stage": "classical"}
+{
+  "jobs": [
+    "haul"
+  ],
+  "stage": "classical",
+  "trades": {
+    "sell": [
+      {
+        "id": "travel_meal",
+        "item": "mythic_age:greek_travel_meal",
+        "count": 3,
+        "price": 1,
+        "daily": 4,
+        "source": "import"
+      },
+      {
+        "id": "map",
+        "item": "minecraft:map",
+        "count": 1,
+        "price": 3,
+        "daily": 2,
+        "source": "import"
+      },
+      {
+        "id": "boat",
+        "item": "minecraft:oak_boat",
+        "count": 1,
+        "price": 2,
+        "daily": 2,
+        "source": "import"
+      },
+      {
+        "id": "olive_oil",
+        "item": "mythic_age:olive_oil",
+        "count": 1,
+        "price": 1,
+        "daily": 6
+      },
+      {
+        "id": "wine",
+        "item": "mythic_age:wine",
+        "count": 1,
+        "price": 2,
+        "daily": 4,
+        "minAge": "classical"
+      }
+    ],
+    "buy": []
+  }
+}

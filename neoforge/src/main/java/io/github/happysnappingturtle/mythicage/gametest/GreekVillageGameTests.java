@@ -132,6 +132,8 @@ public final class GreekVillageGameTests {
                 missing.add(id);
             }
         };
+        // 居民交易表（T19 阶段 ④b）
+        d.professions().values().forEach(p -> p.trades().forEach(o -> item.accept(o.item())));
         for (VillageRecipe r : d.recipes().values()) {
             r.inputs().keySet().forEach(item);
             r.outputs().keySet().forEach(item);

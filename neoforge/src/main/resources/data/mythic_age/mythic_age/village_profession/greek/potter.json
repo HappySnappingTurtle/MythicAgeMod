@@ -1,1 +1,47 @@
-{"jobs": ["gather_point", "craft"], "stage": "archaic"}
+{
+  "jobs": [
+    "gather_point",
+    "craft"
+  ],
+  "stage": "archaic",
+  "shortWhen": {
+    "point": "clay",
+    "items": [
+      "minecraft:clay_ball"
+    ]
+  },
+  "trades": {
+    "sell": [
+      {
+        "id": "ceramic",
+        "item": "mythic_age:ceramic_component",
+        "count": 4,
+        "price": 1,
+        "daily": 8
+      },
+      {
+        "id": "roof_tiles",
+        "item": "mythic_age:terracotta_roof_tiles",
+        "count": 8,
+        "price": 1,
+        "daily": 8
+      }
+    ],
+    "buy": [
+      {
+        "id": "clay",
+        "item": "minecraft:clay_ball",
+        "count": 16,
+        "price": 1,
+        "daily": 8
+      },
+      {
+        "id": "charcoal",
+        "item": "minecraft:charcoal",
+        "count": 10,
+        "price": 1,
+        "daily": 6
+      }
+    ]
+  }
+}

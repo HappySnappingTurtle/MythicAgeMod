@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "15";
+    private static final String PROTOCOL_VERSION = "16";
 
     private MythNetwork() {
     }
@@ -90,6 +90,13 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleDonate)
+                // 居民交易（T19 阶段 ④b）
+                .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Trade.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Trade.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.residentTrade(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Deal.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Deal.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.economy.ResidentTrade::handleDeal)
                 // 举盾时攻击（T17）
                 .playToServer(io.github.happysnappingturtle.mythicage.equipment.ShieldAttack.Payload.TYPE,
                         io.github.happysnappingturtle.mythicage.equipment.ShieldAttack.Payload.STREAM_CODEC,
