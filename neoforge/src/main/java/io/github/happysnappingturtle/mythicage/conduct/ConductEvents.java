@@ -115,11 +115,12 @@ public final class ConductEvents {
         if (victim instanceof GuardianEntity) {
             return Category.GUARDIAN;
         }
+        // 先判防卫者：转岗的士兵也是居民实体，伤害他按「防卫者」计（T18 D6、T20 §6.3）
+        if (victim instanceof VillageDefender d && d.defending()) {
+            return Category.DEFENDER;
+        }
         if (victim instanceof Villager || victim instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity) {
             return Category.VILLAGER;
-        }
-        if (victim instanceof VillageDefender) {
-            return Category.DEFENDER;
         }
         if (victim instanceof IronGolem) {
             return VillageZones.zoneAt(level, victim.blockPosition()).builtKnown() ? Category.DEFENDER : null;

@@ -66,7 +66,12 @@ public final class Residents {
             return Optional.empty();
         }
         VillageEconomy eco = VillageEconomy.get(level.getServer());
-        eco.state(village.id()).roster.put(r.getUUID(), new VillageEconomy.Member(r.getUUID(), profession, home.immutable(), keeper));
+        VillageEconomy.State state = eco.state(village.id());
+        state.roster.put(r.getUUID(), new VillageEconomy.Member(r.getUUID(), profession, home.immutable(), keeper));
+        // 生成时的士兵（V3 §8 初始卫兵）：直接穿上种子兵装，不从村库扣（T20 §4.4）
+        data.soldier(profession).ifPresent(p -> io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.enlistFree(state, r,
+                profession, p, data.soldiers().seedKit().getOrDefault(profession,
+                        io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierProfile.Tier.SIMPLE)));
         eco.setDirty();
         return Optional.of(r);
     }

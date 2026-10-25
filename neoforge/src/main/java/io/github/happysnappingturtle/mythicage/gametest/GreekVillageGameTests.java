@@ -75,6 +75,17 @@ public final class GreekVillageGameTests {
         return VillageWorkGameTests.state(h, tv);
     }
 
+    /**
+     * T20 起希腊合并了五文明共用的采石面、砾石滩（§10.6）。只看林地、大理石的用例先占住这两种点（余量 0）：
+     * 否则接管时找不到砾石会在附近放露头（可能放进本场地或隔壁场地），采石单也会抢在伐木单前面。
+     */
+    static void withoutCommonPoints(GameTestHelper h, VillageWorkGameTests.TV tv) {
+        VillageEconomy.State s = state(h, tv);
+        for (String k : List.of("stone", "gravel")) {
+            s.points.put(k + "_0", new ResourcePoint(k + "_0", k, abs(h, 0, 1, 35), 0, 0, 0, 0));
+        }
+    }
+
     private static void cleanup(GameTestHelper h, VillageWorkGameTests.TV tv) {
         VillageWorkGameTests.cleanup(h, tv);
     }
@@ -355,6 +366,7 @@ public final class GreekVillageGameTests {
         }
         h.setBlock(new BlockPos(3, 5, 30), Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true));
         ResidentEntity r = VillageWorkGameTests.resident(h, tv, LABORER, 12, 19);
+        withoutCommonPoints(h, tv);
         VillageWorkGameTests.takeOver(h, tv);
         VillageEconomy.State s = state(h, tv);
         BlockPos natural = h.absolutePos(new BlockPos(12, 2, 20));
@@ -383,10 +395,13 @@ public final class GreekVillageGameTests {
         VillageWorkGameTests.TV tv = village(h, Map.of());
         VillageEconomy.State s = state(h, tv);
         try {
+            withoutCommonPoints(h, tv);
             VillageWorkGameTests.takeOver(h, tv);
             ResourcePoint q = s.points.get("quarry_0");
             BlockPos mp = h.absolutePos(new BlockPos(14, 2, 28));
-            h.assertTrue(q != null && q.pos().equals(abs(h, 14, 2, 28)), "登记了露头大理石：" + s.points.keySet()
+            // 48 格的正式半径可能先找到隔壁场地放的露头（场地排布随用例数变），所以只要求登记的是一块露出的大理石
+            h.assertTrue(q != null && h.getLevel().getBlockState(new BlockPos(q.pos().x(), q.pos().y(), q.pos().z()))
+                    .is(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE.get()), "登记了露头大理石：" + s.points.keySet()
                     + " 高度图 " + h.getLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, mp.getX(), mp.getZ())
                     + " 方块 y " + mp.getY() + " = " + h.getLevel().getBlockState(mp) + " 中心 " + tv.village().bell().pos()
                     + " 已加载 " + h.getLevel().isLoaded(mp));
@@ -395,7 +410,9 @@ public final class GreekVillageGameTests {
             s.points.remove("quarry_0");
             CivVillageData.NaturalPoint full = VillageData.civ(GREEK).orElseThrow().naturalPoints().get("quarry");
             // 只在本场地附近找（20 格，露头从 14 格起放）：同一批并行的用例会在隔壁场地放露头，48 格的正式半径会找到别人的（场地排布变了才暴露）
-            CivVillageData.NaturalPoint np = new CivVillageData.NaturalPoint(full.kind(), full.block(), 20, full.outcrop());
+            // T20：用例变多后，隔壁场地的大理石露头也会落进 20 格内（场地排布变了）。这一半只验证「找不到就放露头」的机制，
+            // 所以换成一种别的用例从不放的方块（粗铜块），数量检查同样按它数
+            CivVillageData.NaturalPoint np = new CivVillageData.NaturalPoint(full.kind(), "minecraft:raw_copper_block", 20, full.outcrop());
             h.assertTrue(NaturalResources.registerNaturalForTest(h.getLevel(), tv.id(), np), "放了露头");
             ResourcePoint o = s.points.get("quarry" + NaturalResources.OUTCROP);
             h.assertTrue(o != null, "露头登记了：" + s.points.keySet() + " " + s.points.values().stream()
@@ -404,7 +421,7 @@ public final class GreekVillageGameTests {
             BlockPos top = new BlockPos(o.pos().x(), o.pos().y(), o.pos().z());
             int marble = 0;
             for (BlockPos p : BlockPos.betweenClosed(top.offset(-1, -1, -1), top.offset(1, 0, 1))) {
-                if (h.getLevel().getBlockState(p).is(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.MARBLE.get())) {
+                if (h.getLevel().getBlockState(p).is(Blocks.RAW_COPPER_BLOCK)) {
                     marble++;
                 }
             }

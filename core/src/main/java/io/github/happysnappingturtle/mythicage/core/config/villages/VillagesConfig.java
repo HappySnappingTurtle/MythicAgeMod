@@ -13,11 +13,28 @@ import java.util.Map;
  * @param patronWeights          文明 → 主神权重表；没有条目的文明，村庄登记时主神为空，有了条目后补抽
  * @param patronBiomeBonus       文明 → 主神 → 群系加成：村庄中心附近有指定群系时该主神权重乘以倍率
  * @param titleOnEnter           进入村庄时显示标题
+ * @param soldiers               村民士兵（T20 设计文档 §10.5）
  */
 public record VillagesConfig(Mode vanillaVillages, Map<String, Map<String, Integer>> vanillaTypeToCiv,
                              boolean generateVanillaVillages, double chineseRiverChance,
                              Map<String, Map<String, Integer>> patronWeights,
-                             Map<String, Map<String, BiomeBonus>> patronBiomeBonus, boolean titleOnEnter) {
+                             Map<String, Map<String, BiomeBonus>> patronBiomeBonus, boolean titleOnEnter,
+                             Soldiers soldiers) {
+    /**
+     * 村民士兵：是否启用、硬上限（0–12）、人口比例（0–0.5），01 号 §0.2。
+     */
+    public record Soldiers(boolean enabled, int hardCap, double ratio) {
+        public static final Soldiers DEFAULTS = new Soldiers(true, 6, 0.25);
+    }
+
+    public VillagesConfig(Mode vanillaVillages, Map<String, Map<String, Integer>> vanillaTypeToCiv,
+                          boolean generateVanillaVillages, double chineseRiverChance,
+                          Map<String, Map<String, Integer>> patronWeights,
+                          Map<String, Map<String, BiomeBonus>> patronBiomeBonus, boolean titleOnEnter) {
+        this(vanillaVillages, vanillaTypeToCiv, generateVanillaVillages, chineseRiverChance, patronWeights, patronBiomeBonus,
+                titleOnEnter, Soldiers.DEFAULTS);
+    }
+
     public VillagesConfig {
         vanillaTypeToCiv = Map.copyOf(vanillaTypeToCiv);
         patronWeights = Map.copyOf(patronWeights);

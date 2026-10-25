@@ -57,7 +57,7 @@ public final class Responsibility {
         if (e == null || depth > 4) {
             return Blame.NONE;
         }
-        if (e instanceof VillageDefender) {
+        if (e instanceof VillageDefender d && d.defending()) {
             return Blame.SOLDIER;
         }
         if (e instanceof Player p) {

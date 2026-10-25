@@ -1,0 +1,52 @@
+{
+  "_doc": "五文明共用的基础采集（T20 设计文档 §10.6，D5：采集原石、燧石、树木是各文明的正常能力，皮革自产一部分）。合并进每个文明的 village_civ/<文明>.json：woodland 逐字段、points 与 naturalPoints 逐条；文明写了同名条目就覆盖，写 null 就关掉。@fallback 换成文明自己的基础劳力职业。",
+  "woodland": {
+    "radius": 48,
+    "max": 24,
+    "anim": "chop",
+    "ticks": 80,
+    "professions": ["@fallback"],
+    "perDay": 2,
+    "logsPerTree": 5
+  },
+  "points": {
+    "stone": {
+      "_doc": "采石面：村外露出地面的石头，采得圆石；余量每日恢复（换一处接着采）。",
+      "outputs": {"minecraft:cobblestone": 2},
+      "take": 2,
+      "max": 64,
+      "recover": 4,
+      "anim": "quarry_wedge",
+      "ticks": 60,
+      "professions": ["@fallback"],
+      "perDay": 3
+    },
+    "gravel": {
+      "_doc": "砾石滩：河岸、海滩的砾石，筛得燧石。",
+      "outputs": {"minecraft:flint": 1},
+      "take": 1,
+      "max": 8,
+      "recover": 2,
+      "anim": "dig",
+      "ticks": 40,
+      "professions": ["@fallback"],
+      "perDay": 2
+    },
+    "hides": {
+      "_doc": "剥皮鞣革：畜栏里老弱牲畜宰后取皮、鞣制（不显示宰杀过程）；一座畜栏两天 1 张，其余靠捐赠与收购。",
+      "anchor": "pen",
+      "outputs": {"minecraft:leather": 1},
+      "take": 2,
+      "max": 2,
+      "recover": 1,
+      "anim": "scrape_hide",
+      "ticks": 100,
+      "professions": ["@fallback"],
+      "perDay": 0.5
+    }
+  },
+  "naturalPoints": {
+    "stone": {"block": "minecraft:stone", "radius": 48, "outcrop": true},
+    "gravel": {"block": "minecraft:gravel", "radius": 48, "outcrop": true}
+  }
+}

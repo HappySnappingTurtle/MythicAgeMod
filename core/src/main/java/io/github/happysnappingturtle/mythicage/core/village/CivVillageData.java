@@ -30,7 +30,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Map<String, VillageRecipe> recipes, BuildCosts buildCosts,
                              io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade,
                              io.github.happysnappingturtle.mythicage.core.village.life.LifeData life,
-                             Foundation foundation) {
+                             Foundation foundation,
+                             io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules soldiers) {
     /**
      * 奠基石（T19 §1.13 K1）：方块、可选主神、起步住居（没有住居时的第一个项目，远古也开工）、露宿名额。
      * 方块为空表示这个文明还没有奠基石。
@@ -115,17 +116,23 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
     }
 
     /**
-     * @param jobs   能做的工作单类型（基础工作另外任何人都能做）
-     * @param trades 交易表（T19 §1.8 I1）；空表示这个职业不交易
+     * @param jobs    能做的工作单类型（基础工作另外任何人都能做）；兵种职业是不值勤时能做的
+     * @param trades  交易表（T19 §1.8 I1）；空表示这个职业不交易
+     * @param soldier 兵种数据（T20）；普通职业为 null
      */
     public record Profession(String id, Set<String> jobs, String stage, boolean special,
-                             List<io.github.happysnappingturtle.mythicage.core.village.trade.ResidentOffer> trades, ShortWhen shortWhen) {
+                             List<io.github.happysnappingturtle.mythicage.core.village.trade.ResidentOffer> trades, ShortWhen shortWhen,
+                             io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierProfile soldier) {
         public Profession(String id, Set<String> jobs, String stage, boolean special) {
-            this(id, jobs, stage, special, List.of(), ShortWhen.NONE);
+            this(id, jobs, stage, special, List.of(), ShortWhen.NONE, null);
         }
 
         public Profession {
             trades = List.copyOf(trades);
+        }
+
+        public boolean isSoldier() {
+            return soldier != null;
         }
     }
 
@@ -159,7 +166,14 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
-                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life, foundation);
+                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life, foundation,
+                soldiers);
+    }
+
+    /** 兵种数据：职业是兵种时返回它的数据。 */
+    public java.util.Optional<io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierProfile> soldier(String profession) {
+        Profession p = professions.get(profession);
+        return p == null ? java.util.Optional.empty() : java.util.Optional.ofNullable(p.soldier());
     }
 
     /** 生成时 {@code homes} 张床的职业分配：先按 {@code initial} 的顺序，床不够就截断，多出来的是 {@code fallback}。 */
@@ -250,7 +264,9 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                         : io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.none(),
                 o.has("life") ? io.github.happysnappingturtle.mythicage.core.village.life.LifeData.parse(o.getAsJsonObject("life"))
                         : io.github.happysnappingturtle.mythicage.core.village.life.LifeData.none(),
-                o.has("foundation") ? foundation(o.getAsJsonObject("foundation")) : Foundation.NONE);
+                o.has("foundation") ? foundation(o.getAsJsonObject("foundation")) : Foundation.NONE,
+                o.has("soldiers") ? io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules.parse(o.getAsJsonObject("soldiers"))
+                        : io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules.NONE);
     }
 
     static Foundation foundation(JsonObject f) {
@@ -258,10 +274,17 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
     }
 
     public static Profession parseProfession(String id, JsonObject o) {
+        return parseProfession(id, o, new ArrayList<>());
+    }
+
+    /** 解析职业；兵种段的可修正问题写进 {@code warnings}。 */
+    public static Profession parseProfession(String id, JsonObject o, List<String> warnings) {
         return new Profession(id, set(o, "jobs"), str(o, "stage", "archaic"), o.has("special") && o.get("special").getAsBoolean(),
                 o.has("trades") ? io.github.happysnappingturtle.mythicage.core.village.trade.ResidentOffer.parse(o.getAsJsonObject("trades"))
                         : List.of(),
-                o.has("shortWhen") ? ShortWhen.parse(o.getAsJsonObject("shortWhen")) : ShortWhen.NONE);
+                o.has("shortWhen") ? ShortWhen.parse(o.getAsJsonObject("shortWhen")) : ShortWhen.NONE,
+                o.has("soldier") ? io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierProfile.parse(
+                        o.getAsJsonObject("soldier"), id + ".soldier", warnings) : null);
     }
 
     private static int integer(JsonObject o, String k, int d) {

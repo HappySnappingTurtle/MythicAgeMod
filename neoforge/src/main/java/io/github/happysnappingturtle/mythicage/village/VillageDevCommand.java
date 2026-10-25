@@ -122,6 +122,7 @@ public final class VillageDevCommand {
         if (FMLEnvironment.production) {
             return;
         }
+        io.github.happysnappingturtle.mythicage.village.soldier.SoldierDevCommand.register(d);
         // 奠基石（T19 阶段 ⑥，D9：阶段 A 只能用命令发放）
         d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
                 .then(Commands.literal("foundation").then(Commands.literal("give").executes(c -> {

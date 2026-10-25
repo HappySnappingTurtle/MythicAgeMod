@@ -317,6 +317,9 @@ public final class LangKeys {
         add("mythic_age.village.activity.go_home", "天晚了，该回家了。", "It's getting late; time to head home.", "遅くなったので家に帰ります。");
         add("mythic_age.village.log.line", "第 %s 日：%s", "Day %s: %s", "%s 日目：%s");
         add("mythic_age.village.log.founded", "村务开始登记", "The village records begin", "村の記録が始まった");
+        add("mythic_age.village.log.enlisted", "%s 穿上兵装，成为%s", "%s took up arms as a %s", "%sが装備を整え、%sになった");
+        add("mythic_age.village.log.discharged", "%s 卸下兵装，回去做工", "%s laid down arms and went back to work", "%sは装備を解いて仕事に戻った");
+        add("mythic_age.village.log.kit_seeded", "村库里备好了一套兵装", "A set of soldier's gear was readied in the stores", "村の倉に兵装が一揃い用意された");
         add("mythic_age.village.log.hungry", "晚饭的口粮差 %s 份", "Supper was %s rations short", "夕食の食料が %s 食分足りなかった");
         add("mythic_age.village.log.catch_up", "离开期间（%s 日）：%s", "While you were away (%s days): %s", "不在の間（%s 日）：%s");
         add("mythic_age.village.activity.build", "我在帮着盖房子。", "I'm helping with the building work.", "建物の工事を手伝っています。");
@@ -432,6 +435,9 @@ public final class LangKeys {
         add("mythic_age.village.point.clay", "黏土坑", "clay pit", "粘土坑");
         add("mythic_age.village.point.quarry", "采石点", "quarry", "採石場");
         add("mythic_age.village.point.woodland", "林地", "woodland", "林");
+        add("mythic_age.village.point.stone", "采石面", "stone face", "石切り場");
+        add("mythic_age.village.point.gravel", "砾石滩", "gravel bank", "砂利の浜");
+        add("mythic_age.village.point.hides", "鞣革", "tanning", "なめし革");
         add("mythic_age.village.date", "%s第 %s 日", "%s, day %s", "%s %s 日目");
         add("mythic_age.village.date.plain", "一年中的第 %s 日", "Day %s of the year", "一年の %s 日目");
         add("mythic_age.village.period.greek.sowing", "耕种期", "Sowing", "耕作期");

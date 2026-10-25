@@ -8,4 +8,8 @@ package io.github.happysnappingturtle.mythicage.conduct;
  * </ul>
  */
 public interface VillageDefender {
+    /** 此刻是不是防卫者（居民只有转岗成士兵时才是，T20）。 */
+    default boolean defending() {
+        return true;
+    }
 }

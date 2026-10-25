@@ -28,7 +28,10 @@ public final class ResidentAnims {
             case "eat", "sit_watch" -> "sit";
             case "run", "torch_run" -> "walk";
             case "water_carry_head", "carry_basket_head" -> "carry_walk";
-            case "fish_cast", "fish_reel", "boat_push" -> "haul_pick";
+            case "fish_cast", "fish_reel", "boat_push", "scrape_hide", "collect_pick" -> "haul_pick";
+            // 士兵动作（T20 阶段 ③ 制作）：站岗、警觉、举盾、拦截先用待机；巡逻、后撤用走
+            case "guard_idle", "alert", "block_hold", "block_raise", "block_lower", "intercept_step", "train" -> "idle";
+            case "patrol_walk", "retreat", "skirmish_backstep" -> "walk";
             default -> "build_hammer";
         };
     }

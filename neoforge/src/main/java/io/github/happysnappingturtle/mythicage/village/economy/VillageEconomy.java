@@ -96,6 +96,12 @@ public final class VillageEconomy extends SavedData {
         /** 当日计数（§1.10：打鱼次数、节庆商品、祭品、祭司差事……），换日清零。 */
         public final Map<String, Integer> daily = new LinkedHashMap<>();
         public long dailyDay = -1;
+        /** 士兵（T20）：居民 UUID → 兵装与弹药。和名册的职业同步：职业是兵种的人才有这一行。 */
+        public final Map<UUID, io.github.happysnappingturtle.mythicage.village.soldier.SoldierRecord> soldiers = new LinkedHashMap<>();
+        /** 转岗序号的计数。 */
+        public long enlistCounter;
+        /** 已有存档补发过初始兵装（T20 D11，只补一次）。 */
+        public boolean soldierSeeded;
 
         State(UUID village) {
             this.village = village;
@@ -232,6 +238,13 @@ public final class VillageEconomy extends SavedData {
                 s.dailyDay = c.contains("dailyDay") ? c.getLong("dailyDay") : -1;
                 CompoundTag dc = c.getCompound("daily");
                 dc.getAllKeys().forEach(k -> s.daily.put(k, dc.getInt(k)));
+                CompoundTag sol = c.getCompound("soldiers");
+                for (String k : sol.getAllKeys()) {
+                    s.soldiers.put(UUID.fromString(k),
+                            io.github.happysnappingturtle.mythicage.village.soldier.SoldierRecord.load(sol.getCompound(k)));
+                }
+                s.enlistCounter = c.getLong("enlistCounter");
+                s.soldierSeeded = c.getBoolean("soldierSeeded");
                 e.states.put(s.village, s);
             } catch (RuntimeException ex) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄运行数据：{}", ex.getMessage());
@@ -326,6 +339,11 @@ public final class VillageEconomy extends SavedData {
             CompoundTag dc = new CompoundTag();
             s.daily.forEach(dc::putInt);
             c.put("daily", dc);
+            CompoundTag sol = new CompoundTag();
+            s.soldiers.forEach((id, r) -> sol.put(id.toString(), r.save()));
+            c.put("soldiers", sol);
+            c.putLong("enlistCounter", s.enlistCounter);
+            c.putBoolean("soldierSeeded", s.soldierSeeded);
             if (s.migrant != null) {
                 c.putUUID("migrant", s.migrant);
                 c.putLong("migrantSince", s.migrantSince);

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import io.github.happysnappingturtle.mythicage.MythicAge;
 import io.github.happysnappingturtle.mythicage.core.village.CivVillageData;
+import io.github.happysnappingturtle.mythicage.core.village.CommonVillageData;
 import io.github.happysnappingturtle.mythicage.core.village.recipe.VillageRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -87,9 +88,21 @@ public final class VillageData {
             switch (kind) {
                 case CIV -> {
                     Map<String, CivVillageData> next = new LinkedHashMap<>(civs);
+                    // 五文明共用的基础采集（T20 §10.6）：先读共用文件，再合并进每个文明
+                    com.google.gson.JsonObject common = null;
+                    for (Map.Entry<ResourceLocation, JsonElement> e : files.entrySet()) {
+                        if (e.getKey().getPath().equals(CommonVillageData.FILE) && e.getValue().isJsonObject()) {
+                            common = e.getValue().getAsJsonObject();
+                        }
+                    }
+                    final com.google.gson.JsonObject shared = common;
                     files.forEach((id, json) -> {
+                        if (id.getPath().equals(CommonVillageData.FILE)) {
+                            return;
+                        }
                         try {
-                            next.put(id.getPath(), CivVillageData.parse(id.getPath(), json.getAsJsonObject()));
+                            next.put(id.getPath(), CivVillageData.parse(id.getPath(),
+                                    CommonVillageData.merge(shared, json.getAsJsonObject(), id.getPath())));
                         } catch (RuntimeException e) {
                             MythicAge.LOGGER.error("村庄数据 {} 解析失败，保留上一版：{}", id, e.getMessage());
                         }
@@ -100,8 +113,10 @@ public final class VillageData {
                     Map<String, Map<String, CivVillageData.Profession>> next = new LinkedHashMap<>();
                     files.forEach((id, json) -> split(id).ifPresent(s -> {
                         try {
+                            java.util.List<String> warnings = new java.util.ArrayList<>();
                             next.computeIfAbsent(s[0], k -> new LinkedHashMap<>()).put(s[0] + ":" + s[1],
-                                    CivVillageData.parseProfession(s[0] + ":" + s[1], json.getAsJsonObject()));
+                                    CivVillageData.parseProfession(s[0] + ":" + s[1], json.getAsJsonObject(), warnings));
+                            warnings.forEach(w -> MythicAge.LOGGER.warn("村庄职业 {}：{}", id, w));
                         } catch (RuntimeException e) {
                             MythicAge.LOGGER.error("村庄职业 {} 解析失败：{}", id, e.getMessage());
                         }

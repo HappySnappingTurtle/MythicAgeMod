@@ -590,17 +590,6 @@
       "outcrop": true
     }
   },
-  "woodland": {
-    "radius": 48,
-    "max": 24,
-    "anim": "chop",
-    "ticks": 80,
-    "professions": [
-      "greek:laborer"
-    ],
-    "perDay": 2,
-    "logsPerTree": 5
-  },
   "fruits": {
     "fruit_tree": {
       "harvester": "olive",

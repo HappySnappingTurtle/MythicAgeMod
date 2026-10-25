@@ -109,6 +109,15 @@ public final class TargetFactsCollector {
             boolean mate = op != null && caster.isAlliedTo(op);
             b.summon(caster.getUUID().equals(owner), mate, op != null && pvp && !mate);
         }
+        if (e instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity r) {
+            // 文明村庄的居民（T20 §6.3）：转岗的士兵按士兵，其余按村民；「本村」看居民所属村庄
+            boolean own = r.village().map(ownVillages::contains).orElse(false);
+            if (r.isSoldier()) {
+                b.soldier(own);
+            } else {
+                b.villager(own);
+            }
+        }
         if (e instanceof AbstractVillager v) {
             boolean own = v instanceof net.minecraft.world.entity.npc.Villager villager
                     && VillageResolver.villageOf(villager).map(x -> ownVillages.contains(x.id())).orElse(false);

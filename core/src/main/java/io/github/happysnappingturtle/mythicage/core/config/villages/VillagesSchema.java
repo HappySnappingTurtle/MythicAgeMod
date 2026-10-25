@@ -84,7 +84,11 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         }
         readBiomeBonus(root.object("patronBiomeBonus"), bonus);
         boolean title = root.bool("titleOnEnter", base.titleOnEnter());
-        return new VillagesConfig(mode, typeToCiv, generateVanilla, chinese, patrons, bonus, title);
+        ObjectReader so = root.object("soldiers");
+        VillagesConfig.Soldiers sb = base.soldiers();
+        VillagesConfig.Soldiers soldiers = new VillagesConfig.Soldiers(so.bool("enabled", sb.enabled()),
+                so.intIn("hardCap", sb.hardCap(), 0, 12), so.doubleIn("ratio", sb.ratio(), 0.0, 0.5));
+        return new VillagesConfig(mode, typeToCiv, generateVanilla, chinese, patrons, bonus, title, soldiers);
     }
 
     private static Map<String, Map<String, Integer>> readTypeToCiv(ObjectReader root, Map<String, Map<String, Integer>> base) {
@@ -221,6 +225,11 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         });
         root.add("patronBiomeBonus", bonus);
         root.addProperty("titleOnEnter", value.titleOnEnter());
+        JsonObject soldiers = new JsonObject();
+        soldiers.addProperty("enabled", value.soldiers().enabled());
+        soldiers.addProperty("hardCap", value.soldiers().hardCap());
+        soldiers.addProperty("ratio", value.soldiers().ratio());
+        root.add("soldiers", soldiers);
         return root;
     }
 }

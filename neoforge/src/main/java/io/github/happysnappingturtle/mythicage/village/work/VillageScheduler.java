@@ -77,6 +77,8 @@ public final class VillageScheduler {
         long stationsTick = Long.MIN_VALUE / 2;
         long lastPlan = Long.MIN_VALUE / 2;
         long alarmUntil = Long.MIN_VALUE / 2;
+        /** 警戒场次（T20 §5.5）：从平静进入警戒时 +1，警戒持续中不变。 */
+        long alertSerial;
         boolean wasRunning;
         Boolean forceRunning;
         /** 性能统计（§1.6 H6，GameTest 用）：调度与居民执行累计耗时（纳秒）。 */
@@ -146,6 +148,19 @@ public final class VillageScheduler {
 
         public boolean alarmed(long now) {
             return now < alarmUntil;
+        }
+
+        public long alertSerial() {
+            return alertSerial;
+        }
+
+        /** 进入或延长警戒；返回此刻的警戒场次。 */
+        long alarm(long now) {
+            if (now >= alarmUntil) {
+                alertSerial++;
+            }
+            alarmUntil = now + ALARM_TICKS;
+            return alertSerial;
         }
 
         public FailureBook failures() {
@@ -331,6 +346,7 @@ public final class VillageScheduler {
         Construction.tick(ctx);
         io.github.happysnappingturtle.mythicage.village.life.VillageLife.tick(ctx);
         ctx.behavior().tick(ctx);
+        io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.plan(ctx);
         sleepAndWake(ctx);
         plan(ctx);
         return true;
@@ -436,6 +452,7 @@ public final class VillageScheduler {
         natural(ctx);
         ctx.behavior().onDayStart(ctx);
         Construction.daily(ctx);
+        io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.dayStart(ctx);
     }
 
     /** 晚饭段：每人 1 份（行为模块可在节庆日改为 2 份，见 {@link #rationsPerPerson}）。同一 MC 日只扣一次。 */
@@ -459,6 +476,9 @@ public final class VillageScheduler {
     static void sleepAndWake(VillageContext ctx) {
         boolean night = Schedule.SLEEP.equals(ctx.segment());
         for (ResidentEntity r : ctx.residents()) {
+            if (r.soldierBusy()) {
+                continue;
+            }
             if (night && r.idle()) {
                 r.trySleepAtHome();
             } else if (!night && r.resting()) {
@@ -477,7 +497,7 @@ public final class VillageScheduler {
         rt.active.keySet().removeIf(id -> !present.contains(id));
         for (ResidentEntity r : ctx.residents()) {
             if (alarmNear(r)) {
-                rt.alarmUntil = ctx.now() + ALARM_TICKS;
+                rt.alarm(ctx.now());
                 break;
             }
         }
@@ -492,6 +512,10 @@ public final class VillageScheduler {
                     rt.active.put(r.getUUID(), arrive);
                     newPathsThisTick++;
                 }
+                continue;
+            }
+            if (r.soldierBusy()) {
+                // 值勤、补觉、接敌中的士兵由士兵 AI 接管（T20 §5.7）：不派单，警戒时也不派回屋
                 continue;
             }
             byId.put(r.getUUID(), r);
@@ -617,6 +641,7 @@ public final class VillageScheduler {
     public static void onResidentDied(ServerLevel level, ResidentEntity resident) {
         resident.village().ifPresent(v -> VillageEconomy.get(level.getServer()).peek(v).ifPresent(s -> {
             s.roster.remove(resident.getUUID());
+            io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.onDied(s, resident);
             ResidentMigration.onDied(s, resident, MythDays.today(level.getServer()));
             VillageEconomy.get(level.getServer()).setDirty();
         }));
@@ -768,6 +793,11 @@ public final class VillageScheduler {
     }
 
     // ───────────── 测试 ─────────────
+
+    /** 士兵发现敌人：进入或延长警戒（T20 §5.5）。返回警戒场次。 */
+    public static long raiseAlarm(UUID village, long now) {
+        return runtime(village).alarm(now);
+    }
 
     /** 只供 GameTest：让村庄警戒到某一刻（对话优先级）。 */
     public static void alarmForTest(UUID village, long until) {

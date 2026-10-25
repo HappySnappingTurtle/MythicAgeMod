@@ -47,7 +47,8 @@ import java.util.UUID;
  *   <li>睡觉段回到床位睡下，黎明起床。</li>
  * </ul>
  */
-public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVariantHolder {
+public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVariantHolder,
+        io.github.happysnappingturtle.mythicage.conduct.VillageDefender {
     public static final double REACH = 2.0;
     public static final double WALK_SPEED = 0.55;
     /** 跑（火炬接力、赛跑）。 */
@@ -67,6 +68,8 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private static final EntityDataAccessor<String> CARRY = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
     /** 步态：空 = 走，{@code run} = 跑（只是外观与速度）。 */
     private static final EntityDataAccessor<String> GAIT = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
+    /** 士兵的兵装档（T20 §3.3）：空 = 不是士兵；{@code full} / {@code simple} / {@code none}（无兵装模式）。 */
+    private static final EntityDataAccessor<String> KIT = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
 
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
@@ -101,6 +104,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private BlockPos standFor;
     private BlockPos stand = BlockPos.ZERO;
     private boolean endAct;
+    /** 士兵 AI（T20，服务端、不存档；转岗后才用到）。 */
+    @Nullable
+    private io.github.happysnappingturtle.mythicage.village.soldier.SoldierBrain soldier;
 
     public ResidentEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -128,12 +134,14 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         builder.define(APPEARANCE, 0);
         builder.define(CARRY, "");
         builder.define(GAIT, "");
+        builder.define(KIT, "");
     }
 
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new ResidentFleeGoal(this));
+        goalSelector.addGoal(1, new SoldierGoal(this));
         goalSelector.addGoal(2, new ResidentJobGoal(this));
         // 导航只是「允许穿门」，真的开门要有这个目标（原版村民靠大脑行为开门）；进门后随手关上
         goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.OpenDoorGoal(this, true));
@@ -234,7 +242,46 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     // ───────────── 工作单 ─────────────
 
     public boolean idle() {
-        return job == null && !isSleeping();
+        return job == null && !isSleeping() && !soldierBusy();
+    }
+
+    // ───────────── 士兵（T20） ─────────────
+
+    /** 职业是兵种（转岗的居民，T20 §3.1）。 */
+    public boolean isSoldier() {
+        return !entityData.get(KIT).isEmpty();
+    }
+
+    /** 兵装档；不是士兵为空串。 */
+    public String kitTier() {
+        return entityData.get(KIT);
+    }
+
+    public void setKitTier(String tier) {
+        entityData.set(KIT, tier == null ? "" : tier);
+    }
+
+    public io.github.happysnappingturtle.mythicage.village.soldier.SoldierBrain soldierBrain() {
+        if (soldier == null) {
+            soldier = new io.github.happysnappingturtle.mythicage.village.soldier.SoldierBrain(this);
+        }
+        return soldier;
+    }
+
+    /** 士兵此刻由士兵 AI 接管（值勤、补觉、接敌、撤退、换装）：调度器不派单、警戒不派回屋。 */
+    public boolean soldierBusy() {
+        return soldier != null && isSoldier() && soldier.busy();
+    }
+
+    /** 防卫者（T18 D6）：只有士兵算；它造成的伤害与击杀对任何玩家都按 ×0。 */
+    @Override
+    public boolean defending() {
+        return isSoldier();
+    }
+
+    /** 播放一个动作（空串 = 按移动自动待机 / 行走）。 */
+    public void playAnim(String a) {
+        entityData.set(ANIM, a == null ? "" : a);
     }
 
     public boolean walking() {
@@ -304,7 +351,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     }
 
     /** 能站人：脚下这格与头顶一格没有碰撞，脚下有能踩的地面。 */
-    private boolean standable(BlockPos p) {
+    public boolean standable(BlockPos p) {
         return level().getBlockState(p).getCollisionShape(level(), p).isEmpty()
                 && level().getBlockState(p.above()).getCollisionShape(level(), p.above()).isEmpty()
                 && !level().getBlockState(p.below()).getCollisionShape(level(), p.below()).isEmpty();
@@ -314,7 +361,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
      * 目标本身能站就用它；否则（树干、钟、工作站方块、树冠上的果子）在 3 格内找离目标最近、离自己也近的落脚点。
      * 都找不到就照旧走向目标（寻路会尽量靠近）。
      */
-    BlockPos standSpot(BlockPos t) {
+    public BlockPos standSpot(BlockPos t) {
         if (standable(t)) {
             return t;
         }
@@ -559,15 +606,29 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         if (tickCount % 40 == 0) {
             if (isInWall()) {
                 returnHome();
-            } else {
+            } else if (!soldierBusy() || !resting()) {
                 unstickFromBed();
+            }
+        }
+        if (isSoldier() && getHealth() < getMaxHealth()) {
+            // 回血（§3.2）：睡觉时每 40 刻 1 点；醒着要离上次战斗 600 刻后每 100 刻 1 点
+            long now = level().getGameTime();
+            if (resting() ? tickCount % 40 == 0
+                    : tickCount % 100 == 0 && now - soldierBrain().lastCombat() >= io.github.happysnappingturtle.mythicage.village.soldier.SoldierBrain.CALM_TICKS) {
+                heal(1);
             }
         }
     }
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (!level().isClientSide && isSoldier() && soldier != null) {
+            amount *= soldier.shieldMultiplier(source);
+        }
         boolean hurt = super.hurt(source, amount);
+        if (hurt && isSoldier() && source.getEntity() != null && level() instanceof ServerLevel sl) {
+            io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.onHit(sl, this);
+        }
         if (hurt && !level().isClientSide && job != null) {
             abortJob(false);
         }
@@ -633,6 +694,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         }
         tag.putString("Civ", civ());
         tag.putString("Profession", profession());
+        tag.putString("Kit", kitTier());
         tag.putInt("Appearance", entityData.get(APPEARANCE));
         if (migrant) {
             tag.putLong("MigrantSince", migrantSince);
@@ -650,6 +712,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         home = tag.contains("Home") ? BlockPos.of(tag.getLong("Home")) : null;
         entityData.set(CIV, tag.getString("Civ"));
         entityData.set(PROFESSION, tag.getString("Profession"));
+        entityData.set(KIT, tag.getString("Kit"));
         entityData.set(APPEARANCE, tag.getInt("Appearance"));
         migrant = tag.contains("MigrantSince");
         migrantSince = tag.getLong("MigrantSince");

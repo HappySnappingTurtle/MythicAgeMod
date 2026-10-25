@@ -35,7 +35,8 @@ final class ResidentFleeGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (--scanIn > 0) {
+        // 士兵不逃（T20 §5.6）：有兵装的接敌，没有的护送
+        if (resident.isSoldier() || --scanIn > 0) {
             return false;
         }
         scanIn = 10;
@@ -55,7 +56,7 @@ final class ResidentFleeGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return calmTicks < 100;
+        return calmTicks < 100 && !resident.isSoldier();
     }
 
     @Override

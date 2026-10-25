@@ -158,6 +158,12 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityJoin);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityLeave);
         game.addListener(io.github.happysnappingturtle.mythicage.village.resident.ResidentHostility::onEntityJoin);
+        // T20 村民士兵：谁打过本村的人、士兵击杀的归因 ×0
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageThreats::onDamagePost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageThreats::onServerStopped);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST,
+                io.github.happysnappingturtle.mythicage.village.soldier.SoldierAttribution::onDeath);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.SoldierAttribution::onExperienceDrop);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.PointEvents::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillageDevCommand::onRegisterCommands);
 
