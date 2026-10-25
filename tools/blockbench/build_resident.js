@@ -7,6 +7,7 @@
 (function () {
     const MA = window.MA;
     MA.run('tools/blockbench/lib/entity_build.js');
+    MA.run('tools/blockbench/soldier_anim.js');
     MA.run('tools/blockbench/resident_anim.js');
     const result = MA.buildEntity({
         name: 'resident',

@@ -118,7 +118,8 @@ public final class VillageWorkGameTests {
     static TV village(GameTestHelper h, String civ, Map<String, List<Pos>> anchors, Box built) {
         Pos center = abs(h, 8, 2, 2);
         Map<String, List<Pos>> a = new LinkedHashMap<>(anchors);
-        a.put("center", List.of(center));
+        // 调用方给了广场锚点就用它（游行的集合点；村中心仍是场地边上的钟）
+        a.putIfAbsent("center", List.of(center));
         VillageInfoPiece.Info info = new VillageInfoPiece.Info(civ, "zeus", "test", 1, "test", center, a, List.of(built), List.of());
         UUID id = UUID.randomUUID();
         VillageRegistry.Village v = new VillageRegistry.Village(id, GlobalPos.of(h.getLevel().dimension(),

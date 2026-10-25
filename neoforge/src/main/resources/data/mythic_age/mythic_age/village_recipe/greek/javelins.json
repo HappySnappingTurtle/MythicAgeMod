@@ -4,7 +4,7 @@
   "professions": ["greek:bronzesmith"],
   "inputs": {"mythic_age:bronze_ingot": 1, "mythic_age:olive_planks": 1},
   "outputs": {"mythic_age:javelin": 4},
-  "stages": [{"anim": "bronze_hammer", "ticks": 80}],
+  "stages": [{"anim": "build_hammer", "ticks": 80}],
   "stage": "heroic",
   "stockTarget": 12
 }

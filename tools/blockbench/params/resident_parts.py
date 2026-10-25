@@ -38,6 +38,7 @@ OLIVE = "#4E5A2C"
 HAFT = "#8A6A44"         # 工具木柄
 IRON = "#8E9196"         # 铁刃
 BRONZE = "#B0813A"       # 青铜刃
+RAWHIDE = "#A47A52"      # 生皮（刮皮木上）
 TERRACOTTA = "#B5653A"   # 赤陶（水罐、酒罐）
 GLAZE = "#2A1C14"        # 黑釉带
 REED = "#C8B07A"         # 芦苇（双管笛）
@@ -51,6 +52,11 @@ LEAD = "#7A7C80"
 PITCH = "#3A2A1E"
 FLAME = "#F2A33A"
 FLAME_HI = "#FCE08A"
+# T20 士兵兵装
+SHIELD_RED = "#9A2A22"   # 圆盾外面：红漆（贴图上再画青铜包边与盾徽）
+CREST = "#8E2A20"        # 暗红盔缨（马鬃）
+FELT = "#7A5A3C"         # 简易兵装的毡帽（pilos）
+STONE_TIP = "#7E7A72"    # 石尖
 
 BONES = [
     ("root", None, [0, 0, 0]),
@@ -73,6 +79,7 @@ BONES = [
     ("carry_aulos", "head", [0, 24, 4]),
     ("tool_mask", "head", [0, 26, 4]),
     ("tool_hydria", "root", [0, 0, 7]),
+    ("tool_beam", "root", [0, 0, 9]),
     ("outfit_male_skirt", "pelvis", [0, 14, 0]),
     ("outfit_female_skirt", "pelvis", [0, 14, 0]),
     ("hem_front", "pelvis", [0, 10, 0]),
@@ -105,6 +112,7 @@ BONES = [
     ("tool_hammer", "hand_r", [-5.5, 10.5, 0]),
     ("tool_axe", "hand_r", [-5.5, 10.5, 0]),
     ("tool_saw", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_scraper", "hand_r", [-5.5, 10.5, 0]),
     ("carry_torch", "hand_r", [-5.5, 10.5, 0]),
     ("tool_cup", "hand_r", [-5.5, 10.5, 0]),
     ("tool_bread", "hand_r", [-5.5, 10.5, 0]),
@@ -115,6 +123,22 @@ BONES = [
     ("thigh_l", "pelvis", [2, 14, 0]),
     ("shin_l", "thigh_l", [2, 8, 0]),
     ("foot_l", "shin_l", [2, 2, 0]),
+    # 士兵兵装（T20 阶段 ③，见 docs/重构/开发/T20/美术/士兵_白模卡.md）：kit_<兵种>_<full|simple|any>_<部件>，
+    # 按同步字段 KIT 与职业显隐；名字含 spear / shield 的是武器，做农活等非军事动作时隐藏（ResidentGeoModel）
+    ("kit_hoplite_full_helmet", "head", [0, 22, 0]),
+    ("kit_hoplite_full_crest", "head", [0, 22, 0]),
+    ("kit_hoplite_simple_cap", "head", [0, 22, 0]),
+    ("kit_hoplite_full_armor", "torso", [0, 16, 0]),
+    ("kit_hoplite_full_pteruges", "pelvis", [0, 14, 0]),
+    # 盾挂在左手骨（枢轴在腕）：手骨只绕 Y 转就是绕前臂长轴旋前 / 旋后（骨骼按 Z-Y-X 顺序转，前臂自己的 Y 转动的是肘轴）
+    ("kit_hoplite_full_shield", "hand_l", [5.5, 11.5, 0]),
+    ("kit_hoplite_simple_shield", "hand_l", [5.5, 11.5, 0]),
+    ("kit_hoplite_full_spear", "hand_r", [-5.5, 10.5, 0]),
+    ("kit_hoplite_simple_spear", "hand_r", [-5.5, 10.5, 0]),
+    ("kit_javelineer_full_pads_l", "upper_arm_l", [5.5, 21.5, 0]),
+    ("kit_javelineer_full_pads_r", "upper_arm_r", [-5.5, 21.5, 0]),
+    ("kit_javelineer_any_bundle", "torso", [0, 16, 0]),
+    ("kit_javelineer_any_spear", "hand_r", [-5.5, 10.5, 0]),
 ]
 
 ATTACHMENTS = [
@@ -285,9 +309,15 @@ TOOLS = [
     # 手锯：把手 + 锯条
     part("saw_grip", "tool_saw", [R, Y, 0.2], [1.0, 2.0, 2.0], HAFT),
     part("saw_blade", "tool_saw", [R, Y - 0.4, 6.4], [0.3, 2.4, 10.4], IRON),
+    # 刮皮刀（T20 §10.6 鞣革）：短木柄 + 柄下顺着柄向前伸的青铜单刃，刃口朝下贴着皮推刮
+    part("scraper_handle", "tool_scraper", [R, Y, 0.5], [0.9, 0.9, 3.0], HAFT),
+    part("scraper_blade", "tool_scraper", [R, Y - 1.2, 3.6], [0.3, 1.6, 4.0], BRONZE),
     # 左手：铁楔（打楔时扶住）、凿子
     part("wedge", "tool_wedge", [L, Y, 1.6], [1.0, 1.4, 3.2], IRON),
     part("chisel", "tool_chisel", [L, Y, 1.8], [0.6, 0.6, 4.6], IRON),
+    # 刮皮木（刮皮时摆在身前）：圆木 40° 斜搭，上端抵着大腿、下端插地；上面铺一张生皮（皮面 = 刮刀刃口贴的斜面）
+    part("hide_beam", "tool_beam", [0, 5.5, 9.63], [2.6, 2.6, 16.2], WOOD, rot=(40, 0, 0)),
+    part("hide_skin", "tool_beam", [0, 9.1, 7.45], [9.0, 0.3, 8.8], RAWHIDE, rot=(40, 0, 0)),
 ]
 
 # ── 搬运附件（躯干前方，双手从两侧托住；只显示正在搬的那个）──
@@ -386,6 +416,85 @@ LIFE = (
 EXTRA = EXTRA + LIFE
 
 
+def shield(prefix, bone, face):
+    """圆盾 aspis（左前臂，骨骼挂在左手、只靠手骨绕前臂长轴转）：盾面竖直、朝外（卡片 +X），盾心在肘下（y 14）。近圆用三条交叉的块表达，中间厚、边上薄（盾面微凸），
+    内外两面都错开，不共面。内面：套前臂的青铜臂环 porpax、拳头握着的握带 antilabe（握带沿握孔 +Z 穿过左拳）。"""
+    y = 14.0
+    out = [
+        part(f"{prefix}_a", bone, [8.15, y, 0], [1.0, 7.0, 13.0], face, group=f"{prefix}_a"),
+        part(f"{prefix}_b", bone, [8.20, y, 0], [1.3, 11.0, 11.0], face, group=f"{prefix}_b"),
+        part(f"{prefix}_c", bone, [8.25, y, 0], [1.6, 13.0, 7.0], face, group=f"{prefix}_c"),
+        part(f"{prefix}_porpax_front", bone, [5.7, y, 1.7], [3.5, 1.0, 0.4], BRONZE, group="porpax_side"),
+        part(f"{prefix}_porpax_back", bone, [5.7, y, -1.7], [3.5, 1.0, 0.4], BRONZE, group="porpax_side"),
+        part(f"{prefix}_porpax_inner", bone, [3.8, y, 0], [0.4, 1.0, 3.8], BRONZE, group="porpax_inner"),
+        part(f"{prefix}_antilabe", bone, [5.5, 10.4, 0], [0.5, 0.6, 3.8], LEATHER, group="antilabe"),
+        part(f"{prefix}_peg_front", bone, [6.6, 10.4, 1.8], [1.8, 0.5, 0.5], LEATHER, group="antilabe_peg"),
+        part(f"{prefix}_peg_back", bone, [6.6, 10.4, -1.8], [1.8, 0.5, 0.5], LEATHER, group="antilabe_peg"),
+    ]
+    return out
+
+
+def spear(prefix, bone, head, butt, wood):
+    """长矛 dory（右手）：沿握孔 +Z 穿过手心，握点距尾 13u；全长 30.2u（尾刺 2.5、杆 23、銎 1、矛头 3、尖 0.7）。"""
+    return [
+        part(f"{prefix}_butt", bone, [R, Y, -11.75], [0.9, 0.9, 2.5], butt),
+        part(f"{prefix}_shaft", bone, [R, Y, 1.0], [1.0, 1.0, 23.0], wood),
+        part(f"{prefix}_socket", bone, [R, Y, 13.0], [1.2, 1.2, 1.0], head),
+        part(f"{prefix}_blade", bone, [R, Y, 15.0], [0.4, 2.0, 3.0], head),
+        part(f"{prefix}_rib", bone, [R, Y, 15.0], [0.8, 0.5, 3.0], head),
+        part(f"{prefix}_tip", bone, [R, Y, 16.85], [0.4, 1.0, 0.7], head),
+    ]
+
+
+# ── 士兵兵装（T20 阶段 ③）──
+HELM = "kit_hoplite_full_helmet"
+SOLDIER = [
+    # 青铜盔（科林斯式）：帽顶、后片、两侧颊片、额带、鼻梁护片（上段贴额、下段压在鼻梁上），颊前护片在眼睛下方；眼睛露出
+    part("helm_cap", HELM, [0, 30.2, 0], [9.2, 1.6, 9.2], BRONZE),
+    part("helm_back", HELM, [0, 26.6, -4.55], [9.2, 5.6, 0.9], BRONZE),
+    *mirrored("helm_side_l", HELM, [4.55, 26.6, 0.4], [0.9, 5.6, 8.4], BRONZE),
+    part("helm_brow", HELM, [0, 28.9, 4.55], [9.2, 1.2, 0.9], BRONZE),
+    part("helm_nasal", HELM, [0, 27.5, 4.35], [1.0, 2.0, 0.5], BRONZE),
+    part("helm_nasal_low", HELM, [0, 26.0, 6.15], [1.0, 1.2, 0.4], BRONZE),
+    *mirrored("helm_cheek_l", HELM, [3.0, 24.5, 4.85], [2.0, 3.0, 0.5], BRONZE),
+    # 暗红小盔缨（马鬃）：顶脊 + 后垂；顶高 31.6u
+    part("crest_ridge", "kit_hoplite_full_crest", [0, 31.0, -0.4], [1.8, 1.2, 9.0], CREST),
+    part("crest_tail", "kit_hoplite_full_crest", [0, 28.8, -5.3], [1.8, 4.6, 0.8], CREST),
+    # 简易：毡帽（pilos）——帽箍、帽身、收顶
+    part("pilos_brim", "kit_hoplite_simple_cap", [0, 29.4, 0], [9.2, 0.6, 9.2], FELT),
+    part("pilos_body", "kit_hoplite_simple_cap", [0, 30.2, 0], [8.8, 1.2, 8.8], FELT),
+    part("pilos_top", "kit_hoplite_simple_cap", [0, 31.2, 0], [6.0, 0.8, 6.0], FELT),
+    # 青铜胸甲：前后片罩在短袍外，肩上一对肩带
+    part("cuirass_front", "kit_hoplite_full_armor", [0, 18.0, 2.5], [8.6, 8.0, 0.5], BRONZE),
+    part("cuirass_back", "kit_hoplite_full_armor", [0, 18.0, -2.5], [8.6, 8.0, 0.5], BRONZE),
+    *mirrored("cuirass_strap_l", "kit_hoplite_full_armor", [2.2, 22.3, 0], [2.2, 0.5, 5.0], BRONZE),
+] + [
+    # 下摆皮条（pteruges）前后各 4 条
+    part(f"pteruges_{side}_{i}", "kit_hoplite_full_pteruges", [x, 11.6, 2.62 * sz], [1.7, 4.0, 0.35], "#9A7048", group="pteruges")
+    for side, sz in (("front", 1), ("back", -1)) for i, x in enumerate((-3.0, -1.0, 1.0, 3.0))
+] + shield("shield_full", "kit_hoplite_full_shield", SHIELD_RED) + shield("shield_simple", "kit_hoplite_simple_shield", WOOD) \
+    + spear("spear_full", "kit_hoplite_full_spear", BRONZE, BRONZE, HAFT) \
+    + spear("spear_simple", "kit_hoplite_simple_spear", STONE_TIP, HAFT, HAFT) + [
+    # 投矛兵：皮护肩（肩顶 + 外侧垂片，挂上臂）
+    *mirrored("jav_pad_l", "kit_javelineer_full_pads_l", [5.6, 22.0, 0], [4.0, 1.0, 4.8], LEATHER),
+    *mirrored("jav_flap_l", "kit_javelineer_full_pads_l", [7.65, 20.0, 0], [0.5, 3.6, 4.8], LEATHER),
+    # 背后的投矛束（三支）与斜挎带
+    *[part(f"bundle_shaft_{k}", "kit_javelineer_any_bundle", [0.6 * k - 0.6, 18.5, -2.95 - 0.6 * k], [0.6, 22.0, 0.6], HAFT,
+           (0, 0, 25), group="bundle_shaft") for k in range(3)],
+    *[part(f"bundle_head_{k}", "kit_javelineer_any_bundle",
+           [0.6 * k - 0.6 - 11.6 * 0.4226, 18.5 + 11.6 * 0.9063, -2.95 - 0.6 * k], [0.9, 2.4, 0.9], BRONZE, (0, 0, 25),
+           group="bundle_head") for k in range(3)],
+    part("bundle_strap_front", "kit_javelineer_any_bundle", [0.4, 18.2, 2.35], [1.0, 11.0, 0.3], LEATHER, (0, 0, -36), group="bundle_strap"),
+    part("bundle_strap_back", "kit_javelineer_any_bundle", [0.4, 18.2, -2.35], [1.0, 11.0, 0.3], LEATHER, (0, 0, -36), group="bundle_strap"),
+    # 手里的投矛：杆、投矛绳（ankyle）、青铜矛头
+    part("javelin_shaft", "kit_javelineer_any_spear", [R, Y, 1.0], [0.6, 0.6, 20.0], HAFT),
+    part("javelin_loop", "kit_javelineer_any_spear", [R, Y, -0.6], [0.9, 0.9, 0.5], LEATHER),
+    part("javelin_head", "kit_javelineer_any_spear", [R, Y, 12.2], [0.8, 0.8, 2.4], BRONZE),
+    part("javelin_tip", "kit_javelineer_any_spear", [R, Y, 13.8], [0.5, 0.5, 0.8], BRONZE),
+]
+EXTRA = EXTRA + SOLDIER
+
+
 def main():
     pivots = {b[0]: b[2] for b in BONES}
     d = {
@@ -410,7 +519,7 @@ def main():
     d["attachments"] = [{"id": a, "bone": b, "position_model_units": p,
                          "position_bone_local_units": [round(p[i] - pivots[b][i], 4) for i in range(3)]}
                         for a, b, p in ATTACHMENTS]
-    d["revisions"] = ["T19-R4（阶段 ⑤b）：生活与节庆道具 12 组——头顶水罐与祭篮、接水的水罐、酒罐、糕饼盘、双管笛、火炬、丝带、奠酒浅碗、薄饼、投网、戏剧面具。", "T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。", "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
+    d["revisions"] = ["T20-R6（鞣革）：刮皮刀（短木柄 + 横置青铜刃），劳力的刮皮动作用。", "T20-R5（士兵兵装）：盾矛卫兵完整 / 简易两套（科林斯式青铜盔与盔缨或毡帽、胸甲与下摆皮条、圆盾带臂环与握带、长矛带尾刺），轻装投矛兵（皮护肩、背负投矛束、手中投矛）。", "T19-R4（阶段 ⑤b）：生活与节庆道具 12 组——头顶水罐与祭篮、接水的水罐、酒罐、糕饼盘、双管笛、火炬、丝带、奠酒浅碗、薄饼、投网、戏剧面具。", "T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。", "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
                       "女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"]
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")

@@ -194,8 +194,8 @@ public final class FoundationGameTests {
             var err = FoundationService.placementError(p, h.getLevel(), h.absolutePos(STONE), Civilization.GREEK);
             h.assertTrue(err.isPresent() && err.get().getString().contains("2"), "第 3 个拒绝（宽限中的也算）：" + err);
             reg.remove(b.bell());
-            h.assertTrue(FoundationService.placementError(p, h.getLevel(), h.absolutePos(STONE), Civilization.GREEK).isEmpty(),
-                    "只剩 1 个就能放");
+            var err2 = FoundationService.placementError(p, h.getLevel(), h.absolutePos(STONE), Civilization.GREEK);
+            h.assertTrue(err2.isEmpty(), "只剩 1 个就能放：" + err2.map(net.minecraft.network.chat.Component::getString).orElse(""));
             h.succeed();
         } finally {
             reg.remove(a.bell());

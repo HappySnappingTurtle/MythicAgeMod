@@ -22,6 +22,8 @@
         '#5A3B26': 'leather', '#A07A44': 'wicker', '#8A6638': 'wicker', '#7A5A36': 'wood', '#E6E1D6': 'marble',
         '#9C8B7C': 'clay', '#4E5A2C': 'olive', '#8A6A44': 'wood', '#5E4630': 'wood', '#6E5236': 'wood', '#9C7A4E': 'wood',
         '#8E9196': 'metal', '#B0813A': 'metal',
+        // T20 士兵：盔缨是马鬃（按头发画竖纹）、毡帽按皮革、石尖按陶土颗粒；红漆盾面单独画
+        '#8E2A20': 'hair', '#7A5A3C': 'leather', '#7E7A72': 'clay', '#9A7048': 'leather',
     };
 
     function makeHelpers(ctx, nets, P) {
@@ -181,6 +183,78 @@
         for (const f of SIDES) {
             const L = local('knee', f);
             if (L.r) L.px(0, 0, MA.shade('#AE7656', 0.85), L.r[2], 1);
+        }
+
+        // ── 士兵（T20）：圆盾外面红漆 + 青铜包边，内面木板衬皮；盾缘一圈青铜（简易盾是生皮包边）──
+        const inShield = (z, y) => (Math.abs(z) <= 6.5 && Math.abs(y) <= 3.5) || (Math.abs(z) <= 5.5 && Math.abs(y) <= 5.5)
+            || (Math.abs(z) <= 3.5 && Math.abs(y) <= 6.5);
+        const shieldFaces = (prefix, outer, rim, inner) => {
+            for (const [k, w, h] of [['a', 13, 7], ['b', 11, 11], ['c', 7, 13]]) {
+                const g = prefix + '_' + k;
+                const O = local(g, 'left');
+                if (O.r) {
+                    for (let v = 0; v < O.r[3]; v++) {
+                        for (let u = 0; u < O.r[2]; u++) {
+                            const z = (u + 0.5) / 2 - w / 2;
+                            const y = h / 2 - (v + 0.5) / 2;
+                            const edge = !inShield(z + 1, y) || !inShield(z - 1, y) || !inShield(z, y + 1) || !inShield(z, y - 1);
+                            const r2 = z * z + y * y;
+                            let c = outer;
+                            if (edge) c = rim;
+                            else if (r2 < 0.6) c = rim;  // 盾心铆钉（臂环的铆钉露在外面）
+                            O.px(u, v, MA.shade(c, 0.94 + 0.1 * hash(u, v, w * 7 + h)));
+                        }
+                    }
+                }
+                const I = local(g, 'right');
+                if (I.r) {
+                    for (let v = 0; v < I.r[3]; v++) {
+                        for (let u = 0; u < I.r[2]; u++) {
+                            const z = (u + 0.5) / 2 - w / 2;
+                            const y = h / 2 - (v + 0.5) / 2;
+                            const edge = !inShield(z + 1, y) || !inShield(z - 1, y) || !inShield(z, y + 1) || !inShield(z, y - 1);
+                            // 内面：竖向木板（每 2 格一道缝），中间一圈皮衬
+                            let c = (u % 6 === 5) ? MA.shade(inner, 0.78) : inner;
+                            if (Math.abs(z) < 2.6 && Math.abs(y) < 2.6) c = '#5A3B26';
+                            if (edge) c = rim;
+                            I.px(u, v, MA.shade(c, 0.94 + 0.1 * hash(u, v, w + h * 5)));
+                        }
+                    }
+                }
+                for (const f of ['front', 'back', 'top', 'bottom']) {
+                    const E = local(g, f);
+                    if (E.r) E.px(0, 0, rim, E.r[2], E.r[3]);
+                }
+            }
+        };
+        shieldFaces('shield_full', '#9A2A22', '#B0813A', '#7A5A36');
+        shieldFaces('shield_simple', '#8A6A44', '#5A3B26', '#7A5A36');
+        // 青铜胸甲（肌肉甲）：胸线、腹中线、两道腹横纹、肚脐
+        {
+            const L = local('cuirass_front', 'front');
+            if (L.r) {
+                const line = MA.shade('#B0813A', 0.7);
+                const W = L.r[2];
+                const H = L.r[3];
+                for (let u = 2; u < W - 2; u++) {
+                    if (u !== (W >> 1)) L.px(u, 5 + (Math.abs(u - W / 2) < 3 ? 1 : 0), line);
+                }
+                for (let v = 6; v < H - 2; v++) L.px(W >> 1, v, line);
+                for (const v of [9, 12]) for (let u = 4; u < W - 4; u++) L.px(u, v, MA.shade('#B0813A', 0.82));
+                L.px((W >> 1) - 1, H - 3, line, 2, 1);
+                L.px(0, H - 1, MA.shade('#B0813A', 1.2), W, 1);
+            }
+            const B = local('cuirass_back', 'back');
+            if (B.r) for (let v = 2; v < B.r[3] - 1; v++) B.px(B.r[2] >> 1, v, MA.shade('#B0813A', 0.75));
+        }
+        // 盔：额带一道亮边，颊片下缘一道暗边（科林斯盔的护颊）
+        for (const f of SIDES) {
+            const L = local('helm_brow', f);
+            if (L.r) L.px(0, 0, MA.shade('#B0813A', 1.25), L.r[2], 1);
+        }
+        {
+            const L = local('helm_cheek', 'front');
+            if (L.r) L.px(0, L.r[3] - 1, MA.shade('#B0813A', 0.7), L.r[2], 1);
         }
 
         // ── 五官：头正面 16×16 像素，按像素画、严格左右镜像。图案写画面右半边（角色左侧），mirror 生成另一半 ──

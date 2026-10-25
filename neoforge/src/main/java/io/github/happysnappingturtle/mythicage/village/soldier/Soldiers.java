@@ -118,7 +118,10 @@ public final class Soldiers {
                 rec = new SoldierRecord(m.profession(), SoldierProfile.Tier.byId(r.kitTier()), 0, Map.of(), ++s.enlistCounter);
                 s.soldiers.put(r.getUUID(), rec);
             }
-            if (p.isPresent() && !r.isSoldier()) {
+            AttributeInstance fr = r.getAttribute(Attributes.FOLLOW_RANGE);
+            boolean stale = fr != null && fr.getModifier(KIT_MODIFIER) == null;
+            if (p.isPresent() && (!r.isSoldier() || stale)) {
+                // 没挂或挂的是旧版的兵装属性（比如寻路范围是后加的）：重挂一次
                 apply(r, p.get(), rec.tier());
             } else if (p.isEmpty() && r.isSoldier()) {
                 unapply(r);
@@ -193,7 +196,7 @@ public final class Soldiers {
             }
             byId.put(r.getUUID(), r);
             cands.add(new SoldierRoster.Candidate(r.getUUID(), m.profession(), m.keeper(), r.inTransit(),
-                    Math.sqrt(m.home().distSqr(first))));
+                    Math.sqrt(m.home().distSqr(first)), r.female()));
         }
         // 没加载的名册成员也算劳力人数（只是不会被选中）
         for (VillageEconomy.Member m : s.roster.values()) {
@@ -302,6 +305,8 @@ public final class Soldiers {
         float ratio = r.getHealth() / Math.max(1, r.getMaxHealth());
         modifier(r.getAttribute(Attributes.MAX_HEALTH), p.health() - BASE_HEALTH);
         modifier(r.getAttribute(Attributes.ARMOR), tier == SoldierProfile.Tier.NONE ? 0 : p.armor(tier));
+        // 寻路范围 48 → 96：岗位在村口，谷仓、床位常在五六十格外（实机发现）
+        modifier(r.getAttribute(Attributes.FOLLOW_RANGE), 48);
         r.setHealth(Math.max(1, ratio * r.getMaxHealth()));
         r.setKitTier(tier.id());
         r.soldierBrain().reset();
@@ -311,6 +316,10 @@ public final class Soldiers {
         float ratio = r.getHealth() / Math.max(1, r.getMaxHealth());
         AttributeInstance h = r.getAttribute(Attributes.MAX_HEALTH);
         AttributeInstance a = r.getAttribute(Attributes.ARMOR);
+        AttributeInstance fr = r.getAttribute(Attributes.FOLLOW_RANGE);
+        if (fr != null) {
+            fr.removeModifier(KIT_MODIFIER);
+        }
         if (h != null) {
             h.removeModifier(KIT_MODIFIER);
         }
@@ -359,6 +368,9 @@ public final class Soldiers {
         if (!ctx.data().soldiers().enabled()) {
             return;
         }
+        if (ctx.now() % 200 < VillageScheduler.PLAN_INTERVAL) {
+            sync(ctx);
+        }
         VillageEconomy.State s = ctx.state();
         List<ResidentEntity> list = soldiersOf(ctx);
         if (list.isEmpty()) {
@@ -398,6 +410,10 @@ public final class Soldiers {
                     st == DutyRules.State.ON_DUTY ? post : -1, keeper, swap, ctx.center(), ctx.now()));
             if (r.soldierBrain().busy() && r.job().isPresent()) {
                 r.abortJob(false);
+            }
+            // 上岗、接敌时叫醒（睡着的实体不跑 AI 目标，士兵 AI 自己叫不醒自己；作息也不叫醒由士兵 AI 接管的人）
+            if (st != DutyRules.State.SHIFT_SLEEP && r.resting() && r.soldierBrain().busy()) {
+                r.wakeUp();
             }
         }
     }

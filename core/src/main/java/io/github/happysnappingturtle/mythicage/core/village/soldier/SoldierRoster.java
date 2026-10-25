@@ -73,13 +73,17 @@ public final class SoldierRoster {
     }
 
     /**
-     * 转岗候选：{@code distance} 是床位到第一个岗位的距离。
+     * 转岗候选：{@code distance} 是床位到第一个岗位的距离；{@code female} 的不转（重装步兵与轻装兵都是成年男性公民，
+     * T20 士兵白模卡 §3）。
      */
-    public record Candidate(UUID id, String profession, boolean keeper, boolean inTransit, double distance) {
+    public record Candidate(UUID id, String profession, boolean keeper, boolean inTransit, double distance, boolean female) {
+        public Candidate(UUID id, String profession, boolean keeper, boolean inTransit, double distance) {
+            this(id, profession, keeper, inTransit, distance, false);
+        }
     }
 
     /**
-     * 选一名转岗的人：只从基础劳力里选，不选谷仓管事、不选在途移民；转完后劳力（含管事）至少留 {@code minLaborers} 人。
+     * 选一名转岗的人：只从男性基础劳力里选，不选谷仓管事、不选在途移民；转完后劳力（含管事）至少留 {@code minLaborers} 人。
      * 床位离岗位最近的优先，距离相同按 UUID。
      */
     public static Optional<UUID> pickConvert(List<Candidate> roster, String fallback, int minLaborers) {
@@ -88,7 +92,7 @@ public final class SoldierRoster {
             return Optional.empty();
         }
         return roster.stream()
-                .filter(c -> c.profession().equals(fallback) && !c.keeper() && !c.inTransit())
+                .filter(c -> c.profession().equals(fallback) && !c.keeper() && !c.inTransit() && !c.female())
                 .min(Comparator.comparingDouble(Candidate::distance).thenComparing(Candidate::id))
                 .map(Candidate::id);
     }

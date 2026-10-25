@@ -122,7 +122,9 @@ public final class GreekSoldierGameTests {
     static List<ResidentEntity> laborers(GameTestHelper h, VillageWorkGameTests.TV tv, int n) {
         List<ResidentEntity> out = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            out.add(spawn(h, tv, LABORER, 1 + (i % 15), 33 - 2 * (i / 15), i == 0));
+            ResidentEntity r = spawn(h, tv, LABORER, 1 + (i % 15), 33 - 2 * (i / 15), i == 0);
+            r.setFemale(false);
+            out.add(r);
         }
         return out;
     }
@@ -310,8 +312,8 @@ public final class GreekSoldierGameTests {
         GlobalPos alt = altar(h, 8, 8);
         List<ResidentEntity> ls = laborers(h, tv, 5);
         ResidentEntity g = enlist(h, tv, ls.get(1), HOPLITE, SoldierProfile.Tier.FULL);
-        // 卫兵从居民这一侧出发（从敌人那头绕过来时，路过敌人身边会顺手刺它）
-        g.moveTo(h.absoluteVec(new Vec3(8.5, 2, 4.5)));
+        // 卫兵从居民侧面出发：从敌人那头绕过来时，路过敌人身边会顺手刺它；从居民正后方出发要挤过居民身子，偶尔卡住（偶发失败）
+        g.moveTo(h.absoluteVec(new Vec3(12.5, 2, 12.5)));
         ResidentEntity ward = ls.get(2);
         ward.moveTo(h.absoluteVec(new Vec3(8.5, 2, 12.5)));
         ward.setNoAi(true);
@@ -323,7 +325,9 @@ public final class GreekSoldierGameTests {
             h.assertTrue(g.soldierBrain().ward() == ward, "在护他：" + g.soldierBrain().debug() + " 结束原因 "
                     + PrayerGuard.reasonForTest(g.getUUID()));
             double dz = g.getZ() - ward.getZ();
-            h.assertTrue(dz > 0.5 && dz < 2.0 && Math.abs(g.getX() - ward.getX()) < 1.0, "站在居民与威胁之间：" + g.position());
+            h.assertTrue(dz > 0.5 && dz < 2.0 && Math.abs(g.getX() - ward.getX()) < 1.0, "站在居民与威胁之间：" + h.relativeVec(g.position())
+                    + " 居民 " + h.relativeVec(ward.position()) + " 威胁 " + h.relativeVec(m.position()) + " 导航完 " + g.getNavigation().isDone()
+                    + " 动作 " + g.anim() + " | " + g.soldierBrain().debug());
             h.assertTrue(g.soldierBrain().blocking(), "举盾");
             cleanup(h, tv, m, alt);
         });

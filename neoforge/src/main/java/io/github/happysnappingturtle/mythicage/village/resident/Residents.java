@@ -56,7 +56,8 @@ public final class Residents {
             return Optional.empty();
         }
         RandomSource rnd = level.getRandom();
-        boolean female = rnd.nextBoolean();
+        // 生成时就是士兵的（初始卫兵）一定是男性（T20 士兵白模卡 §3）
+        boolean female = data.soldier(profession).isEmpty() && rnd.nextBoolean();
         List<String> names = female ? data.residents().female() : data.residents().male();
         String name = names.isEmpty() ? "" : names.get(rnd.nextInt(names.size()));
         r.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, rnd.nextFloat() * 360, 0);

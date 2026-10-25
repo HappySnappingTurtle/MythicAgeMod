@@ -495,9 +495,44 @@ def run(root: Path, design: Path | None) -> Report:
     check_recolor(paths, report)
     check_relics(paths, report)
     check_village_buildings(paths, report)
+    check_village_anims(paths, report)
     check_equipment(root, report)
     check_rigs(root, report)
     return report
+
+
+def check_village_anims(paths: Paths, report: Report) -> None:
+    """村庄数据里写的居民动作名（配方工序、采集点、兵种动作表）都要在居民动画文件里（T20：配方写了不存在的动作，
+    游戏里只会悄悄退成通用动作，看不出来）。"""
+    anim_file = paths.main / "assets" / MOD / "animations/entity/resident.animation.json"
+    if not anim_file.exists():
+        report.note("没有居民动画文件，跳过动作名校验")
+        return
+    have = set(json.loads(anim_file.read_text(encoding="utf-8")).get("animations", {}))
+    refs: list[tuple[str, str]] = []
+
+    def walk(node, where: str):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == "anim" and isinstance(v, str) and v:
+                    refs.append((v, where))
+                elif k == "anims" and isinstance(v, dict):
+                    refs.extend((x, where) for x in v.values() if isinstance(x, str) and x)
+                else:
+                    walk(v, where)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v, where)
+
+    for d in paths.data():
+        for f in sorted(d.glob(f"{MOD}/{MOD}/village_*/**/*.json")):
+            try:
+                walk(json.loads(f.read_text(encoding="utf-8")), str(f.relative_to(d)))
+            except json.JSONDecodeError:
+                continue
+    for name, where in refs:
+        if name not in have:
+            report.error(f"{where}：居民动作 {name} 不在 resident.animation.json 里")
 
 
 def check_equipment(root: Path, report: Report) -> None:

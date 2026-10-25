@@ -310,6 +310,25 @@
                 rx('forearm_l', [[0, -30]]),
             ),
         },
+        // 刮皮（T20 §10.6 鞣革）：生皮搭在斜放的刮皮木上，俯身用刮刀顺着皮往前下方推刮，左手按住皮边
+        // （SATRA《The ancient art of leather production》：皮绷在木上刮，肉面用刃刀；刮皮木让人能俯身压着刮）
+        scrape_hide: {
+            length: 1.2,
+            loop: 'loop',
+            bones: merge(
+                squat([[0, -15, 25]]),
+                rx('torso', [[0, 40], [0.6, 44], [1.2, 40]]),
+                rx('head', [[0, 12]]),
+                // 右手：刮刀柄顺着皮面（40° 斜向前下），刃口贴皮，从 s=3 推到 s=5.5（solve_pose：起点握点 0.2u / 柄向 12°，终点 0.2u / 1.4°）
+                rx('upper_arm_r', [[0, [-35, 0, 23]], [0.6, [-65, 2, 21]], [1.2, [-35, 0, 23]]]),
+                rx('forearm_r', [[0, -74], [0.6, -23], [1.2, -74]]),
+                rx('hand_r', [[0, 97], [0.6, 83], [1.2, 97]]),
+                // 左手：手掌按在皮的上段（握点 0.1u / 0u）
+                rx('upper_arm_l', [[0, [-20, -7, -23]], [0.6, [-20, -15, -15]], [1.2, [-20, -7, -23]]]),
+                rx('forearm_l', [[0, -62], [0.6, -75], [1.2, -62]]),
+                rx('hand_l', [[0, [-33, 0, 0]], [0.6, [-2, 0, 5]], [1.2, [-33, 0, 0]]]),
+            ),
+        },
         // 推压榨杆：俯身弓步用力推，一推一松
         press_turn: {
             length: 2.0,
@@ -782,7 +801,10 @@
                 both('forearm_l', [[0, [-14, 0, 0]], [0.8, [-4, 0, 0]], [1.6, [-14, 0, 0]]]),
             ),
         },
+        // ───────────── 士兵动作（T20 阶段 ③）：在 SOLDIER 里定义，见文件末尾 ─────────────
     };
+    Object.assign(ANIMS, MA.soldierAnimations ? MA.soldierAnimations({ merge, both, one, rx, squat, LEGS, ZERO, STEP }) : {});
+    const SOLDIER_ANIMS = new Set(MA.SOLDIER_ANIM_NAMES || []);
 
     /** 握持约束：工具骨骼相对手只能绕柄（卡片 Z）转；姿势一律靠上臂、前臂、手腕。 */
     function checkGrip(name, def) {
@@ -816,6 +838,14 @@
         }
     }
 
+    /** 方块所属的士兵兵装组（kit_*），不是兵装为空。 */
+    const kitOf = (c) => {
+        for (let g = c.parent; g && g.name; g = g.parent) {
+            if (g.name.startsWith('kit_')) return g.name;
+        }
+        return '';
+    };
+
     const box = (c) => {
         c.mesh.updateMatrixWorld(true);
         return new THREE.Box3().setFromObject(c.mesh);
@@ -831,6 +861,8 @@
             Animator.preview();
             for (const c of Cube.all) {
                 if (c.parent && c.parent.name && (c.parent.name.startsWith('carry_') || c.parent.name.startsWith('tool_'))) continue;
+                // 士兵兵装只在士兵动作里检查（别的动作里渲染器把武器藏起来，盔甲随身体走）
+                if (kitOf(c) && !SOLDIER_ANIMS.has(anim.name)) continue;
                 const b = box(c);
                 hi = Math.max(hi, b.max.y);
                 lo = Math.min(lo, b.min.y);

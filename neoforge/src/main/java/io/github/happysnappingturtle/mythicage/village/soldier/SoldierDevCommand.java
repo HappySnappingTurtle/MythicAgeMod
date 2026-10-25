@@ -26,6 +26,7 @@ import java.util.function.Predicate;
  * /mythicage dev village soldier convert [职业]   最近的一名劳力立刻转岗（不看上限，按村库扣兵装）
  * /mythicage dev village soldier demote           最近的一名士兵降回劳力
  * /mythicage dev village soldier kit full|simple|none   最近的一名士兵换成这一档（不扣村库，拍图用）
+ * /mythicage dev village soldier spawn <职业>     在脚下生成一名初始卫兵（村里没有男性劳力可转时复测用）
  * /mythicage dev village soldier daystart         立刻做一次日开始的士兵处理（降回、换装、转岗 1 人）
  * </pre>
  */
@@ -60,6 +61,24 @@ public final class SoldierDevCommand {
                         ok(c, r.getName().getString() + " → " + t.id());
                     });
                 }))));
+        // 村里没有男性劳力可转时用：在脚下生成一名初始卫兵（床位就记在脚下）
+        var spawn = Commands.literal("spawn").then(Commands.argument("profession", StringArgumentType.greedyString())
+                .executes(c -> withCtx(c, ctx -> {
+                    String prof = StringArgumentType.getString(c, "profession");
+                    if (ctx.data().soldier(prof).isEmpty()) {
+                        c.getSource().sendFailure(Component.literal("不是兵种：" + prof));
+                        return;
+                    }
+                    // 落到脚下的地面（创造模式常飞在半空）
+                    BlockPos at = BlockPos.containing(c.getSource().getPosition());
+                    while (at.getY() > c.getSource().getLevel().getMinBuildHeight()
+                            && c.getSource().getLevel().getBlockState(at.below()).getCollisionShape(c.getSource().getLevel(), at.below()).isEmpty()) {
+                        at = at.below();
+                    }
+                    BlockPos home = at;
+                    io.github.happysnappingturtle.mythicage.village.resident.Residents.spawn(c.getSource().getLevel(), ctx.village(),
+                            ctx.data(), prof, home, home, false).ifPresent(r -> ok(c, "生成 " + r.getName().getString() + " " + prof));
+                })));
         var dayStart = Commands.literal("daystart").executes(c -> withCtx(c, ctx -> {
             Soldiers.dayStart(ctx);
             ok(c, "士兵日开始处理完：" + ctx.state().soldiers.size() + " 名士兵，上限 " + Soldiers.cap(ctx));
@@ -67,7 +86,7 @@ public final class SoldierDevCommand {
         d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
                 .then(Commands.literal("village")
                         .then(Commands.literal("soldiers").executes(c -> withCtx(c, ctx -> list(c, ctx))))
-                        .then(Commands.literal("soldier").then(convert).then(demote).then(kit).then(dayStart)))));
+                        .then(Commands.literal("soldier").then(convert).then(demote).then(kit).then(spawn).then(dayStart)))));
     }
 
     private static void list(CommandContext<CommandSourceStack> c, VillageContext ctx) {
@@ -81,7 +100,7 @@ public final class SoldierDevCommand {
                     + Optional.ofNullable(r.soldierBrain().target()).map(t -> t.getName().getString() + "(" + r.soldierBrain().decision() + ")")
                     .orElse("-") + " 撤退=" + r.soldierBrain().retreating() + " 举盾=" + r.soldierBrain().blocking()
                     + " 生命=" + (int) r.getHealth() + "/" + (int) r.getMaxHealth() + " 护甲=" + r.getArmorValue()
-                    + " 位=" + r.blockPosition().toShortString());
+                    + " 位=" + r.blockPosition().toShortString() + " | " + r.soldierBrain().debug());
         }
     }
 
@@ -93,7 +112,8 @@ public final class SoldierDevCommand {
             return;
         }
         String fallback = ctx.data().residents().fallback();
-        nearest(c, ctx, r -> r.profession().equals(fallback)).ifPresent(r -> {
+        // 同正式转岗：只选男性劳力（T20 士兵白模卡 §3）
+        nearest(c, ctx, r -> r.profession().equals(fallback) && !r.female()).ifPresent(r -> {
             VillageEconomy.State s = ctx.state();
             SoldierProfile.Tier t = s.stock.count(p.get().kits().item(SoldierProfile.Tier.FULL)) > 0 ? SoldierProfile.Tier.FULL
                     : SoldierProfile.Tier.SIMPLE;

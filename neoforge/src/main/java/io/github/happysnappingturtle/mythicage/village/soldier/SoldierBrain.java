@@ -140,8 +140,7 @@ public final class SoldierBrain {
             return false;
         }
         BlockPos c = leash(o);
-        if (!SoldierTargetRules.keepChasing(Math.sqrt(threat.distanceToSqr(Vec3.atBottomCenterOf(c))),
-                SoldierTargets.inVillage(level, threat.blockPosition(), o.village()))) {
+        if (!SoldierTargetRules.keepChasing(Math.sqrt(threat.distanceToSqr(Vec3.atBottomCenterOf(c))), inRange(level, o, c, threat))) {
             return false;
         }
         SoldierTargetRules.Decision d = SoldierTargetRules.decide(SoldierTargets.facts(soldier, threat, o.village(),
@@ -236,6 +235,10 @@ public final class SoldierBrain {
         }
         long now = level.getGameTime();
         SoldierProfile p = o.profile();
+        // 只有补觉时才躺着；上岗、接敌时先起床（睡着时这里跑不到，主要靠 Soldiers.plan 叫醒；这里兜底「站着打盹」的情况）
+        if (o.state() != DutyRules.State.SHIFT_SLEEP && soldier.resting()) {
+            soldier.wakeUp();
+        }
         float hp = soldier.getHealth() / Math.max(1, soldier.getMaxHealth());
         if (!retreating && hp < p.retreatBelow() && target != null) {
             retreating = true;
@@ -331,8 +334,7 @@ public final class SoldierBrain {
             if (o.tier() == SoldierProfile.Tier.NONE && d == SoldierTargetRules.Decision.ENGAGE) {
                 d = SoldierTargetRules.Decision.ESCORT;
             }
-            if (!SoldierTargetRules.canEngage(Math.sqrt(e.distanceToSqr(Vec3.atBottomCenterOf(c))),
-                    SoldierTargets.inVillage(level, e.blockPosition(), o.village()))) {
+            if (!SoldierTargetRules.canEngage(Math.sqrt(e.distanceToSqr(Vec3.atBottomCenterOf(c))), inRange(level, o, c, e))) {
                 continue;
             }
             if (ward != null) {
@@ -386,7 +388,7 @@ public final class SoldierBrain {
             return;
         }
         BlockPos c = leash(o);
-        boolean in = SoldierTargets.inVillage(level, target.blockPosition(), o.village());
+        boolean in = inRange(level, o, c, target);
         if (!SoldierTargetRules.keepChasing(Math.sqrt(target.distanceToSqr(Vec3.atBottomCenterOf(c))), in)) {
             dropTarget();
             return;
@@ -401,6 +403,15 @@ public final class SoldierBrain {
                         ? SoldierTargetRules.Decision.ESCORT : d;
             }
         }
+    }
+
+    /** 岗位附近这么近的也算本村范围：村口岗多半在已建范围外，卫兵要守得住自己的岗位（实机发现）。 */
+    public static final double POST_GUARD = 8;
+
+    /** 目标在村庄已建范围内，或离这名士兵的岗位 ≤ 8 格。 */
+    static boolean inRange(ServerLevel level, SoldierOrders o, BlockPos post, LivingEntity e) {
+        return SoldierTargets.inVillage(level, e.blockPosition(), o.village())
+                || e.distanceToSqr(Vec3.atBottomCenterOf(post)) <= POST_GUARD * POST_GUARD;
     }
 
     private void dropTarget() {
@@ -431,13 +442,10 @@ public final class SoldierBrain {
             // 拦截：站到被护者与威胁的连线上，面向威胁举盾，等它进入触及
             double[] at = InterceptRules.stand(ward.getX(), ward.getZ(), target.getX(), target.getZ());
             Vec3 dest = new Vec3(at[0], ward.getY(), at[1]);
-            if (soldier.position().distanceToSqr(dest) > 0.5) {
-                approach(dest, RUN);
+            if (standAt(dest, 0.5)) {
                 if (!p.anim("intercept").equals(soldier.anim()) && !blocking) {
                     soldier.playAnim(p.anim("intercept"));
                 }
-            } else {
-                soldier.getNavigation().stop();
             }
             face(target);
             raise(o, now);
@@ -498,6 +506,10 @@ public final class SoldierBrain {
 
     private boolean fired;
     private boolean backstepPending;
+    /** 后撤一步用的时间（刻）；退完之后这么久内不再退（够出一次手）。 */
+    static final int BACKSTEP_TICKS = 12;
+    static final int BACKSTEP_GAP = 40;
+    private long backstepAt = Long.MIN_VALUE / 2;
 
     private void ranged(SoldierOrders o, long now) {
         SoldierProfile p = o.profile();
@@ -516,10 +528,22 @@ public final class SoldierBrain {
                 return;
             }
             if (backstepPending || dist < r.minRange()) {
+                if (now - backstepAt < BACKSTEP_TICKS) {
+                    // 正在退这一步
+                    face(target);
+                    return;
+                }
+                // 一次只退一步：刚退过还被贴身（敌人跟得上）就就近出手。以前每刻都重新后撤，尸壳追着走，投矛兵一直退、一支不投（实机）
+                if (now - backstepAt >= BACKSTEP_TICKS + BACKSTEP_GAP) {
+                    backstepPending = false;
+                    if (backstep(Math.max(r.backstep(), r.minRange() - dist + 1))) {
+                        backstepAt = now;
+                        face(target);
+                        return;
+                    }
+                }
+                // 退无可退（身后是坎或墙）：就近出手，不站着挨打（实机：投矛兵退下平台边的坎被尸壳追上打死）
                 backstepPending = false;
-                backstep(Math.max(r.backstep(), r.minRange() - dist + 1));
-                face(target);
-                return;
             }
             if (dist > r.range() - 0.5 || !soldier.hasLineOfSight(target)) {
                 approach(target.position(), RUN);
@@ -589,15 +613,35 @@ public final class SoldierBrain {
         return Optional.empty();
     }
 
-    /** 面朝目标往后退 {@code dist} 格（投后撤步、近身后撤）。 */
-    private void backstep(double dist) {
+    /**
+     * 面朝目标往后退 {@code dist} 格（投后撤步、近身后撤）：只退到能站、高差不超过 1 格的地方（不退下坎、不退进坑）；
+     * 正后方不行就试左后、右后。返回是否退了。
+     */
+    private boolean backstep(double dist) {
         Vec3 away = soldier.position().subtract(target.position()).multiply(1, 0, 1);
         if (away.lengthSqr() < 1.0E-4) {
             away = new Vec3(1, 0, 0);
         }
-        Vec3 dest = soldier.position().add(away.normalize().scale(dist));
-        soldier.getNavigation().moveTo(dest.x, soldier.getY(), dest.z, WALK);
-        repathIn = 10;
+        away = away.normalize();
+        for (double ang : new double[]{0, 40, -40, 80, -80}) {
+            double a = Math.toRadians(ang);
+            Vec3 dir = new Vec3(away.x * Math.cos(a) - away.z * Math.sin(a), 0, away.x * Math.sin(a) + away.z * Math.cos(a));
+            Vec3 dest = soldier.position().add(dir.scale(dist));
+            BlockPos at = BlockPos.containing(dest.x, soldier.getY(), dest.z);
+            BlockPos s = null;
+            for (int dy : new int[]{0, 1, -1}) {
+                if (soldier.standable(at.above(dy))) {
+                    s = at.above(dy);
+                    break;
+                }
+            }
+            if (s != null) {
+                soldier.getNavigation().moveTo(s.getX() + 0.5, s.getY(), s.getZ() + 0.5, RUN);
+                repathIn = 10;
+                return true;
+            }
+        }
+        return false;
     }
 
     // ───────────── 远程兵的弹药：捡回与补给 ─────────────
@@ -618,7 +662,7 @@ public final class SoldierBrain {
             net.minecraft.world.entity.Entity f = fallen.get();
             if (soldier.distanceToSqr(f) <= 2.25) {
                 soldier.getNavigation().stop();
-                soldier.playAnim("collect_pick");
+                soldier.playAnim("haul_pick");
                 Soldiers.recoverAmmo(level, (SoldierAmmo) f, p);
                 f.discard();
             } else {
@@ -627,12 +671,9 @@ public final class SoldierBrain {
             return true;
         }
         int total = Soldiers.record(level, soldier).map(SoldierRecord::ammoTotal).orElse(0);
-        if (total < p.ammo().carry() && Soldiers.ammoInStock(level, o.village(), p) > 0) {
-            if (soldier.reached(o.keeper())) {
-                soldier.getNavigation().stop();
+        if (total < p.ammo().carry() && Soldiers.ammoInStock(level, o.village(), p) > 0 && !errandBlocked()) {
+            if (errand(o.keeper(), WALK)) {
                 Soldiers.resupply(level, soldier, p);
-            } else {
-                approach(Vec3.atBottomCenterOf(o.keeper()), WALK);
             }
             return true;
         }
@@ -722,12 +763,7 @@ public final class SoldierBrain {
         }
         if (ward != null) {
             double[] at = InterceptRules.stand(ward.getX(), ward.getZ(), threat.getX(), threat.getZ());
-            Vec3 dest = new Vec3(at[0], ward.getY(), at[1]);
-            if (soldier.position().distanceToSqr(dest) > 1.0) {
-                approach(dest, RUN);
-            } else {
-                soldier.getNavigation().stop();
-            }
+            standAt(new Vec3(at[0], ward.getY(), at[1]), 1.0);
         }
         face(threat);
         raise(o, now);
@@ -805,7 +841,7 @@ public final class SoldierBrain {
             return;
         }
         BlockPos home = soldier.home();
-        if (home == null) {
+        if (home == null || errandBlocked()) {
             return;
         }
         if (soldier.reached(home)) {
@@ -813,17 +849,18 @@ public final class SoldierBrain {
             soldier.playAnim("");
             soldier.trySleepAtHome();
         } else {
-            approach(Vec3.atBottomCenterOf(home), WALK);
+            errand(home, WALK);
         }
     }
 
     private void goSwap(SoldierOrders o) {
-        BlockPos k = o.keeper();
-        if (soldier.reached(k)) {
-            soldier.getNavigation().stop();
+        if (errandBlocked()) {
+            // 谷仓走不到：就地换装（兵装是村库的库存单位，不让士兵一直卡在半路）
             Soldiers.swapKit((ServerLevel) soldier.level(), soldier);
-        } else {
-            approach(Vec3.atBottomCenterOf(k), WALK);
+            return;
+        }
+        if (errand(o.keeper(), WALK)) {
+            Soldiers.swapKit((ServerLevel) soldier.level(), soldier);
         }
     }
 
@@ -840,11 +877,79 @@ public final class SoldierBrain {
 
     // ───────────── 移动 ─────────────
 
+    /** 跑腿目标（谷仓、床位）对应的落脚点缓存：锚点常在方块里（谷仓管事位、床），要走到旁边能站的地方。 */
+    @Nullable
+    private BlockPos errandFor;
+    private BlockPos errandStand = BlockPos.ZERO;
+    private long errandSince;
+    /** 跑腿超过这么久没到就放弃这一趟（刻），过一会儿再试（村口到谷仓常有五六十格山路）。 */
+    static final int ERRAND_LIMIT = 800;
+    private long errandBlockedUntil;
+
+    /** 走向一个锚点；到了（锚点或它的落脚点 2 格内）返回 true。走不到超过 800 刻就放弃一阵。 */
+    boolean errand(BlockPos target, double speed) {
+        long now = soldier.level().getGameTime();
+        if (!target.equals(errandFor)) {
+            errandFor = target;
+            errandStand = soldier.standSpot(target);
+            errandSince = now;
+        }
+        if (soldier.reached(target) || soldier.reached(errandStand)) {
+            soldier.getNavigation().stop();
+            return true;
+        }
+        if (now - errandSince > ERRAND_LIMIT) {
+            errandBlockedUntil = now + 1200;
+            errandFor = null;
+            soldier.getNavigation().stop();
+            return false;
+        }
+        approach(Vec3.atBottomCenterOf(errandStand), speed);
+        return false;
+    }
+
+    boolean errandBlocked() {
+        return soldier.level().getGameTime() < errandBlockedUntil;
+    }
+
+    /** 一段路最远多少格（士兵的寻路范围是 96 格；更远的先走一段，落脚点就近找能站的地方）。 */
+    static final double LEG = 80;
+
     private void approach(Vec3 dest, double speed) {
         if (--repathIn <= 0 || soldier.getNavigation().isDone()) {
             repathIn = 10;
-            soldier.getNavigation().moveTo(dest.x, dest.y, dest.z, speed);
+            Vec3 to = dest;
+            Vec3 d = dest.subtract(soldier.position());
+            double flat = Math.sqrt(d.x * d.x + d.z * d.z);
+            if (flat > LEG) {
+                // 远处的目标：先走到朝它方向 80 格处的地面上
+                double k = LEG / flat;
+                int x = (int) Math.floor(soldier.getX() + d.x * k);
+                int z = (int) Math.floor(soldier.getZ() + d.z * k);
+                int y = soldier.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+                to = Vec3.atBottomCenterOf(soldier.standSpot(new BlockPos(x, y, z)));
+            }
+            soldier.getNavigation().moveTo(to.x, to.y, to.z, speed);
         }
+    }
+
+    /**
+     * 走到一个精确的站位（拦截、护送）：离得远就寻路；最后两格直接走过去——寻路的到达精度是 1 格，
+     * 离站位不到 1.5 格时 moveTo 立刻算「到了」，人会停在半路（GameTest 偶发失败）。返回是否还在走。
+     */
+    private boolean standAt(Vec3 dest, double toleranceSqr) {
+        double d2 = soldier.position().distanceToSqr(dest);
+        if (d2 <= toleranceSqr) {
+            soldier.getNavigation().stop();
+            return false;
+        }
+        if (d2 < 4) {
+            soldier.getNavigation().stop();
+            soldier.getMoveControl().setWantedPosition(dest.x, dest.y, dest.z, RUN);
+        } else {
+            approach(dest, RUN);
+        }
+        return true;
     }
 
     private void sidestep() {
@@ -878,8 +983,18 @@ public final class SoldierBrain {
         String phase = o == null || !o.profile().isMelee() ? "-" : AttackTimeline.phase(o.profile().timeline(),
                 (int) Math.min(Integer.MAX_VALUE, Math.max(-1, soldier.level().getGameTime() - attackStart))).name();
         return "出手 " + starts + " 命中 " + strikes + " 收手 " + withholds + " 最近 " + last + " 阶段 " + phase
+                + (o == null ? "" : " 岗位 " + (o.postPos() == null ? "-" : o.postPos().toShortString()) + " 谷仓 " + o.keeper().toShortString())
                 + " 目标 " + (target == null ? "-" : target.getName().getString() + "@" + target.blockPosition().toShortString()
-                + " 距 " + String.format("%.2f", soldier.distanceTo(target))) + " 决定 " + decision + " 命令 "
+                + " 距 " + String.format("%.2f", soldier.distanceTo(target))) + " 睡=" + soldier.resting() + " 导航=" + !soldier.getNavigation().isDone()
+                + " 跑腿=" + (errandFor == null ? "-" : errandFor.toShortString() + "→" + errandStand.toShortString()
+                + " 已 " + (soldier.level().getGameTime() - errandSince) + " 刻")
+                + " 暂停=" + errandBlocked() + " 路径=" + java.util.Optional.ofNullable(errandFor == null ? null
+                : soldier.getNavigation().createPath(errandStand, 1)).map(pp -> pp.canReach() + "/" + pp.getNodeCount()).orElse("null")
+                + " 下床=" + soldier.lastUnstick + " 现刻=" + soldier.level().getGameTime()
+                + " 床=" + (soldier.level().getBlockState(soldier.blockPosition()).getBlock() instanceof net.minecraft.world.level.block.BedBlock)
+                + " 落脚=" + soldier.standSpot(soldier.blockPosition()).toShortString() + " 卡墙=" + soldier.isInWall()
+                + " AI=" + !soldier.isNoAi() + " 骑=" + soldier.isPassenger()
+                + " 决定 " + decision + " 命令 "
                 + (o == null ? "无" : o.state() + "/岗" + o.post());
     }
 

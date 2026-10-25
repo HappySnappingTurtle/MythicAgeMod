@@ -4,7 +4,7 @@
   "professions": ["greek:bronzesmith"],
   "inputs": {"mythic_age:bronze_ingot": 3, "mythic_age:olive_planks": 2, "minecraft:leather": 1, "minecraft:white_wool": 1},
   "outputs": {"mythic_age:hoplite_kit": 1},
-  "stages": [{"anim": "bronze_hammer", "ticks": 160}],
+  "stages": [{"anim": "build_hammer", "ticks": 160}],
   "stage": "heroic",
   "stockTarget": 1
 }

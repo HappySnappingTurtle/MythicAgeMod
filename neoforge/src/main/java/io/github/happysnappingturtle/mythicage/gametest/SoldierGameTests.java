@@ -144,7 +144,9 @@ public final class SoldierGameTests {
     static List<ResidentEntity> workers(GameTestHelper h, VillageWorkGameTests.TV tv, int n) {
         List<ResidentEntity> out = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            out.add(spawn(h, tv, WORKER, 2 + i, 10, i == 0));
+            ResidentEntity r = spawn(h, tv, WORKER, 2 + i, 10, i == 0);
+            r.setFemale(false);
+            out.add(r);
         }
         return out;
     }

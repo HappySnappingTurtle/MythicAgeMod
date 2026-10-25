@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 轻装投矛兵的投矛（T20 设计文档 §9.2）：抛物线飞行；每个目标只打一次；只打士兵能打的（飞过居民身上不伤人）；
- * 打中或撞到方块就落地插着，最多留 {@code lifetime} 刻。落在村庄已建范围外的直接损耗；玩家捡不起来。
+ * 打中或撞到方块就落地插着，最多留 {@code lifetime} 刻。落在村庄已建范围外、又离投矛兵岗位超过 16 格的直接损耗；玩家捡不起来。
  * 每村同时最多 {@link #VILLAGE_CAP} 支在飞或插地，多出的最早那支直接计损耗（§13）。
  */
 public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAmmo {
@@ -45,6 +45,8 @@ public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAm
     private static final Map<UUID, Deque<UUID>> BY_VILLAGE = new ConcurrentHashMap<>();
 
     private UUID village;
+    /** 投出时投矛兵的岗位（落在岗位 16 格内的也能捡回：村口岗多半在已建范围外）。 */
+    private net.minecraft.core.BlockPos post;
     private float damage = 5;
     private double gravity = 0.05;
     private double waterDrag = 0.8;
@@ -59,6 +61,10 @@ public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAm
 
     public void configure(UUID village, String item, float damage, double gravity, double waterDrag, int lifetime) {
         this.village = village;
+        if (getOwner() instanceof ResidentEntity r && r.soldierBrain().orders() != null) {
+            var o = r.soldierBrain().orders();
+            this.post = o.postPos() != null ? o.postPos() : r.blockPosition();
+        }
         entityData.set(ITEM, item);
         this.damage = damage;
         this.gravity = gravity;
@@ -174,7 +180,8 @@ public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAm
     private void land() {
         setDeltaMovement(Vec3.ZERO);
         entityData.set(LANDED, true);
-        if (level() instanceof ServerLevel sl && (village == null || !SoldierTargets.inVillage(sl, blockPosition(), village))) {
+        boolean nearPost = post != null && blockPosition().distSqr(post) <= 16 * 16;
+        if (level() instanceof ServerLevel sl && (village == null || !(nearPost || SoldierTargets.inVillage(sl, blockPosition(), village)))) {
             discard();
         }
     }
@@ -207,6 +214,9 @@ public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAm
             tag.putUUID("Village", village);
         }
         tag.putString("Item", ammoItem());
+        if (post != null) {
+            tag.putLong("Post", post.asLong());
+        }
         tag.putBoolean("Landed", landed());
         tag.putFloat("Damage", damage);
         tag.putDouble("Gravity", gravity);
@@ -221,6 +231,7 @@ public class JavelinEntity extends Projectile implements ItemSupplier, SoldierAm
         super.readAdditionalSaveData(tag);
         village = tag.hasUUID("Village") ? tag.getUUID("Village") : null;
         entityData.set(ITEM, tag.getString("Item"));
+        post = tag.contains("Post") ? net.minecraft.core.BlockPos.of(tag.getLong("Post")) : null;
         entityData.set(LANDED, tag.getBoolean("Landed"));
         damage = tag.getFloat("Damage");
         gravity = tag.getDouble("Gravity");

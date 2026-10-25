@@ -116,6 +116,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
             nav.setCanOpenDoors(true);
             nav.setCanPassDoors(true);
         }
+        // 不踩会着火的方块（点着的灶火、火、岩浆块）：T20 实机里一名投矛兵去谷仓的路上踩进灶火烧死了
+        setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.DAMAGE_FIRE, -1.0F);
+        setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.DANGER_FIRE, 16.0F);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -212,6 +215,11 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
 
     public boolean female() {
         return (entityData.get(APPEARANCE) & 1) != 0;
+    }
+
+    /** 改性别（外观第 0 位；GameTest 用来排出确定的转岗人选）。 */
+    public void setFemale(boolean f) {
+        entityData.set(APPEARANCE, (entityData.get(APPEARANCE) & ~1) | (f ? 1 : 0));
     }
 
     public int palette() {
@@ -344,17 +352,41 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         BlockPos bed = blockPosition();
         Optional<net.minecraft.world.phys.Vec3> stand = BedBlock.findStandUpPosition(getType(), level(), bed,
                 level().getBlockState(bed).getValue(BedBlock.FACING), getYRot());
-        net.minecraft.world.phys.Vec3 to = stand.orElse(net.minecraft.world.phys.Vec3.atBottomCenterOf(bed.above()));
+        // 原版找不到起床位置时（屋子窄），以前退到「床正上方」——人又落回床面上，一直下不了床（T20 实机）；改用附近能站的落脚点
+        net.minecraft.world.phys.Vec3 to = stand.orElseGet(() -> net.minecraft.world.phys.Vec3.atBottomCenterOf(standSpot(bed, 6)));
+        // 原版的起床位置可能正好是床边点着的灶火（T20 实机：读档后两名居民被挪进灶火烧死）：改到附近不着火的落脚点
+        // 原版也可能挑到并排的另一张床的床面（T20 实机：一名士兵在两张床之间来回跳、一直下不了床）
+        BlockPos at = BlockPos.containing(to);
+        if (burning(at) || burning(at.below()) || !standable(at)) {
+            to = net.minecraft.world.phys.Vec3.atBottomCenterOf(standSpot(bed, 6));
+        }
         moveTo(to.x, to.y, to.z, getYRot(), getXRot());
         getNavigation().stop();
+        lastUnstick = level().getGameTime() + "@" + BlockPos.containing(to).toShortString() + (stand.isPresent() ? "(原版)" : "(就近)");
         return true;
     }
 
+    /** 调试：最近一次下床的时刻与落点。 */
+    public String lastUnstick = "-";
+
     /** 能站人：脚下这格与头顶一格没有碰撞，脚下有能踩的地面。 */
     public boolean standable(BlockPos p) {
+        // 不踩着火的方块；床面不算落脚点（站在床上下不了床，T20 实机）
+        if (burning(p) || burning(p.below()) || level().getBlockState(p.below()).getBlock() instanceof BedBlock) {
+            return false;
+        }
         return level().getBlockState(p).getCollisionShape(level(), p).isEmpty()
                 && level().getBlockState(p.above()).getCollisionShape(level(), p.above()).isEmpty()
                 && !level().getBlockState(p.below()).getCollisionShape(level(), p.below()).isEmpty();
+    }
+
+    /** 会让人着火的方块（火、点着的营火、岩浆块）。 */
+    private boolean burning(BlockPos p) {
+        BlockState st = level().getBlockState(p);
+        return st.is(net.minecraft.tags.BlockTags.FIRE) || st.is(net.minecraft.world.level.block.Blocks.MAGMA_BLOCK)
+                || st.is(net.minecraft.world.level.block.Blocks.LAVA)
+                || (st.is(net.minecraft.tags.BlockTags.CAMPFIRES) && st.hasProperty(net.minecraft.world.level.block.CampfireBlock.LIT)
+                && st.getValue(net.minecraft.world.level.block.CampfireBlock.LIT));
     }
 
     /**
@@ -362,12 +394,17 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
      * 都找不到就照旧走向目标（寻路会尽量靠近）。
      */
     public BlockPos standSpot(BlockPos t) {
+        return standSpot(t, 3);
+    }
+
+    /** 同 {@link #standSpot(BlockPos)}，水平搜索半径 {@code r}（并排的几张床占满了床边时要搜远一点）。 */
+    public BlockPos standSpot(BlockPos t, int r) {
         if (standable(t)) {
             return t;
         }
         BlockPos best = null;
         double bestD = Double.MAX_VALUE;
-        for (BlockPos p : BlockPos.betweenClosed(t.offset(-3, -5, -3), t.offset(3, 2, 3))) {
+        for (BlockPos p : BlockPos.betweenClosed(t.offset(-r, -5, -r), t.offset(r, 2, r))) {
             if (!standable(p)) {
                 continue;
             }
@@ -410,10 +447,19 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         return false;
     }
 
-    /** 卡住时回到自己的床位锚点（床位锚点是生成时就能站的地面）。 */
+    /** 卡住时回到自己的床位锚点（站不住人就落到附近能站的地方；不落进火里）。 */
     void returnHome() {
-        if (home != null && !blockPosition().equals(home)) {
-            moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, getYRot(), getXRot());
+        if (home == null) {
+            return;
+        }
+        // 床位锚点可能就是床（奠基村庄、施工建的房子），也可能后来被改得站不住人（悬空、旁边点了灶火）：落到附近能站的地方。
+        // T20 实机：卡墙回床位把人放到灶火正上方，落下去烧死了
+        BlockPos to = standable(home) ? home : standSpot(home, 6);
+        if (burning(to) || burning(to.below())) {
+            return;
+        }
+        if (!blockPosition().equals(to)) {
+            moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, getYRot(), getXRot());
             getNavigation().stop();
         }
     }
@@ -604,10 +650,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         super.customServerAiStep();
         // 脱困：卡在方块里（会窒息）就回床位锚点；没睡觉却站在床里就下床
         if (tickCount % 40 == 0) {
-            if (isInWall()) {
+            // 先下床、再判卡墙：站在床上头会顶进矮屋顶（算卡墙），而「回床位」又把人放回床上——T20 实机里一名士兵就这样一直下不了床
+            if (!unstickFromBed() && isInWall()) {
                 returnHome();
-            } else if (!soldierBusy() || !resting()) {
-                unstickFromBed();
             }
         }
         if (isSoldier() && getHealth() < getMaxHealth()) {
@@ -752,6 +797,11 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
             String a = anim();
             if (!a.isEmpty()) {
                 return state.setAndContinue(RawAnimation.begin().thenLoop(ResidentAnims.resolve(a)));
+            }
+            if (isSoldier() && carrying().isEmpty() && !"none".equals(kitTier())) {
+                // 士兵（T20）：站岗、巡逻用持矛带盾的姿势
+                return state.setAndContinue(RawAnimation.begin().thenLoop(ResidentAnims.resolve(
+                        state.isMoving() ? "patrol_walk" : "guard_idle")));
             }
             if (state.isMoving()) {
                 String m = ResidentAnims.moving(carrying(), gait());

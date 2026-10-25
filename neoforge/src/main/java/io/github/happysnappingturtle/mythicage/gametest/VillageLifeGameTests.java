@@ -518,7 +518,9 @@ public final class VillageLifeGameTests {
     @GameTest(template = T, batch = "village_life_procession", timeoutTicks = 1600)
     public static void polis_procession(GameTestHelper h) {
         h.setBlock(new BlockPos(8, 2, 26), Blocks.STONE_BRICKS);
-        VillageWorkGameTests.TV tv = village(h, Age.HEROIC, anchors("ritual", abs(h, 8, 2, 26), "guardian", abs(h, 8, 2, 28)));
+        // 集合点（广场锚点）放在场地中部：默认的广场就是场地边上的钟，后两排纵队会排到场地外、落到隔壁用例的地形里（T20 偶发失败）
+        VillageWorkGameTests.TV tv = village(h, Age.HEROIC, anchors("ritual", abs(h, 8, 2, 26), "guardian", abs(h, 8, 2, 28),
+                "center", abs(h, 8, 2, 12)));
         List<ResidentEntity> rs = members(h, tv, LABORER, 8);
         VillageEconomy.State s = state(h, tv);
         s.stock.putUnchecked("mythic_age:wine", 1);
@@ -541,7 +543,10 @@ public final class VillageLifeGameTests {
             h.assertTrue(s.stock.count("mythic_age:wine") == 0 && s.stock.count("mythic_age:olive_oil") == 1, "先用葡萄酒");
             BlockPos altar = h.absolutePos(new BlockPos(8, 2, 26));
             long near = rs.stream().filter(r -> r.distanceToSqr(altar.getX() + 0.5, altar.getY(), altar.getZ() + 0.5) < 8 * 8).count();
-            h.assertTrue(near >= 6, "游行走到祭坛前：" + near);
+            h.assertTrue(near >= 6, "游行走到祭坛前：" + near + " 警戒 " + VillageScheduler.runtime(tv.id()).alarmed(io.github.happysnappingturtle.mythicage.runtime.WorldClock.now(h.getLevel().getServer()))
+                    + " 敌对 " + h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, new net.minecraft.world.phys.AABB(altar).inflate(48),
+                    e -> e instanceof net.minecraft.world.entity.monster.Enemy).stream().map(e -> e.getType().toShortString() + "@" + h.relativePos(e.blockPosition()).toShortString()).toList()
+                    + " 各人 " + rs.stream().map(r -> h.relativePos(r.blockPosition()).toShortString() + ":" + r.job().map(Job::ref).orElse("-") + ":" + r.profession()).toList());
             int bread = s.stock.count("mythic_age:olive_flatbread");
             VillageScheduler.supperForTest(h.getLevel(), tv.id());
             h.assertTrue(bread - s.stock.count("mythic_age:olive_flatbread") == 16, "口粮 ×2：8 人吃 16 份");

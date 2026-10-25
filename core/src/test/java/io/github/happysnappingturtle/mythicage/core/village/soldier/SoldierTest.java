@@ -167,6 +167,16 @@ class SoldierTest {
     }
 
     @Test
+    void tc13bMaleOnly() {
+        List<SoldierRoster.Candidate> r = List.of(c("k", LAB, true, 0), c("a", LAB, false, 9),
+                new SoldierRoster.Candidate(uuid("f"), LAB, false, false, 1, true));
+        assertEquals(Optional.of(uuid("a")), SoldierRoster.pickConvert(r, LAB, 1), "女性居民不转岗");
+        List<SoldierRoster.Candidate> onlyWomen = List.of(c("k", LAB, true, 0),
+                new SoldierRoster.Candidate(uuid("f"), LAB, false, false, 1, true));
+        assertEquals(Optional.empty(), SoldierRoster.pickConvert(onlyWomen, LAB, 1), "只剩女性劳力：没有人选");
+    }
+
+    @Test
     void tc14DemoteNewest() {
         List<SoldierRoster.Enlisted> s = List.of(new SoldierRoster.Enlisted(uuid("a"), "g:h", 1),
                 new SoldierRoster.Enlisted(uuid("b"), "g:h", 5), new SoldierRoster.Enlisted(uuid("c"), "g:h", 3));
