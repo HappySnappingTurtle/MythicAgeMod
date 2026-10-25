@@ -1,0 +1,10 @@
+{
+  "_doc": "修复破损的投矛兵装：原材料的一半（向上取整）。",
+  "station": "anchor:storage_keeper",
+  "professions": ["greek:laborer"],
+  "inputs": {"mythic_age:javelineer_kit_broken": 1, "minecraft:leather": 1, "minecraft:white_wool": 1},
+  "outputs": {"mythic_age:javelineer_kit": 1},
+  "stages": [{"anim": "build_hammer", "ticks": 80}],
+  "stage": "classical",
+  "stockTarget": 1
+}

@@ -59,6 +59,9 @@ public final class ClientSetup {
         // 斯廷法利斯怪鸟（T15 阶段 ②）：领头鸟才显示冠羽；青铜羽弹射物画成物品贴图
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.STYMPHALIAN_BIRD.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.wild.StymphalianGeoModel(), 0.8F));
+        // 希腊投矛兵的投矛（T20）：先画成物品贴图，阶段 ③ 换模型
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.village.soldier.GreekSoldiers.JAVELIN.get(),
+                net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         // 文明村庄的居民（T19）
         event.registerEntityRenderer(ModEntities.RESIDENT.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new io.github.happysnappingturtle.mythicage.client.ResidentGeoModel(), 0.6F));

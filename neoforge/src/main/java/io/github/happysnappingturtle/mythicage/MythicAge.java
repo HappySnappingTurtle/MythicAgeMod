@@ -65,6 +65,8 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.init();
         io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.init();
         io.github.happysnappingturtle.mythicage.content.greek.village.GreekFestivalItems.init();
+        io.github.happysnappingturtle.mythicage.content.greek.village.soldier.GreekSoldierItems.init();
+        io.github.happysnappingturtle.mythicage.content.greek.village.soldier.GreekSoldiers.init();
         io.github.happysnappingturtle.mythicage.content.greek.village.GreekFoundation.init();
         io.github.happysnappingturtle.mythicage.village.VillageGuide.init();
         io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.init(modBus);
@@ -164,6 +166,9 @@ public final class MythicAge {
         game.addListener(net.neoforged.bus.api.EventPriority.LOWEST,
                 io.github.happysnappingturtle.mythicage.village.soldier.SoldierAttribution::onDeath);
         game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.SoldierAttribution::onExperienceDrop);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageLandmarks::onPlace);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageLandmarks::onBreak);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageLandmarks::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.PointEvents::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillageDevCommand::onRegisterCommands);
 

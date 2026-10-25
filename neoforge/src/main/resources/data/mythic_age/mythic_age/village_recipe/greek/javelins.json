@@ -1,0 +1,10 @@
+{
+  "_doc": "投矛（01 号 SO-GR-JAV-01）：青铜矛头。",
+  "station": "mythic_age:greek_anvil",
+  "professions": ["greek:bronzesmith"],
+  "inputs": {"mythic_age:bronze_ingot": 1, "mythic_age:olive_planks": 1},
+  "outputs": {"mythic_age:javelin": 4},
+  "stages": [{"anim": "bronze_hammer", "ticks": 80}],
+  "stage": "heroic",
+  "stockTarget": 12
+}

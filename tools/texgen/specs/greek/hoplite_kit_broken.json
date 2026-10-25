@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/hoplite_kit_broken",
+  "size": 16,
+  "_note": "破损的盾矛兵装：盾面裂开、矛杆折断，颜色发暗",
+  "palette": {
+    "s": "#6b4a2b",
+    "w": "#e8e2d0",
+    "r": "#6e5434",
+    "f": "#6e2a24",
+    "k": "#2a1a12"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "....rrrrrr......",
+      "...rrfkffrr.....",
+      "..rrfffkffrr....",
+      "..rffffkfffr....",
+      "..rfffffkffr....",
+      "..rfffffkffr....",
+      "..rffffffkfr....",
+      "..rrfffffkrr....",
+      "...rrffffrk.....",
+      "..s.rrrrrr......",
+      ".s..............",
+      "................"
+    ]
+  }
+}

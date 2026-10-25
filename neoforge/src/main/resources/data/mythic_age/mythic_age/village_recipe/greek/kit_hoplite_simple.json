@@ -1,0 +1,9 @@
+{
+  "_doc": "简易盾矛兵装（01 号）：木盾、石尖木矛、白羊毛短袍；空闲的劳力在谷仓做。",
+  "station": "anchor:storage_keeper",
+  "professions": ["greek:laborer"],
+  "inputs": {"mythic_age:olive_planks": 3, "minecraft:cobblestone": 1, "minecraft:white_wool": 1},
+  "outputs": {"mythic_age:hoplite_kit_simple": 1},
+  "stages": [{"anim": "build_hammer", "ticks": 160}],
+  "stockTarget": 1
+}

@@ -1,0 +1,25 @@
+{
+  "_doc": "盾矛卫兵（01 号 SO-GR-SP-01，T20 设计文档 §9.1）：右手长矛、左手圆盾；不值勤时帮农务（H10）。独有机制护祷拦截。",
+  "jobs": ["harvest_crop", "pick_fruit", "haul"],
+  "stage": "archaic",
+  "soldier": {
+    "kind": "melee",
+    "health": 28,
+    "armor": 6,
+    "damage": 5,
+    "timeline": {"windup": 12, "lock": 4, "active": 3, "recover": 9, "interval": 32},
+    "melee": {"reach": 2.8, "radius": 0.25, "height": 1.15, "halfHeight": 0.5},
+    "shield": {"arc": 120, "reduction": 0.6, "maxHold": 40, "gap": 15, "raise": 6, "lower": 8},
+    "kits": {
+      "full": {"item": "mythic_age:hoplite_kit"},
+      "simple": {"item": "mythic_age:hoplite_kit_simple", "armor": -2, "damage": -1},
+      "broken": "mythic_age:hoplite_kit_broken"
+    },
+    "durability": 60,
+    "retreatBelow": 0.3,
+    "returnAbove": 0.6,
+    "ability": "greek:prayer_guard",
+    "anims": {"idle": "guard_idle", "alert": "alert", "attack": "spear_thrust", "block": "block_hold", "patrol": "patrol_walk"},
+    "attribution": {"favor": 0, "conduct": 0, "firstKill": 0}
+  }
+}

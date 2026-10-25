@@ -25,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 挂在居民身上的士兵 AI（T20 设计文档 §5、§8）：服务端、不存档。命令来自调度器（{@link SoldierOrders}），
@@ -66,6 +67,11 @@ public final class SoldierBrain {
     /** 调试统计：出手、命中、收手次数与最近一次的结果。 */
     private int starts, strikes, withholds;
     private String last = "";
+    /** 正在护的人（拦截）：站到他与威胁之间，只在威胁进入触及时出手。 */
+    @Nullable
+    private LivingEntity ward;
+    /** 被护者 → 护他的士兵（一个人同时只由一名士兵护，§9.1）。 */
+    private static final java.util.Map<java.util.UUID, ResidentEntity> WARDS = new java.util.concurrent.ConcurrentHashMap<>();
 
     public SoldierBrain(ResidentEntity soldier) {
         this.soldier = soldier;
@@ -102,6 +108,71 @@ public final class SoldierBrain {
 
     public boolean blocking() {
         return blocking;
+    }
+
+    @Nullable
+    public LivingEntity ward() {
+        return ward;
+    }
+
+    /** 开始护一个人：威胁就是目标（无兵装时只拦不打）。 */
+    public void guard(LivingEntity who, LivingEntity threat) {
+        SoldierOrders o = orders();
+        if (target == null && o != null && soldier.level() instanceof ServerLevel level) {
+            onFirstSight(o, level, level.getGameTime(), threat);
+        }
+        clearWard();
+        ward = who;
+        WARDS.put(who.getUUID(), soldier);
+        target = threat;
+        decision = o != null && o.tier() == SoldierProfile.Tier.NONE ? SoldierTargetRules.Decision.ESCORT
+                : SoldierTargetRules.Decision.ENGAGE;
+    }
+
+    /**
+     * 别人报来的威胁（圣火烽号、呼喊，§9.2）：在岗、手上没有目标、岗位离威胁 ≤ 24 格、按敌我表该接敌的，就去接敌。
+     * 返回是否接了。
+     */
+    public boolean notifyThreat(LivingEntity threat) {
+        SoldierOrders o = orders();
+        if (o == null || target != null || retreating || o.state() != DutyRules.State.ON_DUTY || threat == null || !threat.isAlive()
+                || !(soldier.level() instanceof ServerLevel level)) {
+            return false;
+        }
+        BlockPos c = leash(o);
+        if (!SoldierTargetRules.keepChasing(Math.sqrt(threat.distanceToSqr(Vec3.atBottomCenterOf(c))),
+                SoldierTargets.inVillage(level, threat.blockPosition(), o.village()))) {
+            return false;
+        }
+        SoldierTargetRules.Decision d = SoldierTargetRules.decide(SoldierTargets.facts(soldier, threat, o.village(),
+                reach(o.profile()), level.getGameTime()));
+        if (d == SoldierTargetRules.Decision.IGNORE) {
+            return false;
+        }
+        alertSerialSeen = Soldiers.alertSerial(o.village());
+        target = threat;
+        decision = o.tier() == SoldierProfile.Tier.NONE && d == SoldierTargetRules.Decision.ENGAGE ? SoldierTargetRules.Decision.ESCORT : d;
+        soldier.playAnim(o.profile().anim("alert"));
+        alertAnimUntil = level.getGameTime() + 16;
+        return true;
+    }
+
+    public void clearWard() {
+        if (ward != null) {
+            WARDS.remove(ward.getUUID(), soldier);
+            ward = null;
+        }
+    }
+
+    /** 护着某人的士兵（还活着、还在护他）。 */
+    public static java.util.Optional<ResidentEntity> guardOf(java.util.UUID who) {
+        ResidentEntity g = WARDS.get(who);
+        if (g == null || !g.isAlive() || g.isRemoved() || !g.isSoldier() || g.soldierBrain().ward == null
+                || !g.soldierBrain().ward.getUUID().equals(who)) {
+            WARDS.remove(who);
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.of(g);
     }
 
     public long lastCombat() {
@@ -210,6 +281,9 @@ public final class SoldierBrain {
             goSwap(o);
             return;
         }
+        if (o.state() == DutyRules.State.ON_DUTY && ammoChores(o, now)) {
+            return;
+        }
         switch (o.state()) {
             case ON_DUTY -> guard(o, now);
             case SHIFT_SLEEP -> sleep();
@@ -261,6 +335,10 @@ public final class SoldierBrain {
                     SoldierTargets.inVillage(level, e.blockPosition(), o.village()))) {
                 continue;
             }
+            if (ward != null) {
+                // 护人时不换目标
+                break;
+            }
             if (e != target && !soldier.hasLineOfSight(e)) {
                 continue;
             }
@@ -274,7 +352,7 @@ public final class SoldierBrain {
             }
         }
         if (best != null && target == null) {
-            onFirstSight(o, level, now);
+            onFirstSight(o, level, now, best);
         }
         if (best != null) {
             target = best;
@@ -282,7 +360,7 @@ public final class SoldierBrain {
         }
     }
 
-    private void onFirstSight(SoldierOrders o, ServerLevel level, long now) {
+    private void onFirstSight(SoldierOrders o, ServerLevel level, long now, LivingEntity threat) {
         if (soldier.resting()) {
             soldier.wakeUp();
         }
@@ -294,7 +372,8 @@ public final class SoldierBrain {
         alertAnimUntil = now + 16;
         if (serial != alertSerialSeen) {
             alertSerialSeen = serial;
-            SoldierAbility.of(o.profile().ability()).ifPresent(a -> a.onAlert(soldier, this, serial));
+            // 新一场警戒：告诉本村所有士兵的独有机制（圣火烽号等，每场一次）
+            Soldiers.broadcastAlert(level, o.village(), serial, threat);
         }
     }
 
@@ -325,6 +404,7 @@ public final class SoldierBrain {
     }
 
     private void dropTarget() {
+        clearWard();
         target = null;
         decision = SoldierTargetRules.Decision.IGNORE;
         soldier.getNavigation().stop();
@@ -340,15 +420,29 @@ public final class SoldierBrain {
     private void combat(SoldierOrders o, long now) {
         SoldierProfile p = o.profile();
         if (!p.isMelee()) {
-            // 远程攻击由阶段 ② 的 RangedAttack 接管；没有时退为护送
-            if (!RangedAttacks.tick(soldier, this, o, target, now)) {
-                escort(o, now);
-            }
+            ranged(o, now);
             return;
         }
         int t = (int) Math.min(Integer.MAX_VALUE, Math.max(-1, now - attackStart));
         AttackTimeline.Phase phase = AttackTimeline.phase(p.timeline(), t);
         double edge = soldier.distanceTo(target) - target.getBbWidth() / 2;
+        if (ward != null && phase == AttackTimeline.Phase.READY
+                && !(edge <= p.melee().reach() && soldier.hasLineOfSight(target))) {
+            // 拦截：站到被护者与威胁的连线上，面向威胁举盾，等它进入触及
+            double[] at = InterceptRules.stand(ward.getX(), ward.getZ(), target.getX(), target.getZ());
+            Vec3 dest = new Vec3(at[0], ward.getY(), at[1]);
+            if (soldier.position().distanceToSqr(dest) > 0.5) {
+                approach(dest, RUN);
+                if (!p.anim("intercept").equals(soldier.anim()) && !blocking) {
+                    soldier.playAnim(p.anim("intercept"));
+                }
+            } else {
+                soldier.getNavigation().stop();
+            }
+            face(target);
+            raise(o, now);
+            return;
+        }
         if (phase == AttackTimeline.Phase.READY) {
             if (edge <= p.melee().reach() && soldier.hasLineOfSight(target)) {
                 face(target);
@@ -398,6 +492,151 @@ public final class SoldierBrain {
                 raise(o, now);
             }
         }
+    }
+
+    // ───────────── 接敌（远程，§8.2） ─────────────
+
+    private boolean fired;
+    private boolean backstepPending;
+
+    private void ranged(SoldierOrders o, long now) {
+        SoldierProfile p = o.profile();
+        SoldierProfile.Ranged r = p.ranged();
+        ServerLevel level = (ServerLevel) soldier.level();
+        Optional<SoldierRecord> rec = Soldiers.record(level, soldier);
+        Optional<SoldierProfile.AmmoItem> ammo = rec.flatMap(x -> p.ammo().items().stream()
+                .filter(a -> x.ammo().getOrDefault(a.item(), 0) > 0 && RangedAttacks.launcher(a.item()).isPresent()).findFirst());
+        int t = (int) Math.min(Integer.MAX_VALUE, Math.max(-1, now - attackStart));
+        AttackTimeline.Phase phase = AttackTimeline.phase(p.timeline(), t);
+        double dist = soldier.distanceTo(target);
+        if (phase == AttackTimeline.Phase.READY) {
+            if (ammo.isEmpty()) {
+                // 没有弹药：护送居民（§9.2）
+                escort(o, now);
+                return;
+            }
+            if (backstepPending || dist < r.minRange()) {
+                backstepPending = false;
+                backstep(Math.max(r.backstep(), r.minRange() - dist + 1));
+                face(target);
+                return;
+            }
+            if (dist > r.range() - 0.5 || !soldier.hasLineOfSight(target)) {
+                approach(target.position(), RUN);
+                return;
+            }
+            Optional<LivingEntity> blocker = lineBlocker(o, now);
+            if (blocker.isPresent()) {
+                withholds++;
+                last = "withhold-line:" + blocker.get().getName().getString();
+                sidestep();
+                return;
+            }
+            soldier.getNavigation().stop();
+            face(target);
+            starts++;
+            attackStart = now;
+            fired = false;
+            soldier.playAnim(p.anim("attack"));
+            return;
+        }
+        if (!AttackTimeline.locked(p.timeline(), t)) {
+            face(target);
+        }
+        soldier.getNavigation().stop();
+        if (phase == AttackTimeline.Phase.ACTIVE && !fired && ammo.isPresent()) {
+            fired = true;
+            SoldierProfile.AmmoItem a = ammo.get();
+            Vec3 from = new Vec3(soldier.getX(), soldier.getY() + soldier.getEyeHeight() * 0.95, soldier.getZ());
+            Vec3 aim = target.position().add(0, target.getBbHeight() * 0.6, 0);
+            double[] v = io.github.happysnappingturtle.mythicage.core.village.soldier.Ballistics.launch(aim.x - from.x, aim.y - from.y,
+                    aim.z - from.z, r.speed(), r.gravity()).orElseGet(() -> {
+                        Vec3 d = aim.subtract(from).multiply(1, 0, 1).normalize().scale(r.speed() * Math.cos(Math.PI / 4));
+                        return new double[]{d.x, r.speed() * Math.sin(Math.PI / 4), d.z};
+                    });
+            float dmg = Math.max(1, p.damage(o.tier()) + a.damage());
+            RangedAttacks.launcher(a.item()).ifPresent(l -> l.launch(level, soldier, o.village(), a.item(), dmg, from,
+                    new Vec3(v[0], v[1], v[2]), p));
+            Soldiers.useAmmo(level, soldier, a.item());
+            strikes++;
+            last = "throw:" + a.item();
+            backstepPending = r.backstep() > 0;
+        }
+        if (t >= AttackTimeline.animationEnd(p.timeline())) {
+            endAttackAnim(p);
+        }
+    }
+
+    /** 投射线上（出手点到目标胸口）0.6 格内有不能打的人（§8.2）。 */
+    private Optional<LivingEntity> lineBlocker(SoldierOrders o, long now) {
+        Vec3 a = soldier.getEyePosition();
+        Vec3 b = target.position().add(0, target.getBbHeight() * 0.6, 0);
+        Vec3 ab = b.subtract(a);
+        double len2 = ab.lengthSqr();
+        for (LivingEntity e : soldier.level().getEntitiesOfClass(LivingEntity.class, new AABB(a, b).inflate(1),
+                x -> x != soldier && x != target && x.isAlive())) {
+            Vec3 c = e.position().add(0, e.getBbHeight() * 0.5, 0);
+            double k = len2 < 1.0E-6 ? 0 : Math.max(0, Math.min(1, c.subtract(a).dot(ab) / len2));
+            if (k <= 0 || k >= 1) {
+                continue;
+            }
+            Vec3 p = a.add(ab.scale(k));
+            if (p.distanceTo(c) <= 0.6 + e.getBbWidth() / 2 && SoldierTargetRules.decide(SoldierTargets.facts(soldier, e, o.village(),
+                    o.profile().ranged().range(), now)) != SoldierTargetRules.Decision.ENGAGE) {
+                return Optional.of(e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /** 面朝目标往后退 {@code dist} 格（投后撤步、近身后撤）。 */
+    private void backstep(double dist) {
+        Vec3 away = soldier.position().subtract(target.position()).multiply(1, 0, 1);
+        if (away.lengthSqr() < 1.0E-4) {
+            away = new Vec3(1, 0, 0);
+        }
+        Vec3 dest = soldier.position().add(away.normalize().scale(dist));
+        soldier.getNavigation().moveTo(dest.x, soldier.getY(), dest.z, WALK);
+        repathIn = 10;
+    }
+
+    // ───────────── 远程兵的弹药：捡回与补给 ─────────────
+
+    /** 不在警戒时，捡回岗位附近落地的弹药，或回谷仓补满（§9.2）。返回是否接管了这一刻。 */
+    private boolean ammoChores(SoldierOrders o, long now) {
+        SoldierProfile p = o.profile();
+        if (p.isMelee() || p.ammo() == null || VillageScheduler.runtime(o.village()).alarmed(now)) {
+            return false;
+        }
+        ServerLevel level = (ServerLevel) soldier.level();
+        BlockPos c = leash(o);
+        Optional<net.minecraft.world.entity.Entity> fallen = level.getEntities((net.minecraft.world.entity.Entity) null,
+                new AABB(c).inflate(SoldierTargetRules.CHASE_RADIUS, 8, SoldierTargetRules.CHASE_RADIUS),
+                e -> e instanceof SoldierAmmo a && a.landed() && o.village().equals(a.ammoVillage())).stream()
+                .min(java.util.Comparator.comparingDouble(e -> e.distanceToSqr(soldier)));
+        if (fallen.isPresent()) {
+            net.minecraft.world.entity.Entity f = fallen.get();
+            if (soldier.distanceToSqr(f) <= 2.25) {
+                soldier.getNavigation().stop();
+                soldier.playAnim("collect_pick");
+                Soldiers.recoverAmmo(level, (SoldierAmmo) f, p);
+                f.discard();
+            } else {
+                approach(f.position(), WALK);
+            }
+            return true;
+        }
+        int total = Soldiers.record(level, soldier).map(SoldierRecord::ammoTotal).orElse(0);
+        if (total < p.ammo().carry() && Soldiers.ammoInStock(level, o.village(), p) > 0) {
+            if (soldier.reached(o.keeper())) {
+                soldier.getNavigation().stop();
+                Soldiers.resupply(level, soldier, p);
+            } else {
+                approach(Vec3.atBottomCenterOf(o.keeper()), WALK);
+            }
+            return true;
+        }
+        return false;
     }
 
     private void endAttackAnim(SoldierProfile p) {

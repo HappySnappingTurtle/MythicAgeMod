@@ -1,0 +1,34 @@
+{
+  "template": "pixels",
+  "out": "item/hoplite_kit_simple",
+  "size": 16,
+  "_note": "简易盾矛兵装：素木圆盾、石尖木矛",
+  "palette": {
+    "s": "#6b4a2b",
+    "w": "#e8e2d0",
+    "g": "#8a8d90",
+    "r": "#5a3d22",
+    "f": "#9c7448"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "...............g",
+      "..............g.",
+      "............gg..",
+      "...........gg...",
+      "....rrrrrr.w....",
+      "...rrffffrr.....",
+      "..rrffffffrr....",
+      "..rffffffffr....",
+      "..rffffffffr....",
+      "..rfrrfffrrr....",
+      "..rffffffffr....",
+      "..rrffffffrr....",
+      "...rrffffrr.....",
+      "..s.rrrrrr......",
+      ".s..............",
+      "................"
+    ]
+  }
+}

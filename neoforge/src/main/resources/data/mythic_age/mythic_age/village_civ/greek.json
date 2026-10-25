@@ -473,7 +473,8 @@
   "residents": {
     "initial": {
       "greek:farmer": 2,
-      "greek:potter": 1
+      "greek:potter": 1,
+      "greek:hoplite": 1
     },
     "fallback": "greek:laborer",
     "keeper": "greek:laborer",
@@ -931,5 +932,36 @@
     ],
     "starter": "greek:house_small",
     "camp": 3
+  },
+  "soldiers": {
+    "_doc": "村民士兵（T20 设计文档 §10.2，V3-希腊-居民 §7）：先补盾矛卫兵，古典起补轻装投矛兵（远程 ≤ ⌊上限/2⌋）；岗位按村口 → 神庙前祭坛 → 广场；英雄起的体育场、角力场训练锚点只在不值勤时用。生成村庄的初始卫兵穿简易兵装。",
+    "order": [
+      "greek:hoplite",
+      "greek:javelineer"
+    ],
+    "posts": [
+      "entrance",
+      "ritual",
+      "center"
+    ],
+    "training": "training",
+    "minLaborers": 2,
+    "shifts": {
+      "day": [
+        23000,
+        12000
+      ],
+      "night": [
+        12000,
+        23000
+      ],
+      "nightSleep": [
+        23000,
+        6000
+      ]
+    },
+    "seedKit": {
+      "greek:hoplite": "simple"
+    }
   }
 }

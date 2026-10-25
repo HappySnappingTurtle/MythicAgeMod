@@ -1,0 +1,10 @@
+{
+  "_doc": "投矛兵装（01 号 SO-GR-JAV-01）：短袍与皮护肩、投矛束。",
+  "station": "anchor:storage_keeper",
+  "professions": ["greek:laborer"],
+  "inputs": {"minecraft:leather": 2, "minecraft:white_wool": 1},
+  "outputs": {"mythic_age:javelineer_kit": 1},
+  "stages": [{"anim": "build_hammer", "ticks": 120}],
+  "stage": "classical",
+  "stockTarget": 1
+}

@@ -19,7 +19,7 @@ public record SoldierProfile(Kind kind, int health, int armor, int damage, Timel
                              String ability, java.util.Map<String, String> anims) {
     /** 没写动作名时的通用名。 */
     public static final java.util.Map<String, String> DEFAULT_ANIMS = java.util.Map.of("idle", "guard_idle", "alert", "alert",
-            "attack", "attack", "block", "block_hold", "throw", "throw");
+            "attack", "attack", "block", "block_hold", "throw", "throw", "intercept", "intercept_step", "patrol", "patrol_walk");
 
     public SoldierProfile {
         anims = java.util.Map.copyOf(anims);

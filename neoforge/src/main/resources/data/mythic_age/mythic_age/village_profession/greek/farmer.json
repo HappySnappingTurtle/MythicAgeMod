@@ -102,6 +102,13 @@
         "count": 16,
         "price": 1,
         "daily": 6
+      },
+      {
+        "id": "leather",
+        "item": "minecraft:leather",
+        "count": 4,
+        "price": 1,
+        "daily": 4
       }
     ]
   }

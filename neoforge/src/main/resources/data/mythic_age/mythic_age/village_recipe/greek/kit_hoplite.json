@@ -1,0 +1,10 @@
+{
+  "_doc": "完整盾矛兵装（01 号 SO-GR-SP-01）：青铜盔、胸甲、长矛头与圆盾包边。村庄 NPC 为本村士兵做兵装不受玩家时代限制，但青铜工匠要英雄的青铜工坊。",
+  "station": "mythic_age:greek_anvil",
+  "professions": ["greek:bronzesmith"],
+  "inputs": {"mythic_age:bronze_ingot": 3, "mythic_age:olive_planks": 2, "minecraft:leather": 1, "minecraft:white_wool": 1},
+  "outputs": {"mythic_age:hoplite_kit": 1},
+  "stages": [{"anim": "bronze_hammer", "ticks": 160}],
+  "stage": "heroic",
+  "stockTarget": 1
+}

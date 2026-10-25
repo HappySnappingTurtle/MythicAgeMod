@@ -1,0 +1,30 @@
+{
+  "_doc": "轻装投矛兵（01 号 SO-GR-JAV-01，T20 设计文档 §9.2）：右手投矛，抛物线 12 格，近身 4 格内后撤；身上 6 支投矛。独有机制圣火烽号。",
+  "jobs": ["harvest_crop", "pick_fruit", "haul"],
+  "stage": "classical",
+  "soldier": {
+    "kind": "ranged",
+    "health": 22,
+    "armor": 2,
+    "damage": 5,
+    "timeline": {"windup": 20, "lock": 4, "active": 1, "recover": 12, "interval": 48},
+    "ranged": {"range": 12, "minRange": 4, "speed": 1.1, "gravity": 0.05, "waterDrag": 0.8, "burst": 1, "burstGap": 0, "backstep": 3},
+    "ammo": {
+      "carry": 6,
+      "items": [{"item": "mythic_age:javelin"}, {"item": "mythic_age:rough_javelin", "damage": -1}],
+      "recover": 0.6,
+      "lifetime": 1200
+    },
+    "kits": {
+      "full": {"item": "mythic_age:javelineer_kit"},
+      "simple": {"item": "mythic_age:javelineer_kit_simple", "armor": -2},
+      "broken": "mythic_age:javelineer_kit_broken"
+    },
+    "durability": 60,
+    "retreatBelow": 0.3,
+    "returnAbove": 0.6,
+    "ability": "greek:brazier_signal",
+    "anims": {"idle": "guard_idle", "alert": "alert", "attack": "javelin_throw", "patrol": "patrol_walk"},
+    "attribution": {"favor": 0, "conduct": 0, "firstKill": 0}
+  }
+}

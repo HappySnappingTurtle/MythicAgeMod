@@ -415,6 +415,19 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.laborer.chat.4", "伐一棵树就补种一棵，林子才砍不完。", "Fell one, plant one — that way the woods never run out.", "一本伐ったら一本植える。そうすれば林はなくなりません。");
         add("mythic_age.village.say.greek.laborer.chat.5", "谷仓里的陶瓮装满了，冬天心里就踏实。", "When the jars in the granary are full, winter holds no fear.", "穀物庫の甕が満ちていれば、冬も安心です。");
         add("mythic_age.village.say.greek.laborer.chat.6", "傍晚到广场上坐坐，听人讲讲外头的新鲜事。", "Evenings I sit in the square and hear the news from outside.", "夕方は広場に座って、よその噂話を聞きます。");
+        // T20：士兵的闲话（盾护身旁的人：普鲁塔克《斯巴达人语录》德玛拉托斯条；公民兵农闲操练；轻装兵在斯法克特里亚的战法；烽火）
+        add("mythic_age.village.say.greek.hoplite.chat.1", "头盔和胸甲护的是自己，盾护的是身边整排的人。", "A helmet and breastplate guard yourself; the shield guards the whole line.", "兜と胸甲は自分のため、盾は隣に並ぶ皆のためのものです。");
+        add("mythic_age.village.say.greek.hoplite.chat.2", "臂环套到肘下，手抓边上的握带，再重的盾也举得住。", "Forearm through the band, hand on the grip at the rim — then even a heavy shield stays up.", "腕を輪に通し、縁の握りをつかめば、重い盾でも構えていられます。");
+        add("mythic_age.village.say.greek.hoplite.chat.3", "不值勤的时候我也下地，矛是公民的，田也是。", "Off duty I work the fields too — the spear is a citizen's, and so is the plough.", "非番のときは畑にも出ます。槍も鋤も市民のものですから。");
+        add("mythic_age.village.say.greek.hoplite.chat.4", "有人在神坛前祈祷，我就站在他和危险之间。", "When someone prays at the altar, I stand between them and the danger.", "祭壇で祈る人がいれば、わたしはその人と危険の間に立ちます。");
+        add("mythic_age.village.say.greek.hoplite.chat.5", "接近时矛压低，贴上去再举过肩刺。", "Spear low on the approach; once you close, raise it over the shoulder and thrust.", "近づくときは槍を低く、間合いに入ったら肩の上から突きます。");
+        add("mythic_age.village.say.greek.hoplite.chat.6", "村口夜里也有人守着，你只管睡。", "Someone watches the village gate through the night — sleep easy.", "村の入口は夜も見張っています。安心して眠ってください。");
+        add("mythic_age.village.say.greek.javelineer.chat.1", "我们穿得轻，跑得快，靠的就是这个。", "We go light and run fast — that's the whole of our art.", "身軽で足が速い。それがわたしたちの強みです。");
+        add("mythic_age.village.say.greek.javelineer.chat.2", "投一支，退三步，再投一支。重甲的追不上我们。", "Throw, step back three paces, throw again. The heavy men can't catch us.", "一本投げて三歩下がり、また投げる。重装の者には追いつけません。");
+        add("mythic_age.village.say.greek.javelineer.chat.3", "听老人讲，在斯法克特里亚，就是我们这样的人把斯巴达人困住的。", "The old men say it was folk like us who pinned the Spartans down at Sphacteria.", "スファクテリアでスパルタ人を追い詰めたのは、わたしたちのような者だったと年寄りは言います。");
+        add("mythic_age.village.say.greek.javelineer.chat.4", "有敌人来，我先去圣火盆扬火，全村就都知道了。", "When enemies come I fan the sacred brazier first — then the whole village knows.", "敵が来たら、まず聖火台の火をあおぎます。そうすれば村じゅうに伝わります。");
+        add("mythic_age.village.say.greek.javelineer.chat.5", "仗打完了要把投矛捡回来，能用的放回谷仓。", "After a fight we gather the javelins; the good ones go back to the granary.", "戦いのあとは投げ槍を拾い集め、使えるものは倉に戻します。");
+        add("mythic_age.village.say.greek.javelineer.chat.6", "烽火能一座山一座山传过去，听说特洛伊陷落的消息就是这么传回来的。", "Fire signals leap from peak to peak — they say that's how the fall of Troy was told.", "烽火は山から山へ伝わります。トロイア陥落の知らせもそうして届いたそうです。");
         add("mythic_age.village.say.greek.laborer.short", "手头没什么急活，等管事的吩咐。", "Nothing urgent on hand; waiting for the steward's word.", "急ぎの仕事はありません。差配役の指示待ちです。");
         add("mythic_age.village.trade.sell", "出售", "For sale", "売り物");
         add("mythic_age.village.trade.buy", "收购", "Buying", "買い取り");
@@ -436,6 +449,8 @@ public final class LangKeys {
         add("mythic_age.village.point.quarry", "采石点", "quarry", "採石場");
         add("mythic_age.village.point.woodland", "林地", "woodland", "林");
         add("mythic_age.village.point.stone", "采石面", "stone face", "石切り場");
+        add("item.mythic_age.soldier_gear.tooltip", "供本村士兵使用（存进村库）", "For the village's soldiers (deposit it in the stores)",
+                "村の兵士用（村の倉に納める）");
         add("mythic_age.village.point.gravel", "砾石滩", "gravel bank", "砂利の浜");
         add("mythic_age.village.point.hides", "鞣革", "tanning", "なめし革");
         add("mythic_age.village.date", "%s第 %s 日", "%s, day %s", "%s %s 日目");

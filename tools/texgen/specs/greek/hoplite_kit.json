@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/hoplite_kit",
+  "size": 16,
+  "_note": "盾矛兵装：红面青铜边的圆盾（aspis），后面斜放长矛（dory）；颜色同 V02 卫兵外观",
+  "palette": {
+    "s": "#6b4a2b",
+    "w": "#e8e2d0",
+    "h": "#f0d494",
+    "b": "#b8843f",
+    "r": "#8e5d28",
+    "f": "#9a2a22",
+    "l": "#c65448"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "...............h",
+      "..............b.",
+      "............bb..",
+      "...........bb...",
+      "....rrrrrr.w....",
+      "...rrffffrr.....",
+      "..rrfflfffrr....",
+      "..rfflfffffr....",
+      "..rffffffffr....",
+      "..rffffbbffr....",
+      "..rffffbbffr....",
+      "..rrffffffrr....",
+      "...rrffffrr.....",
+      "..s.rrrrrr......",
+      ".s..............",
+      "................"
+    ]
+  }
+}

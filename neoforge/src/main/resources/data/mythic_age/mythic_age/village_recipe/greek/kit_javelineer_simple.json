@@ -1,0 +1,10 @@
+{
+  "_doc": "简易投矛兵装（01 号）：没有皮护肩。",
+  "station": "anchor:storage_keeper",
+  "professions": ["greek:laborer"],
+  "inputs": {"minecraft:white_wool": 2},
+  "outputs": {"mythic_age:javelineer_kit_simple": 1},
+  "stages": [{"anim": "build_hammer", "ticks": 80}],
+  "stage": "classical",
+  "stockTarget": 1
+}

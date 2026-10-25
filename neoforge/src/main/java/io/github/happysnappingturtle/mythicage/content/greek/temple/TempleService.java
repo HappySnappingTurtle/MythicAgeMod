@@ -121,6 +121,12 @@ public final class TempleService {
         QUEUE.submit(key, rules.scan().volume());
     }
 
+    /** 祭坛的扫描范围（世界坐标的包围盒，T20 护祷拦截用）。 */
+    public static net.minecraft.world.phys.AABB scanArea(ServerLevel level, BlockPos altar) {
+        BlockPos[] b = TempleScan.bounds(altar, facingAt(level, altar), rules().scan());
+        return new net.minecraft.world.phys.AABB(b[0].getX(), b[0].getY(), b[0].getZ(), b[1].getX() + 1, b[1].getY() + 1, b[1].getZ() + 1);
+    }
+
     static Direction facingAt(ServerLevel level, BlockPos pos) {
         var state = level.getBlockState(pos);
         return state.hasProperty(GreekAltarBlock.FACING) ? state.getValue(GreekAltarBlock.FACING) : Direction.NORTH;

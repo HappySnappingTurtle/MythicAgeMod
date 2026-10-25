@@ -263,12 +263,34 @@ final class FestivalJob implements JobType {
     // ───────────── 竞技、剧场、广场 ─────────────
 
     private List<Job> games(VillageContext ctx, String fid, LifeData.Phase p, List<ResidentEntity> free) {
+        List<Job> wrestle = new ArrayList<>();
+        // 角力（T20 §9.3，T19 J10 留下的）：有训练锚点（角力场、体育场）就让两名不值勤的士兵在第一个锚点上对练
+        String training = ctx.data().soldiers().training();
+        List<Pos> ring = training.isEmpty() ? List.of() : ctx.anchors(training);
+        boolean wrestleOn = ctx.rt().activeJobs().stream().anyMatch(j -> j.type().equals(id()) && j.ref().contains("|wrestle|"));
+        if (!wrestleOn && until(ctx.timeOfDay(), p.to()) > 700 && !ring.isEmpty()) {
+            BlockPos spot = VillageContext.block(ring.get(0));
+            List<ResidentEntity> pair = free.stream().filter(ResidentEntity::isSoldier).sorted(nearest(spot)).limit(2).toList();
+            if (pair.size() == 2) {
+                for (int j = 0; j < 2; j++) {
+                    ResidentEntity r = pair.get(j);
+                    BlockPos a = VillageLife.ground(ctx.level(), spot.getX() + (j == 0 ? -1 : 1), spot.getZ(), spot.getY());
+                    BlockPos other = VillageLife.ground(ctx.level(), spot.getX() + (j == 0 ? 1 : -1), spot.getZ(), spot.getY());
+                    // 先走到自己的位置，再朝对手那一格「迈半步」（动作朝向最近一次走向的目标）
+                    List<JobStep> steps = List.of(JobStep.moveTo(VillageLife.pos(a), ""), JobStep.moveTo(VillageLife.pos(other), ""),
+                            JobStep.act("wrestle", 600), JobStep.settle());
+                    wrestle.add(job(ctx, r, VillageLife.pos(a), "fest:wrestle:" + ctx.today() + ":" + r.getUUID(),
+                            fid + "|wrestle|" + j, steps, 11, 2400));
+                    free.remove(r);
+                }
+            }
+        }
         List<BlockPos> track = trackPoints(ctx, p.track());
         if (track.isEmpty()) {
             track = trackPoints(ctx, p.fallback());
         }
         if (track.isEmpty()) {
-            return List.of();
+            return wrestle;
         }
         ServerLevel level = ctx.level();
         BlockPos start = track.get(0);
@@ -279,7 +301,7 @@ final class FestivalJob implements JobType {
         dx /= len;
         dz /= len;
         int left = until(ctx.timeOfDay(), p.to());
-        List<Job> out = new ArrayList<>();
+        List<Job> out = new ArrayList<>(wrestle);
         boolean heatOn = ctx.rt().activeJobs().stream().anyMatch(j -> j.type().equals(id()) && j.ref().contains("|run|"));
         if (!heatOn && left > 900 && free.size() >= 2) {
             int n = Math.min(Math.max(2, p.count()), free.size());

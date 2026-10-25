@@ -115,7 +115,7 @@ public final class Soldiers {
             Optional<SoldierProfile> p = ctx.data().soldier(m.profession());
             SoldierRecord rec = s.soldiers.get(r.getUUID());
             if (p.isPresent() && rec == null) {
-                rec = new SoldierRecord(m.profession(), SoldierProfile.Tier.byId(r.kitTier()), 0, 0, ++s.enlistCounter);
+                rec = new SoldierRecord(m.profession(), SoldierProfile.Tier.byId(r.kitTier()), 0, Map.of(), ++s.enlistCounter);
                 s.soldiers.put(r.getUUID(), rec);
             }
             if (p.isPresent() && !r.isSoldier()) {
@@ -226,8 +226,7 @@ public final class Soldiers {
         if (m != null) {
             s.roster.put(r.getUUID(), m.withProfession(profession));
         }
-        int ammo = 0;
-        s.soldiers.put(r.getUUID(), new SoldierRecord(profession, tier, 0, ammo, ++s.enlistCounter));
+        s.soldiers.put(r.getUUID(), new SoldierRecord(profession, tier, 0, Map.of(), ++s.enlistCounter));
         apply(r, p, tier);
     }
 
@@ -238,6 +237,8 @@ public final class Soldiers {
         if (rec != null) {
             ctx.data().soldier(rec.profession()).ifPresent(p -> giveBack(s, p, rec.tier(),
                     KitRules.onReturn(rec.tier(), rec.wear(), p.durability())));
+            // 身上的弹药放回村库
+            rec.ammo().forEach((item, n) -> s.stock.deposit(item, n));
         }
         String fallback = ctx.data().residents().fallback();
         r.setProfession(fallback);
@@ -342,6 +343,17 @@ public final class Soldiers {
         return DutyRules.posts(ctx.data().soldiers().posts(), anchors, VillageContext.pos(ctx.center()));
     }
 
+    /** 只供 GameTest：让某村的士兵全部处于某个状态（不改世界时钟）。 */
+    private static final Map<UUID, DutyRules.State> FORCED = new java.util.concurrent.ConcurrentHashMap<>();
+
+    public static void forceStateForTest(UUID village, DutyRules.State st) {
+        if (st == null) {
+            FORCED.remove(village);
+        } else {
+            FORCED.put(village, st);
+        }
+    }
+
     /** 每次规划：排班、派岗、发命令（§5.1–§5.2）。 */
     public static void plan(VillageContext ctx) {
         if (!ctx.data().soldiers().enabled()) {
@@ -359,8 +371,9 @@ public final class Soldiers {
         SoldierCivRules.Shifts shifts = ctx.data().soldiers().shifts();
         List<UUID> onDuty = new ArrayList<>();
         Map<UUID, DutyRules.State> states = new LinkedHashMap<>();
+        DutyRules.State forced = FORCED.get(ctx.village().id());
         for (int i = 0; i < list.size(); i++) {
-            DutyRules.State st = DutyRules.state(DutyRules.shift(i, list.size()), ctx.timeOfDay(), shifts);
+            DutyRules.State st = forced != null ? forced : DutyRules.state(DutyRules.shift(i, list.size()), ctx.timeOfDay(), shifts);
             states.put(list.get(i).getUUID(), st);
             if (st == DutyRules.State.ON_DUTY) {
                 onDuty.add(list.get(i).getUUID());
@@ -425,6 +438,109 @@ public final class Soldiers {
                 VillageEconomy.get(level.getServer()).setDirty();
             }
         });
+    }
+
+    /** 被士兵护着的居民受伤：交给护他的士兵的独有机制（没有就 ×1）。 */
+    public static float wardMultiplier(ResidentEntity victim, net.minecraft.world.damagesource.DamageSource source) {
+        return SoldierBrain.guardOf(victim.getUUID()).map(g -> {
+            SoldierOrders o = g.soldierBrain().orders();
+            return o == null ? 1.0F : SoldierAbility.of(o.profile().ability())
+                    .map(a -> a.protectedHurt(g, g.soldierBrain(), victim, source)).orElse(1.0F);
+        }).orElse(1.0F);
+    }
+
+    // ───────────── 弹药（远程兵种，§9.2） ─────────────
+
+    public static Optional<SoldierRecord> record(ServerLevel level, ResidentEntity r) {
+        return r.village().flatMap(v -> VillageEconomy.get(level.getServer()).peek(v)).map(s -> s.soldiers.get(r.getUUID()));
+    }
+
+    /** 用掉一支。 */
+    public static void useAmmo(ServerLevel level, ResidentEntity r, String item) {
+        r.village().flatMap(v -> VillageEconomy.get(level.getServer()).peek(v)).ifPresent(s -> {
+            SoldierRecord rec = s.soldiers.get(r.getUUID());
+            if (rec != null) {
+                Map<String, Integer> a = new LinkedHashMap<>(rec.ammo());
+                a.merge(item, -1, Integer::sum);
+                s.soldiers.put(r.getUUID(), rec.withAmmo(a));
+                VillageEconomy.get(level.getServer()).setDirty();
+            }
+        });
+    }
+
+    /** 村库里这个兵种能用的弹药一共几支。 */
+    public static int ammoInStock(ServerLevel level, java.util.UUID village, SoldierProfile p) {
+        return VillageEconomy.get(level.getServer()).peek(village).map(s -> p.ammo().items().stream()
+                .mapToInt(a -> s.stock.count(a.item())).sum()).orElse(0);
+    }
+
+    /** 回谷仓补到上限：先拿好的（弹药表靠前的）。 */
+    public static void resupply(ServerLevel level, ResidentEntity r, SoldierProfile p) {
+        r.village().flatMap(v -> VillageEconomy.get(level.getServer()).peek(v)).ifPresent(s -> {
+            SoldierRecord rec = s.soldiers.get(r.getUUID());
+            if (rec == null || p.ammo() == null) {
+                return;
+            }
+            Map<String, Integer> a = new LinkedHashMap<>(rec.ammo());
+            int need = p.ammo().carry() - rec.ammoTotal();
+            for (SoldierProfile.AmmoItem it : p.ammo().items()) {
+                if (need <= 0) {
+                    break;
+                }
+                int got = s.stock.take(it.item(), need, 0);
+                a.merge(it.item(), got, Integer::sum);
+                need -= got;
+            }
+            s.soldiers.put(r.getUUID(), rec.withAmmo(a));
+            VillageEconomy.get(level.getServer()).setDirty();
+        });
+    }
+
+    /**
+     * 捡回一支落地的弹药：按它的 UUID 定种子，{@code recover} 的概率完好回村库，其余计损耗（01 号「每支 60% 完好可回库」）。
+     * 返回是否回了库。
+     */
+    public static boolean recoverAmmo(ServerLevel level, SoldierAmmo ammo, SoldierProfile p) {
+        java.util.UUID id = ((net.minecraft.world.entity.Entity) ammo).getUUID();
+        boolean intact = intact(id, p.ammo().recover());
+        if (intact) {
+            VillageEconomy.get(level.getServer()).peek(ammo.ammoVillage()).ifPresent(s -> {
+                s.stock.deposit(ammo.ammoItem(), 1);
+                VillageEconomy.get(level.getServer()).setDirty();
+            });
+        }
+        return intact;
+    }
+
+    /** 这支弹药捡回来是不是完好的（按 UUID 定种子，可复现）。 */
+    public static boolean intact(java.util.UUID id, double recover) {
+        long h = id.getMostSignificantBits() * 31 + id.getLeastSignificantBits();
+        return Math.floorMod(h ^ (h >>> 29), 1000) < recover * 1000;
+    }
+
+    /** 村庄 → 已经通知过独有机制的警戒场次。 */
+    private static final Map<UUID, Long> BROADCAST = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** 新一场警戒：本村每名已加载士兵的独有机制各收到一次（同一场只通知一次）。 */
+    public static void broadcastAlert(ServerLevel level, UUID village, long serial, net.minecraft.world.entity.LivingEntity threat) {
+        Long seen = BROADCAST.put(village, serial);
+        if (seen != null && seen == serial) {
+            return;
+        }
+        VillageThreats.setAlertThreat(village, threat);
+        for (ResidentEntity s : VillageScheduler.loaded(village)) {
+            if (!s.isSoldier()) {
+                continue;
+            }
+            SoldierOrders o = s.soldierBrain().orders();
+            if (o != null) {
+                SoldierAbility.of(o.profile().ability()).ifPresent(a -> a.onAlert(s, s.soldierBrain(), serial));
+            }
+        }
+    }
+
+    public static void clearForTest(UUID village) {
+        BROADCAST.remove(village);
     }
 
     /** 当前警戒场次（独有机制「每场一次」用）。 */

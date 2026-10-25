@@ -624,6 +624,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     public boolean hurt(DamageSource source, float amount) {
         if (!level().isClientSide && isSoldier() && soldier != null) {
             amount *= soldier.shieldMultiplier(source);
+        } else if (!level().isClientSide && !isSoldier()) {
+            // 被士兵护着（拦截）：独有机制可以挡掉一部分（护祷拦截的投射物掩护，T20 §9.1）
+            amount *= io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.wardMultiplier(this, source);
         }
         boolean hurt = super.hurt(source, amount);
         if (hurt && isSoldier() && source.getEntity() != null && level() instanceof ServerLevel sl) {

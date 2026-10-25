@@ -1,40 +1,37 @@
 package io.github.happysnappingturtle.mythicage.village.soldier;
 
+import io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierProfile;
 import io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 远程兵种的出手（T20 设计文档 §8.2）：按弹药物品找到投射物的执行器（各文明注册；希腊投矛在阶段 ②）。
- * 没有执行器的远程兵种退为护送。
+ * 远程兵种的投射物（T20 设计文档 §8.2）：出手的时间轴、瞄准、射线遮挡、近身后撤都在 {@link SoldierBrain} 里通用处理；
+ * 各文明只按弹药物品注册「怎么生成这支投射物」（希腊：投矛、粗投矛）。没有注册的弹药，远程兵种退为护送。
  */
 public final class RangedAttacks {
-    /** 一种弹药的执行：返回 true 表示这一刻已经处理（走位、出手或后撤）。 */
-    public interface Shooter {
-        boolean tick(ResidentEntity soldier, SoldierBrain brain, SoldierOrders orders, LivingEntity target, long now);
+    /** 生成一支投射物并加进世界。 */
+    public interface Launcher {
+        Entity launch(ServerLevel level, ResidentEntity soldier, UUID village, String item, float damage, Vec3 from, Vec3 velocity,
+                      SoldierProfile profile);
     }
 
-    private static final Map<String, Shooter> BY_AMMO = new ConcurrentHashMap<>();
+    private static final Map<String, Launcher> BY_AMMO = new ConcurrentHashMap<>();
 
     private RangedAttacks() {
     }
 
-    public static void register(String ammoItem, Shooter s) {
-        BY_AMMO.put(ammoItem, s);
+    public static void register(String ammoItem, Launcher l) {
+        BY_AMMO.put(ammoItem, l);
     }
 
-    static boolean tick(ResidentEntity soldier, SoldierBrain brain, SoldierOrders o, LivingEntity target, long now) {
-        if (o.profile().ammo() == null) {
-            return false;
-        }
-        for (var item : o.profile().ammo().items()) {
-            Shooter s = BY_AMMO.get(item.item());
-            if (s != null) {
-                return s.tick(soldier, brain, o, target, now);
-            }
-        }
-        return false;
+    public static Optional<Launcher> launcher(String ammoItem) {
+        return Optional.ofNullable(BY_AMMO.get(ammoItem));
     }
 }

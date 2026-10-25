@@ -485,6 +485,18 @@ class SoldierTest {
         assertFalse(InterceptRules.covers(s, false, 0, 0, 0, 0, 8, 0, -2.5), "没举盾");
     }
 
+    @Test
+    void tc39nBallistics() {
+        double[] v = Ballistics.launch(10, 0, 0, 1.1, 0.05).orElseThrow();
+        assertEquals(1.1, Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]), 1e-9, "初速不变");
+        assertTrue(v[1] > 0 && v[1] < v[0], "低抛（仰角 < 45°）");
+        assertEquals(0, Ballistics.heightAt(v, 10, 0.05), 1.2, "落在 10 格外的同一高度附近（离散步长误差）");
+        assertTrue(Ballistics.launch(40, 0, 0, 1.1, 0.05).isEmpty(), "超出最大射程");
+        double[] flat = Ballistics.launch(3, 4, 0, 1.0, 0).orElseThrow();
+        assertEquals(0.6, flat[0], 1e-9);
+        assertEquals(0.8, flat[1], 1e-9);
+    }
+
     // ───────────── 2.7 数据解析 ─────────────
 
     @Test

@@ -1,0 +1,10 @@
+{
+  "_doc": "粗投矛（01 号）：橄榄木杆、燧石尖，伤害 −1；燧石来自砾石滩（T20 §10.6）。",
+  "station": "anchor:storage_keeper",
+  "professions": ["greek:laborer"],
+  "inputs": {"mythic_age:olive_stick": 2, "minecraft:flint": 1},
+  "outputs": {"mythic_age:rough_javelin": 2},
+  "stages": [{"anim": "build_hammer", "ticks": 40}],
+  "stage": "classical",
+  "stockTarget": 12
+}

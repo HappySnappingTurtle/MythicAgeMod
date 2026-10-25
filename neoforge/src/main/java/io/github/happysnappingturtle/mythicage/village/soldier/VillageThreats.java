@@ -48,11 +48,29 @@ public final class VillageThreats {
         return t == null ? -1 : Math.max(0, now - t);
     }
 
+    /** 村庄 → 这场警戒最先被发现的威胁（独有机制用来通知全村，弱引用）。 */
+    private static final Map<UUID, java.lang.ref.WeakReference<net.minecraft.world.entity.LivingEntity>> ALERT = new ConcurrentHashMap<>();
+
+    public static void setAlertThreat(UUID village, net.minecraft.world.entity.LivingEntity threat) {
+        if (threat != null) {
+            ALERT.put(village, new java.lang.ref.WeakReference<>(threat));
+        }
+    }
+
+    /** 这场警戒的威胁（还活着才返回）。 */
+    public static java.util.Optional<net.minecraft.world.entity.LivingEntity> alertThreat(UUID village) {
+        var ref = ALERT.get(village);
+        var e = ref == null ? null : ref.get();
+        return e != null && e.isAlive() && !e.isRemoved() ? java.util.Optional.of(e) : java.util.Optional.empty();
+    }
+
     public static void onServerStopped(ServerStoppedEvent e) {
         HARMS.clear();
+        ALERT.clear();
     }
 
     public static void clearForTest(UUID village) {
         HARMS.remove(village);
+        ALERT.remove(village);
     }
 }

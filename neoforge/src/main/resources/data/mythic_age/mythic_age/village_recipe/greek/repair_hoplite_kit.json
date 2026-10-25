@@ -1,0 +1,10 @@
+{
+  "_doc": "修复破损的盾矛兵装：完整兵装原材料的一半（向上取整，01 号 §0.5）。",
+  "station": "mythic_age:greek_anvil",
+  "professions": ["greek:bronzesmith"],
+  "inputs": {"mythic_age:hoplite_kit_broken": 1, "mythic_age:bronze_ingot": 2, "mythic_age:olive_planks": 1, "minecraft:leather": 1, "minecraft:white_wool": 1},
+  "outputs": {"mythic_age:hoplite_kit": 1},
+  "stages": [{"anim": "bronze_hammer", "ticks": 120}],
+  "stage": "heroic",
+  "stockTarget": 1
+}
