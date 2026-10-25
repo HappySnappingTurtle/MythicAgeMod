@@ -931,5 +931,16 @@
       "from": 1500,
       "until": 11000
     }
+  },
+  "foundation": {
+    "_doc": "城邦奠基石（T19 设计文档 §1.13）：市政厅里赫斯提亚的公共灶。立村后第一个项目是起步住居；没有住居时 camp 名居民露宿在石灶旁。",
+    "block": "mythic_age:greek_hearth_stone",
+    "patrons": [
+      "zeus",
+      "poseidon",
+      "hades"
+    ],
+    "starter": "greek:house_small",
+    "camp": 3
   }
 }

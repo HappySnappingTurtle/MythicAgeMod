@@ -92,6 +92,13 @@ public final class VillageAffairs {
             shortages.add(AffairsView.Line.of("mythic_age.village.short.housing"));
         }
         shortages.addAll(0, projectLines(s));
+        String space = io.github.happysnappingturtle.mythicage.village.work.VillageScheduler.runtime(village).needsSpace();
+        io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spaceSpec =
+                io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(space);
+        if (spaceSpec != null && s.activeProject().isEmpty()) {
+            shortages.add(AffairsView.Line.of("mythic_age.village.short.space",
+                    io.github.happysnappingturtle.mythicage.village.build.Construction.nameArg(spaceSpec, "")));
+        }
         List<AffairsView.Line> log = new ArrayList<>();
         for (int i = s.log.size() - 1; i >= 0 && log.size() < 8; i--) {
             VillageEconomy.LogEntry e = s.log.get(i);

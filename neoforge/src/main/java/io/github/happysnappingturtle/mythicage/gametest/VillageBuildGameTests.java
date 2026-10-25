@@ -547,7 +547,10 @@ public final class VillageBuildGameTests {
             }
             Box plot = absBox(h, 6, 2, 10, 8, 12);
             h.assertTrue(!Construction.groundOk(h.getLevel(), plot), "水面不算实地");
-            h.assertTrue(Construction.daily(ctx(h, tv)).isEmpty(), "不选水面上的地块");
+            // 水面上的地块不选；阶段 ⑥ 起改为临时找地（别处开工就取消掉，好接着测实地）
+            var first = Construction.daily(ctx(h, tv));
+            h.assertTrue(first.map(x -> !x.plot.equals("classical_hut_1")).orElse(true), "不选水面上的地块");
+            first.ifPresent(x -> Construction.cancel(ctx(h, tv), x));
             for (int x = 6; x <= 8; x++) {
                 for (int z = 10; z <= 12; z++) {
                     h.setBlock(new BlockPos(x, 1, z), Blocks.STONE);

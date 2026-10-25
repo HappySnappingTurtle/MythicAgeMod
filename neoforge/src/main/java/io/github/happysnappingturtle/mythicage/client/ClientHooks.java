@@ -11,6 +11,11 @@ public final class ClientHooks {
     private ClientHooks() {
     }
 
+    /** 奠基石选主神（T19 阶段 ⑥）。 */
+    public static void foundation(io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Choose payload) {
+        Minecraft.getInstance().setScreen(new io.github.happysnappingturtle.mythicage.client.screen.FoundationScreen(payload));
+    }
+
     public static void openAltar(AltarSurveyPayload payload) {
         Minecraft.getInstance().setScreen(new GreekAltarScreen(payload));
     }

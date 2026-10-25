@@ -39,6 +39,8 @@ import java.util.Optional;
  * /mythicage dev village project drop &lt;段数&gt;             不等居民，直接落段（拍图用）
  * /mythicage dev village calendar &lt;第几日&gt;              把本村历法调到一年中的第几日（看节庆、神谕日；T19 阶段 ⑤）
  * /mythicage dev village life                          历法、节庆段、神谕所、当日计数、祭司差事
+ * /mythicage dev foundation give                       发一块城邦奠基石（T19 阶段 ⑥；正式获得要神话时代 + 许德拉之鳞，T25）
+ * /mythicage dev foundation place &lt;坐标&gt;             以执行者的身份在某处放一块（等同手放：检查、记建立者、打开选主神界面）
  * </pre>
  */
 public final class VillageDevCommand {
@@ -120,6 +122,31 @@ public final class VillageDevCommand {
         if (FMLEnvironment.production) {
             return;
         }
+        // 奠基石（T19 阶段 ⑥，D9：阶段 A 只能用命令发放）
+        d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
+                .then(Commands.literal("foundation").then(Commands.literal("give").executes(c -> {
+                    boolean ok = FoundationService.give(c.getSource().getPlayerOrException(),
+                            io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK);
+                    c.getSource().sendSuccess(() -> Component.literal(ok ? "给了一块城邦奠基石" : "背包满了或这个文明没有奠基石"), false);
+                    return ok ? 1 : 0;
+                })).then(Commands.literal("place").then(Commands.argument("pos",
+                        net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos()).executes(c -> {
+                    var player = c.getSource().getPlayerOrException();
+                    BlockPos at = net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos");
+                    var civ = io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK;
+                    var err = FoundationService.placementError(player, c.getSource().getLevel(), at, civ);
+                    if (err.isPresent()) {
+                        c.getSource().sendFailure(err.get());
+                        return 0;
+                    }
+                    c.getSource().getLevel().setBlockAndUpdate(at,
+                            io.github.happysnappingturtle.mythicage.content.greek.village.GreekFoundation.HEARTH_STONE.get().defaultBlockState());
+                    if (c.getSource().getLevel().getBlockEntity(at)
+                            instanceof io.github.happysnappingturtle.mythicage.village.found.FoundationStoneBlockEntity be) {
+                        FoundationService.onPlaced(c.getSource().getLevel(), at, player, be, civ);
+                    }
+                    return 1;
+                }))))));
         d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
                 .then(Commands.literal("village")
                         .then(Commands.literal("add").then(Commands.argument("item", ItemArgument.item(build))

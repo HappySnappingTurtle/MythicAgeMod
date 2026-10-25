@@ -29,7 +29,24 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Map<String, Integer> initialStock, Map<String, Profession> professions,
                              Map<String, VillageRecipe> recipes, BuildCosts buildCosts,
                              io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade,
-                             io.github.happysnappingturtle.mythicage.core.village.life.LifeData life) {
+                             io.github.happysnappingturtle.mythicage.core.village.life.LifeData life,
+                             Foundation foundation) {
+    /**
+     * 奠基石（T19 §1.13 K1）：方块、可选主神、起步住居（没有住居时的第一个项目，远古也开工）、露宿名额。
+     * 方块为空表示这个文明还没有奠基石。
+     */
+    public record Foundation(String block, List<String> patrons, String starter, int camp) {
+        public static final Foundation NONE = new Foundation("", List.of(), "", 0);
+
+        public Foundation {
+            patrons = List.copyOf(patrons);
+        }
+
+        public boolean enabled() {
+            return !block.isEmpty() && !patrons.isEmpty();
+        }
+    }
+
     /**
      * 采集点种类（建筑锚点同名）。
      *
@@ -142,7 +159,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
-                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life);
+                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life, foundation);
     }
 
     /** 生成时 {@code homes} 张床的职业分配：先按 {@code initial} 的顺序，床不够就截断，多出来的是 {@code fallback}。 */
@@ -232,7 +249,12 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                 o.has("trade") ? io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.parse(o.getAsJsonObject("trade"))
                         : io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.none(),
                 o.has("life") ? io.github.happysnappingturtle.mythicage.core.village.life.LifeData.parse(o.getAsJsonObject("life"))
-                        : io.github.happysnappingturtle.mythicage.core.village.life.LifeData.none());
+                        : io.github.happysnappingturtle.mythicage.core.village.life.LifeData.none(),
+                o.has("foundation") ? foundation(o.getAsJsonObject("foundation")) : Foundation.NONE);
+    }
+
+    static Foundation foundation(JsonObject f) {
+        return new Foundation(str(f, "block", ""), list(f, "patrons"), str(f, "starter", ""), integer(f, "camp", 3));
     }
 
     public static Profession parseProfession(String id, JsonObject o) {

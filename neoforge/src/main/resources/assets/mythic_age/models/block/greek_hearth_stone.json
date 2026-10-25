@@ -1,0 +1,598 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/marble_ashlar",
+    "stone": "mythic_age:block/marble_ashlar",
+    "rim": "mythic_age:block/polished_marble",
+    "embers": "minecraft:block/magma",
+    "log": "minecraft:block/campfire_log_lit",
+    "fire": "minecraft:block/campfire_fire"
+  },
+  "elements": [
+    {
+      "__comment": "灶座",
+      "from": [
+        0.4,
+        0,
+        4.2
+      ],
+      "to": [
+        15.6,
+        1.4,
+        11.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        4.2,
+        0,
+        0.4
+      ],
+      "to": [
+        11.8,
+        1.4,
+        15.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        -0.061,
+        0,
+        5.313
+      ],
+      "to": [
+        16.061,
+        1.4,
+        10.687
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        -0.061,
+        0,
+        5.313
+      ],
+      "to": [
+        16.061,
+        1.4,
+        10.687
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          0,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "灶壁",
+      "from": [
+        1.0,
+        1.4,
+        4.5
+      ],
+      "to": [
+        15.0,
+        4.2,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        1.4,
+        1.0
+      ],
+      "to": [
+        11.5,
+        4.2,
+        15.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5754,
+        1.4,
+        5.5251
+      ],
+      "to": [
+        15.4246,
+        4.2,
+        10.4749
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          1.4,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5754,
+        1.4,
+        5.5251
+      ],
+      "to": [
+        15.4246,
+        4.2,
+        10.4749
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          1.4,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "down": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "__comment": "灶沿",
+      "from": [
+        0.7,
+        4.2,
+        4.35
+      ],
+      "to": [
+        15.3,
+        4.9,
+        11.65
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "from": [
+        4.35,
+        4.2,
+        0.7
+      ],
+      "to": [
+        11.65,
+        4.9,
+        15.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.2572,
+        4.2,
+        5.4191
+      ],
+      "to": [
+        15.7428,
+        4.9,
+        10.5809
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          4.2,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "from": [
+        0.2572,
+        4.2,
+        5.4191
+      ],
+      "to": [
+        15.7428,
+        4.9,
+        10.5809
+      ],
+      "rotation": {
+        "angle": -45,
+        "axis": "y",
+        "origin": [
+          8,
+          4.2,
+          8
+        ]
+      },
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        }
+      }
+    },
+    {
+      "__comment": "炭床",
+      "from": [
+        3.0,
+        3.4,
+        3.0
+      ],
+      "to": [
+        13.0,
+        4.0,
+        13.0
+      ],
+      "faces": {
+        "up": {
+          "texture": "#embers"
+        }
+      }
+    },
+    {
+      "__comment": "柴·横",
+      "from": [
+        3.4,
+        4.0,
+        7.0
+      ],
+      "to": [
+        12.6,
+        5.6,
+        8.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#log"
+        },
+        "south": {
+          "texture": "#log"
+        },
+        "east": {
+          "texture": "#log"
+        },
+        "west": {
+          "texture": "#log"
+        },
+        "up": {
+          "texture": "#log"
+        },
+        "down": {
+          "texture": "#log"
+        }
+      }
+    },
+    {
+      "__comment": "柴·纵",
+      "from": [
+        7.2,
+        4.0,
+        3.4
+      ],
+      "to": [
+        8.8,
+        5.6,
+        12.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#log"
+        },
+        "south": {
+          "texture": "#log"
+        },
+        "east": {
+          "texture": "#log"
+        },
+        "west": {
+          "texture": "#log"
+        },
+        "up": {
+          "texture": "#log"
+        },
+        "down": {
+          "texture": "#log"
+        }
+      }
+    },
+    {
+      "from": [
+        1.6,
+        4.6,
+        8
+      ],
+      "to": [
+        14.4,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#fire"
+        },
+        "south": {
+          "texture": "#fire"
+        }
+      },
+      "__comment": "圣火",
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "from": [
+        1.6,
+        4.6,
+        8
+      ],
+      "to": [
+        14.4,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#fire"
+        },
+        "south": {
+          "texture": "#fire"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": -45
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

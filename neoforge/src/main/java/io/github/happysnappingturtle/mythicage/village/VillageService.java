@@ -179,6 +179,18 @@ public final class VillageService {
             if (b.distManhattan(pos) > LEAVE_RANGE * 2 || !level.isLoaded(b)) {
                 continue;
             }
+            // 奠基村庄（T19 §1.13 K5）：看奠基石还在不在；拆了进入 3 日宽限，过期注销（立过的原版村庄回到中立）
+            if (v.origin() == VillageRegistry.Origin.FOUNDED) {
+                if (FoundationService.present(level, v)) {
+                    reg.setMissingSince(v, -1);
+                } else if (v.missingSinceDay() < 0) {
+                    reg.setMissingSince(v, today);
+                } else if (io.github.happysnappingturtle.mythicage.core.village.found.FoundationRules.grace(v.missingSinceDay(), today)
+                        == io.github.happysnappingturtle.mythicage.core.village.found.FoundationRules.Grace.EXPIRED) {
+                    FoundationService.expire(level, v);
+                }
+                continue;
+            }
             // 按锚点种类判断村庄还在不在（T18 §1）：生成村庄看规划数据，不要求中心有钟
             boolean present = v.anchor().kind() == VillageAnchor.Kind.CENTER && plans.has(v.id())
                     || level.getPoiManager().existsAtPosition(PoiTypes.MEETING, b);

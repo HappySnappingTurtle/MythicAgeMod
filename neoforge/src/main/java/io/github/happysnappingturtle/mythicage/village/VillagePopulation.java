@@ -103,7 +103,8 @@ public final class VillagePopulation {
 
     /** 生成的文明村庄由居民框架管人口（T19），这里不再往里放原版无业村民。 */
     public static boolean residentFramework(VillageRegistry.Village v) {
-        return v.origin() == VillageRegistry.Origin.GENERATED
+        // 生成村庄与奠基村庄（T19 §1.13 K6）走居民框架；原版村庄（立村之前）走原版人口
+        return (v.origin() == VillageRegistry.Origin.GENERATED || v.origin() == VillageRegistry.Origin.FOUNDED)
                 && io.github.happysnappingturtle.mythicage.village.work.VillageData.civ(v.civ()).isPresent();
     }
 

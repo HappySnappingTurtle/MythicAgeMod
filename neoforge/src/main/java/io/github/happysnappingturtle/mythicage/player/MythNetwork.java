@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "17";
+    private static final String PROTOCOL_VERSION = "18";
 
     private MythNetwork() {
     }
@@ -84,6 +84,13 @@ public final class MythNetwork {
                         io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.relic.RelicPayloads::handleRetrieve)
                 // 村务界面（T19）
+                // 奠基石选主神（T19 阶段 ⑥）
+                .playToClient(io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Choose.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Choose.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.foundation(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Found.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Found.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.FoundationService::handleFound)
                 .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageAffairs(payload))

@@ -459,9 +459,12 @@ def check_village_buildings(paths: Paths, report: Report) -> None:
                 for it in members:
                     if it.startswith(MOD + ":") and it not in items:
                         report.error(f"折算表 {civ_dir.name} 组 #{key}：物品 {it} 未实现")
+            # 奠基村庄的起步住居（T19 §1.13 K7）是生成建筑，但也由居民施工，一样要被折算表覆盖
+            civ_data = json.loads(civ_file.read_text(encoding="utf-8")) if civ_file.exists() else {}
+            starter = civ_data.get("foundation", {}).get("starter", "")
             for f in sorted(civ_dir.glob("*.json")):
                 data = json.loads(f.read_text(encoding="utf-8"))
-                if data.get("generated", False):
+                if data.get("generated", False) and data.get("id") != starter:
                     continue
                 rules = data.get("buildCosts", []) + costs.get("rules", [])
                 tpl = data["template"].split(":", 1)

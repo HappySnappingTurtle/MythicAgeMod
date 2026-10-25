@@ -133,6 +133,15 @@ public final class VillageRegistry extends SavedData {
             return new Village(id, bell, civ, patron, origin, founder, vanillaType, missingSinceDay, stage, shrines,
                     newBaseline, migrationDay);
         }
+        /** 奠基立村（T19 §1.13 K3）：成为该文明的村庄，来源 FOUNDED，阶段从远古起；原版村庄立村时钟坐标不变。 */
+        public Village withFounding(String newCiv, String newPatron, UUID by) {
+            return new Village(id, bell, newCiv, newPatron, Origin.FOUNDED, by, vanillaType, -1, Age.ARCHAIC, Map.of(), -1, -1);
+        }
+
+        /** 奠基宽限过期（K5）：立过的原版村庄回到中立原版村庄。 */
+        public Village asNeutralVanilla() {
+            return new Village(id, bell, "", "", Origin.VANILLA, null, vanillaType, -1, Age.NONE, Map.of(), -1, -1);
+        }
     }
 
     private final Map<UUID, Village> byId = new LinkedHashMap<>();
@@ -172,6 +181,11 @@ public final class VillageRegistry extends SavedData {
     }
 
     /** 用新的记录替换（仪式、管理命令、移民）。 */
+    /** 记下（或清除，day = −1）村庄锚点消失的起始日；奠基石拆除宽限用（K5）。 */
+    public void markMissing(Village v, long day) {
+        setMissingSince(v, day);
+    }
+
     public void update(Village v) {
         if (byId.containsKey(v.id())) {
             add(v);

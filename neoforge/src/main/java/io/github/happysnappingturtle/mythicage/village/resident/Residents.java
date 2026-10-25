@@ -111,12 +111,18 @@ public final class Residents {
         return data.residents().keeper().isEmpty() ? data.residents().fallback() : data.residents().keeper();
     }
 
+    /** 床位锚点；还没有住居的奠基村庄用露宿位（T19 §1.13 K6）。 */
+    public static List<Pos> homes(VillagePlans.Plan plan) {
+        List<Pos> h = plan.anchors(HOME_ANCHOR);
+        return h.isEmpty() ? plan.anchors(io.github.happysnappingturtle.mythicage.village.FoundationService.CAMP) : h;
+    }
+
     /** 名册里没人睡的床位锚点。 */
     public static List<BlockPos> freeHomes(VillagePlans.Plan plan, VillageEconomy.State state) {
         Set<Long> used = new HashSet<>();
         state.roster.values().forEach(m -> used.add(m.home().asLong()));
         List<BlockPos> out = new ArrayList<>();
-        for (Pos p : plan.anchors(HOME_ANCHOR)) {
+        for (Pos p : homes(plan)) {
             BlockPos b = VillageInfoPiece.block(p);
             if (!used.contains(b.asLong())) {
                 out.add(b);

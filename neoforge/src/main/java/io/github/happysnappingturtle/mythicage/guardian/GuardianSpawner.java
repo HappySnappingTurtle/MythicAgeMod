@@ -197,7 +197,7 @@ public final class GuardianSpawner {
     }
 
     /** 中心 radius 格内（由近到远）找一个脚下结实、身体两格可通过的位置。 */
-    static Optional<BlockPos> standableNear(Level level, BlockPos center, int radius) {
+    public static Optional<BlockPos> standableNear(Level level, BlockPos center, int radius) {
         for (int r = 1; r <= radius; r++) {
             for (int dx = -r; dx <= r; dx++) {
                 for (int dz = -r; dz <= r; dz++) {

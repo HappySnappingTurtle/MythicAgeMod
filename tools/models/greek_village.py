@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 import math
 
-from modelgen import MODELS, box, cross, grid, model, noise, rows, spec, tex
+from modelgen import MODELS, box, cross, grid, model, noise, plane, rows, spec, tex
 
 FOLDER = "block/village/"  # 村庄展示方块：内容校验允许 16 或 32
 
@@ -756,6 +756,23 @@ def omphalos_elements():
     return els
 
 
+def hearth_elements():
+    """城邦奠基石（灶石，T19 阶段 ⑥）：市政厅（prytaneion）里赫斯提亚的公共灶——圆形石灶，灶膛里是烧红的炭与木柴，
+    上面一团常燃的圣火。殖民者从母邦的灶里取火种去点燃新城的灶（Wikipedia「Prytaneion」「Hestia」）。约 0.3 m 高的石灶，火苗齐到一格。"""
+    els = []
+    els += ring_y(8, 8, 7.6, 0, 1.4, "stone", comment="灶座")
+    els += ring_y(8, 8, 7.0, 1.4, 4.2, "stone", comment="灶壁")
+    els += ring_y(8, 8, 7.3, 4.2, 4.9, "rim", comment="灶沿")
+    els.append(box((3.0, 3.4, 3.0), (13.0, 4.0, 13.0), "embers", faces="u", comment="炭床"))
+    els.append(box((3.4, 4.0, 7.0), (12.6, 5.6, 8.6), "log", comment="柴·横"))
+    els.append(box((7.2, 4.0, 3.4), (8.8, 5.6, 12.6), "log", comment="柴·纵"))
+    els.append(plane((1.6, 4.6, 8), (14.4, 16, 8), "fire", "north", comment="圣火",
+                     rotation={"origin": [8, 8, 8], "axis": "y", "angle": 45}))
+    els.append(plane((1.6, 4.6, 8), (14.4, 16, 8), "fire", "north",
+                     rotation={"origin": [8, 8, 8], "axis": "y", "angle": -45}))
+    return els
+
+
 def lion_spout_elements():
     """狮头出水口：整块大理石墙面，正面（北）伸出一只张口的狮头（鬃毛一圈、口鼻前突、张开的嘴是出水口）。
     狮头约 35 cm 宽，伸出墙面 4 像素。"""
@@ -1055,6 +1072,10 @@ def main():
     model("oracle_tripod", bz, oracle_tripod_elements())
     model("omphalos", {"particle": vtex("village_omphalos"), "net": vtex("village_omphalos"),
                        "base": "mythic_age:block/marble_ashlar"}, omphalos_elements())
+    model("greek_hearth_stone", {"particle": "mythic_age:block/marble_ashlar", "stone": "mythic_age:block/marble_ashlar",
+                                 "rim": "mythic_age:block/polished_marble", "embers": "minecraft:block/magma",
+                                 "log": "minecraft:block/campfire_log_lit", "fire": "minecraft:block/campfire_fire"},
+          hearth_elements(), render_type="minecraft:cutout")
     model("lion_spout", {"particle": "mythic_age:block/smooth_marble", "wall": "mythic_age:block/smooth_marble",
                          "lion": vtex("village_lion"), "mouth": vtex("village_dark")}, lion_spout_elements())
     model("herm_head", {"particle": mv, "marble": mv, "hair": vtex("village_hair"), "band": vtex("village_dark"),

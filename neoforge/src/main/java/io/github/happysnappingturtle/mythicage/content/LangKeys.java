@@ -344,6 +344,7 @@ public final class LangKeys {
         add("mythic_age.building.greek.stoneworks", "石作坊", "Stoneworks", "石工房");
         add("mythic_age.building.greek.storehouse", "大仓库", "Storehouse", "大倉庫");
         add("mythic_age.building.greek.house_court", "内院宅", "Courtyard House", "中庭の家");
+        add("mythic_age.building.greek.house_small", "小屋", "Cottage", "小さな家");
         add("mythic_age.building.greek.stoa", "柱廊集市", "Stoa Market", "ストア（列柱市場）");
         add("mythic_age.building.greek.winery", "葡萄酒坊", "Winery", "ワイン工房");
         add("mythic_age.building.greek.shrine_athena", "雅典娜祠", "Shrine of Athena", "アテナの祠");
@@ -732,6 +733,25 @@ public final class LangKeys {
         add("mythic_age.dir.northeast", "东北", "northeast", "北東");
         add("item.mythic_age.panathenaic_amphora.inscription", "「来自雅典的奖品之一」", "\"One of the prizes from Athens\"", "「アテナイからの賞品のひとつ」");
         add("item.mythic_age.panathenaic_amphora.use", "右键倒出 %s 瓶橄榄油", "Use to pour out %s olive oil", "使うとオリーブオイル %s 本を注ぎ出す");
+
+        // ───── T19 阶段 ⑥ 奠基石（设计文档 §1.13）─────
+        add("mythic_age.foundation.title.greek", "立城邦：选一位主神", "Found a Polis: Choose a Patron", "ポリスを興す：主神を選ぶ");
+        add("mythic_age.foundation.prompt", "从母邦的灶里取来的火种在这里点燃。这座新城供奉哪一位？", "The fire carried from the mother city is kindled here. Which god will this city honour?", "母市のかまどから運んだ火をここに灯す。この新しい町はどの神を祀るか？");
+        add("mythic_age.foundation.choose", "就是他", "Choose", "この神に");
+        add("mythic_age.foundation.minors", "名下的次神：", "Minor gods: ", "従う小神：");
+        add("mythic_age.foundation.patron.zeus", "神庙旁立多多那圣橡与铜鼎；祭司出售的雷击打九折。", "A Dodona oak and bronze tripods by the temple; the priest's Bolt is 10% off.", "神殿の脇にドドナの聖樫と青銅の鼎。神官の落雷が1割引。");
+        add("mythic_age.foundation.patron.poseidon", "靠海就建码头，劳力出海打鱼；祭司出售的诱兽石打九折。", "By the sea, a harbour and fishing; the priest's Lure Stone is 10% off.", "海辺なら港と漁。神官の誘獣石が1割引。");
+        add("mythic_age.foundation.patron.hades", "村口有柏树墓园与亡灵日；祭司出售的哨兵石像打九折。", "A cypress cemetery and the Day of the Dead; the priest's Sentinel is 10% off.", "村口に糸杉の墓地と死者の日。神官の番人像が1割引。");
+        add("mythic_age.foundation.founded", "新城立起来了，主神是%s。灶火不灭，人们会循着火光来投奔。", "A new city is founded under %s. While the hearth burns, settlers will come.", "%sを主神に新しい町が興った。かまどの火が絶えぬ限り、人々が集まってくる。");
+        add("mythic_age.foundation.restored", "灶火重新点燃，城邦恢复了。", "The hearth is rekindled; the city lives again.", "かまどの火が再び灯り、町がよみがえった。");
+        add("mythic_age.foundation.info", "这座城邦供奉%s。", "This city honours %s.", "この町は%sを祀っている。");
+        add("mythic_age.foundation.error.unavailable", "这个文明还不能立城邦。", "This civilization cannot found a city yet.", "この文明ではまだ町を興せない。");
+        add("mythic_age.foundation.error.limit", "每个文明最多立 %s 座城邦（拆除宽限中的也算）。", "At most %s cities per civilization (including ones in their grace period).", "1つの文明につき町は%sつまで（猶予中も含む）。");
+        add("mythic_age.foundation.error.too_close", "%s 格内已有别的村庄。", "Another village lies within %s blocks.", "%sブロック以内に別の村がある。");
+        add("mythic_age.foundation.error.not_owner", "只有立城的人能移走奠基石。", "Only the founder can move the hearthstone.", "礎石を動かせるのは町を興した者だけだ。");
+        add("mythic_age.foundation.error.not_pending", "这块奠基石已经立过城，或不是你的。", "This hearthstone is already in use, or not yours.", "この礎石は使用済みか、あなたのものではない。");
+        add("mythic_age.village.log.founded_by", "%s 点燃灶火立城，供奉%s", "%s kindled the hearth and founded the city under %s", "%sがかまどに火を灯し、%sを祀る町を興した");
+        add("mythic_age.village.short.space", "需要空地：附近找不到能盖%s的平地", "Needs open ground: no flat site nearby for %s", "空き地が必要：%sを建てられる平地が近くにない");
     }
 
     private LangKeys() {

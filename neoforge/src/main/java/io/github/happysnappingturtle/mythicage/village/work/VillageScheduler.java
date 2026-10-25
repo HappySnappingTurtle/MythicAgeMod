@@ -86,6 +86,17 @@ public final class VillageScheduler {
             return perfNanos;
         }
 
+        /** 临时找地没找到地方的建筑（村务界面显示「需要空地」，§1.13 K7）；空串表示没有。 */
+        String needsSpace = "";
+
+        public String needsSpace() {
+            return needsSpace;
+        }
+
+        public void setNeedsSpace(String building) {
+            needsSpace = building == null ? "" : building;
+        }
+
         /** 生活活动当天做过的（键 → MC 日；纯表现，不存档，§1.10）。 */
         final Map<String, Long> lifeDone = new HashMap<>();
 

@@ -266,7 +266,7 @@ public final class TradeService {
      * 结识村庄主神（T10a 设计文档 §4；18 号 §6：只作图鉴记录，不再决定晋升候选）：与村庄祭司交谈即记入。
      * 用 UNIQUE 收据保证提示只出现一次。
      */
-    static void learnPatron(ServerPlayer player, Civilization civ, String patron) {
+    public static void learnPatron(ServerPlayer player, Civilization civ, String patron) {
         if (patron.isEmpty() || MythData.get(player).civ(civ).knownPatrons().contains(patron)) {
             return;
         }
