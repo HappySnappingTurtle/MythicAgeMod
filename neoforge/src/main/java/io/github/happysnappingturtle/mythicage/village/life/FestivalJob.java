@@ -35,7 +35,8 @@ import java.util.Set;
  * 节庆（T19 设计文档 §1.10 J5，V3-希腊-居民 §5.5）：按数据里的段派工作单。
  * <ul>
  *   <li>{@code relay} 火炬接力（前夜）：路线均分成几程，后一棒站在交接点等前一棒跑到才出发；最后一棒到达点燃祭坛；</li>
- *   <li>{@code procession} 游行：提前 {@link VillageLife#LEAD} 刻在广场排成两列纵队，按排每 {@value #ROW_GAP} 刻放行；
+ *   <li>{@code procession} 游行：提前 {@link VillageLife#LEAD} 刻在广场排成两列纵队，人到齐（或等满 {@value #GATE_WAIT} 刻）开闸，
+ *       之后按排每 {@value #ROW_GAP} 刻放行；
  *       走到祭坛前围成半圈（{@code altar}）或绕村一圈回广场（{@code loop}）；领头者到达祭坛时祭司奠酒、消耗祭品；</li>
  *   <li>{@code games} 赛跑：一轮几人分道起跑，其余人在终点旁欢呼；{@code theater}：演员在歌队场、观众坐看台；
  *       {@code gather}：广场内圈跳舞、外圈坐着吃（宴饮按人数消耗葡萄酒）。</li>
@@ -227,11 +228,12 @@ final class FestivalJob implements JobType {
         for (int k = 0; k < order.size(); k++) {
             ResidentEntity r = order.get(k);
             int idx = base + k;
-            int release = p.from() + FestivalRules.release(idx + 1, PER_ROW, ROW_GAP).get(idx);
+            int release = FestivalRules.release(idx + 1, PER_ROW, ROW_GAP).get(idx);
             String carry = leader && idx == 0 ? p.leader() : carryAt(p, leader ? idx - 1 : idx);
             BlockPos at = slot(level, gather, dx, dz, idx);
             List<JobStep> steps = new ArrayList<>();
-            steps.add(JobStep.moveTo(VillageLife.pos(at), ""));
+            // 去集合时就拿好祭篮、酒罐、笛子：在广场排队时就看得出谁领头、谁抬酒
+            steps.add(JobStep.moveTo(VillageLife.pos(at), carry));
             steps.add(JobStep.act("idle", wait));
             if (loop) {
                 for (BlockPos w : route) {
@@ -465,8 +467,14 @@ final class FestivalJob implements JobType {
             if (now.isEmpty()) {
                 return;
             }
-            if (kind.equals("relay") ? ctx.state().dailyCount(ctx.today(), "relay:" + ref[0]) >= Integer.parseInt(ref[2])
-                    : ctx.timeOfDay() >= Integer.parseInt(ref[3])) {
+            if (kind.equals("relay")) {
+                if (ctx.state().dailyCount(ctx.today(), "relay:" + ref[0]) >= Integer.parseInt(ref[2])) {
+                    r.finishAct();
+                }
+                return;
+            }
+            int gate = processionGate(ctx, ref[0], now.get().phase());
+            if (gate >= 0 && ctx.timeOfDay() >= gate + Integer.parseInt(ref[3])) {
                 r.finishAct();
             }
             return;
@@ -489,6 +497,34 @@ final class FestivalJob implements JobType {
             r.village().flatMap(v -> VillageScheduler.contextOf(level, v)).ifPresent(ctx -> offering(ctx, ref[0]));
         }
     }
+
+    /**
+     * 游行的起步时刻：派出去的人都在广场站好了（没有人还在走向自己的位置），或者段开始后过了 {@value #GATE_WAIT} 刻，
+     * 就开闸，记下开闸时刻；之后第 k 排在开闸后 {@code 20k} 刻出发。还没开闸返回 −1。
+     */
+    static int processionGate(VillageContext ctx, String fid, LifeData.Phase p) {
+        String key = "gate:" + fid;
+        int g = ctx.state().dailyCount(ctx.today(), key);
+        if (g > 0) {
+            return g - 1;
+        }
+        int tod = ctx.timeOfDay();
+        boolean walking = false;
+        for (ResidentEntity r : ctx.residents()) {
+            Optional<Job> j = r.job();
+            if (j.isPresent() && j.get().type().equals(VillageLife.FESTIVAL) && j.get().ref().contains("|procession|") && r.step() == 0) {
+                walking = true;
+                break;
+            }
+        }
+        if (walking && tod < p.from() + GATE_WAIT) {
+            return -1;
+        }
+        ctx.state().addDaily(ctx.today(), key, tod + 1);
+        return tod;
+    }
+
+    static final int GATE_WAIT = 600;
 
     /** 领头者到达祭坛：祭司奠酒、圣火大亮，消耗村库一份祭品（依次找有的），一个节日一次。 */
     static void offering(VillageContext ctx, String fid) {
@@ -541,7 +577,9 @@ final class FestivalJob implements JobType {
         switch (p.kind()) {
             case "gather" -> feast(ctx, fid, p);
             case "procession" -> {
-                if (!p.route().equals("loop") && tod >= p.from() + ROW_GAP) {
+                // 祭司跟在持篮者后面：开闸后第一排走了再出发
+                int gate = ctx.state().dailyCount(ctx.today(), "gate:" + fid) - 1;
+                if (!p.route().equals("loop") && gate >= 0 && tod >= gate + ROW_GAP) {
                     priestTo(ctx, "priest:proc:" + fid, VillageLife.altar(ctx), gt + until(tod, p.to()));
                 }
             }

@@ -3,7 +3,7 @@
  "name": "希腊居民（通用身体）",
  "model": "resident",
  "height_limit_u": 31.6,
- "atlas": 256,
+ "atlas": 512,
  "texels_per_unit": 2,
  "collision_proposal_blocks": [
   0.6,
@@ -178,6 +178,104 @@
     0,
     -1,
     5
+   ]
+  },
+  {
+   "id": "carry_wine_jar",
+   "parent": "torso",
+   "pivot_model_units": [
+    0,
+    15,
+    5
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -1,
+    5
+   ]
+  },
+  {
+   "id": "carry_cakes",
+   "parent": "torso",
+   "pivot_model_units": [
+    0,
+    15,
+    5
+   ],
+   "pivot_parent_local_units": [
+    0,
+    -1,
+    5
+   ]
+  },
+  {
+   "id": "carry_hydria",
+   "parent": "head",
+   "pivot_model_units": [
+    0,
+    30,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    8,
+    0
+   ]
+  },
+  {
+   "id": "carry_kanoun",
+   "parent": "head",
+   "pivot_model_units": [
+    0,
+    30,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0,
+    8,
+    0
+   ]
+  },
+  {
+   "id": "carry_aulos",
+   "parent": "head",
+   "pivot_model_units": [
+    0,
+    24,
+    4
+   ],
+   "pivot_parent_local_units": [
+    0,
+    2,
+    4
+   ]
+  },
+  {
+   "id": "tool_mask",
+   "parent": "head",
+   "pivot_model_units": [
+    0,
+    26,
+    4
+   ],
+   "pivot_parent_local_units": [
+    0,
+    4,
+    4
+   ]
+  },
+  {
+   "id": "tool_hydria",
+   "parent": "root",
+   "pivot_model_units": [
+    0,
+    0,
+    7
+   ],
+   "pivot_parent_local_units": [
+    0,
+    0,
+    7
    ]
   },
   {
@@ -615,6 +713,62 @@
    ]
   },
   {
+   "id": "carry_torch",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_cup",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_bread",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "tool_net",
+   "parent": "hand_r",
+   "pivot_model_units": [
+    -5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
    "id": "tool_wedge",
    "parent": "hand_l",
    "pivot_model_units": [
@@ -630,6 +784,20 @@
   },
   {
    "id": "tool_chisel",
+   "parent": "hand_l",
+   "pivot_model_units": [
+    5.5,
+    10.5,
+    0
+   ],
+   "pivot_parent_local_units": [
+    0.0,
+    -1.0,
+    0
+   ]
+  },
+  {
+   "id": "carry_ribbon",
    "parent": "hand_l",
    "pivot_model_units": [
     5.5,
@@ -3338,6 +3506,1414 @@
    "uv_group": "chisel",
    "uv_share": null,
    "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_pad",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    30.25,
+    0
+   ],
+   "size_model_units": [
+    4.0,
+    0.5,
+    4.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#E8E0CC",
+   "uv_group": "hydria_pad",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_body",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    33.1,
+    0
+   ],
+   "size_model_units": [
+    5.0,
+    4.2,
+    5.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_body",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_body_side",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    33.1,
+    0
+   ],
+   "size_model_units": [
+    5.6,
+    3.2,
+    4.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_body_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_band",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    33.8,
+    0
+   ],
+   "size_model_units": [
+    5.7,
+    1.0,
+    5.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "hydria_band",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_foot",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    30.8,
+    0
+   ],
+   "size_model_units": [
+    3.2,
+    0.6,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_foot",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_shoulder",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    35.7,
+    0
+   ],
+   "size_model_units": [
+    3.8,
+    1.0,
+    3.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_shoulder",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_neck",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    36.8,
+    0
+   ],
+   "size_model_units": [
+    1.8,
+    1.4,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_neck",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_lip",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    37.7,
+    0
+   ],
+   "size_model_units": [
+    3.0,
+    0.5,
+    3.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "hydria_lip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_handle_l",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    3.0,
+    34.1,
+    0
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_handle_r",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    -3.0,
+    34.1,
+    0
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "hydria_handle_back",
+   "bone": "carry_hydria",
+   "center_model_units": [
+    0,
+    36.1,
+    -2.2
+   ],
+   "size_model_units": [
+    0.6,
+    2.6,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle_back",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_body",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    9.6,
+    6.5
+   ],
+   "size_model_units": [
+    5.0,
+    4.2,
+    5.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_body",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_body_side",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    9.6,
+    6.5
+   ],
+   "size_model_units": [
+    5.6,
+    3.2,
+    4.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_body_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_band",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    10.3,
+    6.5
+   ],
+   "size_model_units": [
+    5.7,
+    1.0,
+    5.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "hydria_band",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_foot",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    7.3,
+    6.5
+   ],
+   "size_model_units": [
+    3.2,
+    0.6,
+    3.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_foot",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_shoulder",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    12.2,
+    6.5
+   ],
+   "size_model_units": [
+    3.8,
+    1.0,
+    3.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_shoulder",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_neck",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    13.3,
+    6.5
+   ],
+   "size_model_units": [
+    1.8,
+    1.4,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_neck",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_lip",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    14.2,
+    6.5
+   ],
+   "size_model_units": [
+    3.0,
+    0.5,
+    3.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "hydria_lip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_handle_l",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    3.0,
+    10.6,
+    6.5
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_handle_r",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    -3.0,
+    10.6,
+    6.5
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "fill_hydria_handle_back",
+   "bone": "tool_hydria",
+   "center_model_units": [
+    0,
+    12.6,
+    4.3
+   ],
+   "size_model_units": [
+    0.6,
+    2.6,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "hydria_handle_back",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_base",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    0,
+    30.7,
+    0
+   ],
+   "size_model_units": [
+    7.0,
+    1.4,
+    7.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A07A44",
+   "uv_group": "kanoun_base",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_rim",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    0,
+    31.6,
+    0
+   ],
+   "size_model_units": [
+    7.4,
+    0.5,
+    7.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#8A6638",
+   "uv_group": "kanoun_rim",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_barley",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    0,
+    31.5,
+    0
+   ],
+   "size_model_units": [
+    6.4,
+    0,
+    6.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#D8C27A",
+   "uv_group": "kanoun_barley",
+   "uv_share": null,
+   "surface_kind": "single_plane",
+   "plane_normal_model_axes": [
+    0,
+    1,
+    0
+   ]
+  },
+  {
+   "id": "kanoun_ear_0",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    0,
+    33.2,
+    3.2
+   ],
+   "size_model_units": [
+    1.2,
+    2.6,
+    0.5
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A07A44",
+   "uv_group": "kanoun_ear",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_ear_1",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    2.8,
+    33.2,
+    -1.6
+   ],
+   "size_model_units": [
+    0.5,
+    2.6,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A07A44",
+   "uv_group": "kanoun_ear",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_ear_2",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    -2.8,
+    33.2,
+    -1.6
+   ],
+   "size_model_units": [
+    0.5,
+    2.6,
+    1.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A07A44",
+   "uv_group": "kanoun_ear",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "kanoun_fillet",
+   "bone": "carry_kanoun",
+   "center_model_units": [
+    1.2,
+    31.9,
+    0.4
+   ],
+   "size_model_units": [
+    3.6,
+    0.4,
+    0.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A8322B",
+   "uv_group": "kanoun_fillet",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_body",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    0,
+    14.6,
+    5.6
+   ],
+   "size_model_units": [
+    4.4,
+    5.4,
+    4.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "wine_jar_body",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_toe",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    0,
+    11.4,
+    5.6
+   ],
+   "size_model_units": [
+    1.6,
+    1.2,
+    1.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "wine_jar_toe",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_neck",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    0,
+    18.0,
+    5.6
+   ],
+   "size_model_units": [
+    1.8,
+    1.6,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "wine_jar_neck",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_lip",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    0,
+    19.0,
+    5.6
+   ],
+   "size_model_units": [
+    2.4,
+    0.5,
+    2.4
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "wine_jar_lip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_handle_l",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    1.6,
+    17.6,
+    5.6
+   ],
+   "size_model_units": [
+    0.6,
+    2.2,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "wine_jar_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "wine_jar_handle_r",
+   "bone": "carry_wine_jar",
+   "center_model_units": [
+    -1.6,
+    17.6,
+    5.6
+   ],
+   "size_model_units": [
+    0.6,
+    2.2,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "wine_jar_handle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cakes_tray",
+   "bone": "carry_cakes",
+   "center_model_units": [
+    0,
+    15.0,
+    5.6
+   ],
+   "size_model_units": [
+    6.4,
+    0.6,
+    4.2
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#7A5A36",
+   "uv_group": "cakes_tray",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cake_0",
+   "bone": "carry_cakes",
+   "center_model_units": [
+    -1.8,
+    15.7,
+    5.6
+   ],
+   "size_model_units": [
+    1.8,
+    0.8,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A066",
+   "uv_group": "cake",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cake_1",
+   "bone": "carry_cakes",
+   "center_model_units": [
+    0.2,
+    15.7,
+    5.2
+   ],
+   "size_model_units": [
+    1.8,
+    0.8,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A066",
+   "uv_group": "cake",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cake_2",
+   "bone": "carry_cakes",
+   "center_model_units": [
+    2.0,
+    15.7,
+    6.0
+   ],
+   "size_model_units": [
+    1.8,
+    0.8,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A066",
+   "uv_group": "cake",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "aulos_pipe_l",
+   "bone": "carry_aulos",
+   "center_model_units": [
+    1.2,
+    21.4,
+    7.4
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    7.0
+   ],
+   "rotation_degrees_model_axes": [
+    -38,
+    12,
+    0
+   ],
+   "color": "#C8B07A",
+   "uv_group": "aulos_pipe",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "aulos_pipe_r",
+   "bone": "carry_aulos",
+   "center_model_units": [
+    -1.2,
+    21.4,
+    7.4
+   ],
+   "size_model_units": [
+    0.6,
+    0.6,
+    7.0
+   ],
+   "rotation_degrees_model_axes": [
+    -38,
+    -12,
+    0
+   ],
+   "color": "#C8B07A",
+   "uv_group": "aulos_pipe",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "aulos_band",
+   "bone": "carry_aulos",
+   "center_model_units": [
+    0,
+    24.0,
+    4.15
+   ],
+   "size_model_units": [
+    6.0,
+    0.8,
+    0.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#5A3B26",
+   "uv_group": "aulos_band",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "torch_shaft",
+   "bone": "carry_torch",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    3.5
+   ],
+   "size_model_units": [
+    0.8,
+    0.8,
+    11.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#7A5A36",
+   "uv_group": "torch_shaft",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "torch_head",
+   "bone": "carry_torch",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    9.6
+   ],
+   "size_model_units": [
+    1.6,
+    1.6,
+    1.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#3A2A1E",
+   "uv_group": "torch_head",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "torch_flame",
+   "bone": "carry_torch",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    11.2
+   ],
+   "size_model_units": [
+    1.4,
+    1.4,
+    1.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#F2A33A",
+   "uv_group": "torch_flame",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "torch_flame_tip",
+   "bone": "carry_torch",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    12.5
+   ],
+   "size_model_units": [
+    0.8,
+    0.8,
+    1.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#FCE08A",
+   "uv_group": "torch_flame_tip",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ribbon_red",
+   "bone": "carry_ribbon",
+   "center_model_units": [
+    5.2,
+    7.0,
+    0.6
+   ],
+   "size_model_units": [
+    0.4,
+    6.0,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#A8322B",
+   "uv_group": "ribbon",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "ribbon_white",
+   "bone": "carry_ribbon",
+   "center_model_units": [
+    5.9,
+    7.6,
+    0.2
+   ],
+   "size_model_units": [
+    0.4,
+    5.0,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#E8E0CC",
+   "uv_group": "ribbon",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cup_bowl",
+   "bone": "tool_cup",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    1.6
+   ],
+   "size_model_units": [
+    3.0,
+    3.0,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "cup_bowl",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "cup_boss",
+   "bone": "tool_cup",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    2.0
+   ],
+   "size_model_units": [
+    1.0,
+    1.0,
+    0.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#B5653A",
+   "uv_group": "cup_boss",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "bread",
+   "bone": "tool_bread",
+   "center_model_units": [
+    -5.5,
+    10.5,
+    1.4
+   ],
+   "size_model_units": [
+    2.8,
+    2.8,
+    0.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#C9A066",
+   "uv_group": "bread",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "net_bundle",
+   "bone": "tool_net",
+   "center_model_units": [
+    -5.5,
+    7.6,
+    1.2
+   ],
+   "size_model_units": [
+    3.0,
+    5.0,
+    3.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#6B5636",
+   "uv_group": "net_bundle",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "net_weights",
+   "bone": "tool_net",
+   "center_model_units": [
+    -5.5,
+    5.0,
+    1.2
+   ],
+   "size_model_units": [
+    3.8,
+    0.8,
+    3.8
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#7A7C80",
+   "uv_group": "net_weights",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_face",
+   "bone": "tool_mask",
+   "center_model_units": [
+    0,
+    25.8,
+    5.25
+   ],
+   "size_model_units": [
+    8.8,
+    9.0,
+    2.3
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#E8DCC0",
+   "uv_group": "mask_face",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_eye_l",
+   "bone": "tool_mask",
+   "center_model_units": [
+    1.8,
+    26.9,
+    6.45
+   ],
+   "size_model_units": [
+    1.4,
+    0.8,
+    0.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "mask_eye",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_eye_r",
+   "bone": "tool_mask",
+   "center_model_units": [
+    -1.8,
+    26.9,
+    6.45
+   ],
+   "size_model_units": [
+    1.4,
+    0.8,
+    0.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "mask_eye",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_brow",
+   "bone": "tool_mask",
+   "center_model_units": [
+    0,
+    28.0,
+    6.45
+   ],
+   "size_model_units": [
+    5.6,
+    0.5,
+    0.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "mask_brow",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_mouth",
+   "bone": "tool_mask",
+   "center_model_units": [
+    0,
+    23.4,
+    6.45
+   ],
+   "size_model_units": [
+    2.8,
+    1.6,
+    0.1
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#2A1C14",
+   "uv_group": "mask_mouth",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_hair_top",
+   "bone": "tool_mask",
+   "center_model_units": [
+    0,
+    30.7,
+    0.6
+   ],
+   "size_model_units": [
+    9.2,
+    1.6,
+    9.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#3B2B20",
+   "uv_group": "mask_hair_top",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_hair_back",
+   "bone": "tool_mask",
+   "center_model_units": [
+    0,
+    26.5,
+    -4.4
+   ],
+   "size_model_units": [
+    9.2,
+    7.4,
+    1.0
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#3B2B20",
+   "uv_group": "mask_hair_back",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_hair_l",
+   "bone": "tool_mask",
+   "center_model_units": [
+    4.55,
+    27.2,
+    0.4
+   ],
+   "size_model_units": [
+    0.5,
+    5.6,
+    8.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#3B2B20",
+   "uv_group": "mask_hair_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
+  },
+  {
+   "id": "mask_hair_r",
+   "bone": "tool_mask",
+   "center_model_units": [
+    -4.55,
+    27.2,
+    0.4
+   ],
+   "size_model_units": [
+    0.5,
+    5.6,
+    8.6
+   ],
+   "rotation_degrees_model_axes": [
+    0,
+    0,
+    0
+   ],
+   "color": "#3B2B20",
+   "uv_group": "mask_hair_side",
+   "uv_share": null,
+   "surface_kind": "cuboid"
   }
  ],
  "skin_female": "#C48F6D",
@@ -3386,6 +4962,7 @@
   }
  ],
  "revisions": [
+  "T19-R4（阶段 ⑤b）：生活与节庆道具 12 组——头顶水罐与祭篮、接水的水罐、酒罐、糕饼盘、双管笛、火炬、丝带、奠酒浅碗、薄饼、投网、戏剧面具。",
   "T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。",
   "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。",
   "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"

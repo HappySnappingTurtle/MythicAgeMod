@@ -33,7 +33,14 @@ public class ResidentGeoModel extends MythGeoModel<ResidentEntity> {
             java.util.Map.entry("chisel_strike", java.util.Set.of("tool_hammer", "tool_chisel")),
             java.util.Map.entry("build_hammer", java.util.Set.of("tool_hammer")),
             java.util.Map.entry("chop", java.util.Set.of("tool_axe")),
-            java.util.Map.entry("saw", java.util.Set.of("tool_saw")));
+            java.util.Map.entry("saw", java.util.Set.of("tool_saw")),
+            // 生活与节庆（T19 阶段 ⑤b）：接水的水罐、奠酒浅碗、薄饼、投网、戏剧面具
+            java.util.Map.entry("water_fill", java.util.Set.of("tool_hydria")),
+            java.util.Map.entry("libation_home", java.util.Set.of("tool_cup")),
+            java.util.Map.entry("eat", java.util.Set.of("tool_bread")),
+            java.util.Map.entry("fish_cast", java.util.Set.of("tool_net")),
+            java.util.Map.entry("fish_reel", java.util.Set.of("tool_net")),
+            java.util.Map.entry("perform", java.util.Set.of("tool_mask")));
 
     public ResidentGeoModel() {
         super("resident", Set.of());

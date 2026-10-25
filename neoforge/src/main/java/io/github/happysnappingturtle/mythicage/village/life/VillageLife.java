@@ -97,18 +97,18 @@ public final class VillageLife {
                 ctx.village().stage());
     }
 
-    /** 此刻进行中、或 {@code lead} 刻内开始的节庆段（跨午夜时看明天）。 */
+    /**
+     * 此刻进行中、或 {@code lead} 刻内开始的节庆段。{@code lead} 刻后是哪一天按世界时钟算（MC 日序号跟世界时钟走，
+     * 不跟昼夜时刻：{@code /time set} 和睡觉都会让两者错开），时刻按昼夜算——与到时候 {@link #festivalNow} 看到的一致。
+     */
     public static Optional<FestivalRules.Active> festivalSoon(VillageContext ctx, int lead) {
         Optional<FestivalRules.Active> now = festivalNow(ctx);
         if (now.isPresent()) {
             return now;
         }
-        int t = ctx.timeOfDay() + lead;
-        long day = ctx.today();
-        if (t >= 24000) {
-            t -= 24000;
-            day++;
-        }
+        int t = (ctx.timeOfDay() + lead) % 24000;
+        long day = ctx.today() + io.github.happysnappingturtle.mythicage.core.guardian.GuardianRules.day(ctx.now() + lead)
+                - io.github.happysnappingturtle.mythicage.core.guardian.GuardianRules.day(ctx.now());
         return FestivalRules.at(ctx.life(), ctx.data().calendar(), ctx.offset(), day, t, ctx.village().stage());
     }
 

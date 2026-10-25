@@ -38,6 +38,19 @@ OLIVE = "#4E5A2C"
 HAFT = "#8A6A44"         # 工具木柄
 IRON = "#8E9196"         # 铁刃
 BRONZE = "#B0813A"       # 青铜刃
+TERRACOTTA = "#B5653A"   # 赤陶（水罐、酒罐）
+GLAZE = "#2A1C14"        # 黑釉带
+REED = "#C8B07A"         # 芦苇（双管笛）
+CAKE = "#C9A066"
+BARLEY = "#D8C27A"
+RIBBON = "#A8322B"
+RIBBON_W = "#E8E0CC"
+MASK = "#E8DCC0"
+NET = "#6B5636"
+LEAD = "#7A7C80"
+PITCH = "#3A2A1E"
+FLAME = "#F2A33A"
+FLAME_HI = "#FCE08A"
 
 BONES = [
     ("root", None, [0, 0, 0]),
@@ -52,6 +65,14 @@ BONES = [
     ("carry_wood", "torso", [0, 15, 5]),
     ("carry_stone", "torso", [0, 15, 5]),
     ("carry_clay", "torso", [0, 15, 5]),
+    # 生活与节庆（T19 阶段 ⑤b）：酒罐、糕饼盘抱在胸前；水罐、祭篮顶在头上；双管笛含在嘴上
+    ("carry_wine_jar", "torso", [0, 15, 5]),
+    ("carry_cakes", "torso", [0, 15, 5]),
+    ("carry_hydria", "head", [0, 30, 0]),
+    ("carry_kanoun", "head", [0, 30, 0]),
+    ("carry_aulos", "head", [0, 24, 4]),
+    ("tool_mask", "head", [0, 26, 4]),
+    ("tool_hydria", "root", [0, 0, 7]),
     ("outfit_male_skirt", "pelvis", [0, 14, 0]),
     ("outfit_female_skirt", "pelvis", [0, 14, 0]),
     ("hem_front", "pelvis", [0, 10, 0]),
@@ -84,8 +105,13 @@ BONES = [
     ("tool_hammer", "hand_r", [-5.5, 10.5, 0]),
     ("tool_axe", "hand_r", [-5.5, 10.5, 0]),
     ("tool_saw", "hand_r", [-5.5, 10.5, 0]),
+    ("carry_torch", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_cup", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_bread", "hand_r", [-5.5, 10.5, 0]),
+    ("tool_net", "hand_r", [-5.5, 10.5, 0]),
     ("tool_wedge", "hand_l", [5.5, 10.5, 0]),
     ("tool_chisel", "hand_l", [5.5, 10.5, 0]),
+    ("carry_ribbon", "hand_l", [5.5, 10.5, 0]),
     ("thigh_l", "pelvis", [2, 14, 0]),
     ("shin_l", "thigh_l", [2, 8, 0]),
     ("foot_l", "shin_l", [2, 2, 0]),
@@ -281,6 +307,85 @@ EXTRA = [
 ] + TOOLS
 
 
+def hydria(prefix, bone, x, y, z):
+    """水罐（hydria）：圆腹、肩、窄颈、宽口沿，两侧横耳、背面竖耳（三耳）；腹部一圈黑釉带（黑绘水罐）。y 是罐底。"""
+    return [
+        part(f"{prefix}_body", bone, [x, y + 2.6, z], [5.0, 4.2, 5.0], TERRACOTTA, group="hydria_body"),
+        part(f"{prefix}_body_side", bone, [x, y + 2.6, z], [5.6, 3.2, 4.4], TERRACOTTA, group="hydria_body_side"),
+        part(f"{prefix}_band", bone, [x, y + 3.3, z], [5.7, 1.0, 5.1], GLAZE, group="hydria_band"),
+        part(f"{prefix}_foot", bone, [x, y + 0.3, z], [3.2, 0.6, 3.2], TERRACOTTA, group="hydria_foot"),
+        part(f"{prefix}_shoulder", bone, [x, y + 5.2, z], [3.8, 1.0, 3.8], TERRACOTTA, group="hydria_shoulder"),
+        part(f"{prefix}_neck", bone, [x, y + 6.3, z], [1.8, 1.4, 1.8], TERRACOTTA, group="hydria_neck"),
+        part(f"{prefix}_lip", bone, [x, y + 7.2, z], [3.0, 0.5, 3.0], GLAZE, group="hydria_lip"),
+        part(f"{prefix}_handle_l", bone, [x + 3.0, y + 3.6, z], [0.6, 0.6, 1.8], TERRACOTTA, group="hydria_handle"),
+        part(f"{prefix}_handle_r", bone, [x - 3.0, y + 3.6, z], [0.6, 0.6, 1.8], TERRACOTTA, group="hydria_handle"),
+        part(f"{prefix}_handle_back", bone, [x, y + 5.6, z - 2.2], [0.6, 2.6, 0.6], TERRACOTTA, group="hydria_handle_back"),
+    ]
+
+
+# ── 生活与节庆（T19 阶段 ⑤b；出处见 T19 设计文档 §1.10、V3-希腊-居民 §13）──
+LIFE = (
+    # 头顶水罐：罐底垫一圈布垫（头上顶物时的垫圈）
+    [part("hydria_pad", "carry_hydria", [0, 30.25, 0], [4.0, 0.5, 4.0], RIBBON_W)]
+    + hydria("hydria", "carry_hydria", 0, 30.5, 0)
+    # 在泉口接水时双手扶着的水罐（立在身前的泉台上，罐底离地半格；挂在根骨上，不随弯腰转）
+    + hydria("fill_hydria", "tool_hydria", 0, 7.0, 6.5)
+    + [
+        # 祭篮（kanoun）：浅篮、三只立耳，篮里是大麦与一条彩带（持篮少女顶在头上领头）
+        part("kanoun_base", "carry_kanoun", [0, 30.7, 0], [7.0, 1.4, 7.0], WICKER),
+        part("kanoun_rim", "carry_kanoun", [0, 31.6, 0], [7.4, 0.5, 7.4], RIM),
+        part("kanoun_barley", "carry_kanoun", [0, 31.5, 0], [6.4, 0, 6.4], BARLEY, kind="single_plane", normal=[0, 1, 0]),
+        part("kanoun_ear_0", "carry_kanoun", [0, 33.2, 3.2], [1.2, 2.6, 0.5], WICKER, group="kanoun_ear"),
+        part("kanoun_ear_1", "carry_kanoun", [2.8, 33.2, -1.6], [0.5, 2.6, 1.2], WICKER, group="kanoun_ear"),
+        part("kanoun_ear_2", "carry_kanoun", [-2.8, 33.2, -1.6], [0.5, 2.6, 1.2], WICKER, group="kanoun_ear"),
+        part("kanoun_fillet", "carry_kanoun", [1.2, 31.9, 0.4], [3.6, 0.4, 0.8], RIBBON),
+        # 酒罐（抬着游行）：双耳尖底罐，横抱在胸前
+        part("wine_jar_body", "carry_wine_jar", [0, 14.6, 5.6], [4.4, 5.4, 4.4], TERRACOTTA),
+        part("wine_jar_toe", "carry_wine_jar", [0, 11.4, 5.6], [1.6, 1.2, 1.6], TERRACOTTA),
+        part("wine_jar_neck", "carry_wine_jar", [0, 18.0, 5.6], [1.8, 1.6, 1.8], TERRACOTTA),
+        part("wine_jar_lip", "carry_wine_jar", [0, 19.0, 5.6], [2.4, 0.5, 2.4], GLAZE),
+        part("wine_jar_handle_l", "carry_wine_jar", [1.6, 17.6, 5.6], [0.6, 2.2, 0.6], TERRACOTTA, group="wine_jar_handle"),
+        part("wine_jar_handle_r", "carry_wine_jar", [-1.6, 17.6, 5.6], [0.6, 2.2, 0.6], TERRACOTTA, group="wine_jar_handle"),
+        # 糕饼盘：木盘上三块圆饼
+        part("cakes_tray", "carry_cakes", [0, 15.0, 5.6], [6.4, 0.6, 4.2], WOOD),
+        part("cake_0", "carry_cakes", [-1.8, 15.7, 5.6], [1.8, 0.8, 1.8], CAKE, group="cake"),
+        part("cake_1", "carry_cakes", [0.2, 15.7, 5.2], [1.8, 0.8, 1.8], CAKE, group="cake"),
+        part("cake_2", "carry_cakes", [2.0, 15.7, 6.0], [1.8, 0.8, 1.8], CAKE, group="cake"),
+        # 双管笛（aulos）：两根芦苇管从嘴边向前下方斜伸、左右分开，嘴上系着口罩带（phorbeia）
+        part("aulos_pipe_l", "carry_aulos", [1.2, 21.4, 7.4], [0.6, 0.6, 7.0], REED, rot=(-38, 12, 0), group="aulos_pipe"),
+        part("aulos_pipe_r", "carry_aulos", [-1.2, 21.4, 7.4], [0.6, 0.6, 7.0], REED, rot=(-38, -12, 0), group="aulos_pipe"),
+        part("aulos_band", "carry_aulos", [0, 24.0, 4.15], [6.0, 0.8, 0.3], LEATHER),
+        # 火炬（火炬接力）：木杆、松脂裹头、火苗；杆沿握孔（+Z）
+        part("torch_shaft", "carry_torch", [-5.5, 10.5, 3.5], [0.8, 0.8, 11.0], WOOD),
+        part("torch_head", "carry_torch", [-5.5, 10.5, 9.6], [1.6, 1.6, 1.6], PITCH),
+        part("torch_flame", "carry_torch", [-5.5, 10.5, 11.2], [1.4, 1.4, 1.8], FLAME),
+        part("torch_flame_tip", "carry_torch", [-5.5, 10.5, 12.5], [0.8, 0.8, 1.0], FLAME_HI),
+        # 墓前的丝带（tainiai）：左手里垂下两条，红白各一
+        part("ribbon_red", "carry_ribbon", [5.2, 7.0, 0.6], [0.4, 6.0, 0.6], RIBBON, group="ribbon"),
+        part("ribbon_white", "carry_ribbon", [5.9, 7.6, 0.2], [0.4, 5.0, 0.6], RIBBON_W, group="ribbon"),
+        # 奠酒用的浅碗（phiale）：碗口沿握孔朝向（手平伸时朝上）
+        part("cup_bowl", "tool_cup", [-5.5, 10.5, 1.6], [3.0, 3.0, 0.6], GLAZE),
+        part("cup_boss", "tool_cup", [-5.5, 10.5, 2.0], [1.0, 1.0, 0.3], TERRACOTTA),
+        # 橄榄薄饼（吃早饭）
+        part("bread", "tool_bread", [-5.5, 10.5, 1.4], [2.8, 2.8, 0.6], CAKE),
+        # 投网（amphiblestron）：收拢的网兜，下沿一圈铅坠
+        part("net_bundle", "tool_net", [-5.5, 7.6, 1.2], [3.0, 5.0, 3.0], NET),
+        part("net_weights", "tool_net", [-5.5, 5.0, 1.2], [3.8, 0.8, 3.8], LEAD),
+        # 戏剧面具：像头盔一样套住整个头（古希腊的面具连着假发），脸面盖过鼻子和胡须；眼洞、张开的嘴
+        part("mask_face", "tool_mask", [0, 25.8, 5.25], [8.8, 9.0, 2.3], MASK),
+        part("mask_eye_l", "tool_mask", [1.8, 26.9, 6.45], [1.4, 0.8, 0.1], GLAZE, group="mask_eye"),
+        part("mask_eye_r", "tool_mask", [-1.8, 26.9, 6.45], [1.4, 0.8, 0.1], GLAZE, group="mask_eye"),
+        part("mask_brow", "tool_mask", [0, 28.0, 6.45], [5.6, 0.5, 0.1], GLAZE),
+        part("mask_mouth", "tool_mask", [0, 23.4, 6.45], [2.8, 1.6, 0.1], GLAZE),
+        part("mask_hair_top", "tool_mask", [0, 30.7, 0.6], [9.2, 1.6, 9.6], HAIR),
+        part("mask_hair_back", "tool_mask", [0, 26.5, -4.4], [9.2, 7.4, 1.0], HAIR),
+        part("mask_hair_l", "tool_mask", [4.55, 27.2, 0.4], [0.5, 5.6, 8.6], HAIR, group="mask_hair_side"),
+        part("mask_hair_r", "tool_mask", [-4.55, 27.2, 0.4], [0.5, 5.6, 8.6], HAIR, group="mask_hair_side"),
+    ]
+)
+EXTRA = EXTRA + LIFE
+
+
 def main():
     pivots = {b[0]: b[2] for b in BONES}
     d = {
@@ -288,7 +393,7 @@ def main():
         "name": "希腊居民（通用身体）",
         "model": "resident",
         "height_limit_u": 31.6,
-        "atlas": 256,
+        "atlas": 512,
         "texels_per_unit": 2,
         "collision_proposal_blocks": [0.6, 1.95, 0.6],
         "coordinate_system": "X anatomical left; Y up; Z forward; model rest coordinates; 16 units per block",
@@ -305,7 +410,7 @@ def main():
     d["attachments"] = [{"id": a, "bone": b, "position_model_units": p,
                          "position_bone_local_units": [round(p[i] - pivots[b][i], 4) for i in range(3)]}
                         for a, b, p in ATTACHMENTS]
-    d["revisions"] = ["T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。", "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
+    d["revisions"] = ["T19-R4（阶段 ⑤b）：生活与节庆道具 12 组——头顶水罐与祭篮、接水的水罐、酒罐、糕饼盘、双管笛、火炬、丝带、奠酒浅碗、薄饼、投网、戏剧面具。", "T19-R3（阶段 ②b）：12 件手持工具，柄沿握孔（+Z）穿过手心。", "T19-R2（自查）：女装改番红花黄 + 深红披巾（原赭红与肤色太近，看着像没穿衣服）；披巾改为左肩斜披；发带移到刘海上方、改靛蓝；眉毛改细。", "T19-R1（2026-10-23 白模 v1）：沿用陶工 / 祭司骨架；男装及膝短希顿 + 腰绳 + 短发短须，"
                       "女装及踝希顿 + 折返 + 披巾 + 盘发发带；搬运附件 4 种。"]
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
