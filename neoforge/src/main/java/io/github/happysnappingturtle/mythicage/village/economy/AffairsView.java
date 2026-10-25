@@ -25,7 +25,28 @@ public record AffairsView(UUID village, Line title, Line date, List<Line> notes,
         }
     }
 
-    private static final StreamCodec<FriendlyByteBuf, Line> LINE = StreamCodec.of(
+    /**
+     * 文本行 → 文本组件：参数以 {@code @} 开头的当语言键翻译；以 {@code @@} 开头的当语言键、并把后面所有参数都交给它。
+     * 服务端发聊天消息用（客户端界面有同样的规则）。
+     */
+    public static net.minecraft.network.chat.Component toComponent(Line l) {
+        return net.minecraft.network.chat.Component.translatable(l.key(), componentArgs(l.args()));
+    }
+
+    private static Object[] componentArgs(List<String> in) {
+        List<Object> out = new ArrayList<>();
+        for (int i = 0; i < in.size(); i++) {
+            String a = in.get(i);
+            if (a.startsWith("@@")) {
+                out.add(net.minecraft.network.chat.Component.translatable(a.substring(2), componentArgs(in.subList(i + 1, in.size()))));
+                break;
+            }
+            out.add(a.startsWith("@") ? net.minecraft.network.chat.Component.translatable(a.substring(1)) : a);
+        }
+        return out.toArray();
+    }
+
+    public static final StreamCodec<FriendlyByteBuf, Line> LINE = StreamCodec.of(
             (buf, l) -> {
                 buf.writeUtf(l.key());
                 buf.writeVarInt(l.args().size());

@@ -347,6 +347,7 @@ public final class VillageScheduler {
         io.github.happysnappingturtle.mythicage.village.life.VillageLife.tick(ctx);
         ctx.behavior().tick(ctx);
         io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.plan(ctx);
+        io.github.happysnappingturtle.mythicage.village.quest.QuestService.tick(ctx);
         sleepAndWake(ctx);
         plan(ctx);
         return true;
@@ -453,6 +454,7 @@ public final class VillageScheduler {
         ctx.behavior().onDayStart(ctx);
         Construction.daily(ctx);
         io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.dayStart(ctx);
+        io.github.happysnappingturtle.mythicage.village.quest.QuestService.dayStart(ctx);
     }
 
     /** 晚饭段：每人 1 份（行为模块可在节庆日改为 2 份，见 {@link #rationsPerPerson}）。同一 MC 日只扣一次。 */

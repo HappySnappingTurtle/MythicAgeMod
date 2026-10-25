@@ -156,6 +156,8 @@ public final class VillageWorkGameTests {
         VillagePlans.get(h.getLevel().getServer()).remove(tv.id());
         VillageRegistry.get(h.getLevel().getServer()).remove(tv.village().bell());
         VillageEconomy.get(h.getLevel().getServer()).clearForTest(tv.id());
+        io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(h.getLevel().getServer()).remove(tv.id());
+        io.github.happysnappingturtle.mythicage.village.quest.QuestService.clearForTest(tv.id());
         VillageScheduler.clearForTest(tv.id());
     }
 

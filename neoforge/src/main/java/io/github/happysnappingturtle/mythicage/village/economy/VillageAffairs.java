@@ -213,19 +213,17 @@ public final class VillageAffairs {
             held.shrink(got);
             s.seenBy.add(player.getUUID());
             eco.setDirty();
+            // 捐赠恰好补上了某个委托的缺口：任务当刻转「需求已满足」（T21 §5.3）
+            io.github.happysnappingturtle.mythicage.village.quest.QuestService.refreshNow(player.server, village);
         }
         player.displayClientMessage(Component.translatable(got > 0 ? "mythic_age.village.donate.done"
                 : "mythic_age.village.donate.full", name, got, held.getCount()), true);
         return got;
     }
 
+    /** 离谷仓管事 {@value #REACH} 格内（T21 顺手修正：以前任意居民身边都能捐）。 */
     private static boolean nearKeeper(ServerPlayer player, UUID village) {
-        for (ResidentEntity r : VillageScheduler.loaded(village)) {
-            if (r.distanceToSqr(player) <= REACH * REACH) {
-                return true;
-            }
-        }
-        return false;
+        return io.github.happysnappingturtle.mythicage.village.quest.QuestService.nearKeeper(player, village);
     }
 
     /** 只供 GameTest（TC-T19-51）：跳过距离检查直接捐。 */

@@ -347,6 +347,7 @@ public final class FoundationService {
         });
         VillagePlans.get(server).remove(v.id());
         VillageEconomy.get(server).remove(v.id());
+        io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(server).remove(v.id());
         VillageScheduler.clearForTest(v.id());
         VillageRegistry reg = VillageRegistry.get(server);
         if (!v.vanillaType().isEmpty()) {

@@ -14,12 +14,13 @@ import java.util.Map;
  * @param patronBiomeBonus       文明 → 主神 → 群系加成：村庄中心附近有指定群系时该主神权重乘以倍率
  * @param titleOnEnter           进入村庄时显示标题
  * @param soldiers               村民士兵（T20 设计文档 §10.5）
+ * @param quests                 NPC 任务（T21 设计文档 §10.1）
  */
 public record VillagesConfig(Mode vanillaVillages, Map<String, Map<String, Integer>> vanillaTypeToCiv,
                              boolean generateVanillaVillages, double chineseRiverChance,
                              Map<String, Map<String, Integer>> patronWeights,
                              Map<String, Map<String, BiomeBonus>> patronBiomeBonus, boolean titleOnEnter,
-                             Soldiers soldiers) {
+                             Soldiers soldiers, Quests quests) {
     /**
      * 村民士兵：是否启用、硬上限（0–12）、人口比例（0–0.5），01 号 §0.2。
      */
@@ -27,12 +28,22 @@ public record VillagesConfig(Mode vanillaVillages, Map<String, Map<String, Integ
         public static final Soldiers DEFAULTS = new Soldiers(true, 6, 0.25);
     }
 
+    /**
+     * NPC 任务（T21 设计文档 §10.1）：总开关、每人每村接取上限、每村开放上限、有效期（MC 日）、
+     * 村里能产的料备料多久没进展才发任务、修复的门槛与每日报酬上限、护送的在场半径与比例、救援提示半径。
+     */
+    public record Quests(boolean enabled, int maxActivePerPlayer, int maxOpenPerVillage, int supplyDays, int repairDays,
+                         int stockingGraceDays, int repairMinCells, int repairDailyCap, int escortRadius, double escortPresence,
+                         int rescueRadius) {
+        public static final Quests DEFAULTS = new Quests(true, 3, 5, 3, 5, 1, 3, 16, 24, 0.6, 32);
+    }
+
     public VillagesConfig(Mode vanillaVillages, Map<String, Map<String, Integer>> vanillaTypeToCiv,
                           boolean generateVanillaVillages, double chineseRiverChance,
                           Map<String, Map<String, Integer>> patronWeights,
                           Map<String, Map<String, BiomeBonus>> patronBiomeBonus, boolean titleOnEnter) {
         this(vanillaVillages, vanillaTypeToCiv, generateVanillaVillages, chineseRiverChance, patronWeights, patronBiomeBonus,
-                titleOnEnter, Soldiers.DEFAULTS);
+                titleOnEnter, Soldiers.DEFAULTS, Quests.DEFAULTS);
     }
 
     public VillagesConfig {

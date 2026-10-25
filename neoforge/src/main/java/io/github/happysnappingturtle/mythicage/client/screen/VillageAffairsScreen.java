@@ -57,6 +57,11 @@ public class VillageAffairsScreen extends Screen {
         Component donate = Component.translatable("mythic_age.village.affairs.donate");
         addRenderableWidget(Button.builder(donate, b -> PacketDistributor.sendToServer(new AffairsPayloads.Donate(view.village())))
                 .bounds(left + 8, top + H - 22, font.width(donate) + 16, 16).build());
+        // 委托页（T21 §9.1）
+        Component quests = Component.translatable("mythic_age.quest.screen.open");
+        addRenderableWidget(Button.builder(quests, b -> PacketDistributor.sendToServer(
+                        new io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Open(view.village())))
+                .bounds(left + 8 + font.width(donate) + 20, top + H - 22, font.width(quests) + 16, 16).build());
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
                 .bounds(left + W - 58, top + H - 22, 50, 16).build());
     }

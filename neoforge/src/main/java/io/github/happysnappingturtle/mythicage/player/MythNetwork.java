@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "18";
+    private static final String PROTOCOL_VERSION = "19";
 
     private MythNetwork() {
     }
@@ -97,6 +97,16 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleDonate)
+                // NPC 任务委托页（T21）
+                .playToClient(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageQuests(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Open.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Open.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.quest.QuestService::handleOpen)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Act.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Act.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.quest.QuestService::handleAct)
                 // 居民交易（T19 阶段 ④b）
                 .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Trade.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Trade.STREAM_CODEC,

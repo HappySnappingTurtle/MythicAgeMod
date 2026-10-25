@@ -19,7 +19,7 @@ import java.util.TreeSet;
 /**
  * 一个文明的村庄经济数据 {@code village_civ/<civ>.json}（T19 设计文档 §2、§6、§9、§10.1）：
  * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存、施工折算表（§1.4 E1）、
- * 交易规则（§1.8）、生活与节庆（§1.10 {@code life}）。
+ * 交易规则（§1.8）、生活与节庆（§1.10 {@code life}）、村民士兵（T20 {@code soldiers}）、NPC 任务（T21 {@code quests}）。
  * 职业与配方另有文件（{@code village_profession/<civ>/*}、{@code village_recipe/<civ>/*}）。
  */
 public record CivVillageData(String civ, String behavior, Schedule schedule, VillageCalendar calendar, int baseCapacity,
@@ -31,7 +31,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade,
                              io.github.happysnappingturtle.mythicage.core.village.life.LifeData life,
                              Foundation foundation,
-                             io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules soldiers) {
+                             io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules soldiers,
+                             io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules quests) {
     /**
      * 奠基石（T19 §1.13 K1）：方块、可选主神、起步住居（没有住居时的第一个项目，远古也开工）、露宿名额。
      * 方块为空表示这个文明还没有奠基石。
@@ -167,7 +168,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
                 fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life, foundation,
-                soldiers);
+                soldiers, quests);
     }
 
     /** 兵种数据：职业是兵种时返回它的数据。 */
@@ -266,7 +267,9 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                         : io.github.happysnappingturtle.mythicage.core.village.life.LifeData.none(),
                 o.has("foundation") ? foundation(o.getAsJsonObject("foundation")) : Foundation.NONE,
                 o.has("soldiers") ? io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules.parse(o.getAsJsonObject("soldiers"))
-                        : io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules.NONE);
+                        : io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules.NONE,
+                o.has("quests") ? io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules.parse(o.getAsJsonObject("quests"))
+                        : io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules.DEFAULT);
     }
 
     static Foundation foundation(JsonObject f) {

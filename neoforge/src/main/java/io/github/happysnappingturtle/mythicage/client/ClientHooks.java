@@ -98,6 +98,16 @@ public final class ClientHooks {
         }
     }
 
+    /** 委托页（T21）：已开着就刷新。 */
+    public static void villageQuests(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.VillageQuestScreen open) {
+            open.update(payload.view());
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.VillageQuestScreen(payload.view()));
+        }
+    }
+
     /** 村务界面（T19）：已开着就刷新。 */
     public static void villageAffairs(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View payload) {
         Minecraft mc = Minecraft.getInstance();

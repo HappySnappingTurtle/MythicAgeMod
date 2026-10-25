@@ -773,6 +773,61 @@ public final class LangKeys {
         add("mythic_age.foundation.error.not_pending", "这块奠基石已经立过城，或不是你的。", "This hearthstone is already in use, or not yours.", "この礎石は使用済みか、あなたのものではない。");
         add("mythic_age.village.log.founded_by", "%s 点燃灶火立城，供奉%s", "%s kindled the hearth and founded the city under %s", "%sがかまどに火を灯し、%sを祀る町を興した");
         add("mythic_age.village.short.space", "需要空地：附近找不到能盖%s的平地", "Needs open ground: no flat site nearby for %s", "空き地が必要：%sを建てられる平地が近くにない");
+        quests();
+    }
+
+    /** NPC 任务（T21）：委托页、标题、状态、结果、提示、记录。 */
+    private static void quests() {
+        add("mythic_age.village.log.quest_posted", "发出委托：%s", "Posted a request: %s", "依頼を出した：%s");
+        add("mythic_age.village.say.quest", "……去谷仓那边问问吧，管事正在找人帮忙。", "...Ask over at the granary — the steward is looking for help.", "……穀倉のほうで聞いてみて。管理人が手を貸してくれる人を探してる。");
+        add("mythic_age.quest.title.supply.project", "为%s备料：%s", "Materials for %s: %s", "%sの資材：%s");
+        add("mythic_age.quest.title.supply.short", "送来%s", "Bring %s", "%sを届ける");
+        add("mythic_age.quest.title.supply.food", "补足村里的口粮", "Restock the village rations", "村の食糧を補う");
+        add("mythic_age.quest.building.unknown", "工程", "the works", "工事");
+        add("mythic_age.quest.screen.title", "委托", "Requests", "依頼");
+        add("mythic_age.quest.screen.open", "委托", "Requests", "依頼");
+        add("mythic_age.quest.screen.heading", "%s · 委托", "%s · Requests", "%s・依頼");
+        add("mythic_age.quest.screen.empty", "眼下没有委托", "No requests right now", "今のところ依頼はない");
+        add("mythic_age.quest.screen.disabled", "委托已关闭（服务器配置）", "Requests are turned off (server config)", "依頼は無効になっている（サーバー設定）");
+        add("mythic_age.quest.screen.progress", "%s  %s / %s", "%s  %s / %s", "%s  %s / %s");
+        add("mythic_age.quest.screen.days", "还剩 %s 日", "%s days left", "残り %s 日");
+        add("mythic_age.quest.screen.mine", "我的份额 %s", "my share %s", "自分の分 %s");
+        add("mythic_age.quest.screen.footer", "已接 %s / %s · 你在本村的贡献：%s", "Taken %s / %s · Your contribution here: %s", "受けた依頼 %s / %s・この村への貢献：%s");
+        add("mythic_age.quest.button.accept", "接取", "Accept", "受ける");
+        add("mythic_age.quest.button.deliver", "交付", "Deliver", "納める");
+        add("mythic_age.quest.button.abandon", "放弃", "Drop", "やめる");
+        add("mythic_age.quest.state.open", "进行中", "Open", "受付中");
+        add("mythic_age.quest.state.paused", "暂停", "Paused", "中断");
+        add("mythic_age.quest.state.complete", "已完成", "Completed", "達成");
+        add("mythic_age.quest.state.invalid", "已失效", "No longer needed", "取り下げ");
+        add("mythic_age.quest.state.expired", "已过期", "Expired", "期限切れ");
+        add("mythic_age.quest.state.failed", "失败", "Failed", "失敗");
+        add("mythic_age.quest.state.settled", "已结算", "Settled", "清算済み");
+        add("mythic_age.quest.scope.public", "公共", "Public", "共同");
+        add("mythic_age.quest.scope.personal", "个人", "Personal", "個人");
+        add("mythic_age.quest.scope.event", "事件", "Event", "出来事");
+        add("mythic_age.quest.scope.taken", "已有人接", "Taken by someone", "受け手あり");
+        add("mythic_age.quest.reward.emerald", "绿宝石", "Emeralds", "エメラルド");
+        add("mythic_age.quest.reward.contribution", "贡献", "Contribution", "貢献");
+        add("mythic_age.quest.reward.conduct", "善行", "Good deed", "善行");
+        add("mythic_age.quest.reason.disabled", "委托已关闭", "requests turned off", "依頼は無効");
+        add("mythic_age.quest.reason.gone", "需要的地方已经不在了", "the need is gone", "必要がなくなった");
+        add("mythic_age.quest.reason.satisfied", "已被他人补上", "already covered by others", "ほかの人が補った");
+        add("mythic_age.quest.reason.expired", "到期", "ran out of time", "期限切れ");
+        add("mythic_age.quest.act.ok", "接下了委托", "Request accepted", "依頼を受けた");
+        add("mythic_age.quest.act.delivered", "交付了 %s 件", "Delivered %s", "%s 個納めた");
+        add("mythic_age.quest.act.abandoned", "放弃了这条委托（已交的照样结算）", "Dropped the request (what you delivered still counts)", "依頼をやめた（納めた分は清算される）");
+        add("mythic_age.quest.act.far", "离谷仓管事太远了", "You're too far from the steward", "管理人から離れすぎている");
+        add("mythic_age.quest.act.closed", "这条委托已经结束了", "This request is closed", "この依頼は終わっている");
+        add("mythic_age.quest.act.already", "你已经接了这条委托", "You've already taken this request", "この依頼はもう受けている");
+        add("mythic_age.quest.act.taken", "已经有人接了", "Someone else has taken it", "ほかの人が受けている");
+        add("mythic_age.quest.act.full", "在这个村接的委托已满", "You can't take more requests here", "これ以上依頼を受けられない");
+        add("mythic_age.quest.act.event", "这是突发的事，不用接", "This is an event; no need to accept", "突発の出来事なので受ける必要はない");
+        add("mythic_age.quest.act.missing", "背包里没有要交的东西", "You don't have what's needed", "必要な品を持っていない");
+        add("mythic_age.quest.act.stock_full", "村库已满，交不进去", "The storehouse is full", "倉庫がいっぱいだ");
+        add("mythic_age.quest.act.satisfied", "这里已经不缺了", "It's no longer needed", "もう足りている");
+        add("mythic_age.quest.settled", "委托「%s」结算：绿宝石 %s，贡献 +%s", "Request \"%s\" settled: %s emeralds, contribution +%s", "依頼「%s」の清算：エメラルド %s、貢献 +%s");
+        add("mythic_age.quest.hint.new", "村务处有 %s 条新委托（找谷仓管事）", "%s new requests at the granary (ask the steward)", "穀倉に新しい依頼が %s 件（管理人に聞こう）");
     }
 
     private LangKeys() {

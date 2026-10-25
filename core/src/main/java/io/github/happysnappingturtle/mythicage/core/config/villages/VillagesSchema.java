@@ -88,7 +88,15 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         VillagesConfig.Soldiers sb = base.soldiers();
         VillagesConfig.Soldiers soldiers = new VillagesConfig.Soldiers(so.bool("enabled", sb.enabled()),
                 so.intIn("hardCap", sb.hardCap(), 0, 12), so.doubleIn("ratio", sb.ratio(), 0.0, 0.5));
-        return new VillagesConfig(mode, typeToCiv, generateVanilla, chinese, patrons, bonus, title, soldiers);
+        ObjectReader qo = root.object("quests");
+        VillagesConfig.Quests qb = base.quests();
+        VillagesConfig.Quests quests = new VillagesConfig.Quests(qo.bool("enabled", qb.enabled()),
+                qo.intIn("maxActivePerPlayer", qb.maxActivePerPlayer(), 1, 10), qo.intIn("maxOpenPerVillage", qb.maxOpenPerVillage(), 1, 20),
+                qo.intIn("supplyDays", qb.supplyDays(), 1, 30), qo.intIn("repairDays", qb.repairDays(), 1, 30),
+                qo.intIn("stockingGraceDays", qb.stockingGraceDays(), 0, 10), qo.intIn("repairMinCells", qb.repairMinCells(), 1, 64),
+                qo.intIn("repairDailyCap", qb.repairDailyCap(), 0, 256), qo.intIn("escortRadius", qb.escortRadius(), 8, 64),
+                qo.doubleIn("escortPresence", qb.escortPresence(), 0.1, 1.0), qo.intIn("rescueRadius", qb.rescueRadius(), 8, 64));
+        return new VillagesConfig(mode, typeToCiv, generateVanilla, chinese, patrons, bonus, title, soldiers, quests);
     }
 
     private static Map<String, Map<String, Integer>> readTypeToCiv(ObjectReader root, Map<String, Map<String, Integer>> base) {
@@ -230,6 +238,20 @@ public final class VillagesSchema implements ConfigSchema<VillagesConfig> {
         soldiers.addProperty("hardCap", value.soldiers().hardCap());
         soldiers.addProperty("ratio", value.soldiers().ratio());
         root.add("soldiers", soldiers);
+        VillagesConfig.Quests q = value.quests();
+        JsonObject quests = new JsonObject();
+        quests.addProperty("enabled", q.enabled());
+        quests.addProperty("maxActivePerPlayer", q.maxActivePerPlayer());
+        quests.addProperty("maxOpenPerVillage", q.maxOpenPerVillage());
+        quests.addProperty("supplyDays", q.supplyDays());
+        quests.addProperty("repairDays", q.repairDays());
+        quests.addProperty("stockingGraceDays", q.stockingGraceDays());
+        quests.addProperty("repairMinCells", q.repairMinCells());
+        quests.addProperty("repairDailyCap", q.repairDailyCap());
+        quests.addProperty("escortRadius", q.escortRadius());
+        quests.addProperty("escortPresence", q.escortPresence());
+        quests.addProperty("rescueRadius", q.rescueRadius());
+        root.add("quests", quests);
         return root;
     }
 }

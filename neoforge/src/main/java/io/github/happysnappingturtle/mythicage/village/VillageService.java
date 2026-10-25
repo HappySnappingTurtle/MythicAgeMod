@@ -251,6 +251,7 @@ public final class VillageService {
             INSIDE.put(p.getUUID(), v.id());
             VillageVisits.mark(p, v);
             io.github.happysnappingturtle.mythicage.village.build.BuildNotices.onEnter(p, v);
+            io.github.happysnappingturtle.mythicage.village.quest.QuestService.onEnter(p, v);
             p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
             p.connection.send(new ClientboundSetTitleTextPacket(stagedTitle(v)));
             p.connection.send(new ClientboundSetSubtitleTextPacket(subtitle(v)));

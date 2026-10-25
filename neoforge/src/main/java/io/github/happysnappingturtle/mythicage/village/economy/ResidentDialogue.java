@@ -17,7 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 居民说的一句话（V3-希腊-居民 §6.3、T19 §1.8 I6），按优先级：警戒中 &gt; 节庆（当天与前一天，§1.10 J5）&gt; 本职缺料 &gt; 村里在建项目 &gt;
+ * 居民说的一句话（V3-希腊-居民 §6.3、T19 §1.8 I6），按优先级：警戒中 &gt; 节庆（当天与前一天，§1.10 J5）&gt;
+ * 本职缺料而村务处有对应委托（T21 §9.2）&gt; 本职缺料 &gt; 村里在建项目 &gt;
  * 正在做的事（手上有工作单时）/ 职业闲话（闲着时）。
  * 文本都在语言文件里：{@code mythic_age.village.say.<文明>.<职业>.chat.1–6} / {@code .short}，通用的
  * {@code mythic_age.village.say.alarm}、{@code .project}、{@code .project_building}。
@@ -25,7 +26,7 @@ import java.util.UUID;
 public final class ResidentDialogue {
     public static final int CHATTER = 6;
 
-    public enum Kind { ALARM, FESTIVAL, SHORT, PROJECT, CHATTER }
+    public enum Kind { ALARM, FESTIVAL, QUEST, SHORT, PROJECT, CHATTER }
 
     /** 今天的节日（{@code eve} = 明天的节日的前一天）；都没有为 empty。 */
     record Fest(String id, boolean eve) {
@@ -70,7 +71,11 @@ public final class ResidentDialogue {
             return Kind.FESTIVAL;
         }
         if (isShort(r, s)) {
-            return Kind.SHORT;
+            // 本职缺料而村务处有对应的委托：先让玩家去找管事（T21 §9.2）
+            CivVillageData.ShortWhen w = VillageData.civ(r.civ()).map(d -> d.professions().get(r.profession()))
+                    .map(CivVillageData.Profession::shortWhen).orElse(CivVillageData.ShortWhen.NONE);
+            return io.github.happysnappingturtle.mythicage.village.quest.QuestService.hasShortQuest(server, v.get(), w.items(), w.food())
+                    ? Kind.QUEST : Kind.SHORT;
         }
         if (s.activeProject().isPresent() && VillageBuildings.all().containsKey(s.activeProject().get().building)) {
             return Kind.PROJECT;
@@ -102,6 +107,7 @@ public final class ResidentDialogue {
                 Fest f = festival(server, r, VillageEconomy.get(server).state(r.village().orElseThrow())).orElseThrow();
                 yield Component.translatable("mythic_age.village.say.festival." + f.id() + (f.eve() ? ".eve" : "." + (1 + r.getRandom().nextInt(2))));
             }
+            case QUEST -> Component.translatable("mythic_age.village.say.quest");
             case SHORT -> Component.translatable(profKey(r) + ".short");
             case PROJECT -> {
                 VillageEconomy.State s = VillageEconomy.get(server).state(r.village().orElseThrow());
