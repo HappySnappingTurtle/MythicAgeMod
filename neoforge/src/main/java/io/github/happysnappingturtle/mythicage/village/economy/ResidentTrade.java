@@ -91,8 +91,12 @@ public final class ResidentTrade {
         }
         long today = MythDays.today(player.server);
         Set<String> shrines = v.get().shrineGods();
+        VillageEconomy.State state = VillageEconomy.get(player.server).state(v.get().id());
+        String festival = io.github.happysnappingturtle.mythicage.core.village.life.FestivalRules.on(data.get().life(),
+                data.get().calendar(), VillageData.offset(data.get(), state), today, v.get().stage())
+                .map(io.github.happysnappingturtle.mythicage.core.village.life.LifeData.Festival::id).orElse("");
         List<ResidentOffer> visible = offers(r).stream()
-                .filter(o -> ResidentTradeRules.visible(o, v.get().stage(), shrines)).toList();
+                .filter(o -> ResidentTradeRules.visible(o, v.get().stage(), shrines, festival)).toList();
         return Optional.of(new Context(v.get(), VillageEconomy.get(player.server).state(v.get().id()), data.get(), data.get().trade(),
                 playerGods(player, r.civ()), today, prayed.test(r, today), visible));
     }
@@ -100,6 +104,10 @@ public final class ResidentTrade {
     private static ResidentTradeView.Row row(ServerPlayer player, ResidentEntity r, Context c, ResidentOffer o) {
         int price = c.rules.price(o, c.gods);
         int remaining = Math.max(0, c.rules.dailyCap(o, c.prayedToday, c.gods) - r.tradedToday(o.id(), c.today));
+        if (o.villageCap() > 0) {
+            // 节庆商品：每村每节限量（§1.10 J5）
+            remaining = Math.min(remaining, Math.max(0, o.villageCap() - c.state.dailyCount(c.today, goodsKey(o))));
+        }
         int stock = o.sell() ? ResidentTradeRules.stockShares(o, c.state.stock, c.data.rations()) : 0;
         ResidentTradeView.State state;
         if (remaining <= 0) {
@@ -113,6 +121,10 @@ public final class ResidentTrade {
         }
         return new ResidentTradeView.Row(o.id(), o.sell(), o.item(), o.count(), price, o.price(),
                 o.imported() ? -1 : Math.min(stock, 999), remaining, state);
+    }
+
+    static String goodsKey(ResidentOffer o) {
+        return "goods:" + o.id();
     }
 
     static Item item(ResidentOffer o) {
@@ -196,6 +208,9 @@ public final class ResidentTrade {
             give(player, Items.EMERALD, row.price());
         }
         r.addTraded(o.id(), c.today);
+        if (o.villageCap() > 0) {
+            c.state.addDaily(c.today, goodsKey(o), 1);
+        }
         VillageEconomy.get(player.server).setDirty();
         return ResidentTradeView.State.OK;
     }

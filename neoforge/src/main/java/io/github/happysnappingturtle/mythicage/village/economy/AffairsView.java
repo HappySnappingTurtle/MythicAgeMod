@@ -12,8 +12,9 @@ import java.util.UUID;
  *
  * @param title    语言键行：村庄名称
  * @param date     语言键行：今天是第几期第几日
+ * @param notes    历法提示：节日倒数、下一个神谕日（§1.10 J8）
  */
-public record AffairsView(UUID village, Line title, Line date, int total, int capacity, List<Entry> stock,
+public record AffairsView(UUID village, Line title, Line date, List<Line> notes, int total, int capacity, List<Entry> stock,
                           List<Line> shortages, List<Line> log) {
     public record Entry(String item, int count, int escrowed) {
     }
@@ -45,6 +46,7 @@ public record AffairsView(UUID village, Line title, Line date, int total, int ca
                 buf.writeUUID(v.village());
                 LINE.encode(buf, v.title());
                 LINE.encode(buf, v.date());
+                writeLines(buf, v.notes());
                 buf.writeVarInt(v.total());
                 buf.writeVarInt(v.capacity());
                 buf.writeVarInt(v.stock().size());
@@ -60,6 +62,7 @@ public record AffairsView(UUID village, Line title, Line date, int total, int ca
                 UUID id = buf.readUUID();
                 Line title = LINE.decode(buf);
                 Line date = LINE.decode(buf);
+                List<Line> notes = readLines(buf);
                 int total = buf.readVarInt();
                 int cap = buf.readVarInt();
                 int n = buf.readVarInt();
@@ -67,7 +70,7 @@ public record AffairsView(UUID village, Line title, Line date, int total, int ca
                 for (int i = 0; i < n; i++) {
                     stock.add(new Entry(buf.readUtf(), buf.readVarInt(), buf.readVarInt()));
                 }
-                return new AffairsView(id, title, date, total, cap, List.copyOf(stock), readLines(buf), readLines(buf));
+                return new AffairsView(id, title, date, notes, total, cap, List.copyOf(stock), readLines(buf), readLines(buf));
             });
 
     private static void writeLines(FriendlyByteBuf buf, List<Line> lines) {

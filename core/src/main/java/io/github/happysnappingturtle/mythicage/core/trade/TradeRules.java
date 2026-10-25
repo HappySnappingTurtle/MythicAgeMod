@@ -36,6 +36,11 @@ public final class TradeRules {
             return new VenueContext(TradeOffer.Venue.GUARDIAN, stage, patron, shrineGods);
         }
 
+        /** 神谕所（与祭司处同一村庄的阶段与次神祠）。 */
+        public static VenueContext oracle(Age stage, String patron, Set<String> shrineGods) {
+            return new VenueContext(TradeOffer.Venue.ORACLE, stage, patron, shrineGods);
+        }
+
         public static VenueContext statue(String patron, Set<String> patronGods) {
             return new VenueContext(TradeOffer.Venue.STATUE, Age.NONE, patron, patronGods);
         }
@@ -54,7 +59,7 @@ public final class TradeRules {
             return (o.patron().isEmpty() || o.patron().equals(ctx.patron()))
                     && (o.minorGod().isEmpty() || ctx.gods().contains(o.minorGod()));
         }
-        return ctx.venue() == TradeOffer.Venue.GUARDIAN && (o.minorGod().isEmpty() || ctx.gods().contains(o.minorGod()));
+        return ctx.venue() != TradeOffer.Venue.STATUE && (o.minorGod().isEmpty() || ctx.gods().contains(o.minorGod()));
     }
 
     /**
@@ -83,7 +88,7 @@ public final class TradeRules {
                 return TradeReason.MINOR_GOD_LOCKED;
             }
         } else {
-            if (ctx.venue() != TradeOffer.Venue.GUARDIAN) {
+            if (ctx.venue() == TradeOffer.Venue.STATUE) {
                 return TradeReason.WRONG_VENUE;
             }
             if (!offer.minorGod().isEmpty() && !ctx.gods().contains(offer.minorGod())) {

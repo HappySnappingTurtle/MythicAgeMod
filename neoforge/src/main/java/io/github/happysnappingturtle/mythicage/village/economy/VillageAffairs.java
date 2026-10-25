@@ -25,7 +25,7 @@ import java.util.UUID;
  * 村务（T19 设计文档 §4.3，D4）：右键居民先说一句话（{@link ResidentDialogue}）；谷仓管事接着打开村务界面（库存、缺口、记录、捐赠），
  * 有交易表的职业接着打开交易界面（{@link ResidentTrade}）。
  * 捐赠是真实转移：满仓退回、记贡献（{@code seenBy}），<b>不加善恶、不加恩宠</b>（11 号 §8）。
- * 文本行的参数以 {@code @} 开头时，客户端把它当语言键翻译。
+ * 文本行的参数以 {@code @} 开头时，客户端把它当语言键翻译；{@code @@} 开头的把后面的参数都交给它（记录行）。
  */
 public final class VillageAffairs {
     public static final double REACH = 8;
@@ -97,19 +97,49 @@ public final class VillageAffairs {
             VillageEconomy.LogEntry e = s.log.get(i);
             List<String> args = new ArrayList<>();
             args.add(String.valueOf(e.day() + 1));
-            args.add("@" + e.key());
+            args.add("@@" + e.key());
             args.addAll(e.args());
             log.add(new AffairsView.Line("mythic_age.village.log.line", List.copyOf(args)));
         }
         AffairsView.Line title = v.patron().isEmpty() ? AffairsView.Line.of("mythic_age.village.title.plain")
                 : AffairsView.Line.of("mythic_age.village.title", "@mythic_age.god." + v.patron());
         AffairsView.Line date = data.map(d -> {
-            VillageCalendar.Date dt = d.calendar().date(MythDays.today(player.server), d.calendar().offset(village));
+            VillageCalendar.Date dt = d.calendar().date(MythDays.today(player.server), VillageData.offset(d, s));
             return dt.period().isEmpty() ? AffairsView.Line.of("mythic_age.village.date.plain", String.valueOf(dt.dayOfYear()))
                     : AffairsView.Line.of("mythic_age.village.date", "@mythic_age.village.period." + v.civ() + "." + dt.period(),
                     String.valueOf(dt.dayInPeriod()));
         }).orElse(AffairsView.Line.of("mythic_age.village.date.plain", "?"));
-        return Optional.of(new AffairsView(village, title, date, s.stock.total(), s.stock.capacity(), stock, shortages, log));
+        List<AffairsView.Line> notes = data.map(d -> calendarNotes(player.server, v, d, s)).orElse(List.of());
+        return Optional.of(new AffairsView(village, title, date, notes, s.stock.total(), s.stock.capacity(), stock, shortages, log));
+    }
+
+    /** 历法提示（§1.10 J8）：英雄起显示下一个节日还有几日（今天就是则说今天）；有神谕所时显示下一个神谕日。 */
+    public static List<AffairsView.Line> calendarNotes(net.minecraft.server.MinecraftServer server, VillageRegistry.Village v,
+                                                      CivVillageData d, VillageEconomy.State s) {
+        List<AffairsView.Line> out = new ArrayList<>();
+        long today = MythDays.today(server);
+        int offset = VillageData.offset(d, s);
+        int best = Integer.MAX_VALUE;
+        String next = "";
+        for (io.github.happysnappingturtle.mythicage.core.village.life.LifeData.Festival f : d.life().festivals().values()) {
+            if (!io.github.happysnappingturtle.mythicage.core.village.life.FestivalRules.open(f.minAge(), v.stage())) {
+                continue;
+            }
+            int n = d.calendar().daysUntil(today, offset, f.id());
+            if (n >= 0 && n < best) {
+                best = n;
+                next = f.id();
+            }
+        }
+        if (!next.isEmpty()) {
+            out.add(best == 0 ? AffairsView.Line.of("mythic_age.village.date.festival_today", "@mythic_age.festival." + next)
+                    : AffairsView.Line.of("mythic_age.village.date.festival_in", "@mythic_age.festival." + next, String.valueOf(best)));
+        }
+        io.github.happysnappingturtle.mythicage.village.life.OracleService.status(server, v).ifPresent(st -> out.add(
+                st.state() == io.github.happysnappingturtle.mythicage.core.village.life.OracleRules.State.OPEN
+                        ? AffairsView.Line.of("mythic_age.village.date.oracle_today")
+                        : AffairsView.Line.of("mythic_age.village.date.oracle_next", String.valueOf(st.nextDay()))));
+        return out;
     }
 
     /** 施工项目（T19 §1.4 E7）：进度、缺料、停工坐标。 */

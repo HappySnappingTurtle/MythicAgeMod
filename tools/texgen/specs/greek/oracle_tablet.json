@@ -1,0 +1,24 @@
+{
+  "template": "pixels",
+  "out": "item/oracle_tablet",
+  "size": 16,
+  "_note": "神谕铅板：多多那出土的问卜小铅板，刻着字、折过一道（UNESCO: The lead tablets of the Dodona Oracle）",
+  "palette": {"o": "#2a2c30", "d": "#55595f", "m": "#757a82", "l": "#9aa0a8", "h": "#c3c8cf", "c": "#3c3f44"},
+  "params": {"kind": "item", "rows": [
+    "................",
+    "................",
+    "..ooooooooooo...",
+    "..ohllllllllmo..",
+    "..olcmcclcmlmo..",
+    "..ollllllllldo..",
+    "..olccmlccclmo..",
+    "..odddddddddddo.",
+    "..ommmmmmmmmmdo.",
+    "..omcclccmclmdo.",
+    "..ommmmmmmmmmdo.",
+    "..omccmlcccmmdo.",
+    "..ommmmmmmmmddo.",
+    "...oooooooooooo.",
+    "................",
+    "................"]}
+}

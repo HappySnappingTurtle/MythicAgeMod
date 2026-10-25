@@ -41,11 +41,22 @@ public class GreekGuardianEntity extends GuardianEntity implements GeoEntity, My
             case GREET -> 32;
             case ANNOUNCE -> 44;
             case POINT -> 28;
+            case LIBATION_POUR -> 80;
+            case ORACLE_SIT, LISTEN -> 200;
             case NONE -> 0;
         };
     }
 
+    static final net.minecraft.resources.ResourceLocation ANIMATIONS = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+            io.github.happysnappingturtle.mythicage.core.MythicAgeIds.MOD_ID, "animations/entity/greek_guardian.animation.json");
+
+    /** 动画名；美术还没做的手势（阶段 ⑤b 之前）退回 {@code idle}，免得 GeckoLib 找不到动画停住。 */
     private static String animation(GuardianGesture g) {
+        software.bernie.geckolib.loading.object.BakedAnimations baked =
+                software.bernie.geckolib.cache.GeckoLibCache.getBakedAnimations().get(ANIMATIONS);
+        if (baked != null && baked.getAnimation(g.id()) == null) {
+            return "idle";
+        }
         return g.id();
     }
 
@@ -77,7 +88,8 @@ public class GreekGuardianEntity extends GuardianEntity implements GeoEntity, My
                 }
             }
             if (g != GuardianGesture.NONE) {
-                return state.setAndContinue(RawAnimation.begin().thenPlayAndHold(animation(g)));
+                return state.setAndContinue(g.loops() ? RawAnimation.begin().thenLoop(animation(g))
+                        : RawAnimation.begin().thenPlayAndHold(animation(g)));
             }
             return state.setAndContinue(horizontalSpeed() > WALK_THRESHOLD ? WALK : IDLE);
         });

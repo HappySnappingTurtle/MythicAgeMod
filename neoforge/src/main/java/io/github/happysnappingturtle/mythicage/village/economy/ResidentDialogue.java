@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 居民说的一句话（V3-希腊-居民 §6.3、T19 §1.8 I6），按优先级：警戒中 &gt; （节庆，阶段 ⑤）&gt; 本职缺料 &gt; 村里在建项目 &gt;
+ * 居民说的一句话（V3-希腊-居民 §6.3、T19 §1.8 I6），按优先级：警戒中 &gt; 节庆（当天与前一天，§1.10 J5）&gt; 本职缺料 &gt; 村里在建项目 &gt;
  * 正在做的事（手上有工作单时）/ 职业闲话（闲着时）。
  * 文本都在语言文件里：{@code mythic_age.village.say.<文明>.<职业>.chat.1–6} / {@code .short}，通用的
  * {@code mythic_age.village.say.alarm}、{@code .project}、{@code .project_building}。
@@ -25,7 +25,29 @@ import java.util.UUID;
 public final class ResidentDialogue {
     public static final int CHATTER = 6;
 
-    public enum Kind { ALARM, SHORT, PROJECT, CHATTER }
+    public enum Kind { ALARM, FESTIVAL, SHORT, PROJECT, CHATTER }
+
+    /** 今天的节日（{@code eve} = 明天的节日的前一天）；都没有为 empty。 */
+    record Fest(String id, boolean eve) {
+    }
+
+    static Optional<Fest> festival(MinecraftServer server, ResidentEntity r, VillageEconomy.State s) {
+        Optional<CivVillageData> d = VillageData.civ(r.civ());
+        Optional<io.github.happysnappingturtle.mythicage.village.VillageRegistry.Village> v = r.village()
+                .flatMap(id -> io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(server).byId(id));
+        if (d.isEmpty() || v.isEmpty()) {
+            return Optional.empty();
+        }
+        long today = io.github.happysnappingturtle.mythicage.guardian.MythDays.today(server);
+        int off = VillageData.offset(d.get(), s);
+        Optional<Fest> now = io.github.happysnappingturtle.mythicage.core.village.life.FestivalRules
+                .on(d.get().life(), d.get().calendar(), off, today, v.get().stage()).map(f -> new Fest(f.id(), false));
+        if (now.isPresent()) {
+            return now;
+        }
+        return io.github.happysnappingturtle.mythicage.core.village.life.FestivalRules
+                .on(d.get().life(), d.get().calendar(), off, today + 1, v.get().stage()).map(f -> new Fest(f.id(), true));
+    }
 
     private ResidentDialogue() {
     }
@@ -44,6 +66,9 @@ public final class ResidentDialogue {
             return Kind.ALARM;
         }
         VillageEconomy.State s = VillageEconomy.get(server).state(v.get());
+        if (festival(server, r, s).isPresent()) {
+            return Kind.FESTIVAL;
+        }
         if (isShort(r, s)) {
             return Kind.SHORT;
         }
@@ -73,6 +98,10 @@ public final class ResidentDialogue {
     public static Component line(MinecraftServer server, ResidentEntity r) {
         return switch (kind(server, r)) {
             case ALARM -> Component.translatable("mythic_age.village.say.alarm");
+            case FESTIVAL -> {
+                Fest f = festival(server, r, VillageEconomy.get(server).state(r.village().orElseThrow())).orElseThrow();
+                yield Component.translatable("mythic_age.village.say.festival." + f.id() + (f.eve() ? ".eve" : "." + (1 + r.getRandom().nextInt(2))));
+            }
             case SHORT -> Component.translatable(profKey(r) + ".short");
             case PROJECT -> {
                 VillageEconomy.State s = VillageEconomy.get(server).state(r.village().orElseThrow());

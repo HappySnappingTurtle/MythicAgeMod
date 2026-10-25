@@ -18,9 +18,15 @@ import java.util.List;
  * @param minAge   村庄阶段
  * @param minorGod 次神特色商品：只在立过该次神祠的村庄出现；空串表示普通商品
  * @param imported 集市商人的杂货（村里不产）：不走村库，只受每日额度
+ * @param festival 节庆商品：只在这个节日当天出现（T19 §1.10 J5）；空串表示平日商品
+ * @param villageCap 每村每个节日最多卖几份（0 = 不限，只看每日额度）
  */
 public record ResidentOffer(String id, boolean sell, String item, int count, int price, int daily, Age minAge, String minorGod,
-                            boolean imported) {
+                            boolean imported, String festival, int villageCap) {
+    public ResidentOffer(String id, boolean sell, String item, int count, int price, int daily, Age minAge, String minorGod,
+                         boolean imported) {
+        this(id, sell, item, count, price, daily, minAge, minorGod, imported, "", 0);
+    }
 
     public static List<ResidentOffer> parse(JsonObject trades) {
         List<ResidentOffer> out = new ArrayList<>();
@@ -36,7 +42,9 @@ public record ResidentOffer(String id, boolean sell, String item, int count, int
                         o.has("daily") ? o.get("daily").getAsInt() : 8,
                         o.has("minAge") ? Age.byId(o.get("minAge").getAsString()).orElse(Age.ARCHAIC) : Age.ARCHAIC,
                         o.has("minorGod") ? o.get("minorGod").getAsString() : "",
-                        o.has("source") && o.get("source").getAsString().equals("import")));
+                        o.has("source") && o.get("source").getAsString().equals("import"),
+                        o.has("festival") ? o.get("festival").getAsString() : "",
+                        o.has("villageCap") ? o.get("villageCap").getAsInt() : 0));
             }
         }
         return List.copyOf(out);

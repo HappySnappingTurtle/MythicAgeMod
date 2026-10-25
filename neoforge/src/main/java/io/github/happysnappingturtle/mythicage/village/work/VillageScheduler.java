@@ -86,6 +86,32 @@ public final class VillageScheduler {
             return perfNanos;
         }
 
+        /** 生活活动当天做过的（键 → MC 日；纯表现，不存档，§1.10）。 */
+        final Map<String, Long> lifeDone = new HashMap<>();
+
+        public boolean done(String key, long day) {
+            Long d = lifeDone.get(key);
+            return d != null && d == day;
+        }
+
+        public void markDone(String key, long day) {
+            if (lifeDone.size() > 512) {
+                lifeDone.values().removeIf(d -> d != day);
+            }
+            lifeDone.put(key, day);
+        }
+
+        /** 当天以 {@code prefix} 开头的记录有几条。 */
+        public int countDone(String prefix, long day) {
+            int n = 0;
+            for (Map.Entry<String, Long> e : lifeDone.entrySet()) {
+                if (e.getValue() == day && e.getKey().startsWith(prefix)) {
+                    n++;
+                }
+            }
+            return n;
+        }
+
         /** 本村的岗位（职业 → 人数）与算出它的 MC 日（§1.6 H1，每日重算）。 */
         Map<String, Integer> jobs = Map.of();
         long jobsDay = Long.MIN_VALUE;
@@ -213,6 +239,7 @@ public final class VillageScheduler {
 
     static void tick(MinecraftServer server) {
         newPathsThisTick = 0;
+        io.github.happysnappingturtle.mythicage.village.life.PathBudget.reset();
         Residents.drainQueue(server);
         Construction.drain(server);
         List<VillagePlans.Plan> plans = VillagePlans.get(server).all();
@@ -291,6 +318,8 @@ public final class VillageScheduler {
         rations(ctx);
         ResidentMigration.step(ctx);
         Construction.tick(ctx);
+        io.github.happysnappingturtle.mythicage.village.life.VillageLife.tick(ctx);
+        ctx.behavior().tick(ctx);
         sleepAndWake(ctx);
         plan(ctx);
         return true;
@@ -300,7 +329,7 @@ public final class VillageScheduler {
                                   VillageEconomy.State state, CivVillageData data, Runtime rt, long now) {
         int tod = Schedule.timeOfDay(level.getDayTime());
         long today = MythDays.today(level.getServer());
-        int offset = data.calendar().offset(village.id());
+        int offset = VillageData.offset(data, state);
         return new VillageContext(level, village, plan, state, data, rt, VillageBehavior.byId(data.behavior()), now, tod,
                 data.schedule().segmentAt(tod), today, data.calendar().date(today, offset), loaded(village.id()));
     }
@@ -411,8 +440,9 @@ public final class VillageScheduler {
         }
     }
 
+    /** 节庆日 ×2（§9.3、§1.10 J5）。 */
     static double rationsPerPerson(VillageContext ctx) {
-        return 1;
+        return io.github.happysnappingturtle.mythicage.village.life.VillageLife.rations(ctx);
     }
 
     static void sleepAndWake(VillageContext ctx) {
@@ -475,7 +505,10 @@ public final class VillageScheduler {
                 .withFoodShort(ctx.data().rations().belowFloor(ctx.state().stock))
                 .withFailures(rt.failures, ctx.today())
                 .withBusy(busy)
-                .withBehavior((r, j) -> ctx.behavior().available(ctx, r, j), j -> ctx.behavior().modify(ctx, j));
+                .withMaxWalking(io.github.happysnappingturtle.mythicage.village.life.VillageLife.maxWalking(ctx))
+                .withBehavior((r, j) -> ctx.behavior().available(ctx, r, j),
+                        j -> io.github.happysnappingturtle.mythicage.village.life.VillageLife.filter(ctx, j)
+                                .flatMap(k -> ctx.behavior().modify(ctx, k)));
         List<Scheduler.Assignment> plan = Scheduler.plan(snap);
         int assigned = 0;
         for (Scheduler.Assignment a : plan) {

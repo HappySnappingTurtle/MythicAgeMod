@@ -91,6 +91,11 @@ public final class VillageEconomy extends SavedData {
         /** 在途移民（§1.6 H4，每村最多 1 名）：实体 UUID 与动身的世界刻；没有为 null。 */
         public UUID migrant;
         public long migrantSince;
+        /** 历法偏移的调整（开发命令 {@code calendar}，平时 0）：加在村庄 id 派生的偏移上。 */
+        public int calendarShift;
+        /** 当日计数（§1.10：打鱼次数、节庆商品、祭品、祭司差事……），换日清零。 */
+        public final Map<String, Integer> daily = new LinkedHashMap<>();
+        public long dailyDay = -1;
 
         State(UUID village) {
             this.village = village;
@@ -101,6 +106,19 @@ public final class VillageEconomy extends SavedData {
             while (log.size() > LOG_LIMIT) {
                 log.remove(0);
             }
+        }
+
+        /** 今天某项计数。 */
+        public int dailyCount(long day, String key) {
+            return dailyDay == day ? daily.getOrDefault(key, 0) : 0;
+        }
+
+        public void addDaily(long day, String key, int n) {
+            if (dailyDay != day) {
+                dailyDay = day;
+                daily.clear();
+            }
+            daily.merge(key, n, Integer::sum);
         }
 
         public Optional<Member> keeper() {
@@ -210,6 +228,10 @@ public final class VillageEconomy extends SavedData {
                 s.nextProjectId = Math.max(1, c.getLong("nextProjectId"));
                 s.migrant = c.hasUUID("migrant") ? c.getUUID("migrant") : null;
                 s.migrantSince = c.getLong("migrantSince");
+                s.calendarShift = c.getInt("calendarShift");
+                s.dailyDay = c.contains("dailyDay") ? c.getLong("dailyDay") : -1;
+                CompoundTag dc = c.getCompound("daily");
+                dc.getAllKeys().forEach(k -> s.daily.put(k, dc.getInt(k)));
                 e.states.put(s.village, s);
             } catch (RuntimeException ex) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄运行数据：{}", ex.getMessage());
@@ -299,6 +321,11 @@ public final class VillageEconomy extends SavedData {
             s.notices.forEach(n -> notices.add(ProjectNbt.writeNotice(n)));
             c.put("notices", notices);
             c.putLong("nextProjectId", s.nextProjectId);
+            c.putInt("calendarShift", s.calendarShift);
+            c.putLong("dailyDay", s.dailyDay);
+            CompoundTag dc = new CompoundTag();
+            s.daily.forEach(dc::putInt);
+            c.put("daily", dc);
             if (s.migrant != null) {
                 c.putUUID("migrant", s.migrant);
                 c.putLong("migrantSince", s.migrantSince);

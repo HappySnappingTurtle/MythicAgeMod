@@ -48,6 +48,15 @@ public record VillageContext(ServerLevel level, VillageRegistry.Village village,
         return rt.nextJobId();
     }
 
+    /** 历法偏移（含开发命令的调整）。 */
+    public int offset() {
+        return VillageData.offset(data, state);
+    }
+
+    public io.github.happysnappingturtle.mythicage.core.village.life.LifeData life() {
+        return data.life();
+    }
+
     public boolean raining() {
         return level.isRainingAt(center().above(2)) || level.isRaining();
     }

@@ -43,6 +43,17 @@
         "price": 2,
         "daily": 4,
         "minAge": "classical"
+      },
+      {
+        "id": "prize_amphora",
+        "item": "mythic_age:panathenaic_amphora",
+        "count": 1,
+        "price": 6,
+        "daily": 2,
+        "source": "import",
+        "festival": "polis_festival",
+        "villageCap": 2,
+        "minAge": "heroic"
       }
     ],
     "buy": []

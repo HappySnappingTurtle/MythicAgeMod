@@ -64,6 +64,7 @@ public final class MythicAge {
         GreekArchitecture.init();
         io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.init();
         io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.init();
+        io.github.happysnappingturtle.mythicage.content.greek.village.GreekFestivalItems.init();
         io.github.happysnappingturtle.mythicage.village.VillageGuide.init();
         io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.init(modBus);
         io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.init(modBus);
@@ -149,6 +150,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.content.greek.village.GreekVillageWork.init();
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageData::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.life.OracleService::onRightClickBlock);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.build.Construction::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityJoin);

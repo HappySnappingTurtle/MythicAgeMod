@@ -37,6 +37,8 @@ import java.util.Optional;
  * /mythicage dev village project status|pick|cancel        施工项目（T19 阶段 ③）
  * /mythicage dev village project start &lt;建筑&gt; [地块]     开指定建筑的项目
  * /mythicage dev village project drop &lt;段数&gt;             不等居民，直接落段（拍图用）
+ * /mythicage dev village calendar &lt;第几日&gt;              把本村历法调到一年中的第几日（看节庆、神谕日；T19 阶段 ⑤）
+ * /mythicage dev village life                          历法、节庆段、神谕所、当日计数、祭司差事
  * </pre>
  */
 public final class VillageDevCommand {
@@ -156,6 +158,34 @@ public final class VillageDevCommand {
                                     + io.github.happysnappingturtle.mythicage.guardian.MythDays.today(c.getSource().getServer())), false);
                             return 1;
                         }))
+                        .then(Commands.literal("calendar").then(Commands.argument("day", IntegerArgumentType.integer(1, 366))
+                                .executes(c -> withCtx(c, ctx -> {
+                                    int want = IntegerArgumentType.getInteger(c, "day");
+                                    ctx.state().calendarShift += want - ctx.date().dayOfYear();
+                                    VillageEconomy.get(c.getSource().getServer()).setDirty();
+                                    var dt = ctx.data().calendar().date(ctx.today(), io.github.happysnappingturtle.mythicage.village.work.VillageData
+                                            .offset(ctx.data(), ctx.state()));
+                                    c.getSource().sendSuccess(() -> Component.literal("历法 → 第 " + dt.dayOfYear() + " 日 " + dt.period()
+                                            + " " + dt.special()), false);
+                                }))))
+                        .then(Commands.literal("life").executes(c -> withCtx(c, ctx -> {
+                            String fest = io.github.happysnappingturtle.mythicage.village.life.VillageLife.festivalToday(ctx)
+                                    .map(f -> f.id()).orElse("无");
+                            String phase = io.github.happysnappingturtle.mythicage.village.life.VillageLife.festivalSoon(ctx, 600)
+                                    .map(a -> a.festival().id() + "/" + a.phase().kind() + (a.eve() ? "（前夜）" : "")).orElse("无");
+                            String oracle = io.github.happysnappingturtle.mythicage.village.life.OracleService.status(c.getSource().getServer(),
+                                    ctx.village()).map(o -> o.state() + " 下一个第 " + o.nextDay() + " 日").orElse("没有神谕所");
+                            String priest = io.github.happysnappingturtle.mythicage.village.life.VillageLife.priest(ctx)
+                                    .map(g -> g.errand() == null ? "在居所" : "差事 " + g.errand().tag()).orElse("不在");
+                            c.getSource().sendSuccess(() -> Component.literal("钟 " + ctx.center().toShortString() + " · 祭坛 "
+                                    + io.github.happysnappingturtle.mythicage.village.life.VillageLife.altar(ctx).toShortString()
+                                    + " · 广场 " + io.github.happysnappingturtle.mythicage.village.life.VillageLife.point(ctx, "center")
+                                    .map(BlockPos::toShortString).orElse("-") + " · ritual " + ctx.anchors("ritual") + " · 第 " + ctx.date().dayOfYear() + " 日 " + ctx.date().period()
+                                    + " " + ctx.date().special() + " · 刻 " + ctx.timeOfDay() + " · 阶段 " + ctx.village().stage().id()
+                                    + "\n节日 " + fest + " · 段 " + phase + " · 口粮 ×"
+                                    + io.github.happysnappingturtle.mythicage.village.life.VillageLife.rations(ctx)
+                                    + "\n神谕 " + oracle + " · 祭司 " + priest + "\n当日计数 " + ctx.state().daily), false);
+                        })))
                         .then(Commands.literal("migrate").executes(c -> withCtx(c, ctx -> {
                             var m = io.github.happysnappingturtle.mythicage.village.work.ResidentMigration.forceForCommand(ctx);
                             c.getSource().sendSuccess(() -> Component.literal(m.map(r -> "在途移民 " + r.getName().getString()

@@ -23,9 +23,29 @@ public final class ResidentAnims {
             return name;
         }
         return switch (name) {
-            case "chat", "greet", "cheer", "browse", "hawk", "listen" -> "idle";
+            case "chat", "greet", "cheer", "browse", "hawk", "listen", "dance", "touch_bow", "perform", "libation_home",
+                 "aulos_play", "wash", "grave_tend", "water_fill" -> "idle";
             case "eat", "sit_watch" -> "sit";
+            case "run", "torch_run" -> "walk";
+            case "water_carry_head", "carry_basket_head" -> "carry_walk";
+            case "fish_cast", "fish_reel", "boat_push" -> "haul_pick";
             default -> "build_hammer";
+        };
+    }
+
+    /**
+     * 走路时的动作（T19 §1.10 J9）：按手上的东西与步态换——头顶水罐、头顶祭篮、边走边吹双管笛、举火炬跑；
+     * 其余搬着东西是 {@code carry_walk}，空手是 {@code walk}（跑是 {@code run}）。
+     */
+    public static String moving(String carry, String gait) {
+        boolean run = "run".equals(gait);
+        return switch (carry) {
+            case "hydria" -> "water_carry_head";
+            case "kanoun" -> "carry_basket_head";
+            case "aulos" -> "aulos_play";
+            case "torch" -> run ? "torch_run" : "carry_walk";
+            case "" -> run ? "run" : "walk";
+            default -> "carry_walk";
         };
     }
 }

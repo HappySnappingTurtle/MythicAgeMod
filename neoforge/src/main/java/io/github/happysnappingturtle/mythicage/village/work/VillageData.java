@@ -55,6 +55,12 @@ public final class VillageData {
         return Optional.of(base.withProfessions(professions.getOrDefault(civ, Map.of()), recipes.getOrDefault(civ, Map.of())));
     }
 
+    /** 村庄的历法偏移：村庄 id 派生 + 开发命令的调整（{@code calendarShift}）。 */
+    public static int offset(CivVillageData data,
+                             io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.State state) {
+        return data.calendar().offset(state.village) + state.calendarShift;
+    }
+
     /** 只供 GameTest：注入或清除（null）一个文明的数据。 */
     public static void overrideForTest(String civ, @Nullable CivVillageData data) {
         synchronized (TEST) {

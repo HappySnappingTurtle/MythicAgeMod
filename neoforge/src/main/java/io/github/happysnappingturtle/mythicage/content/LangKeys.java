@@ -430,6 +430,7 @@ public final class LangKeys {
         add("mythic_age.village.short.full", "仓库满了：生产暂停，捐来的东西也收不下", "Storage is full: production paused, donations refused", "倉庫が満杯：生産停止、寄付も受け取れない");
         add("mythic_age.village.point.clay", "黏土坑", "clay pit", "粘土坑");
         add("mythic_age.village.point.quarry", "采石点", "quarry", "採石場");
+        add("mythic_age.village.point.woodland", "林地", "woodland", "林");
         add("mythic_age.village.date", "%s第 %s 日", "%s, day %s", "%s %s 日目");
         add("mythic_age.village.date.plain", "一年中的第 %s 日", "Day %s of the year", "一年の %s 日目");
         add("mythic_age.village.period.greek.sowing", "耕种期", "Sowing", "耕作期");
@@ -680,6 +681,57 @@ public final class LangKeys {
         add("subtitles.mythic_age.gp.gr.curse.impact", "诅咒苹果落地", "Curse apple lands", "呪いの林檎が落ちる");
         add("subtitles.mythic_age.gp.gr.curse.transform", "被变成猪", "Turned into a pig", "豚に変えられる");
         add("subtitles.mythic_age.gp.gr.curse.immune", "诅咒被弹开", "Curse repelled", "呪いがはじかれる");
+
+        // ───── T19 阶段 ⑤ 生活与节庆（设计文档 §1.10）─────
+        add("mythic_age.village.activity.meal", "吃饭呢，先给灶上的神奠一点。", "Eating — a few drops for the hearth first.", "食事中です。まずかまどの神に少しお神酒を。");
+        add("mythic_age.village.activity.life", "家里的事：打水、跑跑腿。", "Household errands — fetching water and the like.", "家の用事です。水汲みなどを。");
+        add("mythic_age.village.activity.fish", "我去码头撒网。", "Off to the jetty to cast the net.", "桟橋へ網を打ちに行きます。");
+        add("mythic_age.village.activity.festival", "过节呢！", "It's a feast day!", "お祭りですよ！");
+        add("mythic_age.festival.polis_festival", "城邦节", "Polis Festival", "ポリスの祭");
+        add("mythic_age.festival.polis_festival.sub", "持篮者领着游行走上卫城，祭坛圣火通明", "The basket-bearer leads the procession up to the altar", "籠を頭に載せた乙女を先頭に、行列が祭壇へ登る");
+        add("mythic_age.festival.rural_dionysia", "乡村酒神节", "Rural Dionysia", "田舎のディオニュシア祭");
+        add("mythic_age.festival.rural_dionysia.sub", "抬着酒罐、吹着双管笛绕村游行，午后看戏", "Wine jars and pipes around the village; a play in the afternoon", "酒甕と笛の行列が村を巡り、午後は芝居");
+        add("mythic_age.village.say.festival.polis_festival.1", "今天是城邦节，跟着篮子走上卫城吧。", "It's the Polis Festival — follow the basket up to the altar.", "今日はポリスの祭。籠について祭壇へ登りましょう。");
+        add("mythic_age.village.say.festival.polis_festival.2", "傍晚广场上跳舞，大家手拉手连成一串。", "This evening we dance in the square, hand in hand in a long chain.", "夕方は広場で踊ります。みんなで手をつないで一列に。");
+        add("mythic_age.village.say.festival.polis_festival.eve", "明天城邦节。今晚有人举着火炬从村口一路跑到祭坛。", "The festival is tomorrow. Tonight torch-runners carry the fire from the village gate to the altar.", "明日は祭です。今夜は松明を持った走り手が村の入口から祭壇まで火を運びます。");
+        add("mythic_age.village.say.festival.rural_dionysia.1", "酒神节！抬酒罐的走在前面，吹笛的跟着。", "The Dionysia! Wine jars in front, the piper close behind.", "ディオニュシア祭！酒甕を担ぐ者が先頭、笛吹きがその後ろ。");
+        add("mythic_age.village.say.festival.rural_dionysia.2", "下午有戏看，演员都戴着面具。", "There's a play this afternoon — the actors all wear masks.", "午後は芝居があります。役者はみんな仮面をつけるんです。");
+        add("mythic_age.village.say.festival.rural_dionysia.eve", "明天是乡村酒神节，新酒该开坛了。", "The Rural Dionysia is tomorrow — time to open the new wine.", "明日は田舎のディオニュシア祭。新酒の甕を開ける頃です。");
+        add("mythic_age.village.log.relay_lit", "%s前夜：火炬接力跑到祭坛，圣火点燃", "%s eve: the torch relay reached the altar and lit the fire", "%sの前夜：松明リレーが祭壇に着き、聖火がともった");
+        add("mythic_age.village.log.festival_offering", "%s：游行到达祭坛，奠了一份%s", "%s: the procession reached the altar; one %s was poured", "%s：行列が祭壇に着き、%sを一つ献じた");
+        add("mythic_age.village.log.festival_no_offering", "%s：游行到达祭坛，村里没有酒也没有油，只行了礼", "%s: the procession reached the altar; with no wine or oil in store, only prayers were offered", "%s：行列が祭壇に着いたが、酒も油もなく祈りだけを捧げた");
+        add("mythic_age.village.log.feast", "%s宴饮：喝掉葡萄酒 %s 瓶", "%s feast: %s bottles of wine drunk", "%sの宴：ワイン %s 本");
+        add("mythic_age.village.date.festival_in", "%s还有 %s 日", "%s in %s days", "%sまであと %s 日");
+        add("mythic_age.village.date.festival_today", "今天是%s", "Today: %s", "今日は%s");
+        add("mythic_age.village.date.oracle_today", "今天是神谕日", "Oracle day today", "今日は神託の日");
+        add("mythic_age.village.date.oracle_next", "下一个神谕日：第 %s 日", "Next oracle day: day %s", "次の神託の日：%s 日目");
+        add("mythic_age.oracle.title", "神谕所", "Oracle", "神託所");
+        add("mythic_age.oracle.open", "今天是神谕日，祭司在内室坐诊。", "It's an oracle day; the priest sits in the inner chamber.", "今日は神託の日。神官が奥の間に座っています。");
+        add("mythic_age.oracle.closed", "神谕所今日不开。下一个神谕日：第 %s 日（还有 %s 日）", "The oracle is closed today. Next oracle day: day %s (in %s days)", "神託所は今日は開いていません。次の神託の日：%s 日目（あと %s 日）");
+        add("mythic_age.oracle.winter", "冬季阿波罗离开德尔斐，神谕所闭门。下一个神谕日：第 %s 日", "In winter Apollo leaves Delphi; the oracle is shut. Next oracle day: day %s", "冬の間アポロンはデルポイを去り、神託所は閉ざされています。次の神託の日：%s 日目");
+        add("mythic_age.oracle.offer.oracle_storm", "神谕铅板：雷雨之兆", "Oracle Tablet: Signs of Storm", "神託の鉛板：雷雨の兆し");
+        add("mythic_age.oracle.offer.oracle_creature", "神谕铅板：神兽的踪迹", "Oracle Tablet: Tracks of a Beast", "神託の鉛板：神獣の足跡");
+        add("mythic_age.oracle.storm.unknown", "神谕沉默不语。", "The oracle is silent.", "神託は沈黙している。");
+        add("mythic_age.oracle.storm.clear", "天将放晴约 %s 日，之后雨与雷一同到来。", "Clear skies for about %s days; then rain and thunder together.", "およそ %s 日は晴れ、その後雨と雷がともに来る。");
+        add("mythic_age.oracle.storm.ends", "这场雨约 %s 日后停歇。", "This rain will stop in about %s days.", "この雨はおよそ %s 日後に止む。");
+        add("mythic_age.oracle.storm.comes", "约 %s 日后天降雨水。", "Rain will come in about %s days.", "およそ %s 日後に雨が降る。");
+        add("mythic_age.oracle.storm.thunder_yes", "雨中有宙斯的雷鸣。", "Zeus's thunder will sound in it.", "その雨にはゼウスの雷鳴が伴う。");
+        add("mythic_age.oracle.storm.thunder_no", "这场雨不带雷。", "This rain brings no thunder.", "この雨に雷はない。");
+        add("mythic_age.oracle.storm.thunder_maybe", "雷鸣未卜。", "Whether thunder comes is not foretold.", "雷のことはまだ定まらない。");
+        add("mythic_age.oracle.creature", "神谕说起%s的踪迹：", "The oracle speaks of the %s:", "神託は%sの足跡を告げる：");
+        add("mythic_age.oracle.creature.where", "往%s约 %s 格的%s。", "about %2$s blocks %1$s, in the %3$s.", "%sへおよそ %s ブロック、%sにて。");
+        add("mythic_age.oracle.creature.none", "方圆 %2$s 格内没有%1$s的踪迹。", "No trace of the %1$s within %2$s blocks.", "%2$s ブロック以内に%1$sの足跡はない。");
+        add("mythic_age.oracle.creature.silent", "神谕沉默不语。", "The oracle is silent.", "神託は沈黙している。");
+        add("mythic_age.dir.east", "东", "east", "東");
+        add("mythic_age.dir.southeast", "东南", "southeast", "南東");
+        add("mythic_age.dir.south", "南", "south", "南");
+        add("mythic_age.dir.southwest", "西南", "southwest", "南西");
+        add("mythic_age.dir.west", "西", "west", "西");
+        add("mythic_age.dir.northwest", "西北", "northwest", "北西");
+        add("mythic_age.dir.north", "北", "north", "北");
+        add("mythic_age.dir.northeast", "东北", "northeast", "北東");
+        add("item.mythic_age.panathenaic_amphora.inscription", "「来自雅典的奖品之一」", "\"One of the prizes from Athens\"", "「アテナイからの賞品のひとつ」");
+        add("item.mythic_age.panathenaic_amphora.use", "右键倒出 %s 瓶橄榄油", "Use to pour out %s olive oil", "使うとオリーブオイル %s 本を注ぎ出す");
     }
 
     private LangKeys() {

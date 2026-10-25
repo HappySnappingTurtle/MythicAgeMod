@@ -111,7 +111,10 @@ public final class TradeService {
         }
         Optional<VillageRegistry.Village> village = GuardianSpawner.villageOf(guardian);
         String patron = village.map(VillageRegistry.Village::patron).orElse("");
-        Session s = new Session(guardian.civ(), TradeOffer.Venue.GUARDIAN, guardian.getId(), null,
+        // 神谕日在神谕所坐诊的祭司：只开神谕兑换（T19 §1.10 J6）
+        TradeOffer.Venue venue = io.github.happysnappingturtle.mythicage.village.life.OracleService.seated(guardian)
+                ? TradeOffer.Venue.ORACLE : TradeOffer.Venue.GUARDIAN;
+        Session s = new Session(guardian.civ(), venue, guardian.getId(), null,
                 guardian.level().dimension(), village.map(VillageRegistry.Village::id).orElse(null), patron);
         SESSIONS.put(player.getUUID(), s);
         learnPatron(player, guardian.civ(), patron);
@@ -155,6 +158,10 @@ public final class TradeService {
             return TradeRules.VenueContext.statue(s.patron(), gods);
         }
         Optional<VillageRegistry.Village> v = village(player, s);
+        if (s.venue() == TradeOffer.Venue.ORACLE) {
+            return TradeRules.VenueContext.oracle(v.map(VillageRegistry.Village::stage).orElse(Age.ARCHAIC), s.patron(),
+                    v.map(VillageRegistry.Village::shrineGods).orElse(Set.of()));
+        }
         // 不属于任何村庄的祭司（刷怪蛋、命令生成）：按远古阶段出售
         return TradeRules.VenueContext.guardian(v.map(VillageRegistry.Village::stage).orElse(Age.ARCHAIC), s.patron(),
                 v.map(VillageRegistry.Village::shrineGods).orElse(Set.of()));
@@ -243,10 +250,11 @@ public final class TradeService {
             return false;
         }
         double max = (double) range() * range();
-        if (s.venue() == TradeOffer.Venue.GUARDIAN) {
+        if (s.venue() == TradeOffer.Venue.GUARDIAN || s.venue() == TradeOffer.Venue.ORACLE) {
             Entity e = player.level().getEntity(s.guardianEntityId());
             return e instanceof GuardianEntity g && g.civ() == s.civ() && g.isAlive() && !g.isRemoved()
-                    && g.distanceToSqr(player) <= max;
+                    && g.distanceToSqr(player) <= max
+                    && (s.venue() != TradeOffer.Venue.ORACLE || io.github.happysnappingturtle.mythicage.village.life.OracleService.seated(g));
         }
         BlockPos statue = s.statue();
         return statue != null && PatronStatues.info(player.serverLevel(), statue)
@@ -314,6 +322,9 @@ public final class TradeService {
     static ItemStack resultOf(TradeOffer o, Civilization civ, Session s) {
         if (o.id().equals(VILLAGE_GUIDE)) {
             return io.github.happysnappingturtle.mythicage.village.VillageGuide.displayStack(civ);
+        }
+        if (o.id().startsWith(ORACLE_PREFIX)) {
+            return io.github.happysnappingturtle.mythicage.village.life.OracleService.tablet(o.id());
         }
         return o.result().item().equals(STATUE_ITEM) ? PatronStatues.stack(civ, s.patron())
                 : stack(o.result().item(), o.result().count());
@@ -432,7 +443,9 @@ public final class TradeService {
         if (offer.id().equals(VILLAGE_GUIDE)) {
             return beginGuide(player, civ, offer, items, plan, requestId);
         }
-        ItemStack result = resultOf(offer, civ, s);
+        ItemStack result = offer.id().startsWith(ORACLE_PREFIX)
+                ? io.github.happysnappingturtle.mythicage.village.life.OracleService.answer(player, offer.id())
+                : resultOf(offer, civ, s);
         if (result.isEmpty() || !plan.insert(offer.result().item(), result.getCount(), result.getMaxStackSize())) {
             return Outcome.of(TradeReason.INVENTORY_FULL);
         }
@@ -462,6 +475,9 @@ public final class TradeService {
     }
 
     // ───────────── 村庄指引（T13b 设计文档 §7） ─────────────
+
+    /** 神谕的商品 id 前缀：结果是写着答案的神谕铅板（T19 §1.10 J6）。 */
+    public static final String ORACLE_PREFIX = "oracle_";
 
     /** 村庄指引的商品 id：找到村庄才成交，搜索在后台进行。 */
     public static final String VILLAGE_GUIDE = "village_guide";

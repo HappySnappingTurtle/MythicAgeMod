@@ -1,0 +1,24 @@
+{
+  "template": "pixels",
+  "out": "item/panathenaic_amphora",
+  "size": 16,
+  "_note": "泛雅典娜奖瓶：黑绘，窄颈、紧贴的双耳、小足；腹部赭色画面里是持矛持盾的雅典娜（Wikipedia: Panathenaic amphora）",
+  "palette": {"o": "#140c08", "k": "#241712", "t": "#b5653a", "T": "#8e4a28", "h": "#d58a5a", "w": "#efe3c8", "s": "#6b6b6b"},
+  "params": {"kind": "item", "rows": [
+    "......oooo......",
+    "......okko......",
+    ".....o.kk.o.....",
+    "....ok.kk.ko....",
+    "....ok.kk.ko....",
+    "....okkkkkko....",
+    "...okthhttTko...",
+    "...oktkwkkTko...",
+    "...oktkkskTko...",
+    "...oktkkksTko...",
+    "...okthkksTko...",
+    "....okTTTTko....",
+    ".....okkkko.....",
+    "......okko......",
+    ".....okkkko.....",
+    "......oooo......"]}
+}

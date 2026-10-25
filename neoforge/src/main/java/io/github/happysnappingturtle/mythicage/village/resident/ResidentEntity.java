@@ -50,6 +50,8 @@ import java.util.UUID;
 public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVariantHolder {
     public static final double REACH = 2.0;
     public static final double WALK_SPEED = 0.55;
+    /** 跑（火炬接力、赛跑）。 */
+    public static final double RUN_SPEED = 0.9;
     /** 连续这么多次算不出路（起点四周都走不通）就回床位锚点脱困。 */
     public static final int STUCK_LIMIT = 3;
     /** 走路时多久没进展就挪一步、多久就直接到位或放弃（刻）。 */
@@ -63,6 +65,8 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private static final EntityDataAccessor<Integer> APPEARANCE = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.INT);
     /** 手上搬着的东西（只是外观）。 */
     private static final EntityDataAccessor<String> CARRY = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
+    /** 步态：空 = 走，{@code run} = 跑（只是外观与速度）。 */
+    private static final EntityDataAccessor<String> GAIT = SynchedEntityData.defineId(ResidentEntity.class, EntityDataSerializers.STRING);
 
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
@@ -96,6 +100,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     @Nullable
     private BlockPos standFor;
     private BlockPos stand = BlockPos.ZERO;
+    private boolean endAct;
 
     public ResidentEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -122,6 +127,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         builder.define(ANIM, "");
         builder.define(APPEARANCE, 0);
         builder.define(CARRY, "");
+        builder.define(GAIT, "");
     }
 
     @Override
@@ -216,6 +222,15 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         entityData.set(CARRY, what == null ? "" : what);
     }
 
+    public String gait() {
+        return entityData.get(GAIT);
+    }
+
+    /** 动作提前结束（等候到点、接力轮到自己）：下一刻进入下一步。 */
+    public void finishAct() {
+        endAct = true;
+    }
+
     // ───────────── 工作单 ─────────────
 
     public boolean idle() {
@@ -245,6 +260,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         stepTicks = 0;
         jobStart = level().getGameTime();
         repathIn = 0;
+        endAct = false;
         entityData.set(ANIM, "");
     }
 
@@ -265,6 +281,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         step = 0;
         stepTicks = 0;
         entityData.set(ANIM, "");
+        entityData.set(GAIT, "");
         setCarrying("");
         getNavigation().stop();
     }
@@ -378,6 +395,10 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 if (!s.carry().equals(carrying())) {
                     setCarrying(s.carry());
                 }
+                String gait = s.running() ? JobStep.RUN : "";
+                if (!gait.equals(gait())) {
+                    entityData.set(GAIT, gait);
+                }
                 if (tickCount % 20 == 0) {
                     VillageScheduler.onWalkTick(sl, this, job, step);
                     if (job == null) {
@@ -403,9 +424,13 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                     if (!unstuck(still)) {
                         return;
                     }
-                } else if (--repathIn <= 0 || getNavigation().isDone()) {
+                } else if ((--repathIn <= 0 || getNavigation().isDone()) && !io.github.happysnappingturtle.mythicage.village.life.PathBudget.take()) {
+                    // 本刻的寻路名额用完了：下一刻再算（§1.10 J5）
+                    repathIn = 1;
+                } else if (repathIn <= 0 || getNavigation().isDone()) {
                     repathIn = 40;
-                    boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, WALK_SPEED / 0.5);
+                    boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5,
+                            (s.running() ? RUN_SPEED : WALK_SPEED) / 0.5);
                     net.minecraft.world.level.pathfinder.Path p = getNavigation().getPath();
                     if (!moving || p == null || p.getNodeCount() <= 1) {
                         if (++stuckTries >= STUCK_LIMIT) {
@@ -429,7 +454,8 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 if (job == null) {
                     return;
                 }
-                if (stepTicks >= s.ticks()) {
+                if (stepTicks >= s.ticks() || endAct) {
+                    endAct = false;
                     entityData.set(ANIM, "");
                     int done = step;
                     Job j = job;
@@ -459,6 +485,10 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     private void next() {
         step++;
         stepTicks = 0;
+        endAct = false;
+        if (job != null && (step >= job.steps().size() || !job.steps().get(step).running())) {
+            entityData.set(GAIT, "");
+        }
     }
 
     public boolean reached(BlockPos t) {
@@ -658,7 +688,9 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 return state.setAndContinue(RawAnimation.begin().thenLoop(ResidentAnims.resolve(a)));
             }
             if (state.isMoving()) {
-                return state.setAndContinue(carrying().isEmpty() ? WALK : CARRY_WALK);
+                String m = ResidentAnims.moving(carrying(), gait());
+                return state.setAndContinue(m.equals("walk") ? WALK : m.equals("carry_walk") ? CARRY_WALK
+                        : RawAnimation.begin().thenLoop(ResidentAnims.resolve(m)));
             }
             return state.setAndContinue(IDLE);
         }));

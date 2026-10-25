@@ -28,6 +28,13 @@
   },
   "priority": 30,
   "anchors": {
+    "bath": [
+      [
+        7,
+        1,
+        1
+      ]
+    ],
     "oracle": [
       [
         4,

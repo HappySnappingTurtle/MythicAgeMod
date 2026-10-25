@@ -30,9 +30,16 @@
     "building:greek:palaestra"
   ],
   "anchors": {
-    "festival": [
+    "track_finish": [
       [
-        13,
+        24,
+        1,
+        8
+      ]
+    ],
+    "track_start": [
+      [
+        2,
         1,
         8
       ]

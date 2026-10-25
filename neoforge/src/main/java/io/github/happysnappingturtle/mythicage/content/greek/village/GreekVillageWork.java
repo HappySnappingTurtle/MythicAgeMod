@@ -41,6 +41,9 @@ public final class GreekVillageWork {
         FruitHarvester.register("grape", new GrapeHarvester());
         PointVisuals.register("quarry", NaturalResources::quarryVisual);
         VillageBehavior.register(new Behavior());
+        // 节庆日祈祷照常，游行时段除外（V3-希腊-居民 §5.5）
+        io.github.happysnappingturtle.mythicage.village.life.VillageLife.keepOnFestival(
+                io.github.happysnappingturtle.mythicage.content.greek.prayer.ResidentPrayer.ID, false);
     }
 
     /** 橄榄树：锚点是树干底，熟果长在树冠的树叶上（{@link OliveLeavesBlock#FRUIT} = 熟）。每片熟叶 1–2 颗，与玩家采摘一致。 */
@@ -126,6 +129,25 @@ public final class GreekVillageWork {
         @Override
         public List<Job> jobs(VillageContext ctx) {
             return io.github.happysnappingturtle.mythicage.content.greek.prayer.ResidentPrayer.jobs(ctx);
+        }
+
+        /**
+         * 宙斯村：下雨或雷雨时圣橡旁的铜鼎每 200 刻共鸣一次（多多那：铜鼎彼此相接，一敲全圈共鸣，V3 §5.7）。
+         * 只在附近有玩家时放声音。
+         */
+        @Override
+        public void tick(VillageContext ctx) {
+            if (!"zeus".equals(ctx.village().patron()) || !ctx.level().isRaining() || Math.floorMod(ctx.level().getGameTime(), 200L) >= 20) {
+                return;
+            }
+            for (io.github.happysnappingturtle.mythicage.core.village.gen.Pos p : ctx.anchors("sacred_tree")) {
+                BlockPos b = VillageContext.block(p);
+                if (ctx.level().getNearestPlayer(b.getX() + 0.5, b.getY(), b.getZ() + 0.5, 32, false) != null) {
+                    ctx.level().playSound(null, b, net.minecraft.sounds.SoundEvents.BELL_RESONATE,
+                            net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, ctx.level().isThundering() ? 0.7F : 1.0F);
+                }
+                break;
+            }
         }
 
         @Override

@@ -76,6 +76,9 @@ public class GuardianScreen extends Screen {
             var e = level == null ? null : level.getEntity(view.guardianEntityId());
             return e != null ? e.getDisplayName() : Component.translatable("mythic_age.guardian.title");
         }
+        if (view.venue() == TradeOffer.Venue.ORACLE) {
+            return Component.translatable("mythic_age.oracle.title");
+        }
         return Component.translatable("mythic_age.trade.statue_title",
                 Component.translatable("mythic_age.god." + view.villagePatron()));
     }

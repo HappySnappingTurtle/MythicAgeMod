@@ -32,6 +32,10 @@ public interface VillageBehavior {
     default void onDayStart(VillageContext ctx) {
     }
 
+    /** 每次调度（约每 20 刻）调用：文明特有的小表现（宙斯村下雨时铜鼎共鸣）。 */
+    default void tick(VillageContext ctx) {
+    }
+
     /** 某居民此刻能否被派这份工作单。 */
     default boolean available(VillageContext ctx, Scheduler.ResidentView resident, Job job) {
         return true;

@@ -77,6 +77,12 @@ public final class Scheduler {
                     avail, mod);
         }
 
+        /** 每村同时走路的上限（节庆段放宽，T19 §1.10 J5）。 */
+        public Snapshot withMaxWalking(int n) {
+            return new Snapshot(residents, candidates, alarm, raining, foodShort, n, busyTargets, failures, day,
+                    available, modify);
+        }
+
         public Snapshot withBusy(Set<String> busy) {
             return new Snapshot(residents, candidates, alarm, raining, foodShort, maxWalking, busy, failures, day,
                     available, modify);

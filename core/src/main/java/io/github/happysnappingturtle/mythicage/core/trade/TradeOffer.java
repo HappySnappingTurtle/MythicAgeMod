@@ -68,7 +68,9 @@ public record TradeOffer(String id, Category category, ItemAmount result, Price 
      * 数据里的 {@code altar} 读作 {@code statue}。
      */
     public enum Venue {
-        GUARDIAN, STATUE;
+        GUARDIAN, STATUE,
+        /** 神谕所：神谕日祭司坐诊时（T19 §1.10 J6），只卖小情报。 */
+        ORACLE;
 
         public String id() {
             return name().toLowerCase(Locale.ROOT);

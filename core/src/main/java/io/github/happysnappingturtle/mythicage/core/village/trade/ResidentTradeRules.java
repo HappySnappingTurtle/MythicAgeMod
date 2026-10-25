@@ -36,7 +36,13 @@ public record ResidentTradeRules(double devoteeDiscount, Map<String, Double> god
 
     /** 这条商品此刻在这个村庄出不出现：阶段已到；次神商品要本村立过该次神祠。 */
     public static boolean visible(ResidentOffer o, Age villageStage, Set<String> shrineGods) {
-        return villageStage.atLeast(o.minAge()) && (o.minorGod().isEmpty() || shrineGods.contains(o.minorGod()));
+        return visible(o, villageStage, shrineGods, "");
+    }
+
+    /** {@code festivalToday}：今天的节日（空串 = 不过节）；节庆商品只在当天出现。 */
+    public static boolean visible(ResidentOffer o, Age villageStage, Set<String> shrineGods, String festivalToday) {
+        return villageStage.atLeast(o.minAge()) && (o.minorGod().isEmpty() || shrineGods.contains(o.minorGod()))
+                && (o.festival().isEmpty() || o.festival().equals(festivalToday));
     }
 
     /**

@@ -630,5 +630,306 @@
       "perAnchorPerDay": 0.25,
       "carry": "basket"
     }
+  },
+  "life": {
+    "_doc": "生活与节庆（T19 设计文档 §1.10；V3-希腊-居民 §2.1、§5.2–5.7）。全是表现与交易，不产恩宠。",
+    "meals": {
+      "dawn": [
+        "libation_home:40",
+        "eat:100"
+      ],
+      "supper": [
+        "libation_home:40",
+        "eat:100"
+      ],
+      "lunch": [
+        "eat:100"
+      ]
+    },
+    "activities": [
+      {
+        "id": "water",
+        "anchor": "water",
+        "windows": [
+          [
+            0,
+            1500
+          ],
+          [
+            11000,
+            12000
+          ]
+        ],
+        "people": [
+          1,
+          3
+        ],
+        "act": "water_fill:20",
+        "carryHome": "hydria",
+        "queueAct": "chat",
+        "prefer": "female"
+      },
+      {
+        "id": "browse",
+        "anchor": "merchant",
+        "windows": [
+          [
+            500,
+            5500
+          ]
+        ],
+        "people": [
+          0,
+          2
+        ],
+        "act": "browse:100"
+      },
+      {
+        "id": "bow_oak",
+        "anchor": "sacred_tree",
+        "patron": "zeus",
+        "windows": [
+          [
+            0,
+            11000
+          ]
+        ],
+        "people": [
+          0,
+          1
+        ],
+        "act": "touch_bow:30"
+      },
+      {
+        "id": "boat_push",
+        "anchor": "berth",
+        "patron": "poseidon",
+        "windows": [
+          [
+            0,
+            1000
+          ]
+        ],
+        "people": [
+          0,
+          1
+        ],
+        "act": "boat_push:80",
+        "professions": [
+          "greek:laborer"
+        ]
+      },
+      {
+        "id": "grave",
+        "anchor": "grave_visit",
+        "patron": "hades",
+        "special": "!genesia",
+        "windows": [
+          [
+            11000,
+            12000
+          ]
+        ],
+        "people": [
+          1,
+          1
+        ],
+        "chance": 0.25,
+        "act": "grave_tend:120",
+        "carry": "ribbon"
+      },
+      {
+        "id": "genesia",
+        "anchor": "grave_visit",
+        "patron": "hades",
+        "special": "genesia",
+        "specialMax": 12,
+        "windows": [
+          [
+            11000,
+            12000
+          ]
+        ],
+        "people": [
+          1,
+          1
+        ],
+        "act": "grave_tend:120",
+        "carry": "ribbon"
+      },
+      {
+        "id": "wash",
+        "anchor": "bath",
+        "special": "oracle",
+        "minAge": "mythic",
+        "windows": [
+          [
+            1500,
+            6000
+          ]
+        ],
+        "people": [
+          0,
+          2
+        ],
+        "act": "wash:80"
+      }
+    ],
+    "meet": {
+      "at": "",
+      "shelter": "merchant"
+    },
+    "priest": [
+      {
+        "id": "listen",
+        "at": 300,
+        "anchor": "sacred_tree",
+        "gesture": "listen",
+        "ticks": 200,
+        "patron": "zeus"
+      },
+      {
+        "id": "libation",
+        "at": 1000,
+        "anchor": "ritual",
+        "gesture": "libation_pour",
+        "ticks": 80,
+        "all": true,
+        "smoke": true
+      },
+      {
+        "id": "oracle",
+        "at": 1500,
+        "until": 11000,
+        "anchor": "oracle",
+        "gesture": "oracle_sit",
+        "special": "oracle",
+        "minAge": "mythic"
+      }
+    ],
+    "festivals": {
+      "polis_festival": {
+        "minAge": "heroic",
+        "rations": 2,
+        "phases": [
+          {
+            "kind": "relay",
+            "eve": true,
+            "from": 13000,
+            "to": 14000,
+            "count": 4,
+            "track": [
+              "entrance",
+              "altar"
+            ],
+            "leader": "torch"
+          },
+          {
+            "kind": "procession",
+            "from": 0,
+            "to": 3000,
+            "at": "center",
+            "route": "altar",
+            "leader": "kanoun",
+            "offering": [
+              "mythic_age:wine",
+              "mythic_age:olive_oil"
+            ]
+          },
+          {
+            "kind": "games",
+            "from": 6000,
+            "to": 10000,
+            "track": [
+              "track_start",
+              "track_finish"
+            ],
+            "fallback": [
+              "agora_gate",
+              "center"
+            ],
+            "count": 4,
+            "acts": [
+              "cheer"
+            ]
+          },
+          {
+            "kind": "gather",
+            "from": 11000,
+            "to": 13000,
+            "at": "center",
+            "acts": [
+              "dance",
+              "eat"
+            ]
+          }
+        ]
+      },
+      "rural_dionysia": {
+        "minAge": "heroic",
+        "rations": 2,
+        "phases": [
+          {
+            "kind": "procession",
+            "from": 0,
+            "to": 3000,
+            "at": "center",
+            "route": "loop",
+            "carries": [
+              "wine_jar",
+              "wine_jar",
+              "cakes",
+              "cakes",
+              "aulos"
+            ]
+          },
+          {
+            "kind": "theater",
+            "from": 6000,
+            "to": 10000,
+            "at": "orchestra",
+            "count": 3,
+            "acts": [
+              "sit_watch",
+              "perform"
+            ],
+            "otherwise": "gather"
+          },
+          {
+            "kind": "gather",
+            "from": 11000,
+            "to": 13000,
+            "at": "center",
+            "acts": [
+              "dance",
+              "eat"
+            ],
+            "consume": "mythic_age:wine",
+            "per": 4
+          }
+        ]
+      }
+    },
+    "fishing": {
+      "anchor": "berth",
+      "professions": [
+        "greek:laborer"
+      ],
+      "patron": "poseidon",
+      "daily": 8,
+      "item": "minecraft:cod",
+      "alt": "minecraft:salmon",
+      "altChance": 0.2,
+      "castTicks": 40,
+      "reelTicks": 60
+    },
+    "oracle": {
+      "anchor": "oracle",
+      "special": "oracle",
+      "closedPeriod": "sowing",
+      "minAge": "mythic",
+      "from": 1500,
+      "until": 11000
+    }
   }
 }

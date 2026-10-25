@@ -55,6 +55,7 @@ public final class BasicJobTypes {
         LandJobTypes.registerAll();
         JobType.register(new io.github.happysnappingturtle.mythicage.village.build.BuildJob());
         ResidentMigration.registerAll();
+        io.github.happysnappingturtle.mythicage.village.life.VillageLife.registerAll();
     }
 
     static boolean working(VillageContext ctx) {
@@ -72,7 +73,7 @@ public final class BasicJobTypes {
     }
 
     /** 离 from 最近的谷仓管事位（搬回仓库的地方）；没有谷仓就原地交。 */
-    static Optional<Pos> storage(VillageContext ctx, Pos from) {
+    public static Optional<Pos> storage(VillageContext ctx, Pos from) {
         return ctx.anchors(Residents.KEEPER_ANCHOR).stream()
                 .min(Comparator.comparingLong(p -> (long) (p.x() - from.x()) * (p.x() - from.x())
                         + (long) (p.z() - from.z()) * (p.z() - from.z())));
@@ -89,7 +90,7 @@ public final class BasicJobTypes {
     }
 
     /** 把本单的途中物品入库。没有（重启丢了、早被作废）返回 false。 */
-    static boolean depositPending(VillageContext ctx, Job job) {
+    public static boolean depositPending(VillageContext ctx, Job job) {
         Map<String, Integer> got = ctx.rt().pending().remove(job.id());
         if (got == null || got.isEmpty()) {
             return false;
@@ -98,7 +99,7 @@ public final class BasicJobTypes {
         return true;
     }
 
-    static void addPending(VillageContext ctx, Job job, Map<String, Integer> items) {
+    public static void addPending(VillageContext ctx, Job job, Map<String, Integer> items) {
         Map<String, Integer> m = ctx.rt().pending().computeIfAbsent(job.id(), k -> new LinkedHashMap<>());
         items.forEach((k, v) -> {
             if (v > 0) {
@@ -181,7 +182,7 @@ public final class BasicJobTypes {
         return BuiltInRegistries.BLOCK.getKey(s.getBlock()).toString();
     }
 
-    static boolean stageOpen(VillageContext ctx, String stage) {
+    public static boolean stageOpen(VillageContext ctx, String stage) {
         return Age.byId(stage).map(a -> a == Age.ARCHAIC || ctx.village().stage().atLeast(a)).orElse(true);
     }
 
@@ -488,11 +489,29 @@ public final class BasicJobTypes {
 
     // ───────────── 作息 ─────────────
 
-    /** 傍晚到村中心附近聚会闲聊（装饰活动，有生产需要时让位）。 */
-    static final class Leisure implements JobType {
+    /**
+     * 傍晚到村中心附近聚会闲聊、坐着歇脚（装饰活动，有生产需要时让位）。下雨时改去避雨处（文明数据 {@code life.meet.shelter}，
+     * 希腊是柱廊铺面），没有避雨处就不聚（T19 §1.10 J3）。
+     */
+    public static final class Leisure implements JobType {
         @Override
         public String id() {
             return LEISURE;
+        }
+
+        /** 聚会地点：平时是聚会锚点（没有就是钟），下雨时是最近的避雨锚点；下雨又没有避雨处为 empty。 */
+        public static Optional<BlockPos> place(VillageContext ctx, boolean raining) {
+            io.github.happysnappingturtle.mythicage.core.village.life.LifeData.Meet m = ctx.life().meet();
+            BlockPos c = ctx.center();
+            if (raining) {
+                return m.shelter().isEmpty() ? Optional.empty() : ctx.anchors(m.shelter()).stream().map(VillageContext::block)
+                        .min(Comparator.comparingDouble(p -> p.distSqr(c)));
+            }
+            if (!m.at().isEmpty()) {
+                return Optional.of(ctx.anchors(m.at()).stream().map(VillageContext::block)
+                        .min(Comparator.comparingDouble(p -> p.distSqr(c))).orElse(c));
+            }
+            return Optional.of(c);
         }
 
         @Override
@@ -500,17 +519,28 @@ public final class BasicJobTypes {
             if (!Schedule.EVENING.equals(ctx.segment())) {
                 return List.of();
             }
+            return jobs(ctx, ctx.raining());
+        }
+
+        public static List<Job> jobs(VillageContext ctx, boolean raining) {
+            Optional<BlockPos> at = place(ctx, raining);
+            if (at.isEmpty()) {
+                return List.of();
+            }
+            BlockPos c = at.get();
+            int spread = raining ? 2 : 3;
             List<Job> out = new ArrayList<>();
-            BlockPos c = ctx.center();
             for (ResidentEntity r : ctx.residents()) {
                 if (!r.idle() || r.distanceToSqr(c.getX() + 0.5, c.getY(), c.getZ() + 0.5) < 36) {
                     continue;
                 }
-                int dx = Math.floorMod(r.getUUID().hashCode(), 7) - 3;
-                int dz = Math.floorMod(r.getUUID().hashCode() >> 8, 7) - 3;
+                int dx = Math.floorMod(r.getUUID().hashCode(), 2 * spread + 1) - spread;
+                int dz = Math.floorMod(r.getUUID().hashCode() >> 8, 2 * spread + 1) - spread;
+                // 三人里有一人坐着歇脚，其余站着聊
+                String anim = Math.floorMod(r.getUUID().hashCode() >> 4, 3) == 0 ? "sit" : "chat";
                 out.add(new Job(ctx.nextJobId(), LEISURE, VillageContext.pos(c.offset(dx, 0, dz)), "leisure:" + r.getUUID(),
-                        "", List.of(JobStep.move(), JobStep.act("chat", 200)), Map.of(), Map.of(), Set.of(), Priority.DECOR,
-                        0, true, 600, r.getUUID()));
+                        "", List.of(JobStep.move(), JobStep.act(anim, 200)), Map.of(), Map.of(), Set.of(), Priority.DECOR,
+                        0, false, 600, r.getUUID()));
             }
             return out;
         }

@@ -61,9 +61,24 @@ public class VillageAffairsScreen extends Screen {
                 .bounds(left + W - 58, top + H - 22, 50, 16).build());
     }
 
+    /**
+     * 参数以 {@code @} 开头的当语言键翻译；以 {@code @@} 开头的当语言键、并把后面所有参数都交给它（记录行：「第 N 日：」+ 一句带参数的话）。
+     */
     static Component line(AffairsView.Line l) {
-        Object[] args = l.args().stream().map(a -> a.startsWith("@") ? Component.translatable(a.substring(1)) : a).toArray();
-        return Component.translatable(l.key(), args);
+        return Component.translatable(l.key(), args(l.args()));
+    }
+
+    private static Object[] args(List<String> in) {
+        List<Object> out = new java.util.ArrayList<>();
+        for (int i = 0; i < in.size(); i++) {
+            String a = in.get(i);
+            if (a.startsWith("@@")) {
+                out.add(Component.translatable(a.substring(2), args(in.subList(i + 1, in.size()))));
+                break;
+            }
+            out.add(a.startsWith("@") ? Component.translatable(a.substring(1)) : a);
+        }
+        return out.toArray();
     }
 
     @Override
@@ -76,6 +91,13 @@ public class VillageAffairsScreen extends Screen {
         g.drawString(font, date, left + W - 8 - font.width(date), top + 7, DIM, false);
         g.drawString(font, Component.translatable("mythic_age.village.affairs.capacity", view.total(), view.capacity()),
                 left + 8, top + 20, DIM, false);
+        if (!view.notes().isEmpty()) {
+            net.minecraft.network.chat.MutableComponent notes = Component.empty();
+            for (int i = 0; i < view.notes().size(); i++) {
+                notes.append(i == 0 ? Component.empty() : Component.literal(" · ")).append(line(view.notes().get(i)));
+            }
+            g.drawString(font, notes, left + W - 8 - font.width(notes), top + 20, GOLD, false);
+        }
         int gx = left + 8;
         int gy = top + 34;
         List<AffairsView.Entry> stock = view.stock();

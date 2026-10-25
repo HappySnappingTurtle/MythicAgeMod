@@ -18,7 +18,8 @@ import java.util.TreeSet;
 
 /**
  * 一个文明的村庄经济数据 {@code village_civ/<civ>.json}（T19 设计文档 §2、§6、§9、§10.1）：
- * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存、施工折算表（§1.4 E1）。
+ * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存、施工折算表（§1.4 E1）、
+ * 交易规则（§1.8）、生活与节庆（§1.10 {@code life}）。
  * 职业与配方另有文件（{@code village_profession/<civ>/*}、{@code village_recipe/<civ>/*}）。
  */
 public record CivVillageData(String civ, String behavior, Schedule schedule, VillageCalendar calendar, int baseCapacity,
@@ -27,7 +28,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Woodland woodland, Map<String, NaturalPoint> naturalPoints, Residents residents,
                              Map<String, Integer> initialStock, Map<String, Profession> professions,
                              Map<String, VillageRecipe> recipes, BuildCosts buildCosts,
-                             io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade) {
+                             io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules trade,
+                             io.github.happysnappingturtle.mythicage.core.village.life.LifeData life) {
     /**
      * 采集点种类（建筑锚点同名）。
      *
@@ -140,7 +142,7 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
-                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade);
+                fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life);
     }
 
     /** 生成时 {@code homes} 张床的职业分配：先按 {@code initial} 的顺序，床不够就截断，多出来的是 {@code fallback}。 */
@@ -228,7 +230,9 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                 VillageRecipe.items(o, "initialStock"), Map.of(), Map.of(),
                 o.has("buildCosts") ? BuildCosts.parse(o.getAsJsonObject("buildCosts")) : BuildCosts.none(),
                 o.has("trade") ? io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.parse(o.getAsJsonObject("trade"))
-                        : io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.none());
+                        : io.github.happysnappingturtle.mythicage.core.village.trade.ResidentTradeRules.none(),
+                o.has("life") ? io.github.happysnappingturtle.mythicage.core.village.life.LifeData.parse(o.getAsJsonObject("life"))
+                        : io.github.happysnappingturtle.mythicage.core.village.life.LifeData.none());
     }
 
     public static Profession parseProfession(String id, JsonObject o) {

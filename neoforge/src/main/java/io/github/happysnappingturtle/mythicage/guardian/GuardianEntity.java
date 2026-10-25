@@ -81,6 +81,7 @@ public abstract class GuardianEntity extends PathfinderMob {
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new HoldForTradeGoal());
+        goalSelector.addGoal(2, new ErrandGoal());
         goalSelector.addGoal(2, new PanicGoal(this, 0.7));
         goalSelector.addGoal(3, new MoveTowardsRestrictionGoal(this, 0.6));
         goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.4));
@@ -117,6 +118,9 @@ public abstract class GuardianEntity extends PathfinderMob {
     }
 
     private void updateRestriction() {
+        if (errand != null) {
+            return;
+        }
         if (home != null) {
             restrictTo(home, level().isNight() ? NIGHT_RADIUS : DAY_RADIUS);
         }
@@ -160,9 +164,127 @@ public abstract class GuardianEntity extends PathfinderMob {
 
     /** 服务端播放一次手势；同一手势再次触发会从头播放。 */
     public void playGesture(GuardianGesture g) {
+        playGesture(g, gestureTicks(g));
+    }
+
+    /** 播放手势并指定时长（差事：坐诊一整天、听橡 200 刻）。 */
+    public void playGesture(GuardianGesture g, int ticks) {
         entityData.set(GESTURE, (byte) g.ordinal());
         entityData.set(GESTURE_START, tickCount);
-        gestureEndTick = tickCount + gestureTicks(g);
+        gestureEndTick = tickCount + Math.max(1, ticks);
+    }
+
+    // ───────────── 差事（T19 §1.10 J4） ─────────────
+
+    /**
+     * 一趟差事：依次走到 {@code stops}，每处播 {@code gesture} {@code ticks} 刻（到达时调用 {@code onArrive}）；
+     * {@code until} > 0 时最后一处一直待到这一刻（世界刻）。差事期间不受居所半径限制，做完回居所。不存档（纯表现）。
+     */
+    public record Errand(String tag, java.util.List<BlockPos> stops, GuardianGesture gesture, int ticks, long until,
+                         @Nullable java.util.function.BiConsumer<GuardianEntity, BlockPos> onArrive) {
+    }
+
+    @Nullable
+    private Errand errand;
+    private int errandStop;
+    private int errandWait = -1;
+    private int errandTicks;
+    private int errandRepath;
+
+    @Nullable
+    public Errand errand() {
+        return errand;
+    }
+
+    /** 正在某差事的目的地上（如神谕坐诊中）。 */
+    public boolean atErrand(String tag) {
+        return errand != null && errand.tag().equals(tag) && errandWait >= 0;
+    }
+
+    public void startErrand(Errand e) {
+        errand = e;
+        errandStop = 0;
+        errandWait = -1;
+        errandTicks = 0;
+        errandRepath = 0;
+        clearRestriction();
+        getNavigation().stop();
+    }
+
+    public void endErrand() {
+        errand = null;
+        errandWait = -1;
+        if (gesture() != GuardianGesture.NONE) {
+            entityData.set(GESTURE, (byte) GuardianGesture.NONE.ordinal());
+        }
+        updateRestriction();
+    }
+
+    /** 只供 GameTest：立刻到达当前目的地。 */
+    public void arriveForTest() {
+        if (errand != null && errandStop < errand.stops().size()) {
+            BlockPos t = errand.stops().get(errandStop);
+            teleportTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5);
+        }
+    }
+
+    private boolean near(BlockPos t) {
+        double dx = getX() - (t.getX() + 0.5);
+        double dz = getZ() - (t.getZ() + 0.5);
+        return dx * dx + dz * dz <= 2.5 * 2.5 && Math.abs(getY() - t.getY()) <= 3;
+    }
+
+    private void tickErrand() {
+        Errand e = errand;
+        if (e == null) {
+            return;
+        }
+        if (errandStop >= e.stops().size()) {
+            endErrand();
+            return;
+        }
+        BlockPos t = e.stops().get(errandStop);
+        boolean last = errandStop == e.stops().size() - 1;
+        if (errandWait < 0) {
+            if (near(t)) {
+                getNavigation().stop();
+                int ticks = e.ticks();
+                if (last && e.until() > 0) {
+                    ticks = (int) Math.max(ticks, e.until() - level().getGameTime());
+                }
+                errandWait = ticks;
+                // 循环手势（坐诊、听橡）一直做到走；一次性手势（奠酒）做完就站着待到时候
+                playGesture(e.gesture(), e.gesture().loops() ? ticks : e.ticks());
+                if (e.onArrive() != null) {
+                    e.onArrive().accept(this, t);
+                }
+                return;
+            }
+            // 走不到（20 秒没到）：附近没有玩家就直接到位，有玩家在看就跳过这一处
+            if (++errandTicks > 400) {
+                errandTicks = 0;
+                if (level().getNearestPlayer(this, 16) == null) {
+                    teleportTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5);
+                } else {
+                    errandStop++;
+                }
+                return;
+            }
+            if (--errandRepath <= 0 || getNavigation().isDone()) {
+                errandRepath = 40;
+                getNavigation().moveTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5, 1.2);
+            }
+            return;
+        }
+        getLookControl().setLookAt(t.getX() + 0.5, t.getY() + 0.5, t.getZ() + 0.5);
+        if (--errandWait <= 0) {
+            errandStop++;
+            errandWait = -1;
+            errandTicks = 0;
+            if (errandStop >= e.stops().size()) {
+                endErrand();
+            }
+        }
     }
 
     @Override
@@ -248,6 +370,33 @@ public abstract class GuardianEntity extends PathfinderMob {
 
     public GlobalPos globalHome() {
         return GlobalPos.of(level().dimension(), home != null ? home : blockPosition());
+    }
+
+    /** 差事：走过去、做手势、回居所。 */
+    private final class ErrandGoal extends Goal {
+        ErrandGoal() {
+            setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return errand != null;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return errand != null;
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void tick() {
+            tickErrand();
+        }
     }
 
     /** 有玩家打开交易界面时：停止走动，面向最近的那位。 */

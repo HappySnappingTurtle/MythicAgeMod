@@ -135,7 +135,7 @@ def theater() -> Building:
                 b.set(x, -1, z, "floor")
     b.set(cx, 0, cz, "floor")
     b.set(cx, 1, cz, "brazier", lit="true")
-    b.anchor("festival", cx, 0, cz)
+    b.anchor("orchestra", cx, 0, cz)  # 歌队场中央（节庆演出，T19 §1.10 J5）
     # 看台：圆心北侧的半圆，7 排，每排高 1、深 1，用大理石楼梯当座位；两条竖向台阶走道
     for x in range(21):
         for z in range(0, cz + 1):
@@ -185,7 +185,9 @@ def gymnasion() -> Building:
     for x in (1, L - 1):
         b.fill(x, -1, 6, x, -1, 9, "floor")
     b.anchor("training", 3, 0, 7)
-    b.anchor("festival", 12, 0, 7)
+    # 跑道两端的起跑线石条（节庆赛跑，T19 §1.10 J5）
+    b.anchor("track_start", 1, 0, 7)
+    b.anchor("track_finish", L - 1, 0, 7)
     return b
 
 
@@ -331,6 +333,7 @@ def oracle() -> Building:
     b.fill(8, -2, 0, 10, -2, 1, "step")
     b.fill(8, -1, 0, 10, -1, 1, "minecraft:water")
     b.set(10, 0, 0, "mythic_age:marble_wall")
+    b.anchor("bath", 7, 0, 1)  # 池边：神谕日问卜前沐浴（T19 §1.10 J6）
     return b
 
 
