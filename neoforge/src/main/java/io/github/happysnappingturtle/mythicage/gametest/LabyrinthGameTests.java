@@ -38,6 +38,8 @@ public final class LabyrinthGameTests {
     private static final AtomicInteger SLOT = new AtomicInteger();
     static final int FLOOR = 40;
     static final int DEPTH = 24;
+    /** 上一次 {@link #place} 里单个区块放置的最长耗时（TC-T22-81）。 */
+    static long lastMaxChunkNanos;
 
     private LabyrinthGameTests() {
     }
@@ -79,11 +81,14 @@ public final class LabyrinthGameTests {
         BoundingBox bb = start.getBoundingBox();
         ChunkPos a = new ChunkPos(SectionPos.blockToSectionCoord(bb.minX()), SectionPos.blockToSectionCoord(bb.minZ()));
         ChunkPos b = new ChunkPos(SectionPos.blockToSectionCoord(bb.maxX()), SectionPos.blockToSectionCoord(bb.maxZ()));
+        lastMaxChunkNanos = 0;
         ChunkPos.rangeClosed(a, b).forEach(c -> {
             level.getChunk(c.x, c.z);
+            long t0 = System.nanoTime();
             start.placeInChunk(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
                     new BoundingBox(c.getMinBlockX(), level.getMinBuildHeight(), c.getMinBlockZ(), c.getMaxBlockX(),
                             level.getMaxBuildHeight(), c.getMaxBlockZ()), c);
+            lastMaxChunkNanos = Math.max(lastMaxChunkNanos, System.nanoTime() - t0);
         });
         StructureInfoPiece.Info info = StructureRegistration.info(start).orElseThrow(() -> new GameTestAssertException("缺元数据件"));
         return new Placed(start, site, info);
@@ -204,6 +209,19 @@ public final class LabyrinthGameTests {
                 throw new GameTestAssertException("迷宫里有液体：" + q);
             }
         }
+        cleanup(level, p);
+        h.succeed();
+    }
+
+    /** TC-T22-81：单区块放置耗时（模板先预热一次，再量第二座）。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
+    public static void labyrinth_placement_cost(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        cleanup(level, place(h, 6, false));
+        Placed p = place(h, 7, false);
+        double ms = lastMaxChunkNanos / 1e6;
+        io.github.happysnappingturtle.mythicage.MythicAge.LOGGER.info("迷宫单区块放置最长 {} ms", String.format("%.1f", ms));
+        h.assertTrue(ms < 50, "单区块放置应 < 50 ms，实际 " + ms);
         cleanup(level, p);
         h.succeed();
     }

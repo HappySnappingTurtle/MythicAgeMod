@@ -1,0 +1,11 @@
+{
+  "structures": [{"structure": "mythic_age:knossos_near_spawn", "weight": 1}],
+  "placement": {
+    "type": "minecraft:concentric_rings",
+    "distance": 8,
+    "spread": 3,
+    "count": 1,
+    "preferred_biomes": "#mythic_age:region/greek/arcadia",
+    "salt": 22042602
+  }
+}

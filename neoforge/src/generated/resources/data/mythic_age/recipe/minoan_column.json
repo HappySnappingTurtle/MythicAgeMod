@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "D": {
+      "tag": "c:dyes/red"
+    },
+    "L": {
+      "item": "mythic_age:cypress_log"
+    }
+  },
+  "pattern": [
+    "L",
+    "D",
+    "L"
+  ],
+  "result": {
+    "count": 3,
+    "id": "mythic_age:minoan_column"
+  }
+}

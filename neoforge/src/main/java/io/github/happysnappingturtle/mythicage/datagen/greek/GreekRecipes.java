@@ -86,6 +86,23 @@ public final class GreekRecipes {
         stonecut(out, SMOOTH_MARBLE, GreekArchitecture.TRIGLYPH_FRIEZE, 1);
         stonecut(out, SMOOTH_MARBLE, GreekArchitecture.DORIC_CAPITAL, 1);
 
+        // 米诺斯构件（T22 阶段 ④，克诺索斯）：柏木原木 2 + 红色染料 1 → 米诺斯红柱 3；白灰墙 1 + 青铜锭 1 → 双斧门楣 1；
+        // 平滑大理石 1 → 圣角 1（切石）。
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, io.github.happysnappingturtle.mythicage.content.greek.ruin
+                        .GreekRuins.MINOAN_COLUMN, 3)
+                .pattern("L").pattern("D").pattern("L")
+                .define('L', io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.CYPRESS_LOG)
+                .define('D', Tags.Items.DYES_RED)
+                .unlockedBy("has_cypress_log", has(io.github.happysnappingturtle.mythicage.content.greek.GreekTrees.CYPRESS_LOG))
+                .save(out, id("minoan_column"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, io.github.happysnappingturtle.mythicage.content.greek.ruin
+                        .GreekRuins.LABRYS_LINTEL)
+                .requires(io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.PLASTER)
+                .requires(BRONZE_INGOT)
+                .unlockedBy("has_bronze_ingot", has(BRONZE_INGOT))
+                .save(out, id("labrys_lintel"));
+        stonecut(out, SMOOTH_MARBLE, io.github.happysnappingturtle.mythicage.content.greek.ruin.GreekRuins.HORNS_OF_CONSECRATION, 1);
+
         // 平滑大理石 2 + 大理石方石 1 → 爱奥尼柱头 1（希腊古典时代）。
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, GreekArchitecture.IONIC_CAPITAL)
                 .pattern("S S").pattern(" A ").define('S', SMOOTH_MARBLE).define('A', MARBLE_ASHLAR)

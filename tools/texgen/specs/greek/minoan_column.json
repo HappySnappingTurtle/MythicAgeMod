@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "block/minoan_column",
+  "size": 16,
+  "palette": {
+    "s": "#4f160f",
+    "r": "#7d2418",
+    "R": "#9a3020",
+    "l": "#b8432c",
+    "L": "#cf5a3c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "rRslRrRRlRRrRlLR",
+      "rRRlsrRRlsRrLlLR",
+      "rRRlRrRRrRRrRrRR",
+      "rRRlRrRRlRRsRlRR",
+      "rRRlRrRRlRRrRrRR",
+      "rRRlRrRRlRRrRlRR",
+      "rRRlRrRRlRRrRlRR",
+      "sRRlRrRRlRRrRlRR",
+      "rRRlRrRRLRRsRlRR",
+      "rRRlRrRRlRRrslsR",
+      "rRRlLrRRlRRrRrRR",
+      "rRRlRrRRrssrRlRR",
+      "rRRlLrRslRRrRlRR",
+      "rRRlRLRRlRRrRlLR",
+      "rRRlRrRRlRRrRlsR",
+      "rsRlRrRRlRRrRlLR"
+    ]
+  }
+}

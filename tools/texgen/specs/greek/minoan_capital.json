@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/minoan_capital",
+  "size": 16,
+  "palette": {
+    "b": "#17130f",
+    "B": "#26201b",
+    "g": "#3a322b",
+    "G": "#544940"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "GGGGGGGGGGGGGGGG",
+      "gggggggggggggggg",
+      "BBBBBBBBBBBBBBBB",
+      "bbbbbbbbbbbbbbbb",
+      "gggggggggggggggg",
+      "BBBBBBBBBBBBBBBB",
+      "BBBBBBBBBBBBBBBB",
+      "bbbbbbbbbbbbbbbb",
+      "GGGGGGGGGGGGGGGG",
+      "gggggggggggggggg",
+      "BBBBBBBBBBBBBBBB",
+      "bbbbbbbbbbbbbbbb",
+      "gggggggggggggggg",
+      "BBBBBBBBBBBBBBBB",
+      "BBBBBBBBBBBBBBBB",
+      "bbbbbbbbbbbbbbbb"
+    ]
+  }
+}

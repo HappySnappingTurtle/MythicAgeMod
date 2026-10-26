@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "mythic_age:plaster"
+    },
+    {
+      "item": "mythic_age:bronze_ingot"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:labrys_lintel"
+  }
+}

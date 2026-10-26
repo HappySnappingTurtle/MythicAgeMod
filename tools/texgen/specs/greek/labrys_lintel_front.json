@@ -1,0 +1,39 @@
+{
+  "template": "pixels",
+  "out": "block/labrys_lintel_front",
+  "size": 16,
+  "palette": {
+    "h": "#f4efe3",
+    "m": "#e6dfcf",
+    "n": "#d6cdb9",
+    "j": "#bdb29b",
+    "s": "#4f160f",
+    "r": "#7d2418",
+    "R": "#9a3020",
+    "Y": "#f0c873",
+    "y": "#cf9a45",
+    "o": "#9c6a2b",
+    "O": "#5e3d17"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "jjjjjjjjjjjjjjjj",
+      "RRRRRRrRRRRrRRRR",
+      "sssssssyosssssss",
+      "mmYhmnnoOmmhmYmh",
+      "mhyYnmnoOhmnYyhm",
+      "hmhyYmmoOhnYymhh",
+      "mhmyyYmoOmYyyhmm",
+      "mmmmyyYoOYyymmmm",
+      "hnhmyyooOoyynmnn",
+      "mnhyyohoOmoyymmm",
+      "nhmyomnoOmmoymnh",
+      "nnyomhnoOmmmoymh",
+      "mmommmmoOmmmmonm",
+      "sssssssoOsssssss",
+      "RRRRRrRRRRrRrRRr",
+      "jjjjjjjjjjjjjjjj"
+    ]
+  }
+}

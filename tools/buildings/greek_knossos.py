@@ -33,10 +33,16 @@ DADO = "mythic_age:plaster_dado"
 FLOOR = "mythic_age:smooth_marble"
 CEILING = "mythic_age:olive_planks"
 LAMP = "mythic_age:greek_oil_lamp"
-# 白模替身（阶段 ④ 换米诺斯红柱、双斧门楣、圣角）
-MINOAN_COLUMN = "minecraft:red_terracotta"
-LABRYS = "minecraft:gold_block"
-HORNS = "minecraft:smooth_quartz_stairs"
+# 米诺斯构件（阶段 ④ 的正式方块，模型见 tools/models/greek_minoan.py）
+MINOAN_COLUMN = "mythic_age:minoan_column"
+LABRYS = "mythic_age:labrys_lintel"
+HORNS = "mythic_age:horns_of_consecration"
+
+
+def column_part(i: int, h: int) -> str:
+    """红柱第 i 段（自下而上，共 h 段）的状态：结构放置不会按邻格更新 part，模板里要写对。"""
+    part = "single" if h == 1 else ("bottom" if i == 0 else ("top" if i == h - 1 else "middle"))
+    return f"{MINOAN_COLUMN}[part={part}]"
 
 
 class Solid:
@@ -160,11 +166,12 @@ def antechamber(mask: int) -> Building:
         s.carve(2, 0, 7, 4, 3, 7)
     if mask & ANTE_S4:
         s.carve(10, 0, 7, 12, 3, 7)
-    # 门两侧的红柱（白模替身）与门上的双斧
+    # 门两侧的红柱，北墙上门两边各一块双斧门楣（朝南，对着前室）
     for x in (5, 11):
         for y in range(0, 5):
-            s.put(x, y, 1, MINOAN_COLUMN)
-    s.put(8, 4, 1, LABRYS)
+            s.put(x, y, 1, column_part(y, 5))
+    for x in (3, 13):
+        s.put(x, 2, 0, f"{LABRYS}[facing=south]")
     s.put(1, 0, 6, LAMP)
     s.put(14, 0, 6, LAMP)
     b = s.build(f"knossos_antechamber_{mask}", f"牛首门前室（开口 {mask}）")
@@ -236,7 +243,8 @@ def vault_room() -> Building:
         s.put(x, 0, 6, LAMP)
     for x in (5, 11):
         for y in range(0, 5):
-            s.put(x, y, 1, MINOAN_COLUMN)
+            s.put(x, y, 1, column_part(y, 5))
+    s.put(8, 2, 0, f"{LABRYS}[facing=south]")  # 宝库后墙上的双斧
     b = s.build("knossos_vault", "迷宫宝库房")
     b.anchor("vault", 8, 0, 2)
     b.anchor("loot", 3, 0, 1)
@@ -270,16 +278,17 @@ def surface_ruin() -> Building:
         for y in range(h):
             b.set(0, y, i, DADO if y == 0 else WALL)
             b.set(i, y, w - 1, DADO if y == 0 else WALL)
-    # 北面的双斧门：两根红柱（4 高）+ 门楣 + 双斧
+    # 北面的双斧门：两根红柱（4 高）+ 门楣（正中一块双斧门楣，朝外）
     for x in (9, 13):
         for y in range(4):
-            b.set(x, y, 1, MINOAN_COLUMN)
+            b.set(x, y, 1, column_part(y, 4))
     for x in range(9, 14):
         b.set(x, 4, 1, "mythic_age:smooth_marble")
-    b.set(11, 5, 1, LABRYS)
-    # 圣角：立在残墙高处与门楣上（远处看得见）
-    for x, y, z in ((0, 3, 1), (0, 3, 8), (17, 3, 22), (10, 5, 1), (12, 5, 1)):
-        b.set(x, y, z, HORNS, facing="north", half="bottom")
+    b.set(11, 4, 1, LABRYS, facing="north")
+    # 圣角：立在残墙高处与门楣上（远处看得见）；两角顺着墙的走向排开
+    for x, y, z, f in ((0, 3, 1, "east"), (0, 3, 8, "east"), (17, 3, 22, "north"), (10, 5, 1, "north"),
+                       (12, 5, 1, "north")):
+        b.set(x, y, z, HORNS, facing=f)
     # 东侧宽缓台阶（剧场式台阶的残段）
     for i in range(4):
         for z in range(4, 18):

@@ -4,6 +4,7 @@
     "type": "minecraft:random_spread",
     "spacing": 80,
     "separation": 24,
-    "salt": 22042601
+    "salt": 22042601,
+    "exclusion_zone": {"other_set": "mythic_age:labyrinth_near_spawn", "chunk_count": 10}
   }
 }

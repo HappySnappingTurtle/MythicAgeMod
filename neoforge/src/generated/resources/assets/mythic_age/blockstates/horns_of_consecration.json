@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "alt=false,facing=east": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 90
+    },
+    "alt=false,facing=north": {
+      "model": "mythic_age:block/horns_of_consecration"
+    },
+    "alt=false,facing=south": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 180
+    },
+    "alt=false,facing=west": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 270
+    },
+    "alt=true,facing=east": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 90
+    },
+    "alt=true,facing=north": {
+      "model": "mythic_age:block/horns_of_consecration"
+    },
+    "alt=true,facing=south": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 180
+    },
+    "alt=true,facing=west": {
+      "model": "mythic_age:block/horns_of_consecration",
+      "y": 270
+    }
+  }
+}

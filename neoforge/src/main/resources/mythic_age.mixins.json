@@ -6,6 +6,7 @@
   "mixins": [
     "BaseSpawnerMixin",
     "BellBlockMixin",
+    "ChunkGeneratorStructureStateMixin",
     "CraftingMenuMixin",
     "LivingEntityHurtByPlayerAccessor",
     "LivingEntityJumpingAccessor",

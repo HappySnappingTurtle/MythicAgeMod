@@ -100,4 +100,17 @@ class MazePlannerTest {
         assertEquals(MazePlanner.plan(42), MazePlanner.plan(42), "同种子同迷宫");
         assertFalse(MazePlanner.plan(42).open().equals(MazePlanner.plan(43).open()), "不同种子不同");
     }
+
+    @Test
+    void tc81PlanningIsCheap() {
+        for (int i = 0; i < 200; i++) {
+            MazePlanner.plan(i);
+        }
+        long t0 = System.nanoTime();
+        for (int i = 0; i < 1000; i++) {
+            MazePlanner.plan(10_000 + i);
+        }
+        double ms = (System.nanoTime() - t0) / 1e6 / 1000;
+        assertTrue(ms < 1.0, "每座规划应 < 1 ms，实际平均 " + ms + " ms");
+    }
 }

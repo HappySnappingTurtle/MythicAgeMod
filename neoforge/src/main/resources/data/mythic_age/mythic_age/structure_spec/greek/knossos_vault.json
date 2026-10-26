@@ -44,14 +44,15 @@
   },
   "materials": {
     "minecraft:tuff": 617,
-    "mythic_age:plaster": 148,
+    "mythic_age:plaster": 147,
     "mythic_age:smooth_marble": 87,
     "mythic_age:olive_planks": 87,
     "mythic_age:plaster_dado": 37,
-    "minecraft:red_terracotta": 10,
+    "mythic_age:minoan_column": 10,
     "mythic_age:pithos": 2,
     "mythic_age:greek_oil_lamp": 2,
     "minecraft:chest": 2,
-    "mythic_age:ruin_vault": 1
+    "mythic_age:ruin_vault": 1,
+    "mythic_age:labrys_lintel": 1
   }
 }

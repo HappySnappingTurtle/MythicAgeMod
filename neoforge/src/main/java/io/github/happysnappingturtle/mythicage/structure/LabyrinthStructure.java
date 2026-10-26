@@ -10,7 +10,14 @@ import io.github.happysnappingturtle.mythicage.core.structure.MazePlanner.Room;
 import io.github.happysnappingturtle.mythicage.core.structure.SiteRules;
 import io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec;
 import io.github.happysnappingturtle.mythicage.core.village.gen.Pos;
+import io.github.happysnappingturtle.mythicage.MythicAge;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.QuartPos;
+import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -33,6 +40,10 @@ import java.util.OptionalInt;
  *   <li>迷宫地面 = 台阶顶的地表 − {@code depth}（默认 24），夹在 −40 与海平面 − 8 之间；夹取后深度变了，台阶顶的位置也变，
  *       重新采样，差 {@value #DEPTH_TOLERANCE} 级以内就接受，最多 {@value #SITE_ITERATIONS} 次（有界）；</li>
  *   <li>地表残迹（模板，轻整地）的中庭接台阶出口；台阶顶 3 × 3 采样起伏 ≤ {@code max_relief}、不在水里才生成；</li>
+ *   <li>选址候选：起点区块与周围 {@code search} 圈区块（默认 3 × 3，有界），按离起点的远近依次试，第一个合格的用；</li>
+ *   <li>{@code flatten_fallback}（近出生点那座，§5.5）：都不合格时取不在水里、起伏最小的候选，地表取中位数，
+ *       残迹照常轻整地（削掉压在上面的山、补坑、外圈削成缓坡）；全在水里就放弃并记日志；</li>
+ *   <li>{@code preferred_biomes}：落点不在其中时记一条「降级」日志（结构本身的群系条件放宽到任意陆地）；</li>
  *   <li>不旋转（大厅入口固定朝南）。</li>
  * </ul>
  */
@@ -47,7 +58,11 @@ public final class LabyrinthStructure extends Structure {
             Codec.STRING.fieldOf("prefix").forGetter(s -> s.prefix),
             Codec.STRING.fieldOf("kind").forGetter(s -> s.kind),
             Codec.INT.optionalFieldOf("max_relief", 6).forGetter(s -> s.maxRelief),
-            Codec.INT.optionalFieldOf("depth", 24).forGetter(s -> s.depth)
+            Codec.INT.optionalFieldOf("depth", 24).forGetter(s -> s.depth),
+            Codec.intRange(0, 2).optionalFieldOf("search", 1).forGetter(s -> s.search),
+            Codec.BOOL.optionalFieldOf("flatten_fallback", false).forGetter(s -> s.flattenFallback),
+            RegistryCodecs.homogeneousList(Registries.BIOME).optionalFieldOf("preferred_biomes")
+                    .forGetter(s -> s.preferredBiomes)
     ).apply(i, LabyrinthStructure::new));
 
     /** 模块前缀，如 {@code greek:knossos}（模块 id = 前缀 + _corridor_5 等）。 */
@@ -55,13 +70,21 @@ public final class LabyrinthStructure extends Structure {
     private final String kind;
     private final int maxRelief;
     private final int depth;
+    /** 选址时向外找几圈区块（1 = 3 × 3）。 */
+    private final int search;
+    private final boolean flattenFallback;
+    private final Optional<HolderSet<Biome>> preferredBiomes;
 
-    public LabyrinthStructure(StructureSettings settings, String prefix, String kind, int maxRelief, int depth) {
+    public LabyrinthStructure(StructureSettings settings, String prefix, String kind, int maxRelief, int depth, int search,
+                              boolean flattenFallback, Optional<HolderSet<Biome>> preferredBiomes) {
         super(settings);
         this.prefix = prefix;
         this.kind = kind;
         this.maxRelief = maxRelief;
         this.depth = depth;
+        this.search = search;
+        this.flattenFallback = flattenFallback;
+        this.preferredBiomes = preferredBiomes;
     }
 
     @Override
@@ -75,41 +98,98 @@ public final class LabyrinthStructure extends Structure {
 
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
-        int gx = ctx.chunkPos().getMiddleBlockX() - GRID / 2;
-        int gz = ctx.chunkPos().getMiddleBlockZ() - GRID / 2;
-        Optional<Site> site = site(ctx, gx, gz);
-        if (site.isEmpty() || StructureSpecs.get(prefix + "_surface").isEmpty()) {
+        if (StructureSpecs.get(prefix + "_surface").isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Site> site = Optional.empty();
+        Sample flattest = null;
+        for (int[] off : candidates(search)) {
+            int gx = ctx.chunkPos().getMiddleBlockX() + off[0] * 16 - GRID / 2;
+            int gz = ctx.chunkPos().getMiddleBlockZ() + off[1] * 16 - GRID / 2;
+            site = site(ctx, gx, gz);
+            if (site.isPresent()) {
+                break;
+            }
+            if (flattenFallback) {
+                Sample sm = sample(ctx, gx, gz, depth);
+                if (!sm.wet() && (flattest == null || SiteRules.relief(sm.heights()) < SiteRules.relief(flattest.heights()))) {
+                    flattest = sm;
+                }
+            }
+        }
+        if (site.isEmpty() && flattest != null) {
+            // 整地版：地表取中位数，残迹的轻整地把坡削平
+            int surface = SiteRules.floor(flattest.heights(), false, Integer.MAX_VALUE).orElseThrow();
+            int floor = SiteRules.mazeFloor(surface, depth, ctx.chunkGenerator().getSeaLevel());
+            site = Optional.of(new Site(flattest.gx(), flattest.gz(), floor, surface - floor));
+            MythicAge.LOGGER.info("迷宫 {}（区块 {}）周围没有起伏 ≤ {} 的地，取最平的一处（起伏 {}）整地", kind, ctx.chunkPos(),
+                    maxRelief, SiteRules.relief(flattest.heights()));
+        }
+        if (site.isEmpty()) {
+            if (flattenFallback) {
+                MythicAge.LOGGER.warn("迷宫 {}（区块 {}）周围都在水里，放弃这一处", kind, ctx.chunkPos());
+            }
             return Optional.empty();
         }
         long seed = ctx.random().nextLong();
         Site s = site.get();
-        return Optional.of(new GenerationStub(new BlockPos(gx + 3, s.floor() + s.depth(), gz + GRID + s.depth()),
+        BlockPos top = new BlockPos(s.gx() + 3, s.floor() + s.depth(), s.gz() + GRID + s.depth());
+        preferredBiomes.ifPresent(pref -> {
+            Holder<Biome> biome = ctx.biomeSource().getNoiseBiome(QuartPos.fromBlock(top.getX()), QuartPos.fromBlock(top.getY()),
+                    QuartPos.fromBlock(top.getZ()), ctx.randomState().sampler());
+            if (!pref.contains(biome)) {
+                MythicAge.LOGGER.info("迷宫 {} 降级：落在 {}（{}），不在偏好群系", kind, top,
+                        biome.unwrapKey().map(k -> k.location().toString()).orElse("?"));
+            }
+        });
+        return Optional.of(new GenerationStub(top,
                 builder -> addPieces(builder, ctx.structureTemplateManager(), s, MazePlanner.plan(seed))));
+    }
+
+    /** 候选区块偏移：起点区块在前，再按离起点的远近（同距离按 z、x）排；共 (2r + 1)² 个。 */
+    static List<int[]> candidates(int r) {
+        List<int[]> out = new ArrayList<>();
+        for (int dz = -r; dz <= r; dz++) {
+            for (int dx = -r; dx <= r; dx++) {
+                out.add(new int[]{dx, dz});
+            }
+        }
+        out.sort(java.util.Comparator.comparingInt(o -> Math.abs(o[0]) + Math.abs(o[1])));
+        return out;
+    }
+
+    /** 台阶顶（地表）3 × 3 采样：地表高度与中心是否在水里。 */
+    record Sample(int gx, int gz, int[] heights, boolean wet) {
+    }
+
+    static Sample sample(GenerationContext ctx, int gx, int gz, int d) {
+        int topX = gx + 3;
+        int topZ = gz + GRID + d;
+        int[] hs = new int[9];
+        boolean wet = false;
+        int n = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int x = topX + i * 8;
+                int z = topZ + j * 8;
+                int top = ctx.chunkGenerator().getFirstFreeHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, ctx.heightAccessor(),
+                        ctx.randomState());
+                if (i == 0 && j == 0) {
+                    wet = SiteRules.wet(top, ctx.chunkGenerator().getFirstFreeHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG,
+                            ctx.heightAccessor(), ctx.randomState()));
+                }
+                hs[n++] = top;
+            }
+        }
+        return new Sample(gx, gz, hs, wet);
     }
 
     /** 台阶顶（地表）采样：夹取后深度变了就挪到新的台阶顶再采，最多 {@value #SITE_ITERATIONS} 次。 */
     Optional<Site> site(GenerationContext ctx, int gx, int gz) {
         int d = depth;
         for (int it = 0; it < SITE_ITERATIONS; it++) {
-            int topX = gx + 3;
-            int topZ = gz + GRID + d;
-            int[] hs = new int[9];
-            boolean wet = false;
-            int n = 0;
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    int x = topX + i * 8;
-                    int z = topZ + j * 8;
-                    int top = ctx.chunkGenerator().getFirstFreeHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, ctx.heightAccessor(),
-                            ctx.randomState());
-                    if (i == 0 && j == 0) {
-                        wet = SiteRules.wet(top, ctx.chunkGenerator().getFirstFreeHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG,
-                                ctx.heightAccessor(), ctx.randomState()));
-                    }
-                    hs[n++] = top;
-                }
-            }
-            OptionalInt surface = SiteRules.floor(hs, wet, maxRelief);
+            Sample sm = sample(ctx, gx, gz, d);
+            OptionalInt surface = SiteRules.floor(sm.heights(), sm.wet(), maxRelief);
             if (surface.isEmpty()) {
                 return Optional.empty();
             }

@@ -1,0 +1,30 @@
+{
+  "template": "pixels",
+  "out": "block/labrys_bronze",
+  "size": 16,
+  "palette": {
+    "y": "#cf9a45",
+    "o": "#9c6a2b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ooyoyyoooooyoyoy",
+      "oyyyyoyyyyoyyoyo",
+      "yyoooyyooyyyoyyo",
+      "yoyoyoyyooyyyooo",
+      "oyoyyyyooyyyyyyy",
+      "yyooyyyooyyyyoyy",
+      "yooyoyoyoooyyyoy",
+      "yooyyoyyyyyyyoyy",
+      "yyyyoyooyoyyyyyy",
+      "oyyyyyyyooyyyyyy",
+      "yyyoyyyyyyyyoyoy",
+      "yyyyyoyooyyyyyyy",
+      "yoyyyyoyyyyoyyyy",
+      "ooyoyyyyyyyyoyoy",
+      "yyoyoyoyyyyyyyyy",
+      "yyyyoyyyoyyyooyo"
+    ]
+  }
+}

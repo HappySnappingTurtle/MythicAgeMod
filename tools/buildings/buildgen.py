@@ -70,6 +70,7 @@ B = {
 
 # 平面图配色（按方块分类）
 CATEGORY = [
+    ("米诺斯红柱 / 双斧 / 圣角", ("minoan_column", "labrys", "horns_of"), (160, 45, 30)),
     ("柱", ("column", "capital"), (236, 232, 222)),
     ("台基 / 地面", ("polished_marble", "marble_ashlar", "mosaic"), (200, 196, 186)),
     ("大理石墙", ("smooth_marble",), (222, 218, 205)),

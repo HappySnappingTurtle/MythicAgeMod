@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "block/horns_of_consecration",
+  "size": 16,
+  "palette": {
+    "h": "#f4efe3",
+    "m": "#e6dfcf",
+    "n": "#d6cdb9",
+    "j": "#bdb29b"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "mmjmmmnmhjmmnmmm",
+      "mmmmmhmmmnnhmmmn",
+      "mmmmmnmmmmmnmmmm",
+      "nmmjhhnmmmmhmhmm",
+      "mmmmmmmhhnmmhmmm",
+      "nnmmmmmmmmhmmmmm",
+      "nmhmnhmhnmmjmhmm",
+      "mhmhnhhmnhmmmjmm",
+      "mhjnnmmmjhmhmmnh",
+      "mmmmhmmnmnmmmmhm",
+      "nhhmmhnmmmhnmhnn",
+      "mhmnmnmmmhmhmmnj",
+      "mmnmmhhmmmmmmmmm",
+      "mmmhmhmmhmmhmmhh",
+      "mnmmnhnmmmmhmmnm",
+      "nnjmjmnmhjmmmmmm"
+    ]
+  }
+}

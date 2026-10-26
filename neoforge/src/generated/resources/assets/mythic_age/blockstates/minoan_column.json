@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=bottom": {
+      "model": "mythic_age:block/minoan_column_bottom"
+    },
+    "part=middle": {
+      "model": "mythic_age:block/minoan_column_middle"
+    },
+    "part=single": {
+      "model": "mythic_age:block/minoan_column_single"
+    },
+    "part=top": {
+      "model": "mythic_age:block/minoan_column_top"
+    }
+  }
+}
