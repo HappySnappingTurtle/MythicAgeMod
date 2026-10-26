@@ -1,0 +1,6 @@
+{
+  "_doc": "废弃神殿后殿宝库（T22 §4.4）：每名玩家一份——圣物 1 件（池里优先给没拿过的；01_希腊 §9 标「废弃神殿（池）」的 5 件里阶段 A 只做了这 2 件）+ 战利品一份。图纸属于锻造系统（阶段 B），先留空。",
+  "relics": ["mythic_age:rheia_crown", "mythic_age:pygmalion_statue"],
+  "loot": "mythic_age:chests/greek/abandoned_temple_vault",
+  "blueprint": null
+}

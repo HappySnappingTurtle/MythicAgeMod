@@ -73,6 +73,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.wild.greek.GreekWild.init(modBus);
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
+        io.github.happysnappingturtle.mythicage.structure.RuinVaults.init();
         io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment.init(modBus);
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
@@ -82,6 +83,7 @@ public final class MythicAge {
         ModEntities.init(modBus);
         ModRegistries.register(modBus);
         io.github.happysnappingturtle.mythicage.village.gen.ModStructures.register(modBus);
+        io.github.happysnappingturtle.mythicage.structure.MythStructures.register(modBus);
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.register(modBus);
         io.github.happysnappingturtle.mythicage.power.PowerItems.register(modBus);
         io.github.happysnappingturtle.mythicage.relic.RelicItems.register(modBus);
@@ -146,6 +148,11 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onChunkLoad);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerStopped);
+        // T22 遗迹与迷宫：生成即登记、遗迹宝库表
+        game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onChunkLoad);
+        game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.structure.RuinVaults::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
         // 居民框架（T19）

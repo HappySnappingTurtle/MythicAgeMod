@@ -93,6 +93,10 @@ CATEGORY = [
     ("铜鼎", ("tripod", "cauldron"), (120, 100, 70)),
     ("打谷场", ("threshing_floor",), (180, 170, 150)),
     ("黑石", ("blackstone",), (50, 48, 55)),
+    ("倒地柱段", ("marble_pillar",), (205, 200, 185)),
+    ("碎石", ("cobblestone", "marble_rubble"), (105, 105, 100)),
+    ("宝库 / 箱子", ("barrel", "chest", "ruin_vault"), (200, 120, 30)),
+    ("苔藓", ("moss",), (95, 125, 55)),
 ]
 
 

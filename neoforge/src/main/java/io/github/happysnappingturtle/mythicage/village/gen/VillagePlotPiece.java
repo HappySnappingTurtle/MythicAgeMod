@@ -1,5 +1,7 @@
 package io.github.happysnappingturtle.mythicage.village.gen;
 
+import io.github.happysnappingturtle.mythicage.structure.TerrainOps;
+
 import io.github.happysnappingturtle.mythicage.core.village.gen.Box;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

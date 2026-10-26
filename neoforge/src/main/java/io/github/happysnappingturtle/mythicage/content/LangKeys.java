@@ -778,9 +778,16 @@ public final class LangKeys {
         add("mythic_age.village.log.founded_by", "%s 点燃灶火立城，供奉%s", "%s kindled the hearth and founded the city under %s", "%sがかまどに火を灯し、%sを祀る町を興した");
         add("mythic_age.village.short.space", "需要空地：附近找不到能盖%s的平地", "Needs open ground: no flat site nearby for %s", "空き地が必要：%sを建てられる平地が近くにない");
         quests();
+        structures();
     }
 
     /** NPC 任务（T21）：委托页、标题、状态、结果、提示、记录。 */
+    private static void structures() {
+        add("mythic_age.vault.opened", "宝库打开了，东西放进了你的背包", "The vault opens; its contents go into your pack", "宝庫が開いた。中身は持ち物に入った");
+        add("mythic_age.vault.already", "你已经开过这座宝库了", "You've already opened this vault", "この宝庫はもう開けている");
+        add("mythic_age.vault.empty", "宝库是空的", "The vault is empty", "宝庫は空だ");
+    }
+
     private static void quests() {
         add("mythic_age.village.log.quest_posted", "发出委托：%s", "Posted a request: %s", "依頼を出した：%s");
         add("mythic_age.quest.title.supply.project", "为%s备料：%s", "Materials for %s: %s", "%sの資材：%s");

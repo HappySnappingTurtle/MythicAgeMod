@@ -1,4 +1,4 @@
-package io.github.happysnappingturtle.mythicage.village.gen;
+package io.github.happysnappingturtle.mythicage.structure;
 
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import net.minecraft.core.BlockPos;
@@ -8,39 +8,39 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-/** 地形工序共用的小工具（V0 §3.7，T13b §4.3）。只在调用方给定的区块范围内写方块。 */
-final class TerrainOps {
+/** 地形工序共用的小工具（V0 §3.7，T13b §4.3；T22 起村庄与遗迹共用）。只在调用方给定的区块范围内写方块。 */
+public final class TerrainOps {
     /** 地基、整平最多向下补多少格。 */
-    static final int MAX_FILL = 12;
+    public static final int MAX_FILL = 12;
     /** 建筑顶上的山体最多削多少格。 */
-    static final int MAX_CUT = 10;
+    public static final int MAX_CUT = 10;
 
     private TerrainOps() {
     }
 
     /** 能被地基 / 填土覆盖的格：空气、可替换的植物、液体。 */
-    static boolean fillable(BlockState s) {
+    public static boolean fillable(BlockState s) {
         return s.isAir() || s.canBeReplaced() || !s.getFluidState().isEmpty();
     }
 
     /** 自然地面（可以铺路、削平的）：土、草、石、沙、砾、雪。 */
-    static boolean natural(BlockState s) {
+    public static boolean natural(BlockState s) {
         return s.is(BlockTags.DIRT) || s.is(BlockTags.BASE_STONE_OVERWORLD) || s.is(BlockTags.SAND)
                 || s.is(Blocks.GRAVEL) || s.is(Blocks.SNOW_BLOCK) || s.is(Blocks.CLAY) || s.is(BlockTags.TERRACOTTA);
     }
 
     /** 可以清掉的自然物：自然地面 + 树木 + 植物。 */
-    static boolean clearable(BlockState s) {
+    public static boolean clearable(BlockState s) {
         return natural(s) || s.is(BlockTags.LOGS) || s.is(BlockTags.LEAVES) || s.canBeReplaced();
     }
 
     /** 地表最上面一个方块的 y（含水面与树叶）。 */
-    static int top(WorldGenLevel level, int x, int z) {
+    public static int top(WorldGenLevel level, int x, int z) {
         return level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) - 1;
     }
 
     /** 从 y 往下补到实心地面（≤ MAX_FILL 格）；top 是最上面一格用的方块。 */
-    static void fillDown(WorldGenLevel level, BlockPos.MutableBlockPos p, int x, int y, int z, BlockState topState,
+    public static void fillDown(WorldGenLevel level, BlockPos.MutableBlockPos p, int x, int y, int z, BlockState topState,
                          BlockState body) {
         for (int yy = y; yy >= y - MAX_FILL; yy--) {
             BlockState s = level.getBlockState(p.set(x, yy, z));
@@ -51,16 +51,16 @@ final class TerrainOps {
         }
     }
 
-    static BlockState polygonal() {
+    public static BlockState polygonal() {
         return GreekMaterials.POLYGONAL_MARBLE.get().defaultBlockState();
     }
 
     /** 预留地块四角的界石（T13b 阶段 ③ 换装：原先用大理石墙柱替身）。 */
-    static BlockState marker() {
+    public static BlockState marker() {
         return io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.BOUNDARY_STONE.get().defaultBlockState();
     }
 
-    static BlockState coping() {
+    public static BlockState coping() {
         return GreekMaterials.MARBLE_ASHLAR.get().defaultBlockState();
     }
 
@@ -68,13 +68,13 @@ final class TerrainOps {
      * 占地外一圈（距离 1..margin）：高处比地面高 ≥ 2 格时在距离 1 处砌挡土墙（≤ maxWall 格高，方石压顶）；
      * 低处按 1:1 培土成缓坡。floor 是地面上第一格的 y。
      */
-    static void ring(WorldGenLevel level, net.minecraft.world.level.levelgen.structure.BoundingBox chunkBox,
+    public static void ring(WorldGenLevel level, net.minecraft.world.level.levelgen.structure.BoundingBox chunkBox,
                      int minX, int minZ, int maxX, int maxZ, int floor, int margin, int maxWall) {
         ring(level, chunkBox, minX, minZ, maxX, maxZ, floor, margin, maxWall, true);
     }
 
     /** walls = false（预留地块）：高处不砌墙，按 1:1 削成缓坡。 */
-    static void ring(WorldGenLevel level, net.minecraft.world.level.levelgen.structure.BoundingBox chunkBox,
+    public static void ring(WorldGenLevel level, net.minecraft.world.level.levelgen.structure.BoundingBox chunkBox,
                      int minX, int minZ, int maxX, int maxZ, int floor, int margin, int maxWall, boolean walls) {
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         BlockState grass = Blocks.GRASS_BLOCK.defaultBlockState();

@@ -5,7 +5,7 @@ import io.github.happysnappingturtle.mythicage.content.ModTags;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
-import io.github.happysnappingturtle.mythicage.worldgen.ModWorldGen;
+import io.github.happysnappingturtle.mythicage.content.greek.worldgen.GreekWorldGen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -62,7 +62,7 @@ public final class WorldGenGameTests {
         RegistryOps<com.google.gson.JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, access);
         record Case(ResourceKey<PlacedFeature> key, int min, int max) {
         }
-        for (Case c : List.of(new Case(ModWorldGen.TIN_ORE_PLACED, 0, 80), new Case(ModWorldGen.MARBLE_PLACED, 40, 120))) {
+        for (Case c : List.of(new Case(GreekWorldGen.TIN_ORE_PLACED, 0, 80), new Case(GreekWorldGen.MARBLE_PLACED, 40, 120))) {
             PlacedFeature pf = placed.getOrThrow(c.key());
             String json = PlacedFeature.DIRECT_CODEC.encodeStart(ops, pf).getOrThrow().toString();
             helper.assertTrue(json.contains("\"min_inclusive\":{\"absolute\":" + c.min() + "}")
@@ -76,7 +76,7 @@ public final class WorldGenGameTests {
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
     public static void biome_modifiers(GameTestHelper helper) {
         Registry<BiomeModifier> mods = helper.getLevel().registryAccess().registryOrThrow(NeoForgeRegistries.Keys.BIOME_MODIFIERS);
-        for (var key : List.of(ModWorldGen.ADD_TIN_ORE, ModWorldGen.ADD_MARBLE)) {
+        for (var key : List.of(GreekWorldGen.ADD_TIN_ORE, GreekWorldGen.ADD_MARBLE)) {
             BiomeModifier m = mods.getOrThrow(key);
             helper.assertTrue(m instanceof BiomeModifiers.AddFeaturesBiomeModifier, key.location() + " 类型");
             var biomes = ((BiomeModifiers.AddFeaturesBiomeModifier) m).biomes();
@@ -99,7 +99,7 @@ public final class WorldGenGameTests {
             }
         }
         ConfiguredFeature<?, ?> feature = level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE)
-                .getOrThrow(ModWorldGen.TIN_ORE_CONFIGURED);
+                .getOrThrow(GreekWorldGen.TIN_ORE_CONFIGURED);
         boolean found = false;
         for (int seed = 0; seed < 20 && !found; seed++) {
             feature.place(level, level.getChunkSource().getGenerator(), RandomSource.create(seed),

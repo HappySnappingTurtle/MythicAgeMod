@@ -1,0 +1,21 @@
+{
+  "__comment": "遗迹宝库（T22 阶段 ①，临时外观）：大理石基座上的青铜箱；阶段 ② 换正式模型",
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/greek_statue_bronze",
+    "base": "mythic_age:block/marble_ashlar",
+    "bronze": "mythic_age:block/greek_statue_bronze"
+  },
+  "elements": [
+    {"from": [0, 0, 0], "to": [16, 4, 16], "faces": {
+      "down": {"texture": "#base", "cullface": "down"}, "up": {"texture": "#base"},
+      "north": {"texture": "#base", "cullface": "north"}, "south": {"texture": "#base", "cullface": "south"},
+      "west": {"texture": "#base", "cullface": "west"}, "east": {"texture": "#base", "cullface": "east"}}},
+    {"from": [2, 4, 3], "to": [14, 13, 13], "faces": {
+      "up": {"texture": "#bronze"}, "north": {"texture": "#bronze"}, "south": {"texture": "#bronze"},
+      "west": {"texture": "#bronze"}, "east": {"texture": "#bronze"}}},
+    {"from": [1.5, 13, 2.5], "to": [14.5, 14, 13.5], "faces": {
+      "up": {"texture": "#bronze"}, "down": {"texture": "#bronze"}, "north": {"texture": "#bronze"}, "south": {"texture": "#bronze"},
+      "west": {"texture": "#bronze"}, "east": {"texture": "#bronze"}}}
+  ]
+}
