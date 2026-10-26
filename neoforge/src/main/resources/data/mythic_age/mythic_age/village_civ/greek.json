@@ -963,5 +963,42 @@
     "seedKit": {
       "greek:hoplite": "simple"
     }
+  },
+  "quests": {
+    "_doc": "NPC 委托（T21 设计文档 §1.4、§10.2）：单价 = 本村居民买卖这件东西的价（收购价或出售价，每件折算），交委托不比卖给收购者更赚；没登记的（修缮用的单块方块）按大宗料 16 件 1 绿宝石。锡锭靠进口与捐赠（V3-希腊-居民 H7），缺了就发委托，定量 3 同青铜匠一次收购的量。",
+    "supplyItems": {
+      "mythic_age:tin_ingot": 3
+    },
+    "prices": {
+      "default": 0.0625,
+      "mythic_age:tin_ingot": 0.33333,
+      "mythic_age:marble_ashlar": 0.125,
+      "mythic_age:polished_marble": 0.125,
+      "mythic_age:marble_column": 0.25,
+      "mythic_age:polygonal_marble": 0.0625,
+      "mythic_age:marble": 0.0625,
+      "mythic_age:terracotta_roof_tiles": 0.125,
+      "mythic_age:ceramic_component": 0.25,
+      "minecraft:clay_ball": 0.0625,
+      "minecraft:white_wool": 0.25,
+      "minecraft:wheat": 0.05,
+      "#planks": 0.0625,
+      "#logs": 0.125,
+      "mythic_age:olive_flatbread": 0.16666,
+      "minecraft:bread": 0.16666,
+      "mythic_age:greek_travel_meal": 0.33333,
+      "mythic_age:grape_platter": 0.5,
+      "minecraft:cooked_cod": 0.08333,
+      "minecraft:cooked_salmon": 0.08333
+    },
+    "repairPrice": 0.125,
+    "escortReward": 3,
+    "rescueReward": 0,
+    "contribution": {
+      "item": 1,
+      "repairCell": 1,
+      "escort": 5,
+      "rescue": 3
+    }
   }
 }

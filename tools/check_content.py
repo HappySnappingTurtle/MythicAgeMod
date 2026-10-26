@@ -496,9 +496,38 @@ def run(root: Path, design: Path | None) -> Report:
     check_relics(paths, report)
     check_village_buildings(paths, report)
     check_village_anims(paths, report)
+    check_village_dialogue(paths, report)
     check_equipment(root, report)
     check_rigs(root, report)
     return report
+
+
+def check_village_dialogue(paths: Paths, report: Report) -> None:
+    """有缺料条件（shortWhen）的居民职业，三语都要有「本职缺料」与「委托」两句（T21 阶段 ④：缺料时有对应委托就说「委托」，
+    没有就说「本职缺料」；少了键，游戏里只显示键名）。键：mythic_age.village.say.<文明>.<职业>.short / .quest。"""
+    langs = {}
+    for loc in LOCALES:
+        merged = {}
+        for a in paths.assets():
+            f = a / "lang" / f"{loc}.json"
+            if f.exists():
+                merged.update(json.loads(f.read_text(encoding="utf-8")))
+        langs[loc] = merged
+    for d in paths.data():
+        for f in sorted(d.glob(f"{MOD}/{MOD}/village_profession/*/*.json")):
+            try:
+                prof = json.loads(f.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            w = prof.get("shortWhen") or {}
+            if not (w.get("items") or w.get("food") or w.get("point")):
+                continue
+            civ, name = f.parent.name, f.stem
+            for suffix in ("short", "quest"):
+                key = f"{MOD}.village.say.{civ}.{name}.{suffix}"
+                for loc in LOCALES:
+                    if key not in langs[loc]:
+                        report.error(f"{f.relative_to(d)}：缺 {loc} 的对话 {key}")
 
 
 def check_village_anims(paths: Paths, report: Report) -> None:

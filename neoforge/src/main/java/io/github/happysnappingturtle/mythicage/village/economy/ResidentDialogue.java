@@ -107,7 +107,8 @@ public final class ResidentDialogue {
                 Fest f = festival(server, r, VillageEconomy.get(server).state(r.village().orElseThrow())).orElseThrow();
                 yield Component.translatable("mythic_age.village.say.festival." + f.id() + (f.eve() ? ".eve" : "." + (1 + r.getRandom().nextInt(2))));
             }
-            case QUEST -> Component.translatable("mythic_age.village.say.quest");
+            // 各职业自己的一句（同「本职缺料」：有缺料条件的职业都要有这条，check_content 校验）
+            case QUEST -> Component.translatable(profKey(r) + ".quest");
             case SHORT -> Component.translatable(profKey(r) + ".short");
             case PROJECT -> {
                 VillageEconomy.State s = VillageEconomy.get(server).state(r.village().orElseThrow());

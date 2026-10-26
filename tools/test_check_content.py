@@ -205,5 +205,33 @@ class RelicCardTest(unittest.TestCase):
         self.assertTrue(any("已被" in e for e in self.run_with(self.CARD, second=True)))
 
 
+class VillageDialogueTest(unittest.TestCase):
+    """T21 阶段 ④：有缺料条件的职业要有三语「本职缺料」与「委托」两句。"""
+
+    def run_with(self, short_when, keys):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            main = root / "neoforge/src/main/resources"
+            write(main / "data/mythic_age/mythic_age/village_profession/greek/smith.json", {"shortWhen": short_when})
+            for loc in cc.LOCALES:
+                write(main / f"assets/mythic_age/lang/{loc}.json", {k: "x" for k in keys})
+            report = cc.Report()
+            cc.check_village_dialogue(cc.Paths(root), report)
+            return report.errors
+
+    BOTH = ["mythic_age.village.say.greek.smith.short", "mythic_age.village.say.greek.smith.quest"]
+
+    def test_complete(self):
+        self.assertEqual([], self.run_with({"items": ["mythic_age:tin_ingot"]}, self.BOTH))
+
+    def test_missing_quest_line(self):
+        errors = self.run_with({"food": True}, self.BOTH[:1])
+        self.assertEqual(3, len(errors), errors)
+        self.assertTrue(all(".quest" in e for e in errors))
+
+    def test_no_short_when_needs_nothing(self):
+        self.assertEqual([], self.run_with({}, []))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -381,6 +381,7 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.farmer.chat.5", "头一道压出来的橄榄油最好，点灯、做饭、抹身子都用它。", "The first pressing gives the best oil — for lamps, for cooking, for the skin.", "最初に搾った油が一番。灯りにも料理にも体に塗るにも使います。");
         add("mythic_age.village.say.greek.farmer.chat.6", "橄榄树要修枝，剪下的枝条正好拿去烧窑。", "The olives need pruning, and the cuttings go to feed the kiln.", "オリーブは剪定が要ります。切った枝は窯の燃料になります。");
         add("mythic_age.village.say.greek.farmer.short", "口粮不多了，这几天先紧着收麦烤饼。", "Food is running low — for now it's harvesting and baking first.", "食料が少ない。しばらくは麦の刈り入れとパン焼きが先です。");
+        add("mythic_age.village.say.greek.farmer.quest", "仓里的口粮见底了，管事在谷仓收饼和麦子，送去能换几块绿宝石。", "The stores are nearly empty. The steward at the granary is taking bread and grain, and pays in emeralds.", "蔵の食料が底をつきかけています。穀倉の管理人がパンや麦を集めていて、エメラルドと換えてくれます。");
         add("mythic_age.village.say.greek.potter.chat.1", "黏土要先泡水沉淀，砂石去干净了才好拉坯。", "Clay has to be soaked and left to settle until the grit is gone before it goes on the wheel.", "粘土は水に浸して沈ませ、砂を除いてからろくろに載せます。");
         add("mythic_age.village.say.greek.potter.chat.2", "转陶轮的是我的学徒，我只管手上的形。", "My apprentice turns the wheel; I only shape the pot.", "ろくろを回すのは弟子で、わたしは形を作るだけです。");
         add("mythic_age.village.say.greek.potter.chat.3", "烧窑分三步：先通风让它发红，再闷住让它发黑，最后再通风。", "Firing goes in three stages: air in to redden it, air shut off to blacken it, then air in again.", "窯焚きは三段階：風を通して赤く、閉じて黒く、もう一度風を通します。");
@@ -388,6 +389,7 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.potter.chat.5", "好陶罐敲起来声音清亮，有裂的就发闷。", "A sound pot rings when you tap it; a cracked one sounds dull.", "良い壺は叩くと澄んだ音がします。ひびがあると鈍い音です。");
         add("mythic_age.village.say.greek.potter.chat.6", "陶坊挨着黏土坑，搬泥省力气。", "The workshop sits by the clay pit to save carrying.", "工房は粘土坑のそばにあるので、土運びが楽です。");
         add("mythic_age.village.say.greek.potter.short", "黏土坑挖空了，要等几天才能再挖。", "The clay pit is dug out; we'll have to wait a few days.", "粘土坑は掘り尽くしました。数日待たないと掘れません。");
+        add("mythic_age.village.say.greek.potter.quest", "黏土跟不上了，管事在谷仓那边收黏土，你有就送去吧。", "We can't keep up with clay. The steward at the granary is taking it in, if you have some.", "粘土が追いつきません。穀倉の管理人が集めているので、あれば届けてください。");
         add("mythic_age.village.say.greek.mason.chat.1", "先在石头上凿一排楔眼，敲进木楔再浇水，木头一胀，石头就顺着裂开。", "Cut a row of wedge holes, drive in wooden wedges and wet them — the wood swells and the stone splits along the line.", "石に楔穴を並べて木の楔を打ち込み、水をかけると木が膨らんで石が割れます。");
         add("mythic_age.village.say.greek.mason.chat.2", "柱子不是一整根，是一节一节的柱鼓叠起来的。", "A column isn't one piece — it's a stack of drums.", "柱は一本物ではなく、円筒を積み重ねたものです。");
         add("mythic_age.village.say.greek.mason.chat.3", "方石之间不抹灰浆，靠铁扣连着，缝里灌铅。", "There's no mortar between the blocks — iron clamps hold them, and lead is poured into the joints.", "切石の間に漆喰は使いません。鉄のかすがいで留めて、継ぎ目に鉛を流し込みます。");
@@ -395,6 +397,7 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.mason.chat.5", "石料先粗打成形，外面留一层保护皮，到了工地再修细。", "Blocks are roughed out with a protective skin left on, and finished only at the site.", "石材はまず粗く形を取り、保護の皮を残して、現場で仕上げます。");
         add("mythic_age.village.say.greek.mason.chat.6", "听凿子的声音，就知道石头里有没有裂。", "You can tell from the sound of the chisel whether the stone has a flaw.", "ノミの音で、石の中にひびがあるか分かります。");
         add("mythic_age.village.say.greek.mason.short", "采石点挖空了，没有大理石就只能干等。", "The quarry is worked out — without marble there's nothing to do but wait.", "採石場は掘り尽くしました。大理石がなければ待つしかありません。");
+        add("mythic_age.village.say.greek.mason.quest", "石料断了。管事在谷仓那边张罗，想帮忙就去问问。", "We're out of stone. The steward at the granary is sorting it out; ask there if you can help.", "石が切れました。穀倉の管理人が手配しているので、手伝えるなら聞いてみてください。");
         add("mythic_age.village.say.greek.bronzesmith.chat.1", "青铜是铜里加一成锡：锡少了太软，多了太脆。", "Bronze is copper with about a tenth part tin — too little and it's soft, too much and it's brittle.", "青銅は銅に一割ほど錫を混ぜます。少なければ柔らかく、多ければ脆い。");
         add("mythic_age.village.say.greek.bronzesmith.chat.2", "风箱要两个人轮流踩，炉火才够旺。", "Two of us take turns on the bellows to keep the fire hot enough.", "ふいごは二人で交代に踏まないと、火が十分に上がりません。");
         add("mythic_age.village.say.greek.bronzesmith.chat.3", "铸件先做蜡模，裹上泥一烧，蜡化了再灌铜水。", "For a casting you make it in wax, coat it in clay and fire it, then pour the bronze where the wax ran out.", "鋳物は蝋で型を作り、粘土で包んで焼き、蝋が流れた跡に青銅を流し込みます。");
@@ -402,6 +405,7 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.bronzesmith.chat.5", "我们的祖师赫菲斯托斯，也是瘸着腿打铁的。", "Our patron Hephaestus worked his forge on a lame leg too.", "わたしたちの祖神ヘパイストスも、足を引きずって鍛冶をしていました。");
         add("mythic_age.village.say.greek.bronzesmith.chat.6", "锡要从很远的地方运来，商人说要过好几片海。", "Tin comes from very far away — the traders say across several seas.", "錫はずっと遠くから運ばれてきます。商人はいくつもの海を越えると言います。");
         add("mythic_age.village.say.greek.bronzesmith.short", "没有锡，炉子就是冷的。", "No tin, no fire in the furnace.", "錫がなければ、炉は冷たいままです。");
+        add("mythic_age.village.say.greek.bronzesmith.quest", "锡是从海那边运来的，船还没到。管事在谷仓收锡锭，你要是有，就送去吧。", "Tin comes from over the sea, and the ship hasn't arrived. The steward at the granary is taking tin ingots; bring some if you have them.", "錫は海の向こうから運ばれてくるのに、船がまだ来ません。穀倉の管理人が錫のインゴットを集めているので、あれば届けてください。");
         add("mythic_age.village.say.greek.merchant.chat.1", "集市上有市场监督官管着秤和砝码，缺斤短两要受罚。", "The market wardens check the scales and weights — short measure gets you fined.", "市場では監督官が秤と分銅を見張っていて、ごまかせば罰金です。");
         add("mythic_age.village.say.greek.merchant.chat.2", "外地的钱币要先找钱商兑换，才能在这里用。", "Foreign coins have to go through the money changer before you can spend them here.", "よその貨幣は両替商で替えないと、ここでは使えません。");
         add("mythic_age.village.say.greek.merchant.chat.3", "葡萄酒装在双耳瓶里走船，瓶口用泥封住。", "Wine travels by ship in amphoras, the mouths sealed with clay.", "ワインはアンフォラに詰めて船で運び、口は粘土で封じます。");
@@ -779,7 +783,6 @@ public final class LangKeys {
     /** NPC 任务（T21）：委托页、标题、状态、结果、提示、记录。 */
     private static void quests() {
         add("mythic_age.village.log.quest_posted", "发出委托：%s", "Posted a request: %s", "依頼を出した：%s");
-        add("mythic_age.village.say.quest", "……去谷仓那边问问吧，管事正在找人帮忙。", "...Ask over at the granary — the steward is looking for help.", "……穀倉のほうで聞いてみて。管理人が手を貸してくれる人を探してる。");
         add("mythic_age.quest.title.supply.project", "为%s备料：%s", "Materials for %s: %s", "%sの資材：%s");
         add("mythic_age.quest.title.supply.short", "送来%s", "Bring %s", "%sを届ける");
         add("mythic_age.quest.title.supply.food", "补足村里的口粮", "Restock the village rations", "村の食糧を補う");
