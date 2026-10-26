@@ -170,6 +170,11 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageLandmarks::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.soldier.VillageLandmarks::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.PointEvents::onBreak);
+        // NPC 任务（T21）：建筑损坏记录与修复核验；最低优先级，只看没被别的模块取消的
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onBreak);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onExplosion);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onLivingDestroy);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onPlace);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillageDevCommand::onRegisterCommands);
 
         // 晋升、立祀、改奉与主神像（T11a）

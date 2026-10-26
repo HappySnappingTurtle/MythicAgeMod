@@ -219,6 +219,54 @@ class QuestTest {
         assertFalse(q.owes(A));
     }
 
+    // ───────────── 修复（阶段 ②） ─────────────
+
+    @Test
+    void tc15PublishThreshold() {
+        assertFalse(RepairRules.shouldPublish(2, false, 3), "2 格普通方块不发");
+        assertTrue(RepairRules.shouldPublish(3, false, 3), "**边界** = 3");
+        assertTrue(RepairRules.shouldPublish(1, true, 3), "门、床、工作站 1 格也发");
+        assertFalse(RepairRules.shouldPublish(0, true, 3));
+    }
+
+    @Test
+    void tc25SameBlockId() {
+        assertTrue(RepairRules.matches("minecraft:oak_stairs", "minecraft:oak_stairs"), "朝向不同也算");
+        assertFalse(RepairRules.matches("minecraft:oak_stairs", "minecraft:spruce_stairs"));
+    }
+
+    @Test
+    void tc26SelfCausedNoCredit() {
+        assertFalse(RepairRules.credit(A, A, 0, 16), "自己打掉的不给报酬");
+        assertTrue(RepairRules.credit(A, B, 0, 16));
+        assertTrue(RepairRules.credit(A, null, 0, 16), "无主的损坏（苦力怕）给");
+    }
+
+    @Test
+    void tc27SameDayOnce() {
+        assertTrue(RepairRules.recordAgain(null, 10));
+        assertFalse(RepairRules.recordAgain(10L, 10), "同一格同一日第二次不记");
+        assertTrue(RepairRules.recordAgain(9L, 10), "第二天可以再记");
+    }
+
+    @Test
+    void tc28DailyCap() {
+        assertTrue(RepairRules.credit(A, null, 15, 16));
+        assertFalse(RepairRules.credit(A, null, 16, 16), "**边界**：第 17 格起不给");
+        assertFalse(RepairRules.credit(A, null, 0, 0), "上限 0 = 修复不给报酬");
+    }
+
+    @Test
+    void tc29CellCap() {
+        assertEquals(256, RepairRules.MAX_CELLS);
+    }
+
+    @Test
+    void tc30SelfRepairDue() {
+        assertFalse(RepairRules.selfRepairDue(10, 14, 5));
+        assertTrue(RepairRules.selfRepairDue(10, 15, 5), "满 5 日转村民自修");
+    }
+
     // ───────────── 文明数据与配置 ─────────────
 
     @Test

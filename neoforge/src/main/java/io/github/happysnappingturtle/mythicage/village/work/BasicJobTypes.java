@@ -57,6 +57,7 @@ public final class BasicJobTypes {
         ResidentMigration.registerAll();
         io.github.happysnappingturtle.mythicage.village.life.VillageLife.registerAll();
         JobType.register(new io.github.happysnappingturtle.mythicage.village.soldier.SoldierTrain());
+        JobType.register(new io.github.happysnappingturtle.mythicage.village.quest.RepairJob());
     }
 
     static boolean working(VillageContext ctx) {

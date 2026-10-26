@@ -30,6 +30,46 @@ public final class VillageQuests extends SavedData {
     public record Track(int missing, long progressDay) {
     }
 
+    /**
+     * 建筑里一格损坏（§6.1）：原方块状态、方块 id、责任玩家（无主为 null）、记下的 MC 日、是否已转给村民自修（D3）。
+     */
+    public static final class Cell {
+        public final long pos;
+        public final net.minecraft.world.level.block.state.BlockState state;
+        public final String block;
+        @org.jetbrains.annotations.Nullable
+        public final UUID cause;
+        public final long day;
+        public boolean self;
+
+        public Cell(long pos, net.minecraft.world.level.block.state.BlockState state, @org.jetbrains.annotations.Nullable UUID cause,
+                    long day) {
+            this.pos = pos;
+            this.state = state;
+            this.block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+            this.cause = cause;
+            this.day = day;
+        }
+    }
+
+    /** 一座建筑（建筑盒）的损坏：未修的格、超出上限的计数、每格最近一次记损坏的日子（防同日反复拆修）。 */
+    public static final class Damage {
+        public final String key;
+        public final io.github.happysnappingturtle.mythicage.core.village.gen.Box box;
+        public final Map<Long, Cell> cells = new LinkedHashMap<>();
+        public int overflow;
+        public final Map<Long, Long> lastDay = new LinkedHashMap<>();
+
+        public Damage(io.github.happysnappingturtle.mythicage.core.village.gen.Box box) {
+            this.box = box;
+            this.key = key(box);
+        }
+
+        public static String key(io.github.happysnappingturtle.mythicage.core.village.gen.Box b) {
+            return b.minX() + "," + b.minY() + "," + b.minZ() + "," + b.maxX() + "," + b.maxY() + "," + b.maxZ();
+        }
+    }
+
     public static final class Book {
         public final UUID village;
         public int next = 1;
@@ -39,6 +79,12 @@ public final class VillageQuests extends SavedData {
         public final Map<UUID, Integer> seen = new LinkedHashMap<>();
         public final Map<UUID, Long> hinted = new LinkedHashMap<>();
         public long lastScanDay = -1;
+        public final Map<String, Damage> damage = new LinkedHashMap<>();
+        /** 玩家放进建筑盒的方块（被打掉不算损坏，§6.2）；最多 {@value #PLAYER_BLOCKS}，超出丢掉最早的。 */
+        public final java.util.LinkedHashSet<Long> playerBlocks = new java.util.LinkedHashSet<>();
+        /** 每人当天在本村的修复报酬格数（§6.3 上限）：日子与格数。 */
+        public final Map<UUID, Long> repairDay = new LinkedHashMap<>();
+        public final Map<UUID, Integer> repairCount = new LinkedHashMap<>();
 
         Book(UUID village) {
             this.village = village;
@@ -51,7 +97,30 @@ public final class VillageQuests extends SavedData {
         public int contribution(UUID player) {
             return contribution.getOrDefault(player, 0);
         }
+
+        public void addPlayerBlock(long pos) {
+            playerBlocks.remove(pos);
+            playerBlocks.add(pos);
+            while (playerBlocks.size() > PLAYER_BLOCKS) {
+                playerBlocks.remove(playerBlocks.iterator().next());
+            }
+        }
+
+        /** 这名玩家今天在本村已拿修复报酬的格数。 */
+        public int repairedToday(UUID player, long today) {
+            return repairDay.getOrDefault(player, -1L) == today ? repairCount.getOrDefault(player, 0) : 0;
+        }
+
+        public void addRepaired(UUID player, long today) {
+            if (repairDay.getOrDefault(player, -1L) != today) {
+                repairDay.put(player, today);
+                repairCount.put(player, 0);
+            }
+            repairCount.merge(player, 1, Integer::sum);
+        }
     }
+
+    public static final int PLAYER_BLOCKS = 1024;
 
     private final Map<UUID, Book> books = new LinkedHashMap<>();
 
@@ -98,6 +167,33 @@ public final class VillageQuests extends SavedData {
                 CompoundTag x = tr.getCompound(k);
                 b.tracks.put(k, new Track(x.getInt("missing"), x.getLong("day")));
             }
+            net.minecraft.core.HolderGetter<net.minecraft.world.level.block.Block> blocks =
+                    registries.lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK);
+            for (Tag dt : c.getList("damage", Tag.TAG_COMPOUND)) {
+                CompoundTag d = (CompoundTag) dt;
+                int[] bx = d.getIntArray("box");
+                if (bx.length != 6) {
+                    continue;
+                }
+                Damage dmg = new Damage(new io.github.happysnappingturtle.mythicage.core.village.gen.Box(bx[0], bx[1], bx[2], bx[3], bx[4], bx[5]));
+                dmg.overflow = d.getInt("overflow");
+                for (Tag ct : d.getList("cells", Tag.TAG_COMPOUND)) {
+                    CompoundTag x = (CompoundTag) ct;
+                    Cell cell = new Cell(x.getLong("pos"), net.minecraft.nbt.NbtUtils.readBlockState(blocks, x.getCompound("state")),
+                            x.hasUUID("cause") ? x.getUUID("cause") : null, x.getLong("day"));
+                    cell.self = x.getBoolean("self");
+                    dmg.cells.put(cell.pos, cell);
+                }
+                CompoundTag ld = d.getCompound("lastDay");
+                ld.getAllKeys().forEach(k -> dmg.lastDay.put(Long.parseLong(k), ld.getLong(k)));
+                b.damage.put(dmg.key, dmg);
+            }
+            for (long pb : c.getLongArray("playerBlocks")) {
+                b.playerBlocks.add(pb);
+            }
+            CompoundTag rd = c.getCompound("repairDay");
+            rd.getAllKeys().forEach(k -> b.repairDay.put(UUID.fromString(k), rd.getLong(k)));
+            readInts(c.getCompound("repairCount"), b.repairCount);
             out.books.put(b.village, b);
         }
         return out;
@@ -127,6 +223,36 @@ public final class VillageQuests extends SavedData {
                 tr.put(k, x);
             });
             c.put("tracks", tr);
+            ListTag damage = new ListTag();
+            for (Damage dmg : b.damage.values()) {
+                CompoundTag d = new CompoundTag();
+                var bx = dmg.box;
+                d.putIntArray("box", new int[]{bx.minX(), bx.minY(), bx.minZ(), bx.maxX(), bx.maxY(), bx.maxZ()});
+                d.putInt("overflow", dmg.overflow);
+                ListTag cells = new ListTag();
+                for (Cell cell : dmg.cells.values()) {
+                    CompoundTag x = new CompoundTag();
+                    x.putLong("pos", cell.pos);
+                    x.put("state", net.minecraft.nbt.NbtUtils.writeBlockState(cell.state));
+                    if (cell.cause != null) {
+                        x.putUUID("cause", cell.cause);
+                    }
+                    x.putLong("day", cell.day);
+                    x.putBoolean("self", cell.self);
+                    cells.add(x);
+                }
+                d.put("cells", cells);
+                CompoundTag ld = new CompoundTag();
+                dmg.lastDay.forEach((k, v) -> ld.putLong(Long.toString(k), v));
+                d.put("lastDay", ld);
+                damage.add(d);
+            }
+            c.put("damage", damage);
+            c.putLongArray("playerBlocks", b.playerBlocks.stream().mapToLong(Long::longValue).toArray());
+            CompoundTag rd = new CompoundTag();
+            b.repairDay.forEach((k, v) -> rd.putLong(k.toString(), v));
+            c.put("repairDay", rd);
+            c.put("repairCount", writeInts(b.repairCount));
             list.add(c);
         }
         tag.put("villages", list);

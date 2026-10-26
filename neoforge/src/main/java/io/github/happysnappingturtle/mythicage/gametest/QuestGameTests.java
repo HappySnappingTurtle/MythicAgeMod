@@ -70,7 +70,7 @@ public final class QuestGameTests {
                  "rations": {"floor": %d, "portions": {"minecraft:bread": 1.0, "minecraft:baked_potato": 0.5}},
                  "residents": {"fallback": "%s", "keeper": "%s", "male": ["Tester"], "female": ["Testa"]},
                  "buildCosts": {"groups": {"planks": ["minecraft:oak_planks", "minecraft:spruce_planks"]}},
-                 "quests": {"supplyItems": {"minecraft:copper_ingot": 3}, "prices": {"default": 1.0}}}"""
+                 "quests": {"supplyItems": {"minecraft:copper_ingot": 3}, "prices": {"default": 1.0}, "repairPrice": 1.0}}"""
                 .formatted(foodFloor, WORKER, WORKER)).getAsJsonObject());
         var brick = io.github.happysnappingturtle.mythicage.core.village.recipe.VillageRecipe.parse("questtest:brick", id,
                 JsonParser.parseString("""

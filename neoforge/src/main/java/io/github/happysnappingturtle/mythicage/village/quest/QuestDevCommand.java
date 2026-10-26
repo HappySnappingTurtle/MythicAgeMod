@@ -26,6 +26,9 @@ import java.util.function.Consumer;
  * /mythicage dev village quest scan               立刻做一次日开始的任务扫描（发布、过期、清旧）
  * /mythicage dev village quest open               不用走到管事身边，直接打开委托页
  * /mythicage dev village quest act &lt;编号&gt; &lt;动作&gt;  不看距离地接取 / 交付 / 放弃（accept / deliver / abandon）
+ * /mythicage dev village quest expire &lt;编号&gt;      让任务今天到期（实测自修用）
+ * /mythicage dev village quest damage             本村的建筑损坏记录（每座最多列 12 格）
+ * /mythicage dev village quest selfrepair         未修的损坏格立刻转给村民自修（不等 5 日）
  * </pre>
  */
 public final class QuestDevCommand {
@@ -62,8 +65,39 @@ public final class QuestDevCommand {
                             StringArgumentType.getString(c, "action"), UUID.randomUUID().toString(), false);
                     ok(c, "结果 " + o.result() + "，交付 " + o.delivered());
                 }))));
+        var damage = Commands.literal("damage").executes(c -> withCtx(c, ctx -> {
+            VillageQuests.Book b = QuestService.book(ctx.level().getServer(), ctx.village().id());
+            ok(c, "损坏 " + b.damage.size() + " 座 · 玩家方块 " + b.playerBlocks.size());
+            b.damage.values().forEach(dm -> {
+                ok(c, "  " + dm.key + " 未修 " + dm.cells.size() + " 超出 " + dm.overflow);
+                dm.cells.values().stream().limit(12).forEach(x -> ok(c, "    " + BlockPos.of(x.pos).toShortString() + " " + x.block
+                        + (x.cause == null ? " 无主" : " 责任 " + x.cause.toString().substring(0, 8)) + " 第 " + x.day + " 日" + (x.self ? " 自修" : "")));
+            });
+        }));
+        var self = Commands.literal("selfrepair").executes(c -> withCtx(c, ctx -> {
+            VillageQuests.Book b = QuestService.book(ctx.level().getServer(), ctx.village().id());
+            int n = 0;
+            for (VillageQuests.Damage dm : b.damage.values()) {
+                for (VillageQuests.Cell x : dm.cells.values()) {
+                    if (!x.self) {
+                        x.self = true;
+                        n++;
+                    }
+                }
+            }
+            ok(c, "转给村民自修 " + n + " 格");
+        }));
+        var expire = Commands.literal("expire").then(Commands.argument("quest", StringArgumentType.word()).executes(c -> withCtx(c, ctx -> {
+            VillageQuests.Book b = QuestService.book(ctx.level().getServer(), ctx.village().id());
+            b.byId(StringArgumentType.getString(c, "quest")).ifPresentOrElse(q -> {
+                q.deadline = ctx.today();
+                QuestService.refresh(ctx);
+                ok(c, q.id() + " → " + q.state.id());
+            }, () -> c.getSource().sendFailure(Component.literal("没有这个任务")));
+        })));
         d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
-                .then(Commands.literal("village").then(Commands.literal("quest").then(list).then(scan).then(open).then(act)))));
+                .then(Commands.literal("village").then(Commands.literal("quest").then(list).then(scan).then(open).then(act)
+                        .then(expire).then(damage).then(self)))));
     }
 
     private static int withCtx(CommandContext<CommandSourceStack> c, Consumer<VillageContext> run) {

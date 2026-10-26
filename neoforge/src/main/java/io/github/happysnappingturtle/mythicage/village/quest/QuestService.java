@@ -90,6 +90,7 @@ public final class QuestService {
         }
         LAST_REFRESH.put(ctx.village().id(), ctx.now());
         refresh(ctx);
+        RepairQuests.showMarks(ctx, book(ctx.level().getServer(), ctx.village().id()));
     }
 
     static void scan(VillageContext ctx) {
@@ -106,6 +107,7 @@ public final class QuestService {
         refresh(ctx);
         if (cfg.enabled()) {
             List<QuestRules.Candidate> cands = new ArrayList<>(SupplyQuests.candidates(ctx, b, cfg));
+            cands.addAll(RepairQuests.candidates(ctx, b, cfg));
             for (QuestRules.Candidate c : QuestRules.pick(b.quests, cands, cfg.maxOpenPerVillage())) {
                 publish(ctx, b, c.source(), cfg);
             }
@@ -118,7 +120,8 @@ public final class QuestService {
         if (QuestRules.openSource(b.quests, source)) {
             return Optional.empty();
         }
-        Optional<Quest> q = SupplyQuests.create(ctx, b.next, source, cfg);
+        Optional<Quest> q = source.startsWith(RepairQuests.PREFIX) ? RepairQuests.create(ctx, b, b.next, source, cfg)
+                : SupplyQuests.create(ctx, b.next, source, cfg);
         q.ifPresent(x -> {
             b.next++;
             b.quests.add(x);
@@ -153,6 +156,8 @@ public final class QuestService {
             }
             if (q.type.equals(SupplyQuests.TYPE)) {
                 refreshSupply(ctx, q, today);
+            } else if (q.type.equals(RepairQuests.TYPE)) {
+                RepairQuests.refresh(ctx, b, q, today);
             }
         }
         settleAll(server, b);
@@ -457,7 +462,7 @@ public final class QuestService {
     }
 
     static AffairsView.Line title(VillageContext ctx, Quest q) {
-        return SupplyQuests.title(ctx, q);
+        return q.type.equals(RepairQuests.TYPE) ? RepairQuests.title(ctx, q) : SupplyQuests.title(ctx, q);
     }
 
     static Component titleComponent(MinecraftServer server, UUID village, Quest q) {

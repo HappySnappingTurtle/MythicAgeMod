@@ -784,6 +784,10 @@ public final class LangKeys {
         add("mythic_age.quest.title.supply.short", "送来%s", "Bring %s", "%sを届ける");
         add("mythic_age.quest.title.supply.food", "补足村里的口粮", "Restock the village rations", "村の食糧を補う");
         add("mythic_age.quest.building.unknown", "工程", "the works", "工事");
+        add("mythic_age.quest.title.repair.named", "修好%s的损坏", "Repair the damage to %s", "%sの損傷を直す");
+        add("mythic_age.quest.title.repair.at", "修好（%s, %s）一带建筑的损坏", "Repair the damaged building near (%s, %s)", "（%s, %s）付近の建物の損傷を直す");
+        add("mythic_age.quest.title.supply.repair", "为修缮备料：%s", "Materials for repairs: %s", "修繕の資材：%s");
+        add("mythic_age.quest.reason.site", "建筑已经不在了", "the building is gone", "建物がなくなった");
         add("mythic_age.quest.screen.title", "委托", "Requests", "依頼");
         add("mythic_age.quest.screen.open", "委托", "Requests", "依頼");
         add("mythic_age.quest.screen.heading", "%s · 委托", "%s · Requests", "%s・依頼");
