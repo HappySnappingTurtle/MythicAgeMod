@@ -69,8 +69,9 @@ public final class TrialArenaGameTests {
             return arena.bossOrigin();
         }
 
+        /** 大厅入口安全点（局部 (0, 13)）。 */
         BlockPos safe() {
-            return LabyrinthGameTests.one(placed, "safe_return");
+            return arena.center().south(13);
         }
     }
 

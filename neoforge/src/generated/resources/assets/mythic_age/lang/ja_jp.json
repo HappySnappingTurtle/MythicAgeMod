@@ -186,6 +186,7 @@
   "entity.mythic_age.summon_centaur": "ケンタウロス",
   "entity.mythic_age.summon_minotaur": "ミノタウロス",
   "entity.mythic_age.summon_pegasus": "ペガサス",
+  "entity.mythic_age.thrown_rubble": "投石",
   "item.mythic_age.ariadne_thread": "アリアドネの糸玉",
   "item.mythic_age.armor_of_achilles": "アキレウスの鎧",
   "item.mythic_age.armor_of_achilles.offered": "祭壇から 48 ブロック以内の村人・アイアンゴーレム・あなたの召喚ユニットと飼い慣らした動物が受ける近接ダメージ −15%",

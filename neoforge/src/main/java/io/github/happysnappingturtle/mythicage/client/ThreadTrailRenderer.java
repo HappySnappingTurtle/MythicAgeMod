@@ -31,6 +31,16 @@ public final class ThreadTrailRenderer {
     private ThreadTrailRenderer() {
     }
 
+    private static Vec3 pointer;
+    private static long pointerUntil;
+
+    /** 阶段二：线团指向 Boss（约 1 秒）。 */
+    public static void pointer(io.github.happysnappingturtle.mythicage.boss.BossPointerPayload p) {
+        Minecraft mc = Minecraft.getInstance();
+        pointer = new Vec3(p.x(), p.y(), p.z());
+        pointerUntil = mc.level == null ? 0 : mc.level.getGameTime() + 25;
+    }
+
     public static void accept(ThreadTrailPayload p) {
         if (p.replace()) {
             POINTS.clear();
@@ -41,14 +51,19 @@ public final class ThreadTrailRenderer {
     @SubscribeEvent
     static void onLogout(ClientPlayerNetworkEvent.LoggingOut e) {
         POINTS.clear();
+        pointer = null;
     }
 
     @SubscribeEvent
     static void onRender(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || POINTS.size() < 2) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
+        boolean showPointer = pointer != null && mc.level != null && mc.player != null && mc.level.getGameTime() < pointerUntil;
+        if (POINTS.size() < 2 && !showPointer) {
+            return;
+        }
         Vec3 cam = event.getCamera().getPosition();
         PoseStack pose = event.getPoseStack();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
@@ -69,6 +84,18 @@ public final class ThreadTrailRenderer {
                         .setNormal(pose.last(), (float) n.x, (float) n.y, (float) n.z);
                 lines.addVertex(m, (float) b.x, (float) (b.y + dy), (float) b.z).setColor(1.0F, 0.82F, 0.25F, pulse)
                         .setNormal(pose.last(), (float) n.x, (float) n.y, (float) n.z);
+            }
+        }
+        if (showPointer) {
+            Vec3 from = mc.player.position().add(0, 0.6, 0);
+            Vec3 dir = pointer.subtract(from).normalize();
+            Vec3 a = from.add(dir.scale(1.0));
+            Vec3 b = from.add(dir.scale(3.0));
+            for (double dy : new double[]{0.0, 0.05, 0.1}) {
+                lines.addVertex(m, (float) a.x, (float) (a.y + dy), (float) a.z).setColor(1.0F, 0.9F, 0.4F, 1.0F)
+                        .setNormal(pose.last(), (float) dir.x, (float) dir.y, (float) dir.z);
+                lines.addVertex(m, (float) b.x, (float) (b.y + dy), (float) b.z).setColor(1.0F, 0.9F, 0.4F, 1.0F)
+                        .setNormal(pose.last(), (float) dir.x, (float) dir.y, (float) dir.z);
             }
         }
         pose.popPose();

@@ -16,6 +16,10 @@ public final class ClientHooks {
         Minecraft.getInstance().setScreen(new io.github.happysnappingturtle.mythicage.client.screen.FoundationScreen(payload));
     }
 
+    public static void bossPointer(io.github.happysnappingturtle.mythicage.boss.BossPointerPayload payload) {
+        ThreadTrailRenderer.pointer(payload);
+    }
+
     public static void threadTrail(io.github.happysnappingturtle.mythicage.content.greek.knossos.ThreadTrailPayload payload) {
         ThreadTrailRenderer.accept(payload);
     }

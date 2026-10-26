@@ -396,34 +396,243 @@ public final class TrialArena {
             }
         }
         brokenPillars = 0;
+        wallLayers.clear();
+        wallTarget.clear();
     }
 
     public void markPillarBroken(int i) {
         brokenPillars |= 1 << i;
+        TrialArenas.markDirty();
     }
 
-    /** 升 / 落一组机关墙。 */
+    // ───────────── 柱 ─────────────
+
+    /** 这一格属于哪根柱（柱础到柱头那一列），不属于返回 −1。 */
+    public int pillarAt(BlockPos p) {
+        int h = spec().map(ArenaSpec::pillarHeight).orElse(7);
+        for (int i = 0; i < pillars.size(); i++) {
+            BlockPos b = pillars.get(i);
+            if (b.getX() == p.getX() && b.getZ() == p.getZ() && p.getY() >= b.getY() && p.getY() < b.getY() + h) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 撞碎第 i 根柱（T23 §5.4）：柱身断桩以上全换成空气，柱础朝撞来方向的那一格放一块碎块；每根柱每场只碎一次。
+     *
+     * @param from 撞来的方向（Boss 冲锋的反方向），碎块落在这一侧
+     */
+    public boolean breakPillar(ServerLevel level, int i, net.minecraft.core.Direction from) {
+        if (i < 0 || i >= pillars.size() || pillarBroken(i)) {
+            return false;
+        }
+        ArenaSpec spec = spec().orElseThrow();
+        BlockPos base = pillars.get(i);
+        for (int y = spec.pillarStump(); y < spec.pillarHeight(); y++) {
+            BlockPos p = base.above(y);
+            BlockState was = level.getBlockState(p);
+            if (!was.isAir()) {
+                level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(
+                        net.minecraft.core.particles.ParticleTypes.BLOCK, was), p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
+                        12, 0.3, 0.3, 0.3, 0.1);
+                change(level, p, Blocks.AIR.defaultBlockState());
+            }
+        }
+        BlockPos rubble = base.relative(from);
+        if (level.getBlockState(rubble).isAir()) {
+            change(level, rubble, BuiltInRegistries.BLOCK.get(spec.rubble()).defaultBlockState());
+        }
+        level.playSound(null, base, net.minecraft.sounds.SoundEvents.ANVIL_LAND, net.minecraft.sounds.SoundSource.HOSTILE,
+                1.5F, 0.6F);
+        markPillarBroken(i);
+        return true;
+    }
+
+    /** 撞到了什么（T23 §6.4）。 */
+    public enum ImpactKind { NONE, INTACT_PILLAR, WALL }
+
+    public record Impact(ImpactKind kind, int pillar) {
+    }
+
+    /**
+     * 把冲锋前方挡路的格子归类：有完整的柱 → INTACT_PILLAR（优先）；有正在升降、还没升满的机关墙 → NONE（中途的墙不算）；
+     * 其余挡路的实心格（已碎的柱、大厅外墙、升满的机关墙）→ WALL。
+     */
+    public Impact classify(ServerLevel level, List<BlockPos> blocking) {
+        boolean solid = false;
+        for (BlockPos p : blocking) {
+            int i = pillarAt(p);
+            if (i >= 0 && !pillarBroken(i)) {
+                return new Impact(ImpactKind.INTACT_PILLAR, i);
+            }
+        }
+        for (BlockPos p : blocking) {
+            for (WallCycle.Group g : WallCycle.Group.values()) {
+                if (isWallCell(g, p) && wallLayers(g) < wallHeight()) {
+                    return new Impact(ImpactKind.NONE, -1);
+                }
+            }
+            solid |= !level.getBlockState(p).getCollisionShape(level, p).isEmpty();
+        }
+        return new Impact(solid ? ImpactKind.WALL : ImpactKind.NONE, -1);
+    }
+
+    // ───────────── 机关墙 ─────────────
+
+    private final Map<WallCycle.Group, Integer> wallLayers = new EnumMap<>(WallCycle.Group.class);
+    private final Map<WallCycle.Group, Boolean> wallTarget = new EnumMap<>(WallCycle.Group.class);
+    /** 只供 GameTest：发过几次「指向 Boss」。 */
+    public int pointerSendsForTest;
+
+    private int wallHeight() {
+        return spec().map(ArenaSpec::wallHeight).orElse(4);
+    }
+
+    public int wallLayers(WallCycle.Group g) {
+        return wallLayers.getOrDefault(g, 0);
+    }
+
+    boolean isWallCell(WallCycle.Group g, BlockPos p) {
+        for (BlockPos b : walls.get(g)) {
+            if (b.getX() == p.getX() && b.getZ() == p.getZ() && p.getY() >= b.getY() && p.getY() < b.getY() + wallHeight()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 一组墙要升到满（up）或落到底。逐层进行，见 {@link #tickWalls}。 */
+    public void setWallTarget(WallCycle.Group g, boolean up) {
+        wallTarget.put(g, up);
+    }
+
+    /** 立即升满 / 落到底（复原、胜利与测试用）。 */
     public void setWall(ServerLevel level, WallCycle.Group g, boolean up) {
+        setWallTarget(g, up);
+        for (int i = 0; i < wallHeight() + 1; i++) {
+            stepWall(level, g);
+        }
+    }
+
+    public boolean wallUp(ServerLevel level, WallCycle.Group g) {
+        return wallLayers(g) >= wallHeight();
+    }
+
+    /** 每 {@value #WALL_STEP} 刻升 / 落一层；要升的那一层格子里有生物或掉落物就等（不把人砌进墙里）。 */
+    public static final int WALL_STEP = 4;
+
+    void tickWalls(ServerLevel level, long now) {
+        if (now % WALL_STEP != 0) {
+            return;
+        }
+        for (WallCycle.Group g : WallCycle.Group.values()) {
+            stepWall(level, g);
+        }
+    }
+
+    private void stepWall(ServerLevel level, WallCycle.Group g) {
+        boolean up = wallTarget.getOrDefault(g, false);
+        int layers = wallLayers(g);
         ArenaSpec spec = spec().orElse(null);
         if (spec == null) {
             return;
         }
-        BlockState wall = BuiltInRegistries.BLOCK.get(spec.wallBlock()).defaultBlockState();
-        for (BlockPos base : walls.get(g)) {
-            for (int y = 0; y < spec.wallHeight(); y++) {
-                BlockPos p = base.above(y);
-                if (up && level.getBlockState(p).isAir()) {
+        if (up && layers < spec.wallHeight()) {
+            if (occupied(level, g, layers, layers)) {
+                return;
+            }
+            BlockState wall = BuiltInRegistries.BLOCK.get(spec.wallBlock()).defaultBlockState();
+            for (BlockPos base : walls.get(g)) {
+                BlockPos p = base.above(layers);
+                if (level.getBlockState(p).isAir()) {
                     change(level, p, wall);
-                } else if (!up) {
-                    restore(level, p);
+                }
+            }
+            wallLayers.put(g, layers + 1);
+            if (layers == 0) {
+                level.playSound(null, walls.get(g).get(walls.get(g).size() / 2), net.minecraft.sounds.SoundEvents.PISTON_EXTEND,
+                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.5F);
+            }
+            TrialArenas.markDirty();
+        } else if (!up && layers > 0) {
+            for (BlockPos base : walls.get(g)) {
+                restore(level, base.above(layers - 1));
+            }
+            wallLayers.put(g, layers - 1);
+            TrialArenas.markDirty();
+        }
+    }
+
+    /** 只供 GameTest：立即按目标升 / 落一层。 */
+    public void stepWallForTest(ServerLevel level, WallCycle.Group g) {
+        stepWall(level, g);
+    }
+
+    /** 一组墙的第 fromLayer–toLayer 层格子里有没有生物或掉落物。 */
+    public boolean occupied(ServerLevel level, WallCycle.Group g, int fromLayer, int toLayer) {
+        for (BlockPos base : walls.get(g)) {
+            AABB box = new AABB(base.getX(), base.getY() + fromLayer, base.getZ(), base.getX() + 1, base.getY() + toLayer + 1,
+                    base.getZ() + 1);
+            if (!level.getEntitiesOfClass(Entity.class, box, e -> e instanceof LivingEntity && e.isAlive()
+                    || e instanceof net.minecraft.world.entity.item.ItemEntity).isEmpty()) {
+                return true;
+            }
+            for (ServerPlayer p : TEST_PLAYERS) {
+                if (p.level() == level && p.getBoundingBox().intersects(box)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 阶段二：机关墙循环与预警、线团指向 Boss。 */
+    private void tickDevices(ServerLevel level, Mob mob, List<ServerPlayer> inHall) {
+        long now = level.getGameTime();
+        if (!wallCycle.running() && mob instanceof TrialBoss tb && tb.phaseTwoReady()) {
+            handle(level, wallCycle.start(now));
+        } else if (wallCycle.running()) {
+            handle(level, wallCycle.tick(now, g -> occupied(level, g, 0, wallHeight() - 1)));
+        }
+        if (now % 4 == 0) {
+            for (WallCycle.Group g : wallCycle.pending()) {
+                for (BlockPos base : walls.get(g)) {
+                    level.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.85F, 0.15F, 0.1F),
+                            1.2F), base.getX() + 0.5, base.getY() + 0.05, base.getZ() + 0.5, 2, 0.3, 0.0, 0.3, 0);
+                    level.sendParticles(net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE, base.getX() + 0.5,
+                            base.getY() + 0.1, base.getZ() + 0.5, 0, 0, 0.05, 0, 1);
+                }
+            }
+        }
+        if (now % 20 == 0) {
+            ArenaSpec spec = spec().orElseThrow();
+            for (ServerPlayer p : inHall) {
+                boolean holds = BuiltInRegistries.ITEM.getKey(p.getMainHandItem().getItem()).equals(spec.keyItem())
+                        || BuiltInRegistries.ITEM.getKey(p.getOffhandItem().getItem()).equals(spec.keyItem());
+                if (holds) {
+                    pointerSendsForTest++;
+                    if (p.connection != null) {
+                        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p,
+                                new BossPointerPayload(mob.getX(), mob.getY() + mob.getBbHeight() * 0.5, mob.getZ()));
+                    }
                 }
             }
         }
     }
 
-    public boolean wallUp(ServerLevel level, WallCycle.Group g) {
-        List<BlockPos> cells = walls.get(g);
-        return !cells.isEmpty() && changed.containsKey(cells.get(0));
+    private void handle(ServerLevel level, List<WallCycle.Action> actions) {
+        for (WallCycle.Action a : actions) {
+            switch (a.kind()) {
+                case WARN -> level.playSound(null, walls.get(a.group()).get(walls.get(a.group()).size() / 2),
+                        net.minecraft.sounds.SoundEvents.GRINDSTONE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.6F);
+                case RAISE -> setWallTarget(a.group(), true);
+                case LOWER -> setWallTarget(a.group(), false);
+                case CANCEL -> {
+                }
+            }
+        }
     }
 
     // ───────────── 推进 ─────────────
@@ -538,6 +747,10 @@ public final class TrialArena {
             setPhase(ArenaPhase.FIGHT_P2);
             tb.onPhaseTwo();
         }
+        if (phase == ArenaPhase.FIGHT_P2) {
+            tickDevices(level, mob, inHall);
+        }
+        tickWalls(level, level.getGameTime());
         if (clock.tick(!inHall.isEmpty(), ArenaClock.EMPTY_RESET)) {
             reset(level);
         }
@@ -550,8 +763,9 @@ public final class TrialArena {
         }
         setPhase(ArenaPhase.VICTORY);
         clock.reset();
-        for (WallCycle.Action a : wallCycle.stop()) {
-            setWall(level, a.group(), false);
+        wallCycle.stop();
+        for (WallCycle.Group g : WallCycle.Group.values()) {
+            setWall(level, g, false);
         }
         openGate(level);
         openVault(level);
@@ -665,6 +879,10 @@ public final class TrialArena {
         t.put("Participants", ps);
         t.putString("Walls", wallCycle.save());
         t.putInt("Broken", brokenPillars);
+        t.putInt("LayersA", wallLayers(WallCycle.Group.A));
+        t.putInt("LayersB", wallLayers(WallCycle.Group.B));
+        t.putBoolean("WallAUp", wallTarget.getOrDefault(WallCycle.Group.A, false));
+        t.putBoolean("WallBUp", wallTarget.getOrDefault(WallCycle.Group.B, false));
         t.putBoolean("VaultOpen", vaultOpen);
         t.putLong("GateCloseAt", gateCloseAt);
         ListTag ch = new ListTag();
@@ -712,6 +930,10 @@ public final class TrialArena {
         }
         a.wallCycle.load(t.getString("Walls"));
         a.brokenPillars = t.getInt("Broken");
+        a.wallLayers.put(WallCycle.Group.A, t.getInt("LayersA"));
+        a.wallLayers.put(WallCycle.Group.B, t.getInt("LayersB"));
+        a.wallTarget.put(WallCycle.Group.A, t.getBoolean("WallAUp"));
+        a.wallTarget.put(WallCycle.Group.B, t.getBoolean("WallBUp"));
         a.vaultOpen = t.getBoolean("VaultOpen");
         a.gateCloseAt = t.getLong("GateCloseAt");
         for (Tag x : t.getList("Changed", Tag.TAG_COMPOUND)) {

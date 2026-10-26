@@ -1,0 +1,19 @@
+{
+  "_note": "弥诺陶洛斯 · 迷宫之主（01_希腊 §7.1、卡片 03 §6）：生命 320（竞技场按人数缩放，见 arena/greek_knossos.json）、护甲 6；斧劈 12、冲锋 16、掷石 10；时间轴单位为刻",
+  "armor": 6,
+  "movement_speed": 0.28,
+  "special": {
+    "axe_damage": 12,
+    "charge_damage": 16,
+    "throw_damage": 10,
+    "axe_windup": 16,
+    "axe_lock_at": 10,
+    "axe_active_end": 20,
+    "axe_total": 36,
+    "double_charge_gap": 12,
+    "throw_windup": 20,
+    "throw_total": 40,
+    "roar_ticks": 40,
+    "stun_recover": 16
+  }
+}

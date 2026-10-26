@@ -788,6 +788,7 @@ public final class LangKeys {
         add("mythic_age.vault.already", "你已经开过这座宝库了", "You've already opened this vault", "この宝庫はもう開けている");
         add("mythic_age.vault.empty", "宝库是空的", "The vault is empty", "宝庫は空だ");
         // 试炼竞技场与克诺索斯（T23）
+        add("entity.mythic_age.thrown_rubble", "碎石", "Thrown Rubble", "投石");
         add("entity.mythic_age.minotaur_boss", "弥诺陶洛斯 · 迷宫之主", "Minotaur, Lord of the Labyrinth", "ミノタウロス・迷宮の主");
         add("mythic_age.arena.gate.locked", "门纹丝不动。也许需要什么指引……", "The gate won't budge. Perhaps something must guide you…",
                 "門はびくともしない。何かの導きが要るのかもしれない……");

@@ -67,6 +67,14 @@ public final class GreekKnossos {
                             .clientTrackingRange(10)
                             .build("mythic_age:minotaur_boss"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<ThrownRubble>> THROWN_RUBBLE =
+            ModRegistries.ENTITY_TYPES.register("thrown_rubble",
+                    () -> EntityType.Builder.<ThrownRubble>of(ThrownRubble::new, MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .clientTrackingRange(6)
+                            .updateInterval(10)
+                            .build("mythic_age:thrown_rubble"));
+
     private GreekKnossos() {
     }
 

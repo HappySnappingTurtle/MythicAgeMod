@@ -17,6 +17,11 @@ public interface TrialBoss {
     default void onPhaseTwo() {
     }
 
+    /** 阶段二的开场（怒吼）结束了，竞技场可以开始机关。 */
+    default boolean phaseTwoReady() {
+        return true;
+    }
+
     /** 当前受伤倍率（机制窗口内 ×2）。 */
     default float damageTakenMultiplier() {
         return 1.0F;
