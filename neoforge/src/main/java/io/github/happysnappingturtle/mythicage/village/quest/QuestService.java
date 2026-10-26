@@ -39,7 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * NPC 任务服务（T21 设计文档 §3–§5、§9、§11）：发布、刷新状态、接取 / 交付 / 放弃、结算、委托页视图。
- * <b>任务状态只在这里改。</b>阶段 ① 只有缺料供给（{@link SupplyQuests}）。
+ * <b>任务状态只在这里改</b>（各类型的判定在 {@link SupplyQuests}、{@link RepairQuests}、{@link EscortQuests}、{@link RescueQuests}，
+ * 由这里调用）。
  *
  * <p>去重：来源同时只有一个未结束任务；奖励每人每任务一张 {@code UNIQUE} 收据 {@code quest:<村庄>/<任务>}；
  * 点击用 {@code REQUEST} 收据 {@code quest_act:<requestId>}。结算是「事务写收据 → 发绿宝石 → 记贡献 → 标已结算」，同一刻完成；
@@ -53,8 +54,13 @@ public final class QuestService {
     static final int KEEP_DAYS = 3;
     /** 平时刷新任务状态的间隔（刻）：交付、捐赠、项目建成另有即时刷新。 */
     static final int REFRESH_TICKS = 100;
+    /** 护送在场采样、救援判定的间隔（刻，§7.2）。 */
+    static final int SAMPLE_TICKS = 20;
+    /** 移民出发时提示多远的玩家（离村中心）。 */
+    static final int MIGRANT_HINT_RADIUS = 96;
 
     private static final Map<UUID, Long> LAST_REFRESH = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> LAST_SAMPLE = new ConcurrentHashMap<>();
     @Nullable
     private static volatile VillagesConfig.Quests testConfig;
 
@@ -84,6 +90,11 @@ public final class QuestService {
 
     /** 每轮调度（节流 {@value #REFRESH_TICKS} 刻）：刷新任务状态、给在线的贡献者结算。 */
     public static void tick(VillageContext ctx) {
+        Long sampled = LAST_SAMPLE.get(ctx.village().id());
+        if (sampled == null || ctx.now() - sampled >= SAMPLE_TICKS || ctx.now() < sampled) {
+            LAST_SAMPLE.put(ctx.village().id(), ctx.now());
+            sample(ctx, ctx.now());
+        }
         Long last = LAST_REFRESH.get(ctx.village().id());
         if (last != null && ctx.now() - last < REFRESH_TICKS && ctx.now() >= last) {
             return;
@@ -91,6 +102,17 @@ public final class QuestService {
         LAST_REFRESH.put(ctx.village().id(), ctx.now());
         refresh(ctx);
         RepairQuests.showMarks(ctx, book(ctx.level().getServer(), ctx.village().id()));
+    }
+
+    /** 护送采样与救援判定（每 {@value #SAMPLE_TICKS} 刻；GameTest 直接调，指定此刻）。 */
+    public static void sample(VillageContext ctx, long now) {
+        MinecraftServer server = ctx.level().getServer();
+        VillageQuests.Book b = book(server, ctx.village().id());
+        VillagesConfig.Quests cfg = config();
+        EscortQuests.sample(ctx, b, cfg, now);
+        RescueQuests.step(ctx, b, cfg, now);
+        settleAll(server, b);
+        VillageQuests.get(server).setDirty();
     }
 
     static void scan(VillageContext ctx) {
@@ -108,6 +130,7 @@ public final class QuestService {
         if (cfg.enabled()) {
             List<QuestRules.Candidate> cands = new ArrayList<>(SupplyQuests.candidates(ctx, b, cfg));
             cands.addAll(RepairQuests.candidates(ctx, b, cfg));
+            cands.addAll(EscortQuests.candidates(ctx, b));
             for (QuestRules.Candidate c : QuestRules.pick(b.quests, cands, cfg.maxOpenPerVillage())) {
                 publish(ctx, b, c.source(), cfg);
             }
@@ -121,6 +144,7 @@ public final class QuestService {
             return Optional.empty();
         }
         Optional<Quest> q = source.startsWith(RepairQuests.PREFIX) ? RepairQuests.create(ctx, b, b.next, source, cfg)
+                : source.startsWith(EscortQuests.PREFIX) ? EscortQuests.create(ctx, b.next, source)
                 : SupplyQuests.create(ctx, b.next, source, cfg);
         q.ifPresent(x -> {
             b.next++;
@@ -158,6 +182,8 @@ public final class QuestService {
                 refreshSupply(ctx, q, today);
             } else if (q.type.equals(RepairQuests.TYPE)) {
                 RepairQuests.refresh(ctx, b, q, today);
+            } else if (q.type.equals(EscortQuests.TYPE)) {
+                EscortQuests.refresh(ctx, q, today);
             }
         }
         settleAll(server, b);
@@ -266,9 +292,20 @@ public final class QuestService {
             case ACCEPT -> QuestRules.canAccept(q, me, QuestRules.activeFor(b.quests, me), cfg.maxActivePerPlayer())
                     .map(r -> Outcome.of(r.name().toLowerCase(java.util.Locale.ROOT))).orElseGet(() -> {
                         q.accepted.add(me);
+                        if (q.type.equals(EscortQuests.TYPE)) {
+                            EscortQuests.restart(q, ctx.get().now());
+                        }
                         return Outcome.of("ok");
                     });
-            case ABANDON -> q.accepted.remove(me) ? Outcome.of("abandoned") : Outcome.of("closed");
+            case ABANDON -> {
+                if (!q.accepted.remove(me)) {
+                    yield Outcome.of("closed");
+                }
+                if (q.type.equals(EscortQuests.TYPE)) {
+                    EscortQuests.restart(q, ctx.get().now());
+                }
+                yield Outcome.of("abandoned");
+            }
             case DELIVER -> deliver(ctx.get(), b, q, player, cfg);
             default -> Outcome.of("closed");
         };
@@ -383,10 +420,30 @@ public final class QuestService {
             if (points > 0) {
                 b.contribution.merge(me, points, Integer::sum);
             }
+            conduct(player, b, q);
             player.sendSystemMessage(Component.translatable("mythic_age.quest.settled", titleComponent(player.server, b.village, q),
                     emeralds, points));
         }
         q.settled.add(me);
+    }
+
+    /**
+     * 救援、护送的善恶（§7.3、§8.2）：只有完成的才给；救援另有一张收据（同一场警戒救同一人只算一次）；护送要一路有真实危险。
+     * 每日正向上限由 {@code ConductService} 管。
+     */
+    static void conduct(ServerPlayer player, VillageQuests.Book b, Quest q) {
+        if (q.state != QuestState.COMPLETE) {
+            return;
+        }
+        var events = io.github.happysnappingturtle.mythicage.conduct.ConductService.config().events();
+        if (q.type.equals(RescueQuests.TYPE)) {
+            if (MythData.transact(player, Transactions.Request.unique(RescueQuests.conductReceipt(b.village, q))).status()
+                    == Transactions.Status.COMMITTED) {
+                io.github.happysnappingturtle.mythicage.conduct.ConductEvents.reward(player, "rescue_resident", events.rescueResident());
+            }
+        } else if (q.type.equals(EscortQuests.TYPE) && EscortQuests.dangerous(q)) {
+            io.github.happysnappingturtle.mythicage.conduct.ConductEvents.reward(player, "rescue_escort", events.rescueEscortQuest());
+        }
     }
 
     public static String receiptId(UUID village, Quest q) {
@@ -444,6 +501,9 @@ public final class QuestService {
                 rewards.add("emerald");
             }
             rewards.add("contribution");
+            if (q.type.equals(RescueQuests.TYPE) || q.type.equals(EscortQuests.TYPE)) {
+                rewards.add("conduct");
+            }
             AffairsView.Line reason = q.reason.isEmpty() || q.state == QuestState.OPEN ? AffairsView.Line.of("")
                     : AffairsView.Line.of("mythic_age.quest.reason." + q.reason);
             boolean canDeliver = q.type.equals(SupplyQuests.TYPE) && q.state == QuestState.OPEN
@@ -462,7 +522,12 @@ public final class QuestService {
     }
 
     static AffairsView.Line title(VillageContext ctx, Quest q) {
-        return q.type.equals(RepairQuests.TYPE) ? RepairQuests.title(ctx, q) : SupplyQuests.title(ctx, q);
+        return switch (q.type) {
+            case RepairQuests.TYPE -> RepairQuests.title(ctx, q);
+            case EscortQuests.TYPE -> EscortQuests.title(q);
+            case RescueQuests.TYPE -> RescueQuests.title(q);
+            default -> SupplyQuests.title(ctx, q);
+        };
     }
 
     static Component titleComponent(MinecraftServer server, UUID village, Quest q) {
@@ -470,6 +535,52 @@ public final class QuestService {
             AffairsView.Line l = title(c, q);
             return AffairsView.toComponent(l);
         }).orElse(Component.literal(q.id()));
+    }
+
+    // ───────────── 移民与居民事件（阶段 ③） ─────────────
+
+    /** 移民出发（{@code ResidentMigration.spawn}）：发护送任务（受每村开放上限）。 */
+    public static void onMigrantSpawned(VillageContext ctx, ResidentEntity migrant) {
+        VillagesConfig.Quests cfg = config();
+        if (!cfg.enabled()) {
+            return;
+        }
+        VillageQuests.Book b = book(ctx.level().getServer(), ctx.village().id());
+        List<QuestRules.Candidate> c = QuestRules.pick(b.quests,
+                List.of(new QuestRules.Candidate(EscortQuests.PREFIX + migrant.getUUID(), 100)), cfg.maxOpenPerVillage());
+        c.forEach(x -> publish(ctx, b, x.source(), cfg).ifPresent(q -> {
+            // 村里的玩家收到提示（T21 D10）：不然等他走到谷仓管事那里，移民早就到了
+            double r2 = (double) MIGRANT_HINT_RADIUS * MIGRANT_HINT_RADIUS;
+            for (ServerPlayer p : OnlinePlayers.in(ctx.level())) {
+                if (p.blockPosition().distSqr(ctx.center()) <= r2) {
+                    p.displayClientMessage(Component.translatable("mythic_age.quest.hint.migrant", q.label), true);
+                }
+            }
+        }));
+        VillageQuests.get(ctx.level().getServer()).setDirty();
+    }
+
+    /** 移民走到床位登记了（{@code ResidentMigration.Arrive}）：当刻判护送。 */
+    public static void onMigrantArrived(VillageContext ctx, UUID migrant) {
+        VillageQuests.Book b = book(ctx.level().getServer(), ctx.village().id());
+        b.quests.stream().filter(q -> q.type.equals(EscortQuests.TYPE) && q.target.equals(migrant.toString()))
+                .forEach(q -> EscortQuests.arrived(ctx, q, ctx.now()));
+        settleAll(ctx.level().getServer(), b);
+        VillageQuests.get(ctx.level().getServer()).setDirty();
+    }
+
+    /** 居民死了：以他为目标的护送、救援失败（合同 §7「目标死亡」）。 */
+    public static void onResidentDied(MinecraftServer server, UUID village, UUID resident, long today) {
+        VillageQuests.get(server).peek(village).ifPresent(b -> {
+            for (Quest q : b.quests) {
+                if (q.state.active() && q.target.equals(resident.toString())
+                        && (q.type.equals(EscortQuests.TYPE) || q.type.equals(RescueQuests.TYPE))) {
+                    q.move(QuestState.FAILED, today, "dead");
+                }
+            }
+            ThreatWatch.forget(resident);
+            VillageQuests.get(server).setDirty();
+        });
     }
 
     // ───────────── 查询（对话、GameTest） ─────────────
@@ -525,5 +636,7 @@ public final class QuestService {
     /** 只供 GameTest：清掉节流记录。 */
     public static void clearForTest(UUID village) {
         LAST_REFRESH.remove(village);
+        LAST_SAMPLE.remove(village);
+        ThreatWatch.clearForTest(village);
     }
 }

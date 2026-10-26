@@ -788,6 +788,16 @@ public final class LangKeys {
         add("mythic_age.quest.title.repair.at", "修好（%s, %s）一带建筑的损坏", "Repair the damaged building near (%s, %s)", "（%s, %s）付近の建物の損傷を直す");
         add("mythic_age.quest.title.supply.repair", "为修缮备料：%s", "Materials for repairs: %s", "修繕の資材：%s");
         add("mythic_age.quest.reason.site", "建筑已经不在了", "the building is gone", "建物がなくなった");
+        add("mythic_age.quest.title.escort", "护送 %s 进村", "Escort %s into the village", "%sを村まで護衛する");
+        add("mythic_age.quest.title.rescue", "%s 遇险", "%s is in danger", "%sが危ない");
+        add("mythic_age.quest.reason.dead", "人没能活下来", "they didn't survive", "助からなかった");
+        add("mythic_age.quest.reason.lost", "移民没能走到村里", "the newcomer never made it", "移住者はたどり着けなかった");
+        add("mythic_age.quest.reason.absent", "你没有一路陪着", "you didn't stay with them", "最後まで付き添わなかった");
+        add("mythic_age.quest.reason.unescorted", "没有人护送，已自己走到了", "arrived on their own", "ひとりでたどり着いた");
+        add("mythic_age.quest.reason.no_rescuer", "没有人救下（威胁已退）", "no one came to the rescue (the threat is gone)", "誰も助けなかった（脅威は去った）");
+        add("mythic_age.quest.hint.migrant", "%s 正往村里来，可在谷仓管事处接护送", "%s is on the way to the village; ask the steward to escort them", "%sが村へ向かっている。管理人のところで護衛を引き受けられる");
+        add("mythic_age.quest.hint.rescue", "%s 遇险！", "%s is in danger!", "%sが危ない！");
+        add("mythic_age.quest.escort.absent", "你没有一路陪着 %s，护送不算数", "You didn't stay with %s; the escort doesn't count", "%sに付き添わなかったので、護衛にならなかった");
         add("mythic_age.quest.screen.title", "委托", "Requests", "依頼");
         add("mythic_age.quest.screen.open", "委托", "Requests", "依頼");
         add("mythic_age.quest.screen.heading", "%s · 委托", "%s · Requests", "%s・依頼");

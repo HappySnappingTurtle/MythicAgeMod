@@ -29,6 +29,8 @@ import java.util.function.Consumer;
  * /mythicage dev village quest expire &lt;编号&gt;      让任务今天到期（实测自修用）
  * /mythicage dev village quest damage             本村的建筑损坏记录（每座最多列 12 格）
  * /mythicage dev village quest selfrepair         未修的损坏格立刻转给村民自修（不等 5 日）
+ * /mythicage dev village quest migrant            有空床就立刻来一名在途移民（发护送任务）
+ * /mythicage dev village quest threats            本村盯着居民的威胁、护送计数（在场 / 总刻数、危险）
  * </pre>
  */
 public final class QuestDevCommand {
@@ -95,9 +97,30 @@ public final class QuestDevCommand {
                 ok(c, q.id() + " → " + q.state.id());
             }, () -> c.getSource().sendFailure(Component.literal("没有这个任务")));
         })));
+        var migrant = Commands.literal("migrant").executes(c -> withCtx(c, ctx ->
+                io.github.happysnappingturtle.mythicage.village.work.ResidentMigration.forceForCommand(ctx).ifPresentOrElse(
+                        r -> ok(c, "移民 " + (r.getCustomName() == null ? "" : r.getCustomName().getString()) + " 出发了，在 "
+                                + r.blockPosition().toShortString()),
+                        () -> c.getSource().sendFailure(Component.literal("没有空床或已有在途移民")))));
+        var threats = Commands.literal("threats").executes(c -> withCtx(c, ctx -> {
+            var ws = ThreatWatch.inVillage(ctx.village().id());
+            ok(c, "被盯上的居民 " + ws.size() + " · 警戒中 " + ctx.rt().alarmed(ctx.now()) + " 场次 " + ctx.rt().alertSerial());
+            for (ThreatWatch.Watch w : ws) {
+                ok(c, "  " + w.ward.toString().substring(0, 8) + " 威胁 " + w.threats.size());
+                w.threats.values().forEach(t -> ok(c, "    " + t.id.toString().substring(0, 8) + (t.dead ? " 已死" : "") + " 受伤 "
+                        + String.format("%.1f", t.total) + " 玩家 " + t.byPlayer.size()
+                        + t.killer.map(k -> " 致死 " + k.toString().substring(0, 8)).orElse("")));
+            }
+            for (Quest q : QuestService.book(ctx.level().getServer(), ctx.village().id()).quests) {
+                if (q.type.equals(EscortQuests.TYPE)) {
+                    ok(c, "  护送 " + q.id() + " " + q.state.id() + " 在场 " + q.vars.getOrDefault("near", 0L) + " / "
+                            + q.vars.getOrDefault("total", 0L) + " 危险 " + q.vars.getOrDefault("danger", 0L));
+                }
+            }
+        }));
         d.register(Commands.literal("mythicage").then(Commands.literal("dev").requires(s -> s.hasPermission(2))
                 .then(Commands.literal("village").then(Commands.literal("quest").then(list).then(scan).then(open).then(act)
-                        .then(expire).then(damage).then(self)))));
+                        .then(expire).then(damage).then(self).then(migrant).then(threats)))));
     }
 
     private static int withCtx(CommandContext<CommandSourceStack> c, Consumer<VillageContext> run) {

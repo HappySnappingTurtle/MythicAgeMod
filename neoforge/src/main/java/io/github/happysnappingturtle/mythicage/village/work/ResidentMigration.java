@@ -143,6 +143,7 @@ public final class ResidentMigration {
             ctx.state().migrantSince = ctx.now();
             ctx.state().log(ctx.today(), "mythic_age.village.log.migrant_coming", "@" + professionKey(prof));
             VillageEconomy.get(ctx.level().getServer()).setDirty();
+            io.github.happysnappingturtle.mythicage.village.quest.QuestService.onMigrantSpawned(ctx, e);
         });
         return r;
     }
@@ -240,6 +241,7 @@ public final class ResidentMigration {
             s.log(ctx.today(), "mythic_age.village.log.migrant_arrived",
                     resident.getCustomName() == null ? "" : resident.getCustomName().getString(), "@" + professionKey(resident.profession()));
             VillageEconomy.get(ctx.level().getServer()).setDirty();
+            io.github.happysnappingturtle.mythicage.village.quest.QuestService.onMigrantArrived(ctx, id);
             return true;
         }
     }

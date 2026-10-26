@@ -645,6 +645,8 @@ public final class VillageScheduler {
             s.roster.remove(resident.getUUID());
             io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.onDied(s, resident);
             ResidentMigration.onDied(s, resident, MythDays.today(level.getServer()));
+            io.github.happysnappingturtle.mythicage.village.quest.QuestService.onResidentDied(level.getServer(), v, resident.getUUID(),
+                    MythDays.today(level.getServer()));
             VillageEconomy.get(level.getServer()).setDirty();
         }));
     }

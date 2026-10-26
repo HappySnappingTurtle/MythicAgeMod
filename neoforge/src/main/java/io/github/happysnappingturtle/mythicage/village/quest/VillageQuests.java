@@ -284,6 +284,10 @@ public final class VillageQuests extends SavedData {
         t.put("contrib", writeInts(q.contrib));
         t.put("accepted", uuids(q.accepted));
         t.put("settled", uuids(q.settled));
+        t.putString("label", q.label);
+        CompoundTag vars = new CompoundTag();
+        q.vars.forEach(vars::putLong);
+        t.put("vars", vars);
         return t;
     }
 
@@ -307,6 +311,9 @@ public final class VillageQuests extends SavedData {
         for (Tag x : t.getList("settled", Tag.TAG_STRING)) {
             q.settled.add(UUID.fromString(x.getAsString()));
         }
+        q.label = t.getString("label");
+        CompoundTag vars = t.getCompound("vars");
+        vars.getAllKeys().forEach(k -> q.vars.put(k, vars.getLong(k)));
         return q;
     }
 

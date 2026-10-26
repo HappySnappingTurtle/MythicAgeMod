@@ -437,13 +437,61 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
             }
             return true;
         }
-        if (level().getNearestPlayer(this, 16) == null && standable(stand)) {
+        if (!playerNear(16) && standable(stand)) {
             moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, getYRot(), getXRot());
             getNavigation().stop();
             lastProgress = level().getGameTime();
             return true;
         }
         abortJob(true);
+        return false;
+    }
+
+    /** 附近有没有（非旁观的）玩家；含 GameTest 登记的假玩家。 */
+    private boolean playerNear(double r) {
+        if (!(level() instanceof ServerLevel sl)) {
+            return false;
+        }
+        for (ServerPlayer p : io.github.happysnappingturtle.mythicage.player.OnlinePlayers.in(sl)) {
+            if (!p.isSpectator() && p.distanceToSqr(this) <= r * r) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 在途移民分段走的段长（由长到短试）。 */
+    private static final int[] SEGMENTS = {32, 16, 8};
+
+    /**
+     * 朝目标走一段（T21 D10）：在连线上取 32 / 16 / 8 格处的地面落脚点，能寻到路就走过去。
+     * 返回是否开始走了。
+     */
+    private boolean walkSegment(BlockPos goal, double speed) {
+        double dx = goal.getX() + 0.5 - getX();
+        double dz = goal.getZ() + 0.5 - getZ();
+        double d = Math.sqrt(dx * dx + dz * dz);
+        for (int len : SEGMENTS) {
+            if (len >= d) {
+                continue;
+            }
+            int x = net.minecraft.util.Mth.floor(getX() + dx / d * len);
+            int z = net.minecraft.util.Mth.floor(getZ() + dz / d * len);
+            if (!level().isLoaded(new BlockPos(x, getBlockY(), z))) {
+                continue;
+            }
+            int y = level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            BlockPos at = standSpot(new BlockPos(x, y, z), 2);
+            if (!standable(at)) {
+                continue;
+            }
+            if (getNavigation().moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, speed)) {
+                net.minecraft.world.level.pathfinder.Path path = getNavigation().getPath();
+                if (path != null && path.getNodeCount() > 1) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -522,11 +570,15 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                     repathIn = 1;
                 } else if (repathIn <= 0 || getNavigation().isDone()) {
                     repathIn = 40;
-                    boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5,
-                            (s.running() ? RUN_SPEED : WALK_SPEED) / 0.5);
+                    double speed = (s.running() ? RUN_SPEED : WALK_SPEED) / 0.5;
+                    boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, speed);
                     net.minecraft.world.level.pathfinder.Path p = getNavigation().getPath();
                     if (!moving || p == null || p.getNodeCount() <= 1) {
-                        if (++stuckTries >= STUCK_LIMIT) {
+                        if (inTransit()) {
+                            // 在途移民离床位太远、一次寻不到路：先朝床位走一段（T21 D10），不立刻传送到床位——
+                            // 不然护送根本来不及；真走不动时由「卡住」兜底（20 秒没进展、16 格内没有玩家才传送）
+                            walkSegment(stand, speed);
+                        } else if (++stuckTries >= STUCK_LIMIT) {
                             stuckTries = 0;
                             returnHome();
                         }

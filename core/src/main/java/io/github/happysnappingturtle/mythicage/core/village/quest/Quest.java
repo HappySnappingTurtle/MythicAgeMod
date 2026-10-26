@@ -63,6 +63,10 @@ public final class Quest {
     public final Map<UUID, Integer> contrib = new LinkedHashMap<>();
     public final Set<UUID> accepted = new LinkedHashSet<>();
     public final Set<UUID> settled = new LinkedHashSet<>();
+    /** 界面上显示的名字（护送、救援：居民的名字；目标不在了也能显示）。 */
+    public String label = "";
+    /** 类型自己的计数（护送：接取起的刻数、在场刻数、有没有真实危险；救援：警戒场次）。 */
+    public final Map<String, Long> vars = new LinkedHashMap<>();
 
     public Quest(int number, String type, String source, String target, Scope scope, long issued, int need, long deadline) {
         this.number = number;
@@ -102,9 +106,12 @@ public final class Quest {
         return true;
     }
 
-    /** 这名玩家在这个任务里交过东西（或修过、护送过、救过）。 */
+    /**
+     * 这名玩家在这个任务里交过东西（或修过、护送过、救过）。贡献表里有他就算（护送、救援在贡献权重为 0 时也记一条 0，
+     * 照样结算善恶）。
+     */
     public boolean contributed(UUID player) {
-        return owed.getOrDefault(player, 0.0) > 0 || contrib.getOrDefault(player, 0) > 0;
+        return owed.getOrDefault(player, 0.0) > 0 || contrib.containsKey(player);
     }
 
     /** 结束了、但这名玩家还没结算。 */
@@ -135,6 +142,20 @@ public final class Quest {
         }
         if (points > 0) {
             contrib.merge(player, points, Integer::sum);
+        }
+    }
+
+    /**
+     * 记一次定额的贡献（护送、救援）：同一个任务对同一人只记一次（同一场警戒救同一人两次也只算一次，TC-T21-38）；
+     * 贡献权重为 0 时也记下他，结算时照样给善恶。
+     */
+    public void creditOnce(UUID player, double emeralds, int points) {
+        if (contrib.containsKey(player)) {
+            return;
+        }
+        contrib.put(player, Math.max(0, points));
+        if (emeralds > 0) {
+            owed.put(player, emeralds);
         }
     }
 

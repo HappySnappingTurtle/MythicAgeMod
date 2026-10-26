@@ -175,6 +175,12 @@ public final class MythicAge {
         game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onExplosion);
         game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onLivingDestroy);
         game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.BuildingDamage::onPlace);
+        // T21 阶段 ③：护送与救援盯着的威胁、玩家刷出来的生物
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.ThreatWatch::onFinalizeSpawn);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.ThreatWatch::onChangeTarget);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.ThreatWatch::onDamagePost);
+        game.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.quest.ThreatWatch::onDeath);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.quest.ThreatWatch::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillageDevCommand::onRegisterCommands);
 
         // 晋升、立祀、改奉与主神像（T11a）

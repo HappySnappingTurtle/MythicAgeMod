@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** T21 阶段 ①：任务框架与缺料供给的纯逻辑（单元测试用例文档 TC-T21-01～24）。 */
+/** T21：任务框架、缺料供给、修复、护送与救援的纯逻辑（单元测试用例文档 TC-T21-01～39）。 */
 class QuestTest {
     static final UUID A = UUID.nameUUIDFromBytes("a".getBytes());
     static final UUID B = UUID.nameUUIDFromBytes("b".getBytes());
@@ -298,5 +298,74 @@ class QuestTest {
         assertFalse(c.quests().enabled());
         assertEquals(3, c.quests().maxActivePerPlayer(), "越界用默认值");
         assertEquals(7, c.quests().supplyDays());
+    }
+
+    // ───────────── 护送（TC-31～34） ─────────────
+
+    @Test
+    void tc31EscortPresence() {
+        assertTrue(EscortRules.enough(120, 200, 0.6), "10 次在场 6 次：成功");
+        assertFalse(EscortRules.enough(100, 200, 0.6), "5 次：在场不足");
+        assertFalse(EscortRules.enough(0, 0, 0.6), "一刻都没记到的不算");
+    }
+
+    @Test
+    void tc32EscortRadiusInclusive() {
+        assertTrue(EscortRules.within(24 * 24, 24), "恰好 24 格算在场");
+        assertFalse(EscortRules.within(24 * 24 + 0.01, 24));
+    }
+
+    @Test
+    void tc33And34EscortDanger() {
+        RescueRules.Danger wild = new RescueRules.Danger(false, false, java.util.Set.of(), java.util.Set.of());
+        assertTrue(wild.realFor(A), "野生的、没人挑衅过：真实危险");
+        RescueRules.Danger egg = new RescueRules.Danger(true, false, java.util.Set.of(), java.util.Set.of());
+        assertFalse(egg.realFor(A), "玩家刷出来的：不加善");
+    }
+
+    // ───────────── 救援（TC-35～39） ─────────────
+
+    @Test
+    void tc35RescuersKillerAndMajority() {
+        java.util.Set<UUID> r = RescueRules.rescuers(java.util.Map.of(A, 8.0, B, 12.0), 20, Optional.of(A));
+        assertEquals(java.util.Set.of(A, B), r, "A 致死一击、B 60%：两人都算");
+    }
+
+    @Test
+    void tc36SoldierKillNobody() {
+        java.util.Set<UUID> r = RescueRules.rescuers(java.util.Map.of(A, 8.0, B, 7.0), 20, Optional.empty());
+        assertTrue(r.isEmpty(), "A 40%、B 35%、士兵致死：没人救下");
+        assertTrue(RescueRules.rescuers(java.util.Map.of(A, 10.0), 20, Optional.empty()).isEmpty(), "恰好一半不算过半");
+    }
+
+    @Test
+    void tc37SelfMadeDanger() {
+        assertFalse(new RescueRules.Danger(true, false, java.util.Set.of(), java.util.Set.of()).realFor(A), "刷怪笼 / 刷怪蛋 / 命令");
+        assertFalse(new RescueRules.Danger(false, true, java.util.Set.of(), java.util.Set.of()).realFor(A), "有主人");
+        RescueRules.Danger provoked = new RescueRules.Danger(false, false, java.util.Set.of(A), java.util.Set.of());
+        assertFalse(provoked.realFor(A), "A 先挑衅过");
+        assertTrue(provoked.realFor(B), "对没挑衅的 B 仍是真实危险");
+        assertFalse(new RescueRules.Danger(false, false, java.util.Set.of(), java.util.Set.of(A)).realFor(A), "A 伤过这名居民");
+    }
+
+    @Test
+    void tc38RescueCreditOnce() {
+        Quest q = new Quest(1, "rescue", "rescue:3:x", "x", Quest.Scope.EVENT, 10, 1, -1);
+        q.creditOnce(A, 0, 3);
+        q.creditOnce(A, 0, 3);
+        assertEquals(3, q.contrib.get(A), "换了一只威胁也只记一次");
+        Quest zero = new Quest(2, "rescue", "rescue:3:y", "y", Quest.Scope.EVENT, 10, 1, -1);
+        zero.creditOnce(B, 0, 0);
+        assertTrue(zero.contributed(B), "贡献权重 0 也算参与（照样结算善恶）");
+        assertEquals(0, zero.payout(B), "D5：默认不给绿宝石");
+    }
+
+    @Test
+    void tc39RescueFailedNoSettle() {
+        Quest q = new Quest(1, "rescue", "rescue:3:x", "x", Quest.Scope.EVENT, 10, 1, -1);
+        q.creditOnce(A, 0, 3);
+        assertTrue(q.move(QuestState.FAILED, 10, "dead"));
+        assertFalse(q.owes(A), "居民死了：失败，不结算");
+        assertTrue(q.state.terminal());
     }
 }
