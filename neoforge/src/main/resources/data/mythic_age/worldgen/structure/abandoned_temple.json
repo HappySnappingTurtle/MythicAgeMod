@@ -1,0 +1,10 @@
+{
+  "type": "mythic_age:ruin",
+  "biomes": "#mythic_age:region/greek",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "spec": "greek:abandoned_temple",
+  "kind": "greek:abandoned_temple",
+  "max_relief": 4
+}

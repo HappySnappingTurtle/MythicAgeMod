@@ -78,6 +78,9 @@ public final class PowerClientSetup {
         // 哨兵石像：GeckoLib 模型 + 眼睛发光层；视线只叠加在头上（升起、碎化期间不叠加）
         event.registerEntityRenderer(GreekPowers.SENTINEL_ENTITY.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("sentinel", Set.of()), 0.8F).glowing());
+        // 废弃神殿的敌对哨兵（T22）：同一套模型与动画
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.ruin.GreekRuins.RUIN_SENTINEL.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("sentinel", Set.of()), 0.8F).glowing());
     }
 
     @SubscribeEvent

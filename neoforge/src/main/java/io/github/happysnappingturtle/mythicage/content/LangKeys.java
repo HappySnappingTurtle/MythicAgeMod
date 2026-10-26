@@ -674,6 +674,7 @@ public final class LangKeys {
         add("item.mythic_age.gp_gr_sentinel.tip", "在落点四角召唤 4 尊哨兵石像，自动射击 16 格内的敌人（每箭 4 点），持续 1 个 MC 日；在自己的神坛 32 格内持续 3 日", "Raise 4 sentinels at the corners of the target point; they shoot enemies within 16 blocks (4 per arrow) for one Minecraft day, or three near your own altar (32 blocks)", "着弾点の四隅に番人の石像を4体呼び出し、16ブロック内の敵を自動で射る（1本4ダメージ）。1日持続、自分の祭壇の32ブロック内なら3日");
         add("item.mythic_age.gp_gr_sentinel.tip2", "哈迪斯 · 吟唱 2 秒 · 冷却 60 秒 · 16 格 · 同时只保留 1 组", "Hades · 2 s cast · 60 s cooldown · 16 blocks · one group at a time", "ハデス・詠唱2秒・クールダウン60秒・16ブロック・同時に1組まで");
         add("entity.mythic_age.sentinel", "哨兵石像", "Sentinel", "番人の石像");
+        add("entity.mythic_age.ruin_sentinel", "古神殿哨兵", "Temple Sentinel", "古神殿の番人");
         add("mythic_age.power.gp_gr_pestilence", "瘟疫", "Pestilence", "疫病");
         add("mythic_age.power.gp_gr_curse", "诅咒", "Curse", "呪い");
         add("item.mythic_age.gp_gr_pestilence.tip", "掷出陶瓮，落点半径 24 内 5 分钟：敌人虚弱、缓慢，远程敌人无法开弓或施法，刷怪器停摆、不自然生成怪物", "Throw the urn: for 5 minutes within 24 blocks, enemies are weakened and slowed, ranged enemies cannot shoot or cast, spawners stall and no monsters spawn naturally", "壺を投げ、落下点の半径24で5分間：敵は弱体化・鈍化し、遠距離の敵は弓も魔法も使えず、スポナーは停止し、モンスターは自然湧きしない");

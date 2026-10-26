@@ -1,21 +1,244 @@
 {
-  "__comment": "遗迹宝库（T22 阶段 ①，临时外观）：大理石基座上的青铜箱；阶段 ② 换正式模型",
+  "__comment": "遗迹宝库（T22 阶段 ②）：大理石基座上的青铜箱，两道铜箍、外伸的箱盖檐、正面金色锁扣（朝北为正面，方块按 facing 旋转）",
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "mythic_age:block/greek_statue_bronze",
     "base": "mythic_age:block/marble_ashlar",
-    "bronze": "mythic_age:block/greek_statue_bronze"
+    "bronze": "mythic_age:block/greek_statue_bronze",
+    "band": "minecraft:block/cut_copper",
+    "lock": "minecraft:block/gold_block"
   },
   "elements": [
-    {"from": [0, 0, 0], "to": [16, 4, 16], "faces": {
-      "down": {"texture": "#base", "cullface": "down"}, "up": {"texture": "#base"},
-      "north": {"texture": "#base", "cullface": "north"}, "south": {"texture": "#base", "cullface": "south"},
-      "west": {"texture": "#base", "cullface": "west"}, "east": {"texture": "#base", "cullface": "east"}}},
-    {"from": [2, 4, 3], "to": [14, 13, 13], "faces": {
-      "up": {"texture": "#bronze"}, "north": {"texture": "#bronze"}, "south": {"texture": "#bronze"},
-      "west": {"texture": "#bronze"}, "east": {"texture": "#bronze"}}},
-    {"from": [1.5, 13, 2.5], "to": [14.5, 14, 13.5], "faces": {
-      "up": {"texture": "#bronze"}, "down": {"texture": "#bronze"}, "north": {"texture": "#bronze"}, "south": {"texture": "#bronze"},
-      "west": {"texture": "#bronze"}, "east": {"texture": "#bronze"}}}
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base"
+        },
+        "south": {
+          "texture": "#base"
+        },
+        "east": {
+          "texture": "#base"
+        },
+        "west": {
+          "texture": "#base"
+        },
+        "up": {
+          "texture": "#base"
+        },
+        "down": {
+          "texture": "#base"
+        }
+      },
+      "__comment": "基座"
+    },
+    {
+      "from": [
+        1,
+        3,
+        1
+      ],
+      "to": [
+        15,
+        4,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base"
+        },
+        "south": {
+          "texture": "#base"
+        },
+        "east": {
+          "texture": "#base"
+        },
+        "west": {
+          "texture": "#base"
+        },
+        "up": {
+          "texture": "#base"
+        },
+        "down": {
+          "texture": "#base"
+        }
+      },
+      "__comment": "基座顶沿"
+    },
+    {
+      "from": [
+        2,
+        4,
+        3
+      ],
+      "to": [
+        14,
+        12,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "up": {
+          "texture": "#bronze"
+        },
+        "down": {
+          "texture": "#bronze"
+        }
+      },
+      "__comment": "箱身"
+    },
+    {
+      "from": [
+        1.5,
+        12,
+        2.5
+      ],
+      "to": [
+        14.5,
+        14,
+        13.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        },
+        "up": {
+          "texture": "#bronze"
+        },
+        "down": {
+          "texture": "#bronze"
+        }
+      },
+      "__comment": "箱盖"
+    },
+    {
+      "from": [
+        3.5,
+        4,
+        2.8
+      ],
+      "to": [
+        5,
+        13,
+        13.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#band"
+        },
+        "south": {
+          "texture": "#band"
+        },
+        "east": {
+          "texture": "#band"
+        },
+        "west": {
+          "texture": "#band"
+        },
+        "up": {
+          "texture": "#band"
+        },
+        "down": {
+          "texture": "#band"
+        }
+      },
+      "__comment": "左箍"
+    },
+    {
+      "from": [
+        11,
+        4,
+        2.8
+      ],
+      "to": [
+        12.5,
+        13,
+        13.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#band"
+        },
+        "south": {
+          "texture": "#band"
+        },
+        "east": {
+          "texture": "#band"
+        },
+        "west": {
+          "texture": "#band"
+        },
+        "up": {
+          "texture": "#band"
+        },
+        "down": {
+          "texture": "#band"
+        }
+      },
+      "__comment": "右箍"
+    },
+    {
+      "from": [
+        7,
+        8,
+        2.5
+      ],
+      "to": [
+        9,
+        11,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lock"
+        },
+        "south": {
+          "texture": "#lock"
+        },
+        "east": {
+          "texture": "#lock"
+        },
+        "west": {
+          "texture": "#lock"
+        },
+        "up": {
+          "texture": "#lock"
+        },
+        "down": {
+          "texture": "#lock"
+        }
+      },
+      "__comment": "锁扣"
+    }
   ]
 }

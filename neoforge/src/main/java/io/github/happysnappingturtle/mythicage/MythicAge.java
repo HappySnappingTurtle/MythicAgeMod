@@ -74,6 +74,7 @@ public final class MythicAge {
         GreekGuardian.init();
         io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
         io.github.happysnappingturtle.mythicage.structure.RuinVaults.init();
+        io.github.happysnappingturtle.mythicage.content.greek.ruin.GreekRuins.init(modBus);
         io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment.init(modBus);
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
@@ -153,6 +154,7 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.RuinVaults::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureSpecs::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
         // 居民框架（T19）

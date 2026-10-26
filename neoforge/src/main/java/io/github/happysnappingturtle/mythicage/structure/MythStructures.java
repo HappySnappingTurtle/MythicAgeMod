@@ -14,6 +14,9 @@ public final class MythStructures {
     private static final DeferredRegister<StructurePieceType> PIECES =
             DeferredRegister.create(Registries.STRUCTURE_PIECE, MythicAgeIds.MOD_ID);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<RuinStructure>> RUIN =
+            TYPES.register("ruin", () -> () -> RuinStructure.CODEC);
+
     public static final DeferredHolder<StructurePieceType, StructurePieceType> TEMPLATE_PIECE =
             PIECES.register("template", () -> (StructurePieceType.StructureTemplateType) TemplatePiece::new);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> INFO_PIECE =

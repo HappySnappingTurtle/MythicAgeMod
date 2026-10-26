@@ -19,10 +19,11 @@ from buildgen import Building
 W_X, W_Z = 31, 21
 CZ = 10  # 中轴（z）
 
-# 白模替身（阶段 ② 换正式方块）：碎石、残像、宝库
-RUBBLE = "minecraft:cobblestone_slab"
-RUBBLE_BLOCK = "minecraft:cobblestone"
-VAULT = "minecraft:barrel"
+# 正式方块（T22 阶段 ②；白模时用圆石台阶、木桶代替）：碎石、残缺神像、宝库
+RUBBLE = "mythic_age:marble_rubble"
+STATUE = "mythic_age:broken_greek_statue"
+VAULT = "mythic_age:ruin_vault"
+FACINGS = ("north", "east", "south", "west")
 
 # 每根柱子剩多高：-1 = 完全没了（只剩台面），0 = 只剩柱础，1..3 = 柱础 + 几段柱身，5 = 完整（柱础 + 3 段 + 柱头）
 # 东立面（x = 22）只有 z = 6、14 两根完整：挡住前庭哨兵看向内殿门的斜线（合同：前庭至少 2 根完整柱子）
@@ -110,8 +111,8 @@ def abandoned_temple() -> Building:
             b.set(x, top + 6, z, "roof_slab", type="bottom")
     # 内殿：神像在西端（面朝东门），台座 1 格
     b.set(11, top, CZ, "floor")
-    b.set(11, top + 1, CZ, "statue", half="lower", facing="east")
-    b.set(11, top + 2, CZ, "statue", half="upper", facing="east")
+    b.set(11, top + 1, CZ, STATUE, half="lower", facing="east")
+    b.set(11, top + 2, CZ, STATUE, half="upper", facing="east")
     b.anchor("statue", 11, top + 1, CZ)
     # 后殿：宝库靠西墙正中，两侧各一个普通箱子
     b.set(6, top, CZ, VAULT, facing="east")
@@ -131,13 +132,17 @@ def abandoned_temple() -> Building:
         x, z = rnd.randint(10, 18), rnd.randint(6, 14)
         if (x, z) in ((11, CZ), (10, CZ), (18, CZ), (18, CZ - 1), (18, CZ + 1)) or abs(z - CZ) <= 1:
             continue
-        b.set(x, top, z, rnd.choice([RUBBLE, RUBBLE, "roof_slab", "smooth_slab"]), type="bottom")
+        kind = rnd.choice([RUBBLE, RUBBLE, "roof_slab", "smooth_slab"])
+        if kind == RUBBLE:
+            b.set(x, top, z, RUBBLE, facing=rnd.choice(FACINGS))
+        else:
+            b.set(x, top, z, kind, type="bottom")
     # 围柱回廊与台基上的碎块
     for _ in range(18):
         x, z = rnd.randint(1, 22), rnd.choice([1, 19, rnd.randint(1, 19)])
         if (x, top, z) in b.blocks or 5 <= x <= 19 and 5 <= z <= 15:
             continue
-        b.set(x, top, z, RUBBLE, type="bottom")
+        b.set(x, top, z, RUBBLE, facing=rnd.choice(FACINGS))
     # 青苔与杂草：台基上零星的苔藓地毯
     for _ in range(30):
         x, z = rnd.randint(1, 22), rnd.randint(1, 19)

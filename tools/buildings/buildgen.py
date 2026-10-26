@@ -340,10 +340,12 @@ def parse_state(state: str):
     return name, props
 
 
-def export_template(b: Building, short: str, meta: dict, civ="greek"):
+def export_template(b: Building, short: str, meta: dict, civ="greek", kind="village"):
     """把体素导出成结构模板（.nbt）+ 建筑数据（.json）。
 
     原点 = 体素包围盒最小角；y ≥ 0 的空格写成空气（建筑内部与上方清空），y < 0 的空格不写（保留地形）。
+    kind：village（村庄建筑，数据在 village_building/）或其他结构类别（ruin、labyrinth，T22；数据在 structure_spec/，
+    村庄系统读不到它们）。
     返回 (模板路径, 数据路径)。
     """
     import json
@@ -392,7 +394,7 @@ def export_template(b: Building, short: str, meta: dict, civ="greek"):
         "blocks": List(TAG_COMPOUND, blocks),
         "entities": List(TAG_COMPOUND, entities),
     })
-    tpl = DATA_ROOT / "structure" / "village" / civ / f"{short}.nbt"
+    tpl = DATA_ROOT / "structure" / kind / civ / f"{short}.nbt"
     write_gzip(tpl, root)
 
     def rel(p):
@@ -401,7 +403,7 @@ def export_template(b: Building, short: str, meta: dict, civ="greek"):
     data = {
         "id": f"{civ}:{short}",
         "civ": civ,
-        "template": f"mythic_age:village/{civ}/{short}",
+        "template": f"mythic_age:{kind}/{civ}/{short}",
         "size": list(size),
         "floor_y": -y0,
         "frame": [x0, y0, z0],
@@ -412,7 +414,7 @@ def export_template(b: Building, short: str, meta: dict, civ="greek"):
     if "door" in meta:
         d = meta["door"]
         data["door"] = {"pos": rel(d["pos"]), "facing": d["facing"]}
-    js = DATA_ROOT / "mythic_age" / "village_building" / civ / f"{short}.json"
+    js = DATA_ROOT / "mythic_age" / ("village_building" if kind == "village" else "structure_spec") / civ / f"{short}.json"
     js.parent.mkdir(parents=True, exist_ok=True)
     js.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return tpl, js

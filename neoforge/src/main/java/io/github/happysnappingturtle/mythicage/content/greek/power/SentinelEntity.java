@@ -123,7 +123,7 @@ public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerP
         return b >= 0 && b < Pose.values().length ? Pose.values()[b] : Pose.IDLE;
     }
 
-    private void setPoseState(Pose p, int ticks) {
+    protected void setPoseState(Pose p, int ticks) {
         entityData.set(POSE, (byte) p.ordinal());
         entityData.set(POSE_START, tickCount);
         poseTicks = ticks;
@@ -235,12 +235,36 @@ public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerP
             LivingEntity t = pickTarget(server);
             if (t != null) {
                 drawTarget = t.getUUID();
-                cooldown = SentinelRules.SHOT_INTERVAL;
+                cooldown = shotInterval();
                 setPoseState(Pose.DRAW, SentinelRules.DRAW_TICKS);
                 getLookControl().setLookAt(t, 30, 30);
                 GreekPowers.play(this, "gp.gr.sentinel.draw");
             }
         }
+    }
+
+    // ───────────── 可覆盖的规则（遗迹守卫版 RuinSentinelEntity 改这些） ─────────────
+
+    /** 射程（格）。 */
+    protected double range() {
+        return SentinelRules.RANGE;
+    }
+
+    /** 两箭之间的刻数。 */
+    protected int shotInterval() {
+        return SentinelRules.SHOT_INTERVAL;
+    }
+
+    /** 每箭的伤害。 */
+    protected float arrowDamage() {
+        return SentinelRules.ARROW_DAMAGE;
+    }
+
+    /** 该不该射它（也用来判断射线上的生物要不要避开：不该射的挡在路上就不射）。 */
+    protected boolean shouldShoot(ServerLevel server, LivingEntity e) {
+        ServerPlayer op = ownerPlayer(server);
+        Set<UUID> own = op == null ? Set.of() : TargetFactsCollector.ownVillages(op);
+        return hostile(server, e, op, own);
     }
 
     @Nullable
@@ -262,18 +286,14 @@ public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerP
     }
 
     private boolean valid(ServerLevel server, LivingEntity t) {
-        ServerPlayer op = ownerPlayer(server);
-        Set<UUID> own = op == null ? Set.of() : TargetFactsCollector.ownVillages(op);
-        return t.distanceTo(this) <= SentinelRules.RANGE && hostile(server, t, op, own);
+        return t.distanceTo(this) <= range() && shouldShoot(server, t);
     }
 
     @Nullable
     LivingEntity pickTarget(ServerLevel server) {
-        ServerPlayer op = ownerPlayer(server);
-        Set<UUID> own = op == null ? Set.of() : TargetFactsCollector.ownVillages(op);
-        double r = SentinelRules.RANGE;
+        double r = range();
         List<LivingEntity> near = server.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(r),
-                e -> e.distanceTo(this) <= r && hostile(server, e, op, own));
+                e -> e.distanceTo(this) <= r && shouldShoot(server, e));
         near.sort(Comparator.comparingDouble(e -> e.distanceToSqr(this)));
         for (LivingEntity e : near) {
             if (clear(server, e)) {
@@ -291,11 +311,9 @@ public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerP
                 != HitResult.Type.MISS) {
             return false;
         }
-        ServerPlayer op = ownerPlayer(server);
-        Set<UUID> own = op == null ? Set.of() : TargetFactsCollector.ownVillages(op);
         for (LivingEntity e : server.getEntitiesOfClass(LivingEntity.class, new AABB(from, to).inflate(1),
                 e -> e != this && e != target && e.isAlive())) {
-            if (e.getBoundingBox().inflate(0.3).clip(from, to).isPresent() && !hostile(server, e, op, own)) {
+            if (e.getBoundingBox().inflate(0.3).clip(from, to).isPresent() && !shouldShoot(server, e)) {
                 return false;
             }
         }
@@ -313,8 +331,8 @@ public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerP
         double horizontal = Math.sqrt(dx * dx + dz * dz);
         float speed = 1.6f;
         arrow.shoot(dx, dy + horizontal * 0.12, dz, speed, 0);
-        // 伤害 = ceil(速度 × 基础伤害)：按出手速度换算，命中时恰好 4 点
-        arrow.setBaseDamage(SentinelRules.ARROW_DAMAGE / speed);
+        // 伤害 = ceil(速度 × 基础伤害)：按出手速度换算，命中时恰好是 arrowDamage()
+        arrow.setBaseDamage(arrowDamage() / speed);
         server.addFreshEntity(arrow);
         flying.add(arrow);
         GreekPowers.play(this, "gp.gr.sentinel.shoot");

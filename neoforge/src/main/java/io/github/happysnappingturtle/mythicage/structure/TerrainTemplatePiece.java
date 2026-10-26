@@ -114,6 +114,9 @@ public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
                 BlockState ground = level.getBlockState(p.set(x, floor - 1, z));
                 if (floorY == 0 && TerrainOps.fillable(ground)) {
                     level.setBlock(p, edge ? TerrainOps.polygonal() : grass, 2);
+                } else if (!walls && floorY > 0) {
+                    // 遗迹：地面那一层模板只写了一部分（前庭铺地），其余没写的格子下面是坑就补土
+                    TerrainOps.fillDown(level, p, x, floor - 1, z, dirt, dirt);
                 }
                 TerrainOps.fillDown(level, p, x, bottom, z, edge ? TerrainOps.polygonal() : dirt,
                         edge ? TerrainOps.polygonal() : dirt);

@@ -1,0 +1,232 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "base": "mythic_age:block/marble_ashlar",
+    "robe": "mythic_age:block/greek_statue_robe",
+    "skin": "mythic_age:block/smooth_marble",
+    "face": "mythic_age:block/greek_statue_face",
+    "shield": "mythic_age:block/greek_statue_shield",
+    "bronze": "mythic_age:block/greek_statue_bronze"
+  },
+  "elements": [
+    {
+      "__comment": "上身（披肩褶皱）",
+      "from": [
+        4.5,
+        0,
+        5.5
+      ],
+      "to": [
+        11.5,
+        6,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#robe"
+        },
+        "south": {
+          "texture": "#robe"
+        },
+        "east": {
+          "texture": "#robe"
+        },
+        "west": {
+          "texture": "#robe"
+        },
+        "down": {
+          "texture": "#robe"
+        }
+      }
+    },
+    {
+      "__comment": "肩",
+      "from": [
+        4,
+        5,
+        5
+      ],
+      "to": [
+        12,
+        7,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "up": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "颈",
+      "from": [
+        7,
+        7,
+        6.5
+      ],
+      "to": [
+        9,
+        8,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "护颈",
+      "from": [
+        5.5,
+        10,
+        9.5
+      ],
+      "to": [
+        10.5,
+        12,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bronze"
+        },
+        "south": {
+          "texture": "#bronze"
+        },
+        "east": {
+          "texture": "#bronze"
+        },
+        "west": {
+          "texture": "#bronze"
+        }
+      }
+    },
+    {
+      "__comment": "左臂",
+      "from": [
+        2.5,
+        0,
+        6.5
+      ],
+      "to": [
+        4.5,
+        6,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#skin"
+        },
+        "south": {
+          "texture": "#skin"
+        },
+        "east": {
+          "texture": "#skin"
+        },
+        "west": {
+          "texture": "#skin"
+        },
+        "down": {
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "__comment": "圆盾（上半）",
+      "from": [
+        1.5,
+        0,
+        3
+      ],
+      "to": [
+        2.5,
+        4,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            12,
+            8,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            12,
+            8,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#shield",
+          "uv": [
+            3,
+            12,
+            13,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#shield",
+          "uv": [
+            3,
+            12,
+            13,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            2,
+            8,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#shield",
+          "uv": [
+            7,
+            2,
+            8,
+            12
+          ]
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout",
+  "__comment": "残缺神像上半（T22）：由 greek_statue_upper 去掉头盔、头、右臂与矛；颈部断口露在外面"
+}

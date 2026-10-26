@@ -231,8 +231,9 @@ public final class VillagePopulation {
         for (int i = 0; i < SPOT_TRIES; i++) {
             double angle = random.nextDouble() * Math.PI * 2;
             double r = lo + random.nextDouble() * (hi - lo);
-            int x = base.getX() + Mth.floor(Math.cos(angle) * r);
-            int z = base.getZ() + Mth.floor(Math.sin(angle) * r);
+            // 四舍五入（向下取整会让负方向的点近 1 格多，GameTest 偶发「不到 7 格」）
+            int x = base.getX() + (int) Math.round(Math.cos(angle) * r);
+            int z = base.getZ() + (int) Math.round(Math.sin(angle) * r);
             if (!level.isLoaded(new BlockPos(x, bell.getY(), z))) {
                 continue;
             }
