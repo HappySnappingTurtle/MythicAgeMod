@@ -32,6 +32,7 @@ public final class TrialArenaEvents {
         game.addListener(TrialArenaEvents::onDeath);
         game.addListener(ArenaSpec.Loader::onAddReloadListeners);
         game.addListener(ArenaCommand::onRegisterCommands);
+        game.addListener(TrialRewards::onLogin);
         TempBlocks.PROTECTED.add((level, pos) -> TrialArenas.get(level.getServer()).protecting(level, pos).isPresent());
     }
 

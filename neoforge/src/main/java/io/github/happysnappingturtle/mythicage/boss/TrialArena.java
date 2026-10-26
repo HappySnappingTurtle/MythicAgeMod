@@ -756,13 +756,21 @@ public final class TrialArena {
         }
     }
 
-    /** Boss 死了：胜利（结算在阶段 ③）、开门、开宝库门、落墙。 */
+    /** Boss 死了：胜利、结算（{@link TrialRewards}）、开门、开宝库门、落墙。只在战斗中、且是本场的 Boss 时生效（重复的死亡事件不再结算）。 */
     public void onBossDeath(ServerLevel level, Mob mob) {
         if (!phase.fighting() || !mob.getUUID().equals(boss)) {
             return;
         }
         setPhase(ArenaPhase.VICTORY);
         clock.reset();
+        // 倒下处的光与声：所有在场的人都看得见、听得见
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.TOTEM_OF_UNDYING, mob.getX(), mob.getY() + mob.getBbHeight() * 0.6,
+                mob.getZ(), 120, 0.8, 1.2, 0.8, 0.6);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, mob.getX(), mob.getY() + 0.2, mob.getZ(), 40, 1.5, 0.1,
+                1.5, 0.05);
+        level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.RAVAGER_DEATH,
+                net.minecraft.sounds.SoundSource.HOSTILE, 3.0F, 0.6F);
+        TrialRewards.settle(level, this);
         wallCycle.stop();
         for (WallCycle.Group g : WallCycle.Group.values()) {
             setWall(level, g, false);

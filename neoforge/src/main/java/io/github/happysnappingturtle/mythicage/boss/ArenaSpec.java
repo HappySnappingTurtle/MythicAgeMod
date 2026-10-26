@@ -21,7 +21,29 @@ import java.util.Optional;
 public record ArenaSpec(String kind, ResourceLocation boss, String trial, ResourceLocation keyItem, float baseHealth,
                         int halfSize, int roof, int pillarHeight, int pillarStump, ResourceLocation rubble,
                         ResourceLocation wallBlock, int wallHeight, int gateWidth, int gateHeight, int vaultWidth, int vaultHeight,
-                        int vaultDepth, double leash, int bossOffsetZ) {
+                        int vaultDepth, double leash, int bossOffsetZ, Rewards rewards) {
+
+    /** 每场胜利发给每位合法参战者的奖励（§7.1）：物品、经验；首杀另解锁一张图纸（只写记录）。 */
+    public record Rewards(java.util.List<Reward> items, int xp, String firstKillBlueprint) {
+        public static final Rewards NONE = new Rewards(java.util.List.of(), 0, "");
+    }
+
+    public record Reward(ResourceLocation item, int count) {
+    }
+
+    static Rewards rewards(JsonObject r) {
+        if (!r.has("rewards")) {
+            return Rewards.NONE;
+        }
+        JsonObject o = r.getAsJsonObject("rewards");
+        java.util.List<Reward> items = new java.util.ArrayList<>();
+        if (o.has("items")) {
+            o.getAsJsonArray("items").forEach(e -> items.add(new Reward(ResourceLocation.parse(
+                    GsonHelper.getAsString(e.getAsJsonObject(), "item")), GsonHelper.getAsInt(e.getAsJsonObject(), "count", 1))));
+        }
+        return new Rewards(java.util.List.copyOf(items), GsonHelper.getAsInt(o, "xp", 0),
+                GsonHelper.getAsString(o, "first_kill_blueprint", ""));
+    }
 
     public static ArenaSpec parse(JsonObject root) {
         JsonObject r = GsonHelper.getAsJsonObject(root, "runtime");
@@ -48,7 +70,8 @@ public record ArenaSpec(String kind, ResourceLocation boss, String trial, Resour
                 GsonHelper.getAsInt(vault, "height"),
                 GsonHelper.getAsInt(vault, "depth"),
                 GsonHelper.getAsDouble(r, "leash"),
-                bossZ);
+                bossZ,
+                rewards(r));
     }
 
     /** 读取全部竞技场数据。 */

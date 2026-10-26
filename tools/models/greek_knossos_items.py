@@ -95,6 +95,55 @@ g[5][4] = "H"
 put("ariadne_thread", g, GOLD, folder="item/")
 
 
+# 牛角（英雄装备部件）：一只弯角，根部深褐、往尖端渐成乳白
+HORN = {"o": "#3b2a1e", "d": "#6b4a30", "m": "#a07a52", "l": "#d9c4a0", "w": "#f2e8d2"}
+
+
+def horn_cells():
+    """弯角：沿一条从左下到右上的弧，宽度从 4 收到 1。"""
+    cells = {}
+    for t in range(0, 23):
+        u = t / 22
+        cx = 3 + 10 * u
+        cy = 13 - 11 * u + 4 * math.sin(u * math.pi) * 0.6
+        w = 2.2 - 1.7 * u
+        for x in range(16):
+            for y in range(16):
+                if math.hypot(x + 0.5 - cx, y + 0.5 - cy) <= w:
+                    k = "d" if u < 0.25 else ("m" if u < 0.55 else ("l" if u < 0.8 else "w"))
+                    cells.setdefault((x, y), k)
+    return cells
+
+
+def draw_horn(extra=None):
+    g = grid()
+    cells = horn_cells()
+    for (x, y), k in cells.items():
+        g[y][x] = k
+    for (x, y) in cells:
+        for dx, dy in ((1, 0), (0, 1)):
+            if (x + dx, y + dy) not in cells and 0 <= x + dx < 16 and 0 <= y + dy < 16 and g[y + dy][x + dx] == ".":
+                g[y + dy][x + dx] = "o"
+    if extra:
+        extra(g)
+    return g
+
+
+put("bull_horn", draw_horn(), HORN, folder="item/")
+
+
+# 弥诺陶洛斯之角（神之信物）：更大更黑的角，根部一道青铜箍与一截红绳
+def token_extra(g):
+    for (x, y) in ((3, 12), (4, 12), (4, 11), (3, 11), (5, 12)):
+        g[y][x] = "B"
+    for (x, y) in ((2, 13), (2, 14), (1, 15)):
+        g[y][x] = "R"
+
+
+TOKEN = {**HORN, "d": "#2a1d14", "m": "#5a4030", "l": "#c9b38c", "B": "#d6a24e", "R": "#a8321f"}
+put("minotaur_horn", draw_horn(token_extra), TOKEN, folder="item/")
+
+
 # ═════════════════════════════ 模型 ═════════════════════════════
 
 model("bull_gate", {"particle": tex("bull_gate"), "all": tex("bull_gate")},

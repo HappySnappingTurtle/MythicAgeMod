@@ -1,0 +1,7 @@
+{
+  "_doc": "克诺索斯迷宫宝库房（T23 §7.2）：只有击败过弥诺陶洛斯（有首杀记录）的玩家能开，每人一份——阿喀琉斯之甲（01_希腊 §7.1「迷宫宝库固定圣物」）+ 战利品一份。没有记录的玩家开不了、也不记收据，以后打赢还能开。",
+  "relics": ["mythic_age:armor_of_achilles"],
+  "loot": "mythic_age:chests/greek/knossos_vault",
+  "blueprint": null,
+  "requires_first_kill": "mythic_age:minotaur"
+}

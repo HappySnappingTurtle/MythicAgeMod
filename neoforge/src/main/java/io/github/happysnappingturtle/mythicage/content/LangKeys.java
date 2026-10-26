@@ -800,6 +800,22 @@ public final class LangKeys {
         add("mythic_age.arena.bar.phase2", "%s · 代达罗斯的机关", "%s · Daedalus's Devices", "%s・ダイダロスの仕掛け");
         add("mythic_age.arena.protected", "竞技场的石头纹丝不动", "The arena's stones will not yield", "闘技場の石はびくともしない");
         add("mythic_age.arena.no_build", "战斗中不能在这里放东西", "You can't build here during the fight", "戦闘中はここに物を置けない");
+        add("mythic_age.arena.victory", "试炼已记入：你又一次击败了迷宫之主", "Trial recorded: you have bested the Lord of the Labyrinth again",
+                "試練を記録した：再び迷宮の主を打ち破った");
+        add("mythic_age.arena.victory.first", "试炼已记入：你击败了迷宫之主！宝库的门为你打开了", "Trial recorded: you have bested the Lord of the Labyrinth! The vault now opens for you",
+                "試練を記録した：迷宮の主を打ち破った！宝庫の扉が開かれた");
+        add("mythic_age.arena.title", "试炼完成", "Trial Complete", "試練達成");
+        add("mythic_age.arena.subtitle.first", "%s 倒下了 · 宝库已开", "%s has fallen · the vault is open", "%sは倒れた・宝庫が開いた");
+        add("mythic_age.arena.subtitle", "%s 倒下了 · 凭证 +1", "%s has fallen · voucher +1", "%sは倒れた・証 +1");
+        add("mythic_age.arena.rewards", "获得：%s", "Rewards: %s", "獲得：%s");
+        add("mythic_age.arena.rewards.sep", "、", ", ", "、");
+        add("mythic_age.arena.rewards.xp", "经验 %s", "%s XP", "経験値 %s");
+        add("mythic_age.arena.rewards.blueprint", "%s 图纸", "%s blueprint", "%sの設計図");
+        add("mythic_age.blueprint.greek.harpe", "哈耳珀", "Harpe", "ハルペー");
+        add("mythic_age.vault.trial_locked", "只有击败迷宫之主的人才能取走这里的东西", "Only one who has bested the Lord of the Labyrinth may take what lies here",
+                "迷宮の主を打ち破った者だけがここの物を手にできる");
+        add("mythic_age.trial.token.recorded", "你的试炼已记入（击败 %s 次）", "Your trial is recorded (%s victories)", "試練は記録されている（%s 回勝利）");
+        add("mythic_age.trial.token.none", "这枚信物不是你赢来的", "This token was not won by you", "この証はあなたが勝ち取ったものではない");
         add("mythic_age.knossos.thread.have", "你已经带着一个线团了", "You already carry a thread", "もう糸玉を持っている");
         add("mythic_age.knossos.thread.taken", "你拿起阿里阿德涅的线团，金线从脚下延伸开去",
                 "You take Ariadne's thread; a golden line unspools behind you", "アリアドネの糸玉を手に取った。金の糸が足元から伸びていく");

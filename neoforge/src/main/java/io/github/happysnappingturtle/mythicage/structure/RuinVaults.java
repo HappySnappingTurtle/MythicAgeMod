@@ -58,9 +58,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class RuinVaults extends SimpleJsonResourceReloadListener {
     /** 一张宝库表。 */
-    public record Table(List<String> relics, String loot, String blueprint) {
+    /**
+     * 一张宝库表。{@code requiresFirstKill} 非空时，只有该试炼 Boss 有首杀记录的玩家能开（克诺索斯：阿喀琉斯之甲，T23 §7.2）。
+     */
+    public record Table(List<String> relics, String loot, String blueprint, String requiresFirstKill) {
         public Table {
             relics = List.copyOf(relics);
+        }
+
+        public Table(List<String> relics, String loot, String blueprint) {
+            this(relics, loot, blueprint, "");
         }
     }
 
@@ -112,7 +119,8 @@ public final class RuinVaults extends SimpleJsonResourceReloadListener {
             o.getAsJsonArray("relics").forEach(e -> relics.add(e.getAsString()));
         }
         return new Table(relics, o.has("loot") ? o.get("loot").getAsString() : "",
-                o.has("blueprint") && !o.get("blueprint").isJsonNull() ? o.get("blueprint").getAsString() : "");
+                o.has("blueprint") && !o.get("blueprint").isJsonNull() ? o.get("blueprint").getAsString() : "",
+                o.has("requires_first_kill") ? o.get("requires_first_kill").getAsString() : "");
     }
 
     public static Optional<Table> table(String id) {
@@ -132,7 +140,7 @@ public final class RuinVaults extends SimpleJsonResourceReloadListener {
     // ───────────── 开启 ─────────────
 
     /** 开启结果（GameTest 看）。 */
-    public enum Outcome { GIVEN, ALREADY, EMPTY }
+    public enum Outcome { GIVEN, ALREADY, EMPTY, LOCKED }
 
     public static Outcome open(ServerPlayer player, RuinVaultBlockEntity be) {
         ServerLevel level = (ServerLevel) be.getLevel();
@@ -141,6 +149,12 @@ public final class RuinVaults extends SimpleJsonResourceReloadListener {
         if (level == null || table.isEmpty()) {
             player.displayClientMessage(Component.translatable("mythic_age.vault.empty"), true);
             return Outcome.EMPTY;
+        }
+        String req = table.get().requiresFirstKill();
+        if (!req.isEmpty() && !MythData.get(player).firstKills().contains(req)) {
+            // 没打赢过：不写收据，以后打赢了还能开
+            player.displayClientMessage(Component.translatable("mythic_age.vault.trial_locked"), true);
+            return Outcome.LOCKED;
         }
         String receipt = VaultRules.receipt(level.dimension().location().toString(), pos.getX(), pos.getY(), pos.getZ());
         if (MythData.get(player).receipts().contains(ReceiptBook.Scope.UNIQUE, receipt)

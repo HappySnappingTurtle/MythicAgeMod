@@ -2798,6 +2798,20 @@
       "width": 3,
       "height": 4,
       "depth": 2
+    },
+    "rewards": {
+      "items": [
+        {
+          "item": "mythic_age:minotaur_horn",
+          "count": 1
+        },
+        {
+          "item": "mythic_age:bull_horn",
+          "count": 2
+        }
+      ],
+      "xp": 100,
+      "first_kill_blueprint": "greek:harpe"
     }
   }
 }

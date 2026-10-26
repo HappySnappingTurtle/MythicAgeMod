@@ -35,6 +35,8 @@ import static io.github.happysnappingturtle.mythicage.core.player.Civilization.G
  */
 public final class GreekKnossos {
     public static final String KIND = "greek:knossos";
+    /** 宝库表：阿喀琉斯之甲，只给有首杀记录的玩家（§7.2）。 */
+    public static final String VAULT_TABLE = "mythic_age:greek_knossos";
 
     public static final DeferredBlock<BullGateBlock> BULL_GATE = Content.block("bull_gate", GREEK, BullGateBlock::new)
             .properties(() -> BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0F, 3600000.0F)
@@ -57,6 +59,18 @@ public final class GreekKnossos {
     public static final DeferredItem<Item> ARIADNE_THREAD = Content.item("ariadne_thread", GREEK, Item::new)
             .properties(p -> p.stacksTo(1))
             .lang("阿里阿德涅线团", "Ariadne's Thread", "アリアドネの糸玉")
+            .register();
+
+    /** 弥诺陶洛斯之角：神之信物（总纲 §3.4：只是纪念与触发器，记录在击杀时已写入）。 */
+    public static final DeferredItem<TrialTokenItem> MINOTAUR_HORN = Content.item("minotaur_horn", GREEK,
+                    p -> new TrialTokenItem(p, "mythic_age:minotaur"))
+            .properties(p -> p.stacksTo(16).rarity(net.minecraft.world.item.Rarity.UNCOMMON))
+            .lang("弥诺陶洛斯之角", "Horn of the Minotaur", "ミノタウロスの角")
+            .register();
+
+    /** 牛角：英雄装备部件（阶段 B 的英雄锻造用）。 */
+    public static final DeferredItem<Item> BULL_HORN = Content.item("bull_horn", GREEK, Item::new)
+            .lang("牛角", "Bull Horn", "牛の角")
             .register();
 
     public static final DeferredHolder<EntityType<?>, EntityType<MinotaurBossEntity>> MINOTAUR_BOSS =
@@ -91,6 +105,11 @@ public final class GreekKnossos {
     public static void register(ServerLevel level, StructureInfoPiece.Info info) {
         for (BlockPos t : info.anchors("thread")) {
             level.setBlock(t, THREAD_ALTAR.get().defaultBlockState(), 2);
+        }
+        for (BlockPos v : info.anchors("vault")) {
+            if (level.getBlockEntity(v) instanceof io.github.happysnappingturtle.mythicage.structure.RuinVaultBlockEntity be) {
+                be.setTable(VAULT_TABLE);
+            }
         }
         Optional<ArenaSpec> spec = ArenaSpec.Loader.get(KIND);
         List<BlockPos> origin = info.anchors("boss_origin");

@@ -134,12 +134,12 @@ public final class TrialArenas extends SavedData {
         }
     }
 
-    /** 只供 GameTest：存档往返（模拟重启）。 */
-    public TrialArenas roundTripForTest(HolderLookup.Provider registries) {
-        TrialArenas copy = read(save(new CompoundTag(), registries), registries);
-        arenas.clear();
-        arenas.putAll(copy.arenas);
-        return this;
+    /** 只供 GameTest：把一个实例存档往返（模拟重启；只动这一个，同批并行的其他用例不受影响）。 */
+    public void roundTripForTest(HolderLookup.Provider registries, String id) {
+        TrialArena a = arenas.get(id);
+        if (a != null) {
+            TrialArena.load(a.save(), registries.lookupOrThrow(Registries.BLOCK)).ifPresent(copy -> arenas.put(id, copy));
+        }
     }
 
     public static List<TrialArena> activeForTest(MinecraftServer server) {

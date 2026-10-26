@@ -37,6 +37,7 @@
     {"id": "aphrodite_pebble_mosaic", "category": "supplies", "result": {"item": "mythic_age:pebble_mosaic", "count": 16}, "price": {"items": [{"item": "minecraft:emerald", "count": 4}]}, "minAge": "heroic", "venues": ["guardian"], "dailyLimit": 4, "minorGod": "aphrodite", "minorGodDiscount": {"aphrodite": 0.1}},
     {"id": "aphrodite_red_meander_marble", "category": "supplies", "result": {"item": "mythic_age:red_meander_marble", "count": 16}, "price": {"items": [{"item": "minecraft:emerald", "count": 4}]}, "minAge": "heroic", "venues": ["guardian"], "dailyLimit": 4, "minorGod": "aphrodite", "minorGodDiscount": {"aphrodite": 0.1}},
     {"id": "oracle_storm", "category": "supplies", "result": {"item": "mythic_age:oracle_tablet", "count": 1}, "price": {"favor": 3}, "minAge": "archaic", "venues": ["oracle"], "dailyLimit": 1},
-    {"id": "oracle_creature", "category": "supplies", "result": {"item": "mythic_age:oracle_tablet", "count": 1}, "price": {"favor": 5}, "minAge": "archaic", "venues": ["oracle"], "dailyLimit": 1}
+    {"id": "oracle_creature", "category": "supplies", "result": {"item": "mythic_age:oracle_tablet", "count": 1}, "price": {"favor": 5}, "minAge": "archaic", "venues": ["oracle"], "dailyLimit": 1},
+    {"id": "ariadne_thread", "category": "supplies", "result": {"item": "mythic_age:ariadne_thread", "count": 1}, "price": {"items": [{"item": "minecraft:emerald", "count": 4}]}, "minAge": "archaic", "venues": ["guardian"], "dailyLimit": 2}
   ]
 }
