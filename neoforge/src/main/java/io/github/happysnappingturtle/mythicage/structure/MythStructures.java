@@ -17,6 +17,12 @@ public final class MythStructures {
     public static final DeferredHolder<StructureType<?>, StructureType<RuinStructure>> RUIN =
             TYPES.register("ruin", () -> () -> RuinStructure.CODEC);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<LabyrinthStructure>> LABYRINTH =
+            TYPES.register("labyrinth", () -> () -> LabyrinthStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> DROMOS_PIECE =
+            PIECES.register("dromos", () -> DromosPiece::new);
+
     public static final DeferredHolder<StructurePieceType, StructurePieceType> TEMPLATE_PIECE =
             PIECES.register("template", () -> (StructurePieceType.StructureTemplateType) TemplatePiece::new);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> INFO_PIECE =

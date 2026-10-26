@@ -44,6 +44,8 @@ public final class GreekRuins {
     public static final String TEMPLE_KIND = "greek:abandoned_temple";
     public static final String VAULT_TABLE = "mythic_age:greek_abandoned_temple";
     public static final String CHEST_LOOT = "mythic_age:chests/greek/abandoned_temple";
+    public static final String KNOSSOS_KIND = "greek:knossos";
+    public static final String KNOSSOS_LOOT = "mythic_age:chests/greek/knossos_storage";
 
     public static final DeferredBlock<FacingShapedBlock> MARBLE_RUBBLE = Content.block("marble_rubble", GREEK,
                     p -> new FacingShapedBlock(p, false, Block.box(0, 0, 0, 16, 5, 16)))
@@ -81,6 +83,20 @@ public final class GreekRuins {
         modBus.addListener((EntityAttributeCreationEvent e) ->
                 e.put(RUIN_SENTINEL.get(), RuinSentinelEntity.createRuinAttributes().build()));
         StructureRegistration.handler(TEMPLE_KIND, GreekRuins::registerTemple);
+        StructureRegistration.handler(KNOSSOS_KIND, GreekRuins::registerKnossos);
+    }
+
+    /**
+     * 登记一座克诺索斯迷宫：储物间与宝库房的箱子设战利品表。宝库方块不设宝库表（阿喀琉斯之甲按首杀发放，T23 接），
+     * 现在开它提示「宝库是空的」。
+     */
+    static void registerKnossos(ServerLevel level, StructureInfoPiece.Info info) {
+        for (BlockPos l : info.anchors("loot")) {
+            if (level.getBlockEntity(l) instanceof RandomizableContainerBlockEntity chest) {
+                chest.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(KNOSSOS_LOOT)),
+                        level.getRandom().nextLong());
+            }
+        }
     }
 
     /** 登记一座废弃神殿：放哨兵、设宝库表与箱子战利品表。 */

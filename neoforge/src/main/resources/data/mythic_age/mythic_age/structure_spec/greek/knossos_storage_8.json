@@ -1,0 +1,44 @@
+{
+  "id": "greek:knossos_storage_8",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_storage_8",
+  "size": [
+    8,
+    11,
+    8
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {
+    "loot": [
+      [
+        1,
+        2,
+        1
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:tuff": 329,
+    "mythic_age:plaster": 84,
+    "mythic_age:smooth_marble": 39,
+    "mythic_age:olive_planks": 38,
+    "mythic_age:plaster_dado": 21,
+    "mythic_age:pithos": 3,
+    "minecraft:chest": 1,
+    "mythic_age:greek_oil_lamp": 1,
+    "minecraft:shroomlight": 1
+  }
+}

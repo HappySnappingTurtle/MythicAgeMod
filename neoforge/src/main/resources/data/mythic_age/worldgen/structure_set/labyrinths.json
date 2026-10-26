@@ -1,0 +1,9 @@
+{
+  "structures": [{"structure": "mythic_age:knossos", "weight": 1}],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 80,
+    "separation": 24,
+    "salt": 22042601
+  }
+}

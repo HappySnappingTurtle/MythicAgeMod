@@ -35,4 +35,11 @@ public final class SiteRules {
     public static boolean wet(int surfaceTop, int oceanFloorTop) {
         return surfaceTop > oceanFloorTop;
     }
+
+    /** 迷宫地面高度（§5.3）：地表 − depth，夹在 {@value #MAZE_MIN_Y} 与海平面 − 8 之间。 */
+    public static int mazeFloor(int surface, int depth, int seaLevel) {
+        return Math.max(MAZE_MIN_Y, Math.min(surface - depth, seaLevel - 8));
+    }
+
+    public static final int MAZE_MIN_Y = -40;
 }

@@ -1,0 +1,37 @@
+{
+  "id": "greek:knossos_hall_ne",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_hall_ne",
+  "size": [
+    16,
+    11,
+    16
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {},
+  "materials": {
+    "minecraft:tuff": 1299,
+    "mythic_age:olive_planks": 149,
+    "mythic_age:smooth_marble": 146,
+    "mythic_age:plaster": 120,
+    "mythic_age:plaster_dado": 20,
+    "mythic_age:marble_column": 10,
+    "mythic_age:blue_meander_marble": 7,
+    "minecraft:shroomlight": 4,
+    "mythic_age:marble_column_base": 2,
+    "mythic_age:doric_capital": 2
+  }
+}

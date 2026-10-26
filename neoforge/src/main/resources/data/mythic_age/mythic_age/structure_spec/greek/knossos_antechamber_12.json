@@ -1,0 +1,43 @@
+{
+  "id": "greek:knossos_antechamber_12",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_antechamber_12",
+  "size": [
+    16,
+    11,
+    8
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {
+    "gate": [
+      [
+        8,
+        2,
+        0
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:tuff": 604,
+    "mythic_age:plaster": 116,
+    "mythic_age:smooth_marble": 95,
+    "mythic_age:olive_planks": 95,
+    "mythic_age:plaster_dado": 29,
+    "minecraft:red_terracotta": 10,
+    "mythic_age:greek_oil_lamp": 2,
+    "minecraft:gold_block": 1
+  }
+}

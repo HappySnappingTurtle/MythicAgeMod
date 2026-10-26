@@ -1,0 +1,52 @@
+{
+  "id": "greek:knossos_surface",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_surface",
+  "size": [
+    23,
+    7,
+    23
+  ],
+  "floor_y": 1,
+  "frame": [
+    0,
+    -1,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {
+    "cut": [
+      [
+        10,
+        1,
+        9
+      ]
+    ],
+    "entrance": [
+      [
+        11,
+        1,
+        14
+      ]
+    ]
+  },
+  "materials": {
+    "mythic_age:smooth_marble": 417,
+    "mythic_age:polygonal_marble": 102,
+    "mythic_age:plaster_dado": 39,
+    "mythic_age:plaster": 38,
+    "mythic_age:marble_ashlar": 28,
+    "mythic_age:marble_ashlar_stairs": 28,
+    "mythic_age:polygonal_marble_wall": 13,
+    "minecraft:red_terracotta": 8,
+    "minecraft:smooth_quartz_stairs": 5,
+    "minecraft:gold_block": 1
+  }
+}

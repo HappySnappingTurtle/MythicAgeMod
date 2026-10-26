@@ -1,0 +1,33 @@
+{
+  "id": "greek:knossos_corridor_5",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_corridor_5",
+  "size": [
+    8,
+    11,
+    8
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {},
+  "materials": {
+    "minecraft:tuff": 496,
+    "mythic_age:plaster": 48,
+    "mythic_age:smooth_marble": 24,
+    "mythic_age:olive_planks": 23,
+    "mythic_age:plaster_dado": 16,
+    "minecraft:shroomlight": 1
+  }
+}

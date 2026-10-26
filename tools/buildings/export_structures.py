@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from buildgen import export_template
+import greek_knossos
 import greek_ruins
 
 STRUCTURES = [
@@ -13,7 +14,11 @@ STRUCTURES = [
      {"category": "ruin", "stage": "archaic", "generated": True, "plot_kinds": [], "terrain": ["flat", "slope"], "provides": {}}),
 ]
 
+RUIN_META = {"category": "ruin", "stage": "archaic", "generated": True, "plot_kinds": [], "terrain": ["flat"], "provides": {}}
+for _b in greek_knossos.all_buildings():
+    STRUCTURES.append((lambda b=_b: b, _b.name, "labyrinth", dict(RUIN_META, category="labyrinth")))
+
 if __name__ == "__main__":
     for build, short, kind, meta in STRUCTURES:
         tpl, js = export_template(build(), short, meta, "greek", kind)
-        print(tpl.relative_to(tpl.parents[5]), js.name)
+        print(tpl.relative_to(tpl.parents[5]))

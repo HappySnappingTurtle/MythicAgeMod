@@ -24,4 +24,16 @@ class SiteRulesTest {
         assertFalse(SiteRules.wet(70, 70), "陆地");
         assertFalse(SiteRules.floor(new int[]{70, 70, 70, 70, 70, 70, 70, 70, 70}, true, 4).isPresent(), "中心在水里不要");
     }
+
+    @Test
+    void tc17And18MazeFloor() {
+        assertEquals(46, SiteRules.mazeFloor(70, 24, 63), "地表 70 → 46");
+        assertEquals(-40, SiteRules.mazeFloor(-20, 24, 63), "地表 −20：夹到下限 −40");
+        assertEquals(55, SiteRules.mazeFloor(90, 24, 63), "不高于海平面 − 8");
+        int[] six = {70, 71, 72, 73, 76, 70, 71, 72, 70};
+        int[] seven = {70, 71, 72, 73, 77, 70, 71, 72, 70};
+        assertTrue(SiteRules.floor(six, false, 6).isPresent(), "迷宫：起伏 6 允许");
+        assertFalse(SiteRules.floor(seven, false, 6).isPresent(), "起伏 7 不允许");
+        assertTrue(SiteRules.floor(new int[]{70, 80, 70, 70, 70, 70, 70, 70, 70}, false, 10).isPresent(), "近出生点放宽到 10");
+    }
 }

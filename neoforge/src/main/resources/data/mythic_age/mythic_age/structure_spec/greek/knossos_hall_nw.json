@@ -1,0 +1,245 @@
+{
+  "id": "greek:knossos_hall_nw",
+  "civ": "greek",
+  "template": "mythic_age:labyrinth/greek/knossos_hall_nw",
+  "size": [
+    16,
+    11,
+    16
+  ],
+  "floor_y": 2,
+  "frame": [
+    0,
+    -2,
+    0
+  ],
+  "category": "labyrinth",
+  "stage": "archaic",
+  "generated": true,
+  "plot_kinds": [],
+  "terrain": [
+    "flat"
+  ],
+  "provides": {},
+  "anchors": {
+    "boss_origin": [
+      [
+        16,
+        2,
+        14
+      ]
+    ],
+    "pillar": [
+      [
+        16,
+        2,
+        5
+      ],
+      [
+        24,
+        2,
+        8
+      ],
+      [
+        27,
+        2,
+        16
+      ],
+      [
+        24,
+        2,
+        24
+      ],
+      [
+        16,
+        2,
+        27
+      ],
+      [
+        8,
+        2,
+        24
+      ],
+      [
+        5,
+        2,
+        16
+      ],
+      [
+        8,
+        2,
+        8
+      ]
+    ],
+    "safe_return": [
+      [
+        16,
+        2,
+        29
+      ]
+    ],
+    "vault_door": [
+      [
+        16,
+        2,
+        1
+      ]
+    ],
+    "wall_a": [
+      [
+        10,
+        2,
+        8
+      ],
+      [
+        10,
+        2,
+        9
+      ],
+      [
+        10,
+        2,
+        10
+      ],
+      [
+        10,
+        2,
+        11
+      ],
+      [
+        10,
+        2,
+        12
+      ],
+      [
+        10,
+        2,
+        13
+      ],
+      [
+        10,
+        2,
+        14
+      ],
+      [
+        10,
+        2,
+        18
+      ],
+      [
+        10,
+        2,
+        19
+      ],
+      [
+        10,
+        2,
+        20
+      ],
+      [
+        10,
+        2,
+        21
+      ],
+      [
+        10,
+        2,
+        22
+      ],
+      [
+        10,
+        2,
+        23
+      ],
+      [
+        10,
+        2,
+        24
+      ]
+    ],
+    "wall_b": [
+      [
+        22,
+        2,
+        8
+      ],
+      [
+        22,
+        2,
+        9
+      ],
+      [
+        22,
+        2,
+        10
+      ],
+      [
+        22,
+        2,
+        11
+      ],
+      [
+        22,
+        2,
+        12
+      ],
+      [
+        22,
+        2,
+        13
+      ],
+      [
+        22,
+        2,
+        14
+      ],
+      [
+        22,
+        2,
+        18
+      ],
+      [
+        22,
+        2,
+        19
+      ],
+      [
+        22,
+        2,
+        20
+      ],
+      [
+        22,
+        2,
+        21
+      ],
+      [
+        22,
+        2,
+        22
+      ],
+      [
+        22,
+        2,
+        23
+      ],
+      [
+        22,
+        2,
+        24
+      ]
+    ]
+  },
+  "materials": {
+    "minecraft:tuff": 1432,
+    "mythic_age:olive_planks": 136,
+    "mythic_age:smooth_marble": 132,
+    "mythic_age:plaster": 114,
+    "mythic_age:plaster_dado": 19,
+    "mythic_age:blue_meander_marble": 7,
+    "mythic_age:marble_column": 5,
+    "minecraft:shroomlight": 3,
+    "mythic_age:marble_column_base": 1,
+    "mythic_age:doric_capital": 1
+  }
+}
