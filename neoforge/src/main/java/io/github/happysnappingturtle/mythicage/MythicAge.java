@@ -75,6 +75,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
         io.github.happysnappingturtle.mythicage.structure.RuinVaults.init();
         io.github.happysnappingturtle.mythicage.content.greek.ruin.GreekRuins.init(modBus);
+        io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.init(modBus);
         io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment.init(modBus);
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
         io.github.happysnappingturtle.mythicage.content.greek.power.GreekPowers.init(modBus, NeoForge.EVENT_BUS);
@@ -109,6 +110,7 @@ public final class MythicAge {
         game.addListener(RuntimeDriver::onServerTickPost);
         game.addListener(RuntimeCommand::onRegisterCommands);
         PlayerActivity.register(game);
+        io.github.happysnappingturtle.mythicage.boss.TrialArenaEvents.register(game);
         TestProducers.register();
         game.addListener(ModRecipes::onServerTickPre);
 

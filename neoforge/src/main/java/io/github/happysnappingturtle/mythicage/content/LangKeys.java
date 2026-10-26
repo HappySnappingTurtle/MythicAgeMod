@@ -787,6 +787,21 @@ public final class LangKeys {
         add("mythic_age.vault.opened", "宝库打开了，东西放进了你的背包", "The vault opens; its contents go into your pack", "宝庫が開いた。中身は持ち物に入った");
         add("mythic_age.vault.already", "你已经开过这座宝库了", "You've already opened this vault", "この宝庫はもう開けている");
         add("mythic_age.vault.empty", "宝库是空的", "The vault is empty", "宝庫は空だ");
+        // 试炼竞技场与克诺索斯（T23）
+        add("entity.mythic_age.minotaur_boss", "弥诺陶洛斯 · 迷宫之主", "Minotaur, Lord of the Labyrinth", "ミノタウロス・迷宮の主");
+        add("mythic_age.arena.gate.locked", "门纹丝不动。也许需要什么指引……", "The gate won't budge. Perhaps something must guide you…",
+                "門はびくともしない。何かの導きが要るのかもしれない……");
+        add("mythic_age.arena.gate.opened", "牛首封门缓缓打开，迷宫深处传来低吼", "The bull-head gate grinds open; a low bellow rises from the depths",
+                "牡牛の封門がゆっくり開き、迷宮の奥から低いうなりが響く");
+        add("mythic_age.arena.gate.exit", "门开了片刻——现在离开还来得及", "The gate opens for a moment — leave now if you must",
+                "門が一瞬開いた——今なら出られる");
+        add("mythic_age.arena.fight.start", "%s 苏醒了！", "%s awakens!", "%sが目覚めた！");
+        add("mythic_age.arena.bar.phase2", "%s · 代达罗斯的机关", "%s · Daedalus's Devices", "%s・ダイダロスの仕掛け");
+        add("mythic_age.arena.protected", "竞技场的石头纹丝不动", "The arena's stones will not yield", "闘技場の石はびくともしない");
+        add("mythic_age.arena.no_build", "战斗中不能在这里放东西", "You can't build here during the fight", "戦闘中はここに物を置けない");
+        add("mythic_age.knossos.thread.have", "你已经带着一个线团了", "You already carry a thread", "もう糸玉を持っている");
+        add("mythic_age.knossos.thread.taken", "你拿起阿里阿德涅的线团，金线从脚下延伸开去",
+                "You take Ariadne's thread; a golden line unspools behind you", "アリアドネの糸玉を手に取った。金の糸が足元から伸びていく");
     }
 
     private static void quests() {

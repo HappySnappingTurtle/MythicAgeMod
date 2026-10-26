@@ -1,0 +1,195 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "mythic_age:block/smooth_marble",
+    "s": "mythic_age:block/smooth_marble",
+    "c": "mythic_age:block/marble_column",
+    "m": "mythic_age:block/marble_molding",
+    "t": "mythic_age:block/golden_thread"
+  },
+  "elements": [
+    {
+      "__comment": "台座",
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        3,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#s"
+        },
+        "south": {
+          "texture": "#s"
+        },
+        "east": {
+          "texture": "#s"
+        },
+        "west": {
+          "texture": "#s"
+        },
+        "up": {
+          "texture": "#s"
+        },
+        "down": {
+          "texture": "#s"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        5
+      ],
+      "to": [
+        13,
+        10,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#c"
+        },
+        "south": {
+          "texture": "#c"
+        },
+        "east": {
+          "texture": "#c"
+        },
+        "west": {
+          "texture": "#c"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        3,
+        3
+      ],
+      "to": [
+        11,
+        10,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#c"
+        },
+        "south": {
+          "texture": "#c"
+        },
+        "east": {
+          "texture": "#c"
+        },
+        "west": {
+          "texture": "#c"
+        }
+      }
+    },
+    {
+      "__comment": "台面",
+      "from": [
+        2,
+        10,
+        2
+      ],
+      "to": [
+        14,
+        12,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#m"
+        },
+        "south": {
+          "texture": "#m"
+        },
+        "east": {
+          "texture": "#m"
+        },
+        "west": {
+          "texture": "#m"
+        },
+        "up": {
+          "texture": "#m"
+        },
+        "down": {
+          "texture": "#m"
+        }
+      }
+    },
+    {
+      "__comment": "线团",
+      "from": [
+        5.5,
+        12,
+        6.7
+      ],
+      "to": [
+        10.5,
+        15.5,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t"
+        },
+        "south": {
+          "texture": "#t"
+        },
+        "east": {
+          "texture": "#t"
+        },
+        "west": {
+          "texture": "#t"
+        },
+        "up": {
+          "texture": "#t"
+        },
+        "down": {
+          "texture": "#t"
+        }
+      }
+    },
+    {
+      "from": [
+        6.7,
+        12,
+        5.5
+      ],
+      "to": [
+        9.3,
+        15.5,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t"
+        },
+        "south": {
+          "texture": "#t"
+        },
+        "east": {
+          "texture": "#t"
+        },
+        "west": {
+          "texture": "#t"
+        },
+        "up": {
+          "texture": "#t"
+        },
+        "down": {
+          "texture": "#t"
+        }
+      }
+    }
+  ]
+}

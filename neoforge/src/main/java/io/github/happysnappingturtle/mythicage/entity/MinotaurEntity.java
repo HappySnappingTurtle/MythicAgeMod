@@ -72,7 +72,7 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
     /** 一次性动画（挥斧、顶飞）播完后由服务端回到 AUTO 的刻数；0 = 不计时。 */
     private int animUntil;
     private final ChargeTimeline charge = new ChargeTimeline();
-    private float chargeYaw;
+    protected float chargeYaw;
     private int clientSeenAnimStart = -1;
 
     public MinotaurEntity(EntityType<? extends PathfinderMob> type, Level level) {
@@ -128,13 +128,18 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
     public void setVariant(String name) {
         double scale = 1.0;
         if (!name.isEmpty()) {
-            ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType());
+            ResourceLocation id = rigId();
             scale = RigRegistry.get(id).map(r -> r.scaleOf(name)).orElseGet(() -> {
                 MythicAge.LOGGER.warn("{} 没有骨架数据，变体 {} 按缩放 1 处理", id, name);
                 return 1.0;
             });
         }
         applyVariant(name, (float) scale);
+    }
+
+    /** 骨架数据的 id（默认 = 实体类型 id；Boss 版与基础版共用 {@code mythic_age:minotaur}）。 */
+    protected ResourceLocation rigId() {
+        return net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType());
     }
 
     private void applyVariant(String name, float scale) {
@@ -225,10 +230,30 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
         }
     }
 
+    /** 冲刺中是否被挡住（默认：水平碰撞）。Boss 版在这里判柱与墙。 */
+    protected boolean chargeBlocked() {
+        return horizontalCollision;
+    }
+
+    /** 冲刺的每一刻（位移之前）：Boss 版在这里做扫掠伤害。 */
+    protected void onChargeRunTick() {
+    }
+
+    /** 冲刺被挡住提前结束（{@link #chargeBlocked()} 为真的那一刻）。 */
+    protected void onChargeBlocked() {
+    }
+
+    /** 一次冲锋完全结束（收势结束或被取消）。 */
+    protected void onChargeFinished() {
+    }
+
     private void tickCharge() {
         ChargeTimeline.Phase before = charge.phase();
-        if (before == ChargeTimeline.Phase.RUN && charge.tickInPhase() > 0 && horizontalCollision) {
+        if (before == ChargeTimeline.Phase.RUN && charge.tickInPhase() > 0 && chargeBlocked()) {
             charge.stopRun();
+            onChargeBlocked();
+        } else if (before == ChargeTimeline.Phase.RUN) {
+            onChargeRunTick();
         }
         if (!charge.canTurn()) {
             setYRot(chargeYaw);
@@ -248,6 +273,7 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
         }
         if (!charge.active()) {
             haltInput();
+            onChargeFinished();
         }
     }
 

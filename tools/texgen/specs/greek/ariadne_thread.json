@@ -1,0 +1,32 @@
+{
+  "template": "pixels",
+  "out": "item/ariadne_thread",
+  "size": 16,
+  "palette": {
+    "d": "#8f6a1f",
+    "g": "#c99a35",
+    "G": "#e8c060",
+    "H": "#fbe7a1"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "................",
+      "....gggggg......",
+      "...ggGgHGgg.....",
+      "..gggHGggddd....",
+      "..gdHHHdGHGd....",
+      ".ggHHGgHGGgdd...",
+      ".ggdGHGGgdGHd...",
+      ".ggHGGgGgdddd...",
+      "..gGgdGddGHd....",
+      "..ggGHHGHGdd....",
+      "...ddGgGgddG....",
+      "....dddddd..gG..",
+      "..............g.",
+      "..............G.",
+      "...............g"
+    ]
+  }
+}

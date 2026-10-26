@@ -158,6 +158,10 @@ def antechamber(mask: int) -> Building:
     s = Solid(2 * CELL, CELL)
     s.carve(1, 0, 1, 14, 4, 6)
     s.carve(6, 0, 0, 10, 4, 0)                     # 北门，接大厅南门（世界 x 30..34）
+    # 牛首封门（T23）：门洞 5 × 5 放满门块，正中上方一格是牛首牌；开关由竞技场负责
+    for x in range(6, 11):
+        for y in range(0, 5):
+            s.put(x, y, 0, f"mythic_age:bull_gate[head={'true' if (x, y) == (8, 4) else 'false'}]")
     if mask & ANTE_W:
         s.carve(0, 0, 2, 0, 3, 4)
     if mask & ANTE_E:

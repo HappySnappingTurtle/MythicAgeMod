@@ -16,6 +16,10 @@ public final class ClientHooks {
         Minecraft.getInstance().setScreen(new io.github.happysnappingturtle.mythicage.client.screen.FoundationScreen(payload));
     }
 
+    public static void threadTrail(io.github.happysnappingturtle.mythicage.content.greek.knossos.ThreadTrailPayload payload) {
+        ThreadTrailRenderer.accept(payload);
+    }
+
     public static void openAltar(AltarSurveyPayload payload) {
         Minecraft.getInstance().setScreen(new GreekAltarScreen(payload));
     }

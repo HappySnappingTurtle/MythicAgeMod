@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "head=false": {
+      "model": "mythic_age:block/bull_gate"
+    },
+    "head=true": {
+      "model": "mythic_age:block/bull_gate_head"
+    }
+  }
+}

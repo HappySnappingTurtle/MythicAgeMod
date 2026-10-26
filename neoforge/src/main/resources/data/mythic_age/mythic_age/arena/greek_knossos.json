@@ -1,8 +1,8 @@
 {
-  "schema": "arena-design-v1-not-runtime",
+  "schema": "arena-v1",
   "id": "BO-GR-01-ARENA",
   "date": "2026-10-13",
-  "status": "proposed_layout_static_checks_only",
+  "status": "runtime_t23",
   "source": "01_希腊.md §7.1",
   "template_outer_size": [
     31,
@@ -2770,6 +2770,34 @@
     "2x2 footprints are conservative grid proxies, not a full swept capsule/3D collision proof.",
     "No block-state template, NBT, visual render or GameTest has been produced."
   ],
-  "approved_for_implementation": false,
-  "pillar_height_note": "2026-10-26 用户审阅：柱子要顶到穹顶（底面 y = 7），柱高由提案的 5 改为 7；平面坐标与可达性不变"
+  "approved_for_implementation": true,
+  "pillar_height_note": "2026-10-26 用户审阅：柱子要顶到穹顶（底面 y = 7），柱高由提案的 5 改为 7；平面坐标与可达性不变",
+  "runtime": {
+    "kind": "greek:knossos",
+    "boss": "mythic_age:minotaur_boss",
+    "trial": "mythic_age:minotaur",
+    "key_item": "mythic_age:ariadne_thread",
+    "base_health": 320,
+    "half_size": 15,
+    "roof": 7,
+    "leash": 18,
+    "pillar": {
+      "height": 7,
+      "stump": 2,
+      "rubble": "mythic_age:marble_rubble"
+    },
+    "wall": {
+      "block": "mythic_age:plaster",
+      "height": 4
+    },
+    "gate": {
+      "width": 5,
+      "height": 5
+    },
+    "vault_door": {
+      "width": 3,
+      "height": 4,
+      "depth": 2
+    }
+  }
 }

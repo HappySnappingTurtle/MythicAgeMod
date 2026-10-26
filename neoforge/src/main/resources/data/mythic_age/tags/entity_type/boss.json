@@ -3,6 +3,7 @@
     "minecraft:wither",
     "minecraft:ender_dragon",
     "minecraft:elder_guardian",
-    "minecraft:warden"
+    "minecraft:warden",
+    "mythic_age:minotaur_boss"
   ]
 }

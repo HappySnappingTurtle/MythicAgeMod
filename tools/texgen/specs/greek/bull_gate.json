@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/bull_gate",
+  "size": 16,
+  "palette": {
+    "a": "#2e2016",
+    "w": "#3d2b1c",
+    "W": "#4f3825",
+    "l": "#62462d",
+    "o": "#5a3818",
+    "b": "#8a5a26",
+    "B": "#b07a36",
+    "h": "#d6a24e"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "aWWWawWWawwWawWw",
+      "aWlWaWWWawWWaWWw",
+      "BhBBBhBBBhBBBhBB",
+      "bobbbobbbobbbobb",
+      "aWWWaWlWaWWwawWW",
+      "aWWWaWwWaWwWaWwW",
+      "aWWWawWwawWWawWW",
+      "aWwWaWwwaWWwaWwW",
+      "awWWaWWWawwWaWWW",
+      "aWWwawWWawwWaWwW",
+      "awwwaWwwaWWwaWwW",
+      "awWWaWWWawwwaWwW",
+      "BhBBBhBBBhBBBhBB",
+      "bobbbobbbobbbobb",
+      "aWwwawWWawwWawwW",
+      "aWwWaWWWaWWWaWwW"
+    ]
+  }
+}

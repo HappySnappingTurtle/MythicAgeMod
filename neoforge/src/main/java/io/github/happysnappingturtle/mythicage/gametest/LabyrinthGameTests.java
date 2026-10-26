@@ -122,7 +122,7 @@ public final class LabyrinthGameTests {
         h.succeed();
     }
 
-    /** TC-T22-61：从地表入口走得到线团祭坛、牛首门前、大厅安全点、休整点（合同「入口可达」）。 */
+    /** TC-T22-61：从地表入口走得到线团祭坛、牛首门前、大厅安全点、休整点（合同「入口可达」）；牛首封门关着时进不了大厅（T23）。 */
     @GameTest(template = T, batch = BATCH, timeoutTicks = 400)
     public static void labyrinth_reachable(GameTestHelper h) {
         ServerLevel level = h.getLevel();
@@ -132,6 +132,12 @@ public final class LabyrinthGameTests {
             h.assertTrue(AbandonedTempleGameTests.standable(level, entrance), "地表入口站得住：" + entrance);
             h.assertTrue(reachable(level, entrance, one(p, "thread")), seed + " 走得到线团祭坛");
             h.assertTrue(reachable(level, entrance, one(p, "gate")), seed + " 走得到牛首门");
+            // 牛首封门（T23）关着时进不了大厅；打开门洞再测大厅里的安全点
+            BlockPos g = one(p, "gate");
+            h.assertFalse(reachable(level, entrance, g.north(3)), seed + " 门关着时进不了大厅");
+            for (BlockPos q : BlockPos.betweenClosed(g.offset(-2, 0, 0), g.offset(2, 4, 0))) {
+                level.setBlock(q, Blocks.AIR.defaultBlockState(), 2);
+            }
             for (BlockPos s : p.info().anchors("safe_return")) {
                 h.assertTrue(reachable(level, entrance, s), seed + " 走得到安全点 " + s);
             }

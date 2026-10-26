@@ -35,6 +35,8 @@ public final class ClientSetup {
 
     @SubscribeEvent
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.MINOTAUR_BOSS.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.5F).glowing());
         event.registerEntityRenderer(ModEntities.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
         // 召唤版弥诺陶洛斯（T14）：与 T7 共用模型与动画

@@ -122,10 +122,10 @@ public final class GreekRuins {
     }
 
     /**
-     * 登记一座克诺索斯迷宫：储物间与宝库房的箱子设战利品表。宝库方块不设宝库表（阿喀琉斯之甲按首杀发放，T23 接），
-     * 现在开它提示「宝库是空的」。
+     * 登记一座克诺索斯迷宫：线团祭坛与竞技场实例（T23，{@code GreekKnossos.register}）；储物间与宝库房的箱子设战利品表。
      */
     static void registerKnossos(ServerLevel level, StructureInfoPiece.Info info) {
+        io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.register(level, info);
         for (BlockPos l : info.anchors("loot")) {
             if (level.getBlockEntity(l) instanceof RandomizableContainerBlockEntity chest) {
                 chest.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(KNOSSOS_LOOT)),
