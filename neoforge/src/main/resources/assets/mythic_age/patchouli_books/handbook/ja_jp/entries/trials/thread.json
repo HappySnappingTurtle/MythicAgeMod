@@ -1,0 +1,17 @@
+{
+  "name": "アリアドネの糸玉",
+  "icon": "mythic_age:ariadne_thread",
+  "category": "mythic_age:trials",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ariadne_thread",
+      "text": "手に持つと、背後に$(l)光る金の糸$()が残る。たどれば入口へ戻れる。ボスが第二段階に入ると、糸はボスの方向も指す。扉を開けても$(l)なくならない$()。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)出典$()：アリアドネはテセウスに糸玉を渡し、彼は入口に糸を結んでミノタウロスを倒したあと糸をたどって出た（アポロドロス『摘要』1.8–9）。"
+    }
+  ]
+}

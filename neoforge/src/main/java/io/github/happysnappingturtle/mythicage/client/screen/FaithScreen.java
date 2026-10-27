@@ -110,6 +110,12 @@ public class FaithScreen extends Screen {
         addRenderableWidget(Button.builder(units, b -> PacketDistributor.sendToServer(
                         new io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Request()))
                 .bounds(left + W - 62 - uw, row2, uw, 16).build());
+        // 《神话手札》（T24 §6.1，D2）：J 面板讲数据，手札讲规则
+        Component book = Component.translatable("mythic_age.handbook.open");
+        int bw2 = font.width(book) + 12;
+        addRenderableWidget(Button.builder(book, b -> vazkii.patchouli.api.PatchouliAPI.get().openBookGUI(
+                        io.github.happysnappingturtle.mythicage.handbook.Handbook.ID))
+                .bounds(left + 8, row2, bw2, 16).build());
         // 善恶与贡献（T24 §3.1）：只看自己
         Component conduct = Component.translatable("mythic_age.conduct.screen.title");
         int cw = font.width(conduct) + 12;

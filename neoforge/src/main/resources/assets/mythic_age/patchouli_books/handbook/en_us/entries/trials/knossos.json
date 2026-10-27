@@ -1,0 +1,20 @@
+{
+  "name": "The Labyrinth of Knossos",
+  "icon": "minecraft:filled_map",
+  "category": "mythic_age:trials",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Inside a ring of ruined walls a $(l)stair leads down to the south$(); at its foot lies the labyrinth. There is always one not far from spawn, and guardians sell a $(l)Knossos map$().$(br2)In the centre of the entrance cell stands the $(l)thread altar$(): right-click with an empty hand for a ball of Ariadne's thread (only if you have none)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Deep inside is the $(l)bull-head gate$(): right-click it holding the thread to open it. The trial begins once you enter the hall and the gate closes behind you; right-click the gate from the hall side to retreat.$(br2)If no one is in the hall for $(l)30 seconds$() the trial resets with no reward; open the gate again to retry."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)Source$(): Daedalus built the labyrinth for King Minos of Crete to hold the Minotaur — Apollodorus, $(o)Library$() 3.1.4. The layout, gate and devices are this mod's adaptation."
+    }
+  ]
+}

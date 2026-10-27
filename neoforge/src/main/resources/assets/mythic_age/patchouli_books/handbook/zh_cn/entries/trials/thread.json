@@ -1,0 +1,17 @@
+{
+  "name": "阿里阿德涅线团",
+  "icon": "mythic_age:ariadne_thread",
+  "category": "mythic_age:trials",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ariadne_thread",
+      "text": "拿在手里时，身后会留下一道$(l)发光的金线$()，沿着它就能走回入口；Boss 进入第二阶段后，线还会指向它。开门$(l)不会消耗$()线团。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)出处$()：阿里阿德涅把线团交给忒修斯，他把线系在迷宫入口，杀死弥诺陶洛斯后循线走出——见阿波罗多洛斯《书库·摘要》1.8–9。"
+    }
+  ]
+}

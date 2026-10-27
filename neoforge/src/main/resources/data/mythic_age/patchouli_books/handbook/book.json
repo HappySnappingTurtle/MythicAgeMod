@@ -1,0 +1,12 @@
+{
+  "name": "mythic_age.handbook.name",
+  "subtitle": "mythic_age.handbook.subtitle",
+  "landing_text": "mythic_age.handbook.landing",
+  "i18n": true,
+  "use_resource_pack": true,
+  "show_progress": true,
+  "show_toasts": true,
+  "book_texture": "patchouli:textures/gui/book_brown.png",
+  "model": "patchouli:book_brown",
+  "creative_tab": "mythic_age:greek"
+}

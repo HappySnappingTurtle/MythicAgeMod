@@ -1,0 +1,16 @@
+{
+  "name": "Reading the Shrine Inspector",
+  "icon": "minecraft:spyglass",
+  "category": "mythic_age:temple",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Right-click the altar with an empty hand:$(li)Left: the recognised tier and factor, and what the next tier still needs$(li)Middle: prayer spots, believers praying now and over 7 days, favor today, estimated daily output (an estimate only), and accrual while you are away$(li)Right: what is missing; unloaded chunks, too-low age and unreachable spots are each named"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Press \"Highlight gaps\" and outlines appear in the world for 10 seconds; their $(l)shapes$() mean:$(li)□ scanned area, counted columns$(li)☒ missing or altar-covering blocks, unlit braziers$(li)⬚ columns too short or on the ground$(li)▮ whole columns without roof$(li)▁ prayer spots$(br2)Only lines are drawn; no blocks are placed."
+    }
+  ]
+}

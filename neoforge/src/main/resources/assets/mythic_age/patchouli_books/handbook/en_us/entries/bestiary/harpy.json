@@ -1,0 +1,26 @@
+{
+  "name": "Harpy",
+  "icon": "mythic_age:storm_feather",
+  "category": "mythic_age:bestiary",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:harpy",
+      "scale": 0.6,
+      "offset": 0.15,
+      "text": "$(l)Cliff nests$() on the stormy highlands and Aegean coast, 2–4 to a nest. Look for white streaks, feathers and shrill laughter."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Diving snatch$(): she circles above you, then $(l)screeches and folds her wings$() for about 0.8 seconds (the tell) and dives to lift you a few blocks before letting go.$(br2)$(l)Raise a shield$() when she folds her wings, or hit her during the dive, and the snatch fails: she crashes and is stunned for 2 seconds. Anyone snatched is safe from it for 8 seconds. They dive more often in thunderstorms.",
+      "advancement": "mythic_age:bestiary/greek/harpy/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Drops the $(item)Storm Feather$() (later used for winged sandals and the harpe).$(br2)$(o)Sources$(): the Harpies, Aello and Ocypete, were daughters of Thaumas and Electra (Hesiod, $(o)Theogony$() 265–269); they snatched the seer Phineus's food until the Argonauts drove them off (Apollonius of Rhodes, $(o)Argonautica$() 2.178–300).",
+      "advancement": "mythic_age:bestiary/greek/harpy/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/harpy/sighted"
+}

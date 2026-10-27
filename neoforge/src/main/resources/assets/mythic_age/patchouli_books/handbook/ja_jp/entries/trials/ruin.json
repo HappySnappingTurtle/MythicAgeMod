@@ -1,0 +1,17 @@
+{
+  "name": "廃神殿",
+  "icon": "mythic_age:ruin_vault",
+  "category": "mythic_age:trials",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "ギリシャの地には崩れた神殿が点在する：折れた柱、瓦礫、倒れた神像。三体の$(l)古神殿の番人$()が守り、近づく者に矢を放つ。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ruin_vault",
+      "text": "奥には$(l)遺跡の宝庫$()がある。$(l)一人一回$()開けられ、中身は主に聖遺物。ほかの人に取り尽くされることはない。"
+    }
+  ]
+}

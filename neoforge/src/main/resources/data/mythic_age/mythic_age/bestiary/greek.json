@@ -1,0 +1,13 @@
+{
+  "_doc": "图鉴点亮表（T24 设计文档 §6.3）：实体类型 → 图鉴条目。召唤版、野外版、Boss 版的同一种神话生物共用一个条目。条目名与 GreekBestiary.ENTRIES、手札条目文件一一对应。",
+  "entries": {
+    "greek/centaur": {"entities": ["mythic_age:centaur", "mythic_age:summon_centaur"]},
+    "greek/stymphalian_bird": {"entities": ["mythic_age:stymphalian_bird"]},
+    "greek/harpy": {"entities": ["mythic_age:harpy"]},
+    "greek/karkinos": {"entities": ["mythic_age:karkinos"]},
+    "greek/hamadryad": {"entities": ["mythic_age:hamadryad"]},
+    "greek/ruin_sentinel": {"entities": ["mythic_age:ruin_sentinel"]},
+    "greek/minotaur": {"entities": ["mythic_age:minotaur", "mythic_age:summon_minotaur", "mythic_age:minotaur_boss"]},
+    "greek/pegasus": {"entities": ["mythic_age:summon_pegasus"]}
+  }
+}

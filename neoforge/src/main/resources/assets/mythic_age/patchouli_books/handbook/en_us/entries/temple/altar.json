@@ -1,0 +1,21 @@
+{
+  "name": "The Olympian Altar",
+  "icon": "mythic_age:greek_altar",
+  "category": "mythic_age:temple",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:greek_altar",
+      "text": "The altar is where all favor begins. Speak to a $(l)temple priest$() in a Greek village for the first time and you receive one for free.$(br2)Place it $(l)inside a Greek village$() (or within 48 blocks of its edge) with $(l)open sky$() above it."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Limit$(): 1 altar in the Archaic age, 2 in the Classical, 3 in the Heroic and Mythic.$(br2)Right-click the altar with an empty hand to open the $(l)shrine inspector$(). Sneak-right-click with a relic to enshrine it here (one per altar).$(br2)Villagers take turns kneeling at the $(l)prayer spots$() around the altar during the day; your favor comes from their prayers."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)Source$(): Greek altars (bōmos) stood in the open in front of the temple door; sacrifice took place at the altar, not inside the temple. That is why the altar here must be under open sky."
+    }
+  ]
+}

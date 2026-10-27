@@ -145,6 +145,14 @@ public final class MythicAge {
         game.addListener(PantheonLoader::onAddReloadListeners);
         game.addListener(VillageService::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.advancement.MythEvents::onLoggedIn);
+        // 神话图鉴点亮（T24 阶段 ③）
+        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.BestiaryLoader::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onDamagePost);
+        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onDeath);
+        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onLoggedIn);
+        game.addListener(io.github.happysnappingturtle.mythicage.handbook.Handbook::onLoggedIn);
+        game.addListener(io.github.happysnappingturtle.mythicage.handbook.Handbook::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);

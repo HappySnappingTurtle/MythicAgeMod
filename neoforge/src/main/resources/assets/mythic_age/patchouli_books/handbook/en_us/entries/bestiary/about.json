@@ -1,0 +1,20 @@
+{
+  "name": "About the Bestiary",
+  "icon": "minecraft:spyglass",
+  "category": "mythic_age:bestiary",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Bestiary entries light up in three steps:$(li)$(l)Seen$(): it is within 24 blocks and in sight$(li)$(l)Fought$(): you (or your units or powers) hurt it, or it hurts you$(li)$(l)Defeated$(): the kill counts as yours; trial bosses count every participant; summoning counts as taming$(br2)Unseen entries stay locked. What you learn stays with you even if the book is lost."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Travellers' tales$():$(li)Centaurs camp in woodland meadows and windswept forests$(li)Noisy flocks roost on dead trees in the Lernaean marshes$(li)Shrill laughter echoes off the cliffs of the stormy highlands and the coast$(li)Something big walks sideways along marshes and stony shores"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)By old oaks in flower forests and meadows, a spirit guards the grove$(li)In collapsed temples the statues turn their heads$(li)Deep in the Labyrinth of Knossos lives a bull-headed monster$(li)Some say a priest will trade you a token for a winged horse"
+    }
+  ]
+}

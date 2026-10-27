@@ -1,0 +1,20 @@
+{
+  "name": "Prayer & Favor",
+  "icon": "mythic_age:libation",
+  "category": "mythic_age:temple",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Believers pray during the day (time 2000–9000, roughly morning to early afternoon). Each believer prays for $(l)only one owner per day$() and must walk $(l)at least 8 blocks$() from their bed — villagers boxed into tiny cells do not count."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Output uses n, the number of believers praying at $(l)all of your altars together$():$(br2)$(l)about 3.5 × √n × average factor per day$()$(br2)n is capped at 24. The more people, the less each one adds; more altars only add prayer spots and cannot get around this."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)For reference$(): open-air altar with 2 believers ≈ 5/day; prostylos with 7 ≈ 18/day; peripteros plus prostylos ≈ 40/day.$(br2)$(l)Rain$() halves an open-air altar; roofed temples are unaffected. Favor stops rising at your cap.$(br2)Skipping time produces nothing: neither /time nor sleeping counts."
+    }
+  ]
+}

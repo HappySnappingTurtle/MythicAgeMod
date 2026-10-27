@@ -251,5 +251,45 @@ class WarningFxTest(unittest.TestCase):
             self.assertIn("Bad.java", r.errors[0])
 
 
+class HandbookTest(unittest.TestCase):
+    """TC-T24-90～92：手札三语一致、引用存在、锁页进度存在。"""
+
+    def make(self, root: Path, *, ja_missing=False, bad_item=False, bad_adv=False):
+        write(root / "neoforge/src/generated/resources/assets/mythic_age/lang/zh_cn.json", {"item.mythic_age.thread": "线团"})
+        write(root / "neoforge/src/generated/resources/assets/mythic_age/models/item/thread.json", {})
+        write(root / "neoforge/src/generated/resources/data/mythic_age/advancement/bestiary/greek/harpy/sighted.json", {})
+        book = root / "neoforge/src/main/resources/assets/mythic_age" / cc.HANDBOOK_REL
+        entry = {"name": "x", "icon": "mythic_age:thread", "category": "mythic_age:trials",
+                 "advancement": "mythic_age:bestiary/greek/harpy/" + ("nope" if bad_adv else "sighted"),
+                 "pages": [{"type": "patchouli:spotlight", "item": "mythic_age:" + ("ghost" if bad_item else "thread"), "text": "t"}]}
+        for lang in cc.HANDBOOK_LANGS:
+            if ja_missing and lang == "ja_jp":
+                write(book / lang / "categories/trials.json", {"name": "c"})
+                continue
+            write(book / lang / "categories/trials.json", {"name": "c"})
+            write(book / lang / "entries/trials/thread.json", entry)
+
+    def run_check(self, **kw):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            self.make(root, **kw)
+            r = cc.Report()
+            cc.check_handbook(cc.Paths(root), r)
+            return r.errors
+
+    def test_consistent_book_passes(self):
+        self.assertEqual([], self.run_check())
+
+    def test_missing_language_file(self):
+        errs = self.run_check(ja_missing=True)
+        self.assertTrue(any("ja_jp" in e and "thread.json" in e for e in errs), errs)
+
+    def test_unknown_item(self):
+        self.assertTrue(any("ghost" in e for e in self.run_check(bad_item=True)))
+
+    def test_unknown_advancement(self):
+        self.assertTrue(any("nope" in e for e in self.run_check(bad_adv=True)))
+
+
 if __name__ == "__main__":
     unittest.main()

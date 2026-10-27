@@ -46,8 +46,12 @@ class TradeTableTest {
     void tc01ParsesDefault() {
         TradeTable t = greek();
         assertEquals(Civilization.GREEK, t.civ());
-        assertEquals(27, t.offers().stream().filter(x -> x.category() == TradeOffer.Category.SUPPLIES).count(),
-                "奠酒、主神像、20 件次神祠商品（T11b）、村庄指引（T13b）、传令杖（T14）、2 件神谕（T19 §1.10 J6）、阿里阿德涅线团（T23）");
+        assertEquals(28, t.offers().stream().filter(x -> x.category() == TradeOffer.Category.SUPPLIES).count(),
+                "奠酒、主神像、20 件次神祠商品（T11b）、村庄指引（T13b）、传令杖（T14）、2 件神谕（T19 §1.10 J6）、阿里阿德涅线团（T23）、"
+                        + "克诺索斯地图（T24）");
+        TradeOffer map = t.offer("knossos_map").orElseThrow();
+        assertEquals(8, map.price().items().get(0).count(), "克诺索斯地图 8 绿宝石（T24 D12）");
+        assertEquals(Set.of(TradeOffer.Venue.GUARDIAN), map.venues(), "守护者处");
         TradeOffer thread = t.offer("ariadne_thread").orElseThrow();
         assertEquals(4, thread.price().items().get(0).count(), "线团 4 绿宝石（T23 D2）");
         assertEquals(2, thread.dailyLimit(), "每日 2 个");

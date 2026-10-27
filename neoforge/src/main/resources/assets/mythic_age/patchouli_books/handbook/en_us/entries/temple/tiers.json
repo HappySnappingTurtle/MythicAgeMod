@@ -1,0 +1,24 @@
+{
+  "name": "The Four Temple Tiers",
+  "icon": "mythic_age:marble_pillar",
+  "category": "mythic_age:temple",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Build a temple around the altar (7 blocks to each side, 32 blocks in front). Higher tiers give more $(l)prayer spots$() and more favor per believer.$(br2)If the building qualifies but your age does not, it counts as the highest tier your age allows; the inspector says which age you need."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Open-air Altar$(): 2 prayer spots, factor 1.0.$(br2)$(l)Naiskos$() (Archaic): ≥4 Greek columns (≥3 tall), ≥60% roofed between them, altar under open sky, ≥1 lit brazier. 4 spots, factor 1.5."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Prostylos$() (Classical): ≥8 columns on a raised platform you can walk onto, ≥2 braziers, 1 statue, ≥2 pediments, ≥40 marble floor. 7 spots, factor 2.0.$(br2)$(l)Peripteros$() (Heroic): ≥14 columns, ≥4 braziers, ≥4 pediments, ≥80 marble floor, the rest as above. 10 spots, factor 3.0."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Greek columns include the $(item)Marble Pillar$() and vanilla quartz pillars.$(br2)$(o)Source$(): prostylos and peripteros are Greek temple plans described in Vitruvius, $(o)De architectura$() 3.2. The numeric requirements for each tier are this mod's adaptation."
+    }
+  ]
+}

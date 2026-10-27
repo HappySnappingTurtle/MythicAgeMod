@@ -109,6 +109,9 @@ public final class SummonService {
         u.last = GlobalPos.of(level.dimension(), e.blockPosition());
         level.addFreshEntity(e);
         level.sendParticles(ParticleTypes.END_ROD, pos.x, pos.y + 1, pos.z, 30, 0.6, 1.0, 0.6, 0.05);
+        // 图鉴（T24 §6.3）：召唤出来就算驯服 / 结缘
+        io.github.happysnappingturtle.mythicage.bestiary.Bestiary.record(owner, e,
+                io.github.happysnappingturtle.mythicage.core.bestiary.BestiaryRules.Tier.DEFEATED);
         return Result.OK;
     }
 

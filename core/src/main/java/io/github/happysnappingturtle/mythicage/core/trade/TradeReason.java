@@ -33,7 +33,9 @@ public enum TradeReason {
     /** 村庄指引：祭司正在回想附近的村庄（T13b，搜索在后台进行，找到才成交）。 */
     SEARCHING,
     /** 村庄指引：搜索半径内没有你没去过的同文明村庄（T13b，不扣钱）。 */
-    NO_VILLAGE_NEARBY;
+    NO_VILLAGE_NEARBY,
+    /** 克诺索斯地图：搜索半径内没有迷宫（T24 §8.2，不扣钱）。 */
+    NO_LABYRINTH_NEARBY;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

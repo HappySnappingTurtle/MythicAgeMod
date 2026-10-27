@@ -1,0 +1,6 @@
+{
+  "name": "Mythic Units",
+  "description": "Summon tokens, the kerykeion and unit management.",
+  "icon": "mythic_age:summon_token_pegasus",
+  "sortnum": 40
+}

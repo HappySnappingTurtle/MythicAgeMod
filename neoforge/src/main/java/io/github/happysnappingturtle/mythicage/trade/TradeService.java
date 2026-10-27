@@ -323,6 +323,9 @@ public final class TradeService {
         if (o.id().equals(VILLAGE_GUIDE)) {
             return io.github.happysnappingturtle.mythicage.village.VillageGuide.displayStack(civ);
         }
+        if (o.id().equals(KNOSSOS_MAP)) {
+            return io.github.happysnappingturtle.mythicage.structure.LabyrinthMap.displayStack();
+        }
         if (o.id().startsWith(ORACLE_PREFIX)) {
             return io.github.happysnappingturtle.mythicage.village.life.OracleService.tablet(o.id());
         }
@@ -443,6 +446,9 @@ public final class TradeService {
         if (offer.id().equals(VILLAGE_GUIDE)) {
             return beginGuide(player, civ, offer, items, plan, requestId);
         }
+        if (offer.id().equals(KNOSSOS_MAP)) {
+            return knossosMap(player, civ, offer, items, plan, requestId);
+        }
         ItemStack result = offer.id().startsWith(ORACLE_PREFIX)
                 ? io.github.happysnappingturtle.mythicage.village.life.OracleService.answer(player, offer.id())
                 : resultOf(offer, civ, s);
@@ -540,6 +546,37 @@ public final class TradeService {
             removeItems(player, a.item(), a.count());
         }
         ItemStack map = io.github.happysnappingturtle.mythicage.village.VillageGuide.map(player.serverLevel(), civ, from, f);
+        give(player, map.copy());
+        return new Outcome(TradeReason.OK, 0, map);
+    }
+
+    /** 克诺索斯地图的商品 id（T24 §8.2，D12）：找到迷宫才成交，找不到不扣钱。 */
+    public static final String KNOSSOS_MAP = "knossos_map";
+
+    private static Outcome knossosMap(ServerPlayer player, Civilization civ, TradeOffer offer, List<TradeOffer.ItemAmount> items,
+                                      InventoryPlan plan, String requestId) {
+        if (!plan.insert("minecraft:filled_map", 1, 1)) {
+            return Outcome.of(TradeReason.INVENTORY_FULL);
+        }
+        Optional<BlockPos> at = io.github.happysnappingturtle.mythicage.structure.LabyrinthMap.find(player.serverLevel(),
+                player.blockPosition());
+        if (at.isEmpty()) {
+            return Outcome.of(TradeReason.NO_LABYRINTH_NEARBY);
+        }
+        Transactions.Result r = MythData.transact(player, new Transactions.Request("trade:" + requestId,
+                ReceiptBook.Scope.REQUEST, List.of(TxSteps.recordDaily(offer.key(civ), MythDays.today(player.server),
+                offer.dailyLimit()))));
+        if (r.status() == Transactions.Status.DUPLICATE) {
+            return Outcome.of(TradeReason.DUPLICATE);
+        }
+        if (!r.committed()) {
+            return Outcome.of(TradeReason.DAILY_LIMIT);
+        }
+        for (TradeOffer.ItemAmount a : items) {
+            removeItems(player, a.item(), a.count());
+        }
+        ItemStack map = io.github.happysnappingturtle.mythicage.structure.LabyrinthMap.map(player.serverLevel(), player.blockPosition(),
+                at.get());
         give(player, map.copy());
         return new Outcome(TradeReason.OK, 0, map);
     }

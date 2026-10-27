@@ -1,0 +1,17 @@
+{
+  "name": "废弃神殿",
+  "icon": "mythic_age:ruin_vault",
+  "category": "mythic_age:trials",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "希腊地域偶尔能见到倒塌的神殿：断柱、碎石与倒下的神像。三尊$(l)古神殿哨兵$()守着它，会向靠近的人放箭。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ruin_vault",
+      "text": "神殿深处有$(l)遗迹宝库$()：$(l)每个人$()都能打开一次，里面多是圣物。宝库不会被别人搬空。"
+    }
+  ]
+}

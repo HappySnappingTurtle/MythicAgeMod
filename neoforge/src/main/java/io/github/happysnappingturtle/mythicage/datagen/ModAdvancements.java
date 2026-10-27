@@ -43,6 +43,23 @@ public final class ModAdvancements implements AdvancementProvider.AdvancementGen
                 AdvancementType.GOAL, MythEventTrigger.atLeast(MythEvents.AGE_REACHED, GR, Age.CLASSICAL.ordinal()), false);
         node(saver, "greek/heroic", classical, GreekArchitecture.CORINTHIAN_CAPITAL.get(), AdvancementType.GOAL,
                 MythEventTrigger.atLeast(MythEvents.AGE_REACHED, GR, Age.HEROIC.ordinal()), false);
+        bestiary(saver);
+    }
+
+    /**
+     * 图鉴的隐藏进度（T24 §6.3）：每个条目三级各一条，无显示、不进进度界面，只给《神话手札》锁页用。
+     * 条件是事件 {@code bestiary:<条目>} 的值至少到该级。
+     */
+    static void bestiary(Consumer<AdvancementHolder> saver) {
+        for (String entry : io.github.happysnappingturtle.mythicage.content.greek.GreekBestiary.ENTRIES) {
+            for (var tier : java.util.List.of(io.github.happysnappingturtle.mythicage.core.bestiary.BestiaryRules.Tier.SIGHTED,
+                    io.github.happysnappingturtle.mythicage.core.bestiary.BestiaryRules.Tier.ENGAGED,
+                    io.github.happysnappingturtle.mythicage.core.bestiary.BestiaryRules.Tier.DEFEATED)) {
+                Advancement.Builder.advancement()
+                        .addCriterion("reached", MythEventTrigger.atLeast("bestiary:" + entry, GR, tier.ordinal()))
+                        .save(saver, MythicAgeIds.MOD_ID + ":bestiary/" + entry + "/" + tier.id());
+            }
+        }
     }
 
     private static AdvancementHolder node(Consumer<AdvancementHolder> saver, String path, AdvancementHolder parent,

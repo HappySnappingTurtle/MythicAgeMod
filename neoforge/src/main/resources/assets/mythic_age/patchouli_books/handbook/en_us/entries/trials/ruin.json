@@ -1,0 +1,17 @@
+{
+  "name": "Abandoned Temples",
+  "icon": "mythic_age:ruin_vault",
+  "category": "mythic_age:trials",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Collapsed temples dot the Greek lands: broken columns, rubble and toppled statues. Three $(l)ruin sentinels$() guard each one and shoot at anyone who comes close."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ruin_vault",
+      "text": "Deep inside is a $(l)ruin vault$(): $(l)each player$() can open it once, and it mostly holds relics. Nobody else can empty it for you."
+    }
+  ]
+}

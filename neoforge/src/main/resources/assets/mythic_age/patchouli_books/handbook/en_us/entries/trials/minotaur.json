@@ -1,0 +1,36 @@
+{
+  "name": "The Minotaur, Lord of the Labyrinth",
+  "icon": "mythic_age:minotaur_horn",
+  "category": "mythic_age:trials",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:minotaur_boss",
+      "scale": 0.45,
+      "offset": 0.15,
+      "text": "A bull-headed giant in the hall of Knossos. 320 health, more when several players fight. It $(l)cleaves$() with its axe and $(l)charges$()."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Lure it into a pillar$(): stand $(l)beside and behind$() an intact pillar. If its charge hits the pillar, the pillar shatters and it is $(l)stunned for 3 seconds$(), taking double damage. Once every pillar is broken, walls stun it too.$(br2)At half health it enters phase two: a roar, rising trap walls (warned on the floor first), double charges and thrown rubble.",
+      "advancement": "mythic_age:bestiary/greek/minotaur/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)A hint from the myth$(): the labyrinth held a bull-headed monster. Theseus did not win by the labyrinth's rules but by Ariadne's thread, finding it and finding his way back — let the labyrinth's own stones stop it.",
+      "advancement": "mythic_age:bestiary/greek/minotaur/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "When it falls, $(l)every participant$() (not just the last hit) receives: the Minotaur's Horn, 2 horns and experience. The first victory also records the $(l)harpe blueprint$() and opens the vault for you, which holds the Armor of Achilles. You can fight it again; each victory records a trial token.",
+      "advancement": "mythic_age:bestiary/greek/minotaur/defeated"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)Sources$(): Apollodorus, $(o)Library$() 3.1.3–4 and $(o)Epitome$() 1.7–9; Plutarch, $(o)Theseus$() 15–19; Ovid, $(o)Metamorphoses$() 8.152–182. The pillar stuns and trap walls are this mod's adaptation.",
+      "advancement": "mythic_age:bestiary/greek/minotaur/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/minotaur/sighted"
+}

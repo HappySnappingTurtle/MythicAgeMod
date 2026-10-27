@@ -1,0 +1,17 @@
+{
+  "name": "Ariadne's Thread",
+  "icon": "mythic_age:ariadne_thread",
+  "category": "mythic_age:trials",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:ariadne_thread",
+      "text": "While you hold it, a $(l)glowing golden thread$() trails behind you; follow it back to the entrance. In the boss's second phase it also points toward the boss. Opening the gate does $(l)not use it up$()."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)Source$(): Ariadne gave Theseus a ball of thread; he tied it at the entrance and, after killing the Minotaur, followed it out — Apollodorus, $(o)Epitome$() 1.8–9."
+    }
+  ]
+}

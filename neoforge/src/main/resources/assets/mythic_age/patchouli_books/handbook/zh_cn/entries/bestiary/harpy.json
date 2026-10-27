@@ -1,0 +1,26 @@
+{
+  "name": "哈耳庇厄",
+  "icon": "mythic_age:storm_feather",
+  "category": "mythic_age:bestiary",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:harpy",
+      "scale": 0.6,
+      "offset": 0.15,
+      "text": "风暴高地与爱琴海岸的$(l)崖巢$()，一巢 2–4 只。崖面白痕、散羽与风中的尖笑都是迹象。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)俯冲抓举$()：在你头顶盘旋，然后$(l)尖啸收翅$()约 0.8 秒（前摇），俯冲把人抓起升高几格再松手。$(br2)看到收翅就$(l)举盾$()，或在她俯冲途中击中她，抓举就会落空，她摔在地上眩晕 2 秒。被抓过的人 8 秒内不会再被抓。雷雨天她们俯冲得更勤。",
+      "advancement": "mythic_age:bestiary/greek/harpy/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "掉落$(item)风暴之羽$()（以后做飞翼凉鞋与哈耳珀的材料）。$(br2)$(o)出处$()：哈耳庇厄是陶玛斯与厄勒克特拉的女儿，名叫埃洛与俄库珀忒（赫西俄德《神谱》265–269）；她们夺走先知菲纽斯的食物，被阿尔戈英雄赶走（阿波罗尼俄斯《阿尔戈英雄纪》2.178–300）。",
+      "advancement": "mythic_age:bestiary/greek/harpy/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/harpy/sighted"
+}

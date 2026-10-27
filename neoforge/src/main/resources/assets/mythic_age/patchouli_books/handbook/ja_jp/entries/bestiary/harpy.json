@@ -1,0 +1,26 @@
+{
+  "name": "ハルピュイア",
+  "icon": "mythic_age:storm_feather",
+  "category": "mythic_age:bestiary",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:harpy",
+      "scale": 0.6,
+      "offset": 0.15,
+      "text": "嵐の高地とエーゲ海の$(l)崖の巣$()に 2–4 羽。岩の白い汚れ、羽根、甲高い笑い声がしるし。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)急降下のつかみ上げ$()：頭上を旋回し、$(l)鋭く鳴いて翼をたたむ$()（約 0.8 秒の予兆）と急降下して人をつかみ、数ブロック持ち上げて放す。$(br2)翼をたたんだら$(l)盾を構える$()か、急降下中に当てればつかみは失敗し、彼女は墜ちて 2 秒気絶する。つかまれた人は 8 秒間つかまれない。雷雨の日はよく急降下する。",
+      "advancement": "mythic_age:bestiary/greek/harpy/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(item)嵐の羽根$()を落とす（のちに翼のサンダルとハルペーの材料）。$(br2)$(o)出典$()：ハルピュイアはタウマスとエーレクトラーの娘アエロとオーキュペテー（ヘシオドス『神統記』265–269）。予言者ピネウスの食べ物を奪い、アルゴー船の英雄に追い払われた（アポロニオス『アルゴナウティカ』2.178–300）。",
+      "advancement": "mythic_age:bestiary/greek/harpy/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/harpy/sighted"
+}

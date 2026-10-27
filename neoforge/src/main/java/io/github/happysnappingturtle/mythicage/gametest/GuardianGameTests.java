@@ -506,6 +506,24 @@ public final class GuardianGameTests {
         });
     }
 
+    /** TC-T24-84～86：克诺索斯地图：在交易表里；找到迷宫才扣 8 绿宝石给带红叉的地图，找不到不扣钱。 */
+    @GameTest(template = T, batch = GUIDE_BATCH, timeoutTicks = 400)
+    public static void knossos_map_charges_only_when_found(GameTestHelper h) {
+        GuardianEntity g = guardian(h);
+        FakePlayer p = blessed(h, g, "ma_knossos_map", 0);
+        p.getInventory().add(new ItemStack(Items.EMERALD, 12));
+        TradeService.Outcome o = buy(p, TradeService.KNOSSOS_MAP, 0);
+        if (o.ok()) {
+            h.assertTrue(count(p, Items.EMERALD) == 4 && count(p, Items.FILLED_MAP) == 1, "扣 8 颗、给 1 张地图");
+            var deco = o.given().get(net.minecraft.core.component.DataComponents.MAP_DECORATIONS);
+            h.assertTrue(deco != null && !deco.decorations().isEmpty(), "地图上有红叉");
+        } else {
+            h.assertTrue(o.reason() == TradeReason.NO_LABYRINTH_NEARBY, "附近没有迷宫，实际 " + o.reason());
+            h.assertTrue(count(p, Items.EMERALD) == 12 && count(p, Items.FILLED_MAP) == 0, "找不到时不扣钱、不给地图");
+        }
+        h.succeed();
+    }
+
     /** 背包放不下地图时直接拒绝，不启动搜索。 */
     @GameTest(template = T, batch = GUIDE_BATCH)
     public static void village_guide_needs_free_slot(GameTestHelper h) {

@@ -67,6 +67,10 @@ public final class TrialRewards extends SavedData {
                 if (grant(p, arena.kind(), receipt)) {
                     given++;
                 }
+                // 图鉴（T24 §6.3）：试炼 Boss 按参战者点亮到击败，不只看最后一击
+                arena.spec().flatMap(sp -> io.github.happysnappingturtle.mythicage.bestiary.BestiaryLoader.table()
+                        .entryOf(sp.boss().toString())).ifPresent(entry -> io.github.happysnappingturtle.mythicage.bestiary.Bestiary
+                        .record(p, entry, io.github.happysnappingturtle.mythicage.core.bestiary.BestiaryRules.Tier.DEFEATED));
             } else {
                 TrialRewards t = get(level.getServer());
                 t.pending.computeIfAbsent(id, k -> new ArrayList<>()).add(new String[]{arena.kind(), receipt});

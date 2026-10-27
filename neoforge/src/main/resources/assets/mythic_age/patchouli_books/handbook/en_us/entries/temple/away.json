@@ -1,0 +1,16 @@
+{
+  "name": "While You Are Away",
+  "icon": "minecraft:clock",
+  "category": "mythic_age:temple",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "While you are $(l)online$() but away from the temple, favor $(l)accrues$() at the rate you last saw in person and is credited when you come back nearby (capped).$(br2)A temple you have not yet watched in person accrues at a $(l)discounted$() estimate; stay away too long and accrual pauses."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "While you are $(l)offline$() nothing is produced (servers may configure otherwise).$(br2)The inspector's \"While you're away\" section shows the current state: rate per day, any discount, whether it is paused, and how much is waiting for you."
+    }
+  ]
+}

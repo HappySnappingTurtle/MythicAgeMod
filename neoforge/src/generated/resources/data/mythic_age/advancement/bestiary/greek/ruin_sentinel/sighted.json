@@ -1,0 +1,18 @@
+{
+  "criteria": {
+    "reached": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "bestiary:greek/ruin_sentinel",
+        "min": 1
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "requirements": [
+    [
+      "reached"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

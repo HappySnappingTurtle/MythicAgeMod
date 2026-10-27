@@ -127,6 +127,9 @@ dependencies {
     compileOnly "vazkii.patchouli:Patchouli:${patchouli_version}:api"
     runtimeOnly "vazkii.patchouli:Patchouli:${patchouli_version}"
 
+    // JEI 可选插件（T24 §8.1）：只编译时用 API，不写进 mods.toml，不打进 jar
+    compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
 
     agentImplementation sourceSets.main.output
@@ -201,8 +204,9 @@ def verifyModJar = tasks.register('verifyModJar') {
 def checkAgentSandbox = tasks.register('checkAgentSandbox', JavaExec) {
     group = 'verification'
     description = '检查 agent 源集没有引用网络、外部进程或桌面截图相关的类。'
-    dependsOn tasks.named('agentClasses')
-    classpath = project(':core').sourceSets.devtools.runtimeClasspath
+    dependsOn tasks.named('agentClasses'), ':core:devtoolsClasses'
+    // 只用 core devtools 的类文件（扫描器只依赖 JDK）；不在本工程里解析 core 的依赖配置（Gradle 9 不允许跨工程解析）
+    classpath = files(project(':core').sourceSets.devtools.output)
     mainClass = 'io.github.happysnappingturtle.mythicage.devtools.ForbiddenReferenceCli'
     def dir = sourceSets.agent.java.destinationDirectory
     args = [dir.get().asFile.absolutePath, 'java/net/', 'java/awt/', 'javax/imageio/',

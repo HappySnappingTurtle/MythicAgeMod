@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -500,7 +501,119 @@ def run(root: Path, design: Path | None) -> Report:
     check_equipment(root, report)
     check_rigs(root, report)
     check_warning_fx(root, report)
+    check_handbook(paths, report)
+    check_untranslated(paths, report)
     return report
+
+
+CJK = re.compile(r"[\u4e00-\u9fff]")
+# 日文与中文同形的词（汉字相同）属于正常情况：只提示含中文专用字形或整句相同的值，交给 codex 核对（T24 §6.5，TC-T24-93）
+JA_SAME_OK: set[str] = set()
+
+
+def check_untranslated(paths: Paths, report: Report) -> None:
+    """en_us / ja_jp 的值与 zh_cn 字面相同且含汉字：多半没翻，列成提示。"""
+    files = {}
+    for lang in ("zh_cn", "en_us", "ja_jp"):
+        for a in paths.assets():
+            f = a / f"lang/{lang}.json"
+            if f.exists():
+                files.setdefault(lang, {}).update(json.loads(f.read_text(encoding="utf-8")))
+    zh = files.get("zh_cn", {})
+    for lang in ("en_us", "ja_jp"):
+        same = [k for k, v in files.get(lang, {}).items()
+                if zh.get(k) == v and CJK.search(v) and not (lang == "ja_jp" and k in JA_SAME_OK)]
+        if same:
+            report.notes.append(f"{lang} 有 {len(same)} 条与 zh_cn 相同且含汉字（可能没翻）：" + "、".join(sorted(same)[:8])
+                                + ("……" if len(same) > 8 else ""))
+
+
+# 《神话手札》（T24 §6.5）：三语条目一一对应、页数与锁页一致；引用的物品、实体、进度都存在。
+HANDBOOK_REL = "patchouli_books/handbook"
+HANDBOOK_LANGS = ("zh_cn", "en_us", "ja_jp")
+EXTERNAL_NS = ("minecraft", "patchouli")
+
+
+def handbook_files(book: Path, lang: str) -> dict[str, dict]:
+    d = book / lang
+    if not d.is_dir():
+        return {}
+    return {str(f.relative_to(d)): json.loads(f.read_text(encoding="utf-8")) for f in sorted(d.rglob("*.json"))}
+
+
+def item_ids(paths: Paths) -> set[str]:
+    """本模组有物品形态的 id：有物品模型的（只有方块、没有物品的不算，Patchouli 图标会失败）。"""
+    out: set[str] = set()
+    for a in paths.assets():
+        d = a / "models/item"
+        if d.is_dir():
+            out.update(f"{MOD}:{f.stem}" for f in d.glob("*.json"))
+    return out
+
+
+def registered_ids(paths: Paths) -> set[str]:
+    """本模组已注册的物品、方块、实体 id：取自 zh_cn 语言文件的名称键。"""
+    out: set[str] = set()
+    for a in paths.assets():
+        f = a / "lang/zh_cn.json"
+        if f.exists():
+            for k in json.loads(f.read_text(encoding="utf-8")):
+                parts = k.split(".")
+                if len(parts) == 3 and parts[0] in ("item", "block", "entity") and parts[1] == MOD:
+                    out.add(f"{MOD}:{parts[2]}")
+    return out
+
+
+def advancement_ids(paths: Paths) -> set[str]:
+    out: set[str] = set()
+    for data in paths.data():
+        base = data / MOD / "advancement"
+        if base.is_dir():
+            for f in base.rglob("*.json"):
+                out.add(f"{MOD}:" + "/".join(f.relative_to(base).with_suffix("").parts))
+    return out
+
+
+def check_handbook(paths: Paths, report: Report) -> None:
+    book = paths.main / "assets" / MOD / HANDBOOK_REL
+    if not book.is_dir():
+        return
+    langs = {lang: handbook_files(book, lang) for lang in HANDBOOK_LANGS}
+    base = langs[HANDBOOK_LANGS[0]]
+    ids = registered_ids(paths)
+    advs = advancement_ids(paths)
+
+    items = item_ids(paths)
+
+    def known(ref: str, need_item: bool = True) -> bool:
+        ref = ref.split("{")[0].split("#")[0]
+        ns = ref.split(":")[0] if ":" in ref else "minecraft"
+        return ns in EXTERNAL_NS or (ref in items if need_item else ref in ids)
+
+    for lang, files in langs.items():
+        for name in sorted(set(base) ^ set(files)):
+            report.errors.append(f"手札：{lang} 与 {HANDBOOK_LANGS[0]} 的文件不一致：{name}")
+        for name, o in files.items():
+            where = f"手札 {lang}/{name}"
+            for key in ("icon",):
+                if key in o and not known(o[key]):
+                    report.errors.append(f"{where}：图标 {o[key]} 不存在")
+            if "advancement" in o and o["advancement"] not in advs:
+                report.errors.append(f"{where}：锁条目的进度 {o['advancement']} 不存在")
+            for i, page in enumerate(o.get("pages", [])):
+                for key in ("item", "entity"):
+                    if key in page and not known(page[key], need_item=key == "item"):
+                        report.errors.append(f"{where} 第 {i + 1} 页：{key} {page[key]} 不存在")
+                if "advancement" in page and page["advancement"] not in advs:
+                    report.errors.append(f"{where} 第 {i + 1} 页：锁页的进度 {page['advancement']} 不存在")
+            ref = base.get(name)
+            if ref is not None and lang != HANDBOOK_LANGS[0]:
+                if len(ref.get("pages", [])) != len(o.get("pages", [])):
+                    report.errors.append(f"{where}：页数与 {HANDBOOK_LANGS[0]} 不同")
+                elif [p.get("advancement") for p in ref.get("pages", [])] != [p.get("advancement") for p in o.get("pages", [])]:
+                    report.errors.append(f"{where}：锁页与 {HANDBOOK_LANGS[0]} 不同")
+                if ref.get("advancement") != o.get("advancement"):
+                    report.errors.append(f"{where}：锁条目与 {HANDBOOK_LANGS[0]} 不同")
 
 
 # 战斗预警所在的代码（T24 §7.1）：这些文件发出的预警粒子、预警声不能被「装饰粒子」客户端选项减掉，
