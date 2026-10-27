@@ -38,7 +38,14 @@ public final class ClientSetup {
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.THROWN_RUBBLE.get(),
                 net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.MINOTAUR_BOSS.get(),
-                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.5F).glowing());
+                ctx -> new MythGeoRenderer<io.github.happysnappingturtle.mythicage.content.greek.knossos.MinotaurBossEntity>(ctx,
+                        new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.5F) {
+                    @Override
+                    protected float getDeathMaxRotation(
+                            io.github.happysnappingturtle.mythicage.content.greek.knossos.MinotaurBossEntity animatable) {
+                        return 0; // 死亡由动画表现（跪倒伏地），不侧倒
+                    }
+                }.glowing());
         event.registerEntityRenderer(ModEntities.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
         // 召唤版弥诺陶洛斯（T14）：与 T7 共用模型与动画

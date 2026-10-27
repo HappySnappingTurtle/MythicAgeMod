@@ -276,6 +276,35 @@ public final class TrialArenaGameTests {
         });
     }
 
+    /** TC-T23-49（补）：玩家跑远、大厅区块卸载期间计时不推进——回来第一刻按离开时长复原；过期的 Boss 实体自行消失。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 300)
+    public static void long_absence_resets_and_stale_boss_vanishes(GameTestHelper h) {
+        Setup s = setup(h, 22);
+        ServerLevel level = h.getLevel();
+        ServerPlayer p = inHall(h, s, "gt_away", 0, 8);
+        open(h, s, p);
+        Mob[] stale = new Mob[1];
+        h.runAtTickTime(10, () -> {
+            boss(h, s);
+            p.moveTo(p.getX(), p.getY(), s.origin().getZ() + 60);
+            s.arena().awayForTest(level.getGameTime(), 5000);
+        });
+        h.runAtTickTime(14, () -> {
+            h.assertTrue(s.arena().phase() == ArenaPhase.IDLE, "离开早已超时：立即复原");
+            // 模拟区块卸载时没被清掉、之后才载入的旧 Boss
+            Mob m = GreekKnossos.MINOTAUR_BOSS.get().create(level);
+            ((MinotaurBossEntity) m).bindArena(s.arena().id());
+            m.moveTo(s.origin().getX() + 0.5, s.origin().getY(), s.origin().getZ() + 0.5);
+            level.addFreshEntity(m);
+            stale[0] = m;
+        });
+        h.runAtTickTime(60, () -> {
+            h.assertTrue(stale[0].isRemoved(), "过期的 Boss 自行消失");
+            cleanup(h, s);
+            h.succeed();
+        });
+    }
+
     /** TC-T23-50、51、52：挖不动、炸不坏；战中不能放方块；神力临时方块被拒。 */
     @GameTest(template = T, batch = BATCH, timeoutTicks = 300)
     public static void arena_is_protected(GameTestHelper h) {

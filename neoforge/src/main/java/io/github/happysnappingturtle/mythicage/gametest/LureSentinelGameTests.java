@@ -255,7 +255,8 @@ public final class LureSentinelGameTests {
             h.assertTrue(n == 1 && LurePower.luresOnForTest(wild).contains(castId), "只吸引野马：" + n);
             h.assertTrue(!LurePower.luresOnForTest(leashed).contains(castId) && !LurePower.luresOnForTest(wolf).contains(castId),
                     "拴绳的马、他人驯服的狼不吸引");
-            tl.later(60, () -> {
+            // 野马从 17.5 格外起步、走路有快有慢：给 100 刻（原来 60 刻偶发不够，2026-10-26）
+            tl.later(100, () -> {
                 h.assertTrue(leashed.isLeashed(), "拴绳的马仍拴着");
                 h.assertTrue(wild.position().distanceTo(h.absoluteVec(new Vec3(8.5, 2, 10.5))) < 17.5, "野马朝石头走");
                 clearAnimals(h);

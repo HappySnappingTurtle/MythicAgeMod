@@ -42,19 +42,18 @@ class BossRulesTest {
     @Test
     void tc07to08Clock() {
         ArenaClock c = new ArenaClock();
-        for (int i = 0; i < 599; i++) {
-            assertFalse(c.tick(false, ArenaClock.EMPTY_RESET));
-        }
-        assertFalse(c.tick(true, ArenaClock.EMPTY_RESET), "有人回来清零");
-        for (int i = 0; i < 599; i++) {
-            assertFalse(c.tick(false, ArenaClock.EMPTY_RESET), "第 " + (i + 1) + " 刻");
-        }
-        assertTrue(c.tick(false, ArenaClock.EMPTY_RESET), "第 600 刻复原");
+        c.reset(1000);
+        assertFalse(c.tick(false, 1599, ArenaClock.EMPTY_RESET), "599 刻不复原");
+        assertFalse(c.tick(true, 1599, ArenaClock.EMPTY_RESET), "有人回来清零");
+        assertFalse(c.tick(false, 2198, ArenaClock.EMPTY_RESET));
+        assertTrue(c.tick(false, 2199, ArenaClock.EMPTY_RESET), "第 600 刻复原");
         ArenaClock o = new ArenaClock();
-        for (int i = 0; i < 1199; i++) {
-            assertFalse(o.tick(false, ArenaClock.OPEN_TIMEOUT));
-        }
-        assertTrue(o.tick(false, ArenaClock.OPEN_TIMEOUT), "1200 刻关门");
+        o.reset(0);
+        assertFalse(o.tick(false, 1199, ArenaClock.OPEN_TIMEOUT));
+        assertTrue(o.tick(false, 1200, ArenaClock.OPEN_TIMEOUT), "1200 刻关门");
+        ArenaClock away = new ArenaClock();
+        away.reset(5000);
+        assertTrue(away.tick(false, 90000, ArenaClock.EMPTY_RESET), "区块卸载期间不推进：回来第一刻就已超时");
     }
 
     @Test

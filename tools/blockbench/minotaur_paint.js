@@ -296,10 +296,72 @@
         }
     }
 
+    /**
+     * Boss 变体（T23 §8；卡片 03 §4「略深皮毛、明显但克制的迷宫束带纹样、少量战损；不靠全身发红发光区分身份」）：
+     * 在召唤版贴图上改色——皮毛与鬃毛压暗偏黑褐、腰布换深绯红、青铜略旧；腰带与护腕铺一条金色回纹（迷宫纹样）；
+     * 胸前与上臂几道浅色旧伤疤。眼睛与发光遮罩不变。
+     */
+    function boss(ctx, nets, P) {
+        const H = makeHelpers(ctx, nets, P);
+        const { local } = H;
+        const tint = (r, m) => {
+            const img = ctx.getImageData(r[0], r[1], r[2], r[3]);
+            for (let i = 0; i < img.data.length; i += 4) {
+                for (let c = 0; c < 3; c++) {
+                    img.data[i + c] = Math.max(0, Math.min(255, Math.round(img.data[i + c] * m[c])));
+                }
+            }
+            ctx.putImageData(img, r[0], r[1]);
+        };
+        const TINT = {
+            fur: [0.66, 0.6, 0.6], mane: [0.6, 0.56, 0.56], cloth: [0.86, 0.55, 0.6], bronze: [0.86, 0.82, 0.76],
+            ivory: [0.93, 0.9, 0.84], hoof: [0.8, 0.78, 0.78],
+        };
+        for (const net of Object.values(nets)) {
+            const m = TINT[MATERIAL[net.color.toUpperCase()]];
+            if (!m) continue;
+            for (const r of Object.values(net.faces)) {
+                tint(r, m);
+            }
+        }
+        // 回纹：每 6 列一个方形螺旋单元，4 行高（腰带正好 4 行；护腕取中间 4 行）
+        const KEY = ['111111', '000001', '111101', '100001'];
+        const gold = '#C9A13B';
+        const dark = '#3B2C16';
+        const meander = (L, top) => {
+            for (let v = 0; v < 4; v++) {
+                for (let u = 0; u < L.r[2]; u++) {
+                    L.px(u, top + v, KEY[v][u % 6] === '1' ? gold : dark);
+                }
+            }
+        };
+        for (const f of SIDES) {
+            meander(local('belt', f), 0);
+            const B = local('bracer', f);
+            meander(B, Math.max(0, Math.floor((B.r[3] - 4) / 2)));
+        }
+        // 旧伤疤：浅色斜线（爪痕三道、刀痕一道）
+        const scar = MA.shade('#865632', 0.95);
+        const line = (L, u0, v0, n, du) => {
+            for (let i = 0; i < n; i++) L.px(u0 + i * du, v0 + i, scar);
+        };
+        {
+            const C = local('chest', 'front');
+            line(C, 3, 2, 6, 1);
+            line(C, 5, 2, 6, 1);
+            line(C, 7, 2, 5, 1);
+            line(C, C.r[2] - 6, 5, 5, -1);
+        }
+        {
+            const U = local('upper_arm', 'front');
+            line(U, 2, 3, 5, 1);
+        }
+    }
+
     function glow(ctx, nets, P) {
         const { local } = makeHelpers(ctx, nets, P);
         drawEyes(local('cranium', 'front'), true);
     }
 
-    return { paint, glow };
+    return { paint, glow, boss };
 })();

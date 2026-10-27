@@ -94,6 +94,7 @@
         draw(ctx, w, h);
         const tex = new Texture({ name, width: w, height: h }).fromDataURL(canvas.toDataURL('image/png'));
         tex.add(false);
+        tex.maCanvas = canvas; // 绘制用的原画布（导出变体贴图时在它上面复制改色，不等图片异步加载）
         return tex;
     };
 

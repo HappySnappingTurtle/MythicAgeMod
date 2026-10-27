@@ -338,7 +338,12 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
             return;
         }
         Optional<TrialArena> arena = arena();
-        if (arena.isEmpty()) {
+        if (arena.isEmpty() || !arena.get().phase().fighting() || !arena.get().bossId().map(getUUID()::equals).orElse(false)) {
+            // 过期的 Boss（竞技场已复原、换了一场，或区块卸载期间被复原后实体才载入）：自行消失，不留孤儿
+            if (tickCount > 20) {
+                io.github.happysnappingturtle.mythicage.MythicAge.LOGGER.info("过期的 Boss {}（竞技场 {}）自行消失", getUUID(), arenaId);
+                discard();
+            }
             return;
         }
         if (stun > 0) {
@@ -366,7 +371,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
             phaseTwoPending = false;
             roar = roarTicks;
             stand();
-            playOnce(MythAnimState.PAW, roarTicks);
+            playOnce(MythAnimState.ROAR, roarTicks);
             level.playSound(null, blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 2.0F, 0.7F);
             return;
         }
@@ -440,7 +445,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
         stand();
         face(yawTo(p));
         throwAt = p.position();
-        playOnce(MythAnimState.TOSS, throwTotal);
+        playOnce(MythAnimState.THROW, throwTotal);
         throwReadyAt = now + MoveScheduler.THROW_COOLDOWN;
     }
 
@@ -626,12 +631,40 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
     @Override
     protected void onChargeFinished() {
         if (stun > 0) {
-            playOnce(MythAnimState.CHARGE_WINDUP, stun);   // 硬直：头角卡住（阶段 ④ 换专用动画）
+            playOnce(MythAnimState.STUN, stun);   // 硬直：头角卡在柱里挣扎
             endMove();
             return;
         }
         if (move == Move.DOUBLE_CHARGE && segment == 1 && blocking.isEmpty() && !horizontalCollision) {
             secondSegmentAt = moveTick + doubleGap;
+        }
+    }
+
+    // ───────────── 死亡 ─────────────
+
+    /** 死亡动画（跪倒伏地）的长度：播完再消失，不用原版的侧倒。 */
+    public static final int DEATH_TICKS = 40;
+
+    @Override
+    public void die(DamageSource source) {
+        super.die(source);
+        charge().cancel();
+        endMove();
+        stun = 0;
+        roar = 0;
+        if (!level().isClientSide()) {
+            setAnimState(MythAnimState.DEATH);
+        }
+    }
+
+    @Override
+    protected void tickDeath() {
+        ++deathTime;
+        Vec3 v = getDeltaMovement();
+        setDeltaMovement(0, v.y, 0);
+        if (deathTime >= DEATH_TICKS && !level().isClientSide() && !isRemoved()) {
+            level().broadcastEntityEvent(this, (byte) 60);
+            remove(RemovalReason.KILLED);
         }
     }
 

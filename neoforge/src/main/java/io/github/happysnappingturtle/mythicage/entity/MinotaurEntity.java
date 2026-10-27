@@ -61,7 +61,7 @@ public class MinotaurEntity extends PathfinderMob implements GeoEntity, MythVari
                 continue;
             }
             RawAnimation raw = switch (s) {
-                case CHARGE_WINDUP, CHARGE_RECOVER, PAW, ATTACK_SWING, TOSS -> RawAnimation.begin().thenPlayAndHold(s.animation());
+                case CHARGE_WINDUP, CHARGE_RECOVER, PAW, ATTACK_SWING, TOSS, ROAR, THROW, DEATH -> RawAnimation.begin().thenPlayAndHold(s.animation());
                 default -> RawAnimation.begin().thenLoop(s.animation());
             };
             ANIMATIONS.put(s, raw);

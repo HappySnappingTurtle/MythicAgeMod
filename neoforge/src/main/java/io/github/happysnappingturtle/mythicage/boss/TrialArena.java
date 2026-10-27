@@ -316,7 +316,7 @@ public final class TrialArena {
                 }
                 openGate(level);
                 setPhase(ArenaPhase.OPEN);
-                clock.reset();
+                clock.reset(level.getGameTime());
                 return Optional.of(Component.translatable("mythic_age.arena.gate.opened"));
             }
             case FIGHT_P1, FIGHT_P2 -> {
@@ -655,17 +655,17 @@ public final class TrialArena {
             case OPEN -> {
                 if (!inHall.isEmpty()) {
                     startFight(level, inHall);
-                } else if (clock.tick(false, ArenaClock.OPEN_TIMEOUT)) {
+                } else if (clock.tick(false, now, ArenaClock.OPEN_TIMEOUT)) {
                     if (closeGate(level)) {
                         setPhase(ArenaPhase.IDLE);
-                        clock.reset();
+                        clock.reset(now);
                     }
                 }
             }
             case FIGHT_P1, FIGHT_P2 -> tickFight(level, inHall);
             case VICTORY -> {
-                if (clock.tick(!inHall.isEmpty(), ArenaClock.EMPTY_RESET)) {
-                    reset(level);
+                if (clock.tick(!inHall.isEmpty(), now, ArenaClock.EMPTY_RESET)) {
+                    reset(level, "胜利后大厅空了");
                 }
             }
             default -> {
@@ -680,14 +680,14 @@ public final class TrialArena {
         fightId++;
         participants.clear();
         windows.reset();
-        clock.reset();
+        clock.reset(level.getGameTime());
         bossMissing = 0;
         players = Math.max(1, inHall.size());
         var type = BuiltInRegistries.ENTITY_TYPE.get(spec.boss());
         Entity e = type.create(level);
         if (!(e instanceof Mob mob)) {
             MythicAge.LOGGER.error("竞技场 {} 的 Boss 类型 {} 不是生物", id, spec.boss());
-            reset(level);
+            reset(level, "Boss 生成失败");
             return;
         }
         mob.moveTo(bossOrigin.getX() + 0.5, bossOrigin.getY(), bossOrigin.getZ() + 0.5, 0, 0);
@@ -713,11 +713,15 @@ public final class TrialArena {
         for (ServerPlayer p : inHall) {
             participants.present(p.getUUID());
         }
+        // 先看空场：大厅区块刚重新载入时 Boss 实体可能还没载入，不能等找到 Boss 才计时
+        if (clock.tick(!inHall.isEmpty(), level.getGameTime(), ArenaClock.EMPTY_RESET)) {
+            reset(level, "大厅里连续 " + clock.empty(level.getGameTime()) + " 刻没有合格玩家");
+            return;
+        }
         Optional<Mob> b = boss(level);
         if (b.isEmpty()) {
             if (++bossMissing >= BOSS_MISSING_RESET) {
-                MythicAge.LOGGER.info("竞技场 {}：Boss 实体 {} 刻找不到，复原（不算胜利）", id, bossMissing);
-                reset(level);
+                reset(level, "Boss 实体 " + bossMissing + " 刻找不到，不算胜利");
             }
             return;
         }
@@ -751,9 +755,6 @@ public final class TrialArena {
             tickDevices(level, mob, inHall);
         }
         tickWalls(level, level.getGameTime());
-        if (clock.tick(!inHall.isEmpty(), ArenaClock.EMPTY_RESET)) {
-            reset(level);
-        }
     }
 
     /** Boss 死了：胜利、结算（{@link TrialRewards}）、开门、开宝库门、落墙。只在战斗中、且是本场的 Boss 时生效（重复的死亡事件不再结算）。 */
@@ -762,7 +763,7 @@ public final class TrialArena {
             return;
         }
         setPhase(ArenaPhase.VICTORY);
-        clock.reset();
+        clock.reset(level.getGameTime());
         // 倒下处的光与声：所有在场的人都看得见、听得见
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.TOTEM_OF_UNDYING, mob.getX(), mob.getY() + mob.getBbHeight() * 0.6,
                 mob.getZ(), 120, 0.8, 1.2, 0.8, 0.6);
@@ -795,6 +796,14 @@ public final class TrialArena {
 
     /** 复原：Boss 消失、墙落下、柱写回、关门 → IDLE。 */
     public void reset(ServerLevel level) {
+        reset(level, "命令或测试");
+    }
+
+    /** 复原并记下原因（日志里查「竞技场 … 复原」）。 */
+    public void reset(ServerLevel level, String reason) {
+        if (phase != ArenaPhase.IDLE) {
+            MythicAge.LOGGER.info("竞技场 {} 第 {} 场复原（{}，原阶段 {}）", id, fightId, reason, phase);
+        }
         boss(level).ifPresent(Entity::discard);
         boss = null;
         wallCycle.stop();
@@ -808,7 +817,7 @@ public final class TrialArena {
             phase = phase.go(ArenaPhase.IDLE);
         }
         gateCloseAt = -1;
-        clock.reset();
+        clock.reset(level.getGameTime());
         windows.reset();
         players = 0;
         clearBar();
@@ -849,6 +858,11 @@ public final class TrialArena {
         }
     }
 
+    /** 只供 GameTest：把「最后有人在场」挪到 now − ticks（模拟区块卸载期间的离开）。 */
+    public void awayForTest(long now, long ticks) {
+        clock.restore(now - ticks);
+    }
+
     public Optional<ServerBossEvent> barForTest() {
         return Optional.ofNullable(bar);
     }
@@ -868,7 +882,7 @@ public final class TrialArena {
         t.put("WallB", longs(walls.get(WallCycle.Group.B)));
         t.putIntArray("Region", new int[]{region.minX(), region.minY(), region.minZ(), region.maxX(), region.maxY(), region.maxZ()});
         t.putString("Phase", phase.name());
-        t.putInt("Empty", clock.empty());
+        t.putLong("LastPresent", clock.lastPresent());
         t.putInt("FightId", fightId);
         if (boss != null) {
             t.putUUID("Boss", boss);
@@ -927,7 +941,7 @@ public final class TrialArena {
                 positions(t.getList("Pillars", Tag.TAG_LONG)), positions(t.getList("WallA", Tag.TAG_LONG)),
                 positions(t.getList("WallB", Tag.TAG_LONG)), region, spec.get());
         a.phase = ArenaPhase.valueOf(t.getString("Phase"));
-        a.clock.restore(t.getInt("Empty"));
+        a.clock.restore(t.getLong("LastPresent"));
         a.fightId = t.getInt("FightId");
         a.boss = t.hasUUID("Boss") ? t.getUUID("Boss") : null;
         a.players = t.getInt("Players");

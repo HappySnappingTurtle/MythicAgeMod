@@ -121,6 +121,24 @@
         MA.writeText(out.glowmask, Buffer.from(glowCanvas.toDataURL('image/png').split(',')[1], 'base64'));
         exportsByPath[out.glowmask] = MA.fs.readFileSync(MA.abs(out.glowmask));
     }
+    // Boss 变体贴图（T23 §8）：在主贴图上改色与加纹样；发光遮罩与主贴图相同（红眼位置不变）
+    if (painter && painter.boss) {
+        const bossCanvas = document.createElement('canvas');
+        bossCanvas.width = ATLAS;
+        bossCanvas.height = ATLAS;
+        const bctx = bossCanvas.getContext('2d');
+        bctx.imageSmoothingEnabled = false;
+        bctx.drawImage(tex.maCanvas, 0, 0);
+        painter.boss(bctx, nets, P);
+        out.bossTexture = out.texture.replace(/\.png$/, '_boss.png');
+        MA.writeText(out.bossTexture, Buffer.from(bossCanvas.toDataURL('image/png').split(',')[1], 'base64'));
+        exportsByPath[out.bossTexture] = MA.fs.readFileSync(MA.abs(out.bossTexture));
+        if (glowCanvas) {
+            out.bossGlowmask = out.bossTexture.replace(/\.png$/, '_glowmask.png');
+            MA.writeText(out.bossGlowmask, Buffer.from(glowCanvas.toDataURL('image/png').split(',')[1], 'base64'));
+            exportsByPath[out.bossGlowmask] = MA.fs.readFileSync(MA.abs(out.bossGlowmask));
+        }
+    }
     if (MA.minotaurAnimations) {
         out.animation = 'neoforge/src/main/resources/assets/mythic_age/animations/entity/minotaur.animation.json';
         exportsByPath[out.animation] = MA.minotaurAnimations(out.animation);

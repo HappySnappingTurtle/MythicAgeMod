@@ -18,7 +18,12 @@ public enum MythAnimState {
     /** 召唤版弥诺陶洛斯（T14）：挥斧普攻、顶飞前的刨地、顶飞。 */
     ATTACK_SWING("attack_swing"),
     PAW("paw"),
-    TOSS("toss");
+    TOSS("toss"),
+    /** 试炼 Boss 版弥诺陶洛斯（T23）：撞柱硬直（循环）、阶段二怒吼、掷碎石、死亡（跪倒伏地）。 */
+    STUN("stun"),
+    ROAR("roar"),
+    THROW("throw"),
+    DEATH("death");
 
     private static final MythAnimState[] VALUES = values();
     private final String animation;
