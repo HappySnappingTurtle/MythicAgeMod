@@ -30,7 +30,8 @@ public class FaithScreen extends Screen {
     private static final int OK = 0xFF7FD67F;
     private static final int BAD = 0xFFFF8A70;
     private static final int COL = 186;
-    private static final int BOTTOM = 26;
+    /** 底部两行按钮：上行重看晋升，下行神话单位、善恶与贡献、完成。 */
+    private static final int BOTTOM = 46;
     private static final int REFRESH_TICKS = 40;
     private static final List<Age> MINOR_AGES = List.of(Age.CLASSICAL, Age.HEROIC, Age.MYTHIC);
 
@@ -100,14 +101,21 @@ public class FaithScreen extends Screen {
                 x += bw + 4;
             }
         }
+        int row2 = top + H - 22;
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
-                .bounds(left + W - 58, top + H - BOTTOM + 4, 50, 16).build());
+                .bounds(left + W - 58, row2, 50, 16).build());
         // 神话单位（T14 D8）：打开召唤管理界面，关闭后回到这里
         Component units = Component.translatable("mythic_age.summon.title");
         int uw = font.width(units) + 12;
         addRenderableWidget(Button.builder(units, b -> PacketDistributor.sendToServer(
                         new io.github.happysnappingturtle.mythicage.summon.SummonPayloads.Request()))
-                .bounds(left + W - 62 - uw, top + H - BOTTOM + 4, uw, 16).build());
+                .bounds(left + W - 62 - uw, row2, uw, 16).build());
+        // 善恶与贡献（T24 §3.1）：只看自己
+        Component conduct = Component.translatable("mythic_age.conduct.screen.title");
+        int cw = font.width(conduct) + 12;
+        addRenderableWidget(Button.builder(conduct, b -> PacketDistributor.sendToServer(
+                        new io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.Request()))
+                .bounds(left + W - 66 - uw - cw, row2, cw, 16).build());
     }
 
     @Override

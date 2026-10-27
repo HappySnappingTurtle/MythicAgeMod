@@ -147,6 +147,12 @@ public final class QuestGameTests {
         QuestService.scanNow(h.getLevel().getServer(), tv.id());
     }
 
+    static void cleanupPlayers(FakePlayer... players) {
+        for (FakePlayer p : players) {
+            OnlinePlayers.forTest(p, false);
+        }
+    }
+
     static void cleanup(GameTestHelper h, VillageWorkGameTests.TV tv, FakePlayer... players) {
         for (FakePlayer p : players) {
             OnlinePlayers.forTest(p, false);

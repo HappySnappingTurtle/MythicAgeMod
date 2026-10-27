@@ -410,6 +410,16 @@ public class GuardianScreen extends Screen {
                 rebuildWidgets();
             }).bounds(view.dialogue() == TradeView.Dialogue.NONE ? left + 8 : left + 164, y, 100, 20).build());
         }
+        // 本村祭司：「村务」打开村庄总览（T24 D8）
+        if (view.dialogue() != TradeView.Dialogue.FIRST && !view.villagePatron().isEmpty()
+                && view.venue() == io.github.happysnappingturtle.mythicage.core.trade.TradeOffer.Venue.GUARDIAN) {
+            int x = view.dialogue() == TradeView.Dialogue.NONE ? left + 112 : left + 268;
+            addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.affairs"), b -> PacketDistributor.sendToServer(
+                    new io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open(
+                            io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open.FROM_PRIEST,
+                            io.github.happysnappingturtle.mythicage.village.economy.AffairsView.TAB_OVERVIEW)))
+                    .bounds(x, y, Math.min(100, left + W - 8 - x), 20).build());
+        }
     }
 
     private void initTrade(int y0) {

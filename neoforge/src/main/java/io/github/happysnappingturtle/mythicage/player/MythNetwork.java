@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "21";
+    private static final String PROTOCOL_VERSION = "22";
 
     private MythNetwork() {
     }
@@ -103,6 +103,26 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleDonate)
+                // 村庄总览分页、村界、升级 toast（T24 阶段 ①）
+                .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleOpen)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.BoundsRequest.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.BoundsRequest.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleBounds)
+                .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Bounds.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Bounds.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageBounds(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageToast(payload))
+                // 善恶与贡献（T24 阶段 ①）
+                .playToServer(io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.Request.TYPE,
+                        io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.Request.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.conduct.ConductViewService::handleRequest)
+                .playToClient(io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.View.TYPE,
+                        io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.View.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.conductView(payload))
                 // NPC 任务委托页（T21）
                 .playToClient(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.TYPE,
                         io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.STREAM_CODEC,

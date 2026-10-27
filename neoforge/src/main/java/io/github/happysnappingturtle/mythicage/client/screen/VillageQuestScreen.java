@@ -14,11 +14,11 @@ import java.util.UUID;
 
 /**
  * 委托页（T21 设计文档 §9.1）：每条任务两行——标题与进度；状态、剩余日、范围、奖励类别——右边是接取 / 交付 / 放弃。
- * 底部「你已接 N / 3」「你在本村的贡献：N」。同村务界面一样的列表风格（统一的村庄总览在 T24）。
+ * 底部「你已接 N / 3」「你在本村的贡献：N」。是村务界面的第三个分页（T24 §4.1）。
  */
 public class VillageQuestScreen extends Screen {
-    private static final int W = 380;
-    private static final int H = 220;
+    private static final int W = VillageAffairsScreen.W;
+    private static final int H = VillageAffairsScreen.H;
     private static final int ROW = 30;
     private static final int ROWS = 5;
     private static final int PANEL = 0xF0201A14;
@@ -56,7 +56,7 @@ public class VillageQuestScreen extends Screen {
         List<QuestView.Row> rows = view.rows();
         for (int i = scroll; i < rows.size() && i < scroll + ROWS; i++) {
             QuestView.Row r = rows.get(i);
-            int y = top + 30 + (i - scroll) * ROW + 6;
+            int y = top + 38 + (i - scroll) * ROW + 6;
             int x = left + W - 8;
             if (r.state().equals("open") || r.state().equals("paused")) {
                 if (r.accepted()) {
@@ -69,6 +69,7 @@ public class VillageQuestScreen extends Screen {
                 }
             }
         }
+        VillageAffairsScreen.tabs(this::addRenderableWidget, font, left, top, view.village(), VillageAffairsScreen.TAB_QUESTS);
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
                 .bounds(left + W - 58, top + H - 22, 50, 16).build());
     }
@@ -91,15 +92,15 @@ public class VillageQuestScreen extends Screen {
         g.drawString(font, Component.translatable("mythic_age.quest.screen.heading", VillageAffairsScreen.line(view.title())),
                 left + 8, top + 8, GOLD, false);
         if (!view.enabled()) {
-            g.drawString(font, Component.translatable("mythic_age.quest.screen.disabled"), left + 8, top + 19, WARN, false);
+            g.drawString(font, Component.translatable("mythic_age.quest.screen.disabled"), left + 8, top + H - 32, WARN, false);
         }
         List<QuestView.Row> rows = view.rows();
         if (rows.isEmpty()) {
-            g.drawString(font, Component.translatable("mythic_age.quest.screen.empty"), left + 8, top + 36, DIM, false);
+            g.drawString(font, Component.translatable("mythic_age.quest.screen.empty"), left + 8, top + 42, DIM, false);
         }
         for (int i = scroll; i < rows.size() && i < scroll + ROWS; i++) {
             QuestView.Row r = rows.get(i);
-            int y = top + 30 + (i - scroll) * ROW;
+            int y = top + 38 + (i - scroll) * ROW;
             g.fill(left + 4, y, left + W - 4, y + ROW - 2, 0x30FFFFFF);
             boolean open = r.state().equals("open");
             Component title = VillageAffairsScreen.line(r.title());

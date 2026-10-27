@@ -109,6 +109,10 @@ public final class RiteCommand {
         reg.update(v.get().withStage(age));
         reg.byId(v.get().id()).ifPresent(x -> io.github.happysnappingturtle.mythicage.village.VillagePopulation
                 .recordBaseline(ctx.getSource().getLevel(), x));
+        // 管理命令把村庄推高时同样提示与记录（T24 §4.5）；降级不提示
+        if (age.ordinal() > v.get().stage().ordinal() && ctx.getSource().getPlayer() != null) {
+            reg.byId(v.get().id()).ifPresent(x -> RiteService.announceStage(ctx.getSource().getPlayer(), v.get(), x));
+        }
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.village.stage_set",
                 bell.toShortString(), age.id()), true);
         return 1;

@@ -126,6 +126,26 @@ public final class ClientHooks {
         }
     }
 
+    /** 村界显示（T24 §4.4）。 */
+    public static void villageBounds(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Bounds payload) {
+        VillageBoundsRenderer.show(payload);
+    }
+
+    /** 村庄升级 toast（T24 §4.5）。 */
+    public static void villageToast(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast payload) {
+        Minecraft.getInstance().getToasts().addToast(new VillageToast(payload));
+    }
+
+    /** 善恶与贡献（T24 §3）：已开着就刷新。 */
+    public static void conductView(io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.View payload) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.ConductScreen open) {
+            open.update(payload.view());
+        } else {
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.ConductScreen(payload.view(), mc.screen));
+        }
+    }
+
     /** 天马天眼（T14 阶段 ②）。 */
     public static void skyEye(io.github.happysnappingturtle.mythicage.summon.SkyEyePayload payload) {
         ClientSkyEye.accept(payload);

@@ -298,6 +298,43 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
         return o.has(k) ? o.get(k).getAsDouble() : d;
     }
 
+    /**
+     * 本村有没有这种料的来源（T21 委托与 T24 受阻分类共用）：配方产物、采集点产物、作物与果树的收成、登记林地的原木；
+     * 物品组（{@code #组}）看组里任一成员。
+     */
+    public boolean producible(String key) {
+        for (String item : buildCosts.items(key)) {
+            if (producibleItem(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean producibleItem(String item) {
+        for (VillageRecipe r : recipes.values()) {
+            if (r.outputs().containsKey(item)) {
+                return true;
+            }
+        }
+        for (PointKind p : points.values()) {
+            if (p.outputs().containsKey(item)) {
+                return true;
+            }
+        }
+        for (CropKind c : crops.values()) {
+            if (c.expected().containsKey(item)) {
+                return true;
+            }
+        }
+        for (FruitKind f : fruits.values()) {
+            if (f.expected().containsKey(item)) {
+                return true;
+            }
+        }
+        return woodland != null && (item.endsWith("_log") || item.endsWith("_wood"));
+    }
+
     private static String str(JsonObject o, String k, String d) {
         return o.has(k) ? o.get(k).getAsString() : d;
     }

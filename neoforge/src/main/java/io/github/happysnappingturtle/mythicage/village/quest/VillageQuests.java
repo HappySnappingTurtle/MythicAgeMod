@@ -75,6 +75,9 @@ public final class VillageQuests extends SavedData {
         public int next = 1;
         public final List<Quest> quests = new ArrayList<>();
         public final Map<UUID, Integer> contribution = new LinkedHashMap<>();
+        /** 每人最近的贡献来源（T24 §3.3，只给界面看）。 */
+        public final io.github.happysnappingturtle.mythicage.core.village.quest.ContributionLog contributionLog =
+                new io.github.happysnappingturtle.mythicage.core.village.quest.ContributionLog();
         public final Map<String, Track> tracks = new LinkedHashMap<>();
         public final Map<UUID, Integer> seen = new LinkedHashMap<>();
         public final Map<UUID, Long> hinted = new LinkedHashMap<>();
@@ -96,6 +99,15 @@ public final class VillageQuests extends SavedData {
 
         public int contribution(UUID player) {
             return contribution.getOrDefault(player, 0);
+        }
+
+        /** 记一笔贡献：累计数与来源记录一起写（T24 §3.3）。 */
+        public void contribute(UUID player, String reason, int points, long day) {
+            if (points <= 0) {
+                return;
+            }
+            contribution.merge(player, points, Integer::sum);
+            contributionLog.add(player, new io.github.happysnappingturtle.mythicage.core.village.quest.ContributionLog.Event(reason, points, day));
         }
 
         public void addPlayerBlock(long pos) {
@@ -134,6 +146,11 @@ public final class VillageQuests extends SavedData {
         return books.computeIfAbsent(village, Book::new);
     }
 
+    /** 全部任务簿（只读遍历）。 */
+    public java.util.Collection<Book> all() {
+        return java.util.Collections.unmodifiableCollection(books.values());
+    }
+
     public Optional<Book> peek(UUID village) {
         return Optional.ofNullable(books.get(village));
     }
@@ -157,6 +174,16 @@ public final class VillageQuests extends SavedData {
                 b.quests.add(readQuest((CompoundTag) qt));
             }
             readInts(c.getCompound("contribution"), b.contribution);
+            CompoundTag cl = c.getCompound("contributionLog");
+            for (String k : cl.getAllKeys()) {
+                List<io.github.happysnappingturtle.mythicage.core.village.quest.ContributionLog.Event> evs = new ArrayList<>();
+                for (Tag et : cl.getList(k, Tag.TAG_COMPOUND)) {
+                    CompoundTag e = (CompoundTag) et;
+                    evs.add(new io.github.happysnappingturtle.mythicage.core.village.quest.ContributionLog.Event(
+                            e.getString("reason"), e.getInt("points"), e.getLong("day")));
+                }
+                b.contributionLog.restore(UUID.fromString(k), evs);
+            }
             readInts(c.getCompound("seen"), b.seen);
             CompoundTag h = c.getCompound("hinted");
             for (String k : h.getAllKeys()) {
@@ -211,6 +238,19 @@ public final class VillageQuests extends SavedData {
             b.quests.forEach(q -> qs.add(writeQuest(q)));
             c.put("quests", qs);
             c.put("contribution", writeInts(b.contribution));
+            CompoundTag cl = new CompoundTag();
+            b.contributionLog.all().forEach((k, evs) -> {
+                ListTag l = new ListTag();
+                for (var e : evs) {
+                    CompoundTag x = new CompoundTag();
+                    x.putString("reason", e.reason());
+                    x.putInt("points", e.points());
+                    x.putLong("day", e.day());
+                    l.add(x);
+                }
+                cl.put(k.toString(), l);
+            });
+            c.put("contributionLog", cl);
             c.put("seen", writeInts(b.seen));
             CompoundTag h = new CompoundTag();
             b.hinted.forEach((k, v) -> h.putLong(k.toString(), v));

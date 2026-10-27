@@ -226,8 +226,10 @@ public final class QuestService {
 
     public static void handleOpen(QuestPayloads.Open payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer p && nearKeeper(p, payload.village())) {
-                open(p, payload.village());
+            // 谷仓管事身边，或本村祭司的会话里（T24 D8：祭司对话页的「村务」）
+            if (context.player() instanceof ServerPlayer p) {
+                io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs.resolve(p, payload.village())
+                        .ifPresent(v -> open(p, v));
             }
         });
     }
@@ -272,7 +274,7 @@ public final class QuestService {
                 == Transactions.Status.DUPLICATE) {
             return Outcome.of("duplicate");
         }
-        if (checkReach && !nearKeeper(player, village)) {
+        if (checkReach && io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs.resolve(player, village).isEmpty()) {
             return Outcome.of("far");
         }
         Optional<VillageContext> ctx = context(server, village);
@@ -417,9 +419,7 @@ public final class QuestService {
                 TradeService.give(player, new ItemStack(Items.EMERALD, Math.min(64, left)));
             }
             int points = q.contrib.getOrDefault(me, 0);
-            if (points > 0) {
-                b.contribution.merge(me, points, Integer::sum);
-            }
+            b.contribute(me, q.type, points, io.github.happysnappingturtle.mythicage.guardian.MythDays.today(player.server));
             conduct(player, b, q);
             player.sendSystemMessage(Component.translatable("mythic_age.quest.settled", titleComponent(player.server, b.village, q),
                     emeralds, points));

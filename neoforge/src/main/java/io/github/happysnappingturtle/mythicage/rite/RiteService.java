@@ -318,7 +318,7 @@ public final class RiteService {
         reg.update(updated);
         updated = VillagePopulation.recordBaseline(player.serverLevel(), updated);
         if (updated.stage() != v.stage()) {
-            announceStage(player, updated);
+            announceStage(player, v, updated);
         }
         if (kind == RiteKind.PROMOTION) {
             afterPromotion(player, civ, plan.target(), god, updated);
@@ -349,18 +349,64 @@ public final class RiteService {
         }
     }
 
-    private static void announceStage(ServerPlayer actor, VillageRegistry.Village v) {
+    /**
+     * 村庄阶段提升（T24 §4.5）：附近玩家收到 toast，村务记录写一条「进入某时代」加每项变化「旧 → 新」
+     * （人口目标、卫兵上限，与晋升预告同一套公式）。不提恩宠与玩家时代（12 号 §4.3 B）。
+     */
+    public static void announceStage(ServerPlayer actor, VillageRegistry.Village before, VillageRegistry.Village v) {
         ServerLevel level = actor.server.getLevel(v.bell().dimension());
         if (level == null) {
             return;
         }
-        Component msg = Component.translatable("mythic_age.village.stage_up", VillageService.title(v),
+        List<io.github.happysnappingturtle.mythicage.core.village.StageChanges.Change> changes = stageChanges(level, before, v);
+        var eco = io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(actor.server);
+        var state = eco.state(v.id());
+        long today = io.github.happysnappingturtle.mythicage.guardian.MythDays.today(actor.server);
+        // 记录新的在前显示：先写各项变化（倒序），最后写「升为某阶段」，读起来是标题在上、明细在下
+        for (int i = changes.size() - 1; i >= 0; i--) {
+            var c = changes.get(i);
+            state.log(today, "mythic_age.village.log.stage_change." + c.key(), String.valueOf(c.before()), String.valueOf(c.after()));
+        }
+        state.log(today, "mythic_age.village.log.stage_up", "@mythic_age.age." + v.stage().id());
+        eco.setDirty();
+        Component title = Component.translatable("mythic_age.village.stage_up", VillageService.title(v),
                 Component.translatable("mythic_age.age." + v.stage().id()));
+        net.minecraft.network.chat.MutableComponent body = Component.empty();
+        for (int i = 0; i < changes.size(); i++) {
+            var c = changes.get(i);
+            if (i > 0) {
+                body.append(Component.translatable("mythic_age.village.built.sep"));
+            }
+            body.append(Component.translatable("mythic_age.village.toast.stage_change." + c.key(), c.before(), c.after()));
+        }
+        Component bodyOrPlain = changes.isEmpty() ? Component.translatable("mythic_age.village.toast.stage_plain") : body;
         for (ServerPlayer p : level.players()) {
             if (p.blockPosition().closerThan(v.bell().pos(), VillageService.LEAVE_RANGE)) {
-                p.sendSystemMessage(msg);
+                p.sendSystemMessage(title);
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p,
+                        new io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast("minecraft:bell", title,
+                                bodyOrPlain));
             }
         }
+    }
+
+    /** 阶段前后的人口目标与卫兵上限（只列有变化的）。 */
+    static List<io.github.happysnappingturtle.mythicage.core.village.StageChanges.Change> stageChanges(ServerLevel level,
+            VillageRegistry.Village before, VillageRegistry.Village after) {
+        Optional<Civilization> civ = Civilization.byId(after.civ());
+        if (civ.isEmpty()) {
+            return List.of();
+        }
+        VillageStageTable table = RiteTables.stages(civ.get());
+        int members = VillagePopulation.members(level, after.bell());
+        int base = after.baseline() >= 0 ? after.baseline() : members;
+        Map<String, Integer> was = new java.util.LinkedHashMap<>();
+        was.put("population", table.populationTarget(base, before.stage()));
+        was.put("guards", table.guardCap(members, before.stage()));
+        Map<String, Integer> now = new java.util.LinkedHashMap<>();
+        now.put("population", table.populationTarget(base, after.stage()));
+        now.put("guards", table.guardCap(members, after.stage()));
+        return io.github.happysnappingturtle.mythicage.core.village.StageChanges.diff(was, now);
     }
 
     // ───────────── 网络 ─────────────

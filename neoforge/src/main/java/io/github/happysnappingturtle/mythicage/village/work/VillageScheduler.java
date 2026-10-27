@@ -693,9 +693,13 @@ public final class VillageScheduler {
                 cfg.maxCatchUpTicks() / 24000.0, ctx.today(), s.roster.size(), 1, ctx.data().rations());
         s.points.clear();
         s.points.putAll(r.points());
-        StringBuilder sb = new StringBuilder();
-        r.gained().forEach((k, v) -> sb.append(sb.isEmpty() ? "" : "、").append(k).append(" +").append(v));
-        s.log(ctx.today(), "mythic_age.village.log.catch_up", String.format("%.1f", r.days()), sb.toString());
+        // 记录写收得最多的一样（物品名由客户端翻译）和种数，不写物品 id（T24 界面文本）
+        String days = String.format(java.util.Locale.ROOT, "%.1f", r.days());
+        r.gained().entrySet().stream().max(Map.Entry.comparingByValue()).ifPresentOrElse(
+                top -> s.log(ctx.today(), "mythic_age.village.log.catch_up_items", days,
+                        "@" + io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs.itemKeyOf(top.getKey()),
+                        String.valueOf(top.getValue()), String.valueOf(r.gained().size())),
+                () -> s.log(ctx.today(), "mythic_age.village.log.catch_up_none", days));
         MythicAge.LOGGER.debug("村庄 {} 离线补算 {} 日：{}", ctx.village().id(), r.days(), r.gained());
     }
 

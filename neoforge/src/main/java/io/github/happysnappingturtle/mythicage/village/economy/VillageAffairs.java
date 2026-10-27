@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.village.economy;
 
 import io.github.happysnappingturtle.mythicage.core.village.CivVillageData;
+import io.github.happysnappingturtle.mythicage.core.village.VillageBlockers;
 import io.github.happysnappingturtle.mythicage.core.village.resource.ResourcePoint;
 import io.github.happysnappingturtle.mythicage.core.village.time.VillageCalendar;
 import io.github.happysnappingturtle.mythicage.guardian.MythDays;
@@ -55,10 +56,19 @@ public final class VillageAffairs {
     }
 
     public static void open(ServerPlayer player, UUID village) {
-        view(player, village).ifPresent(v -> PacketDistributor.sendToPlayer(player, new AffairsPayloads.View(v)));
+        open(player, village, AffairsView.TAB_OVERVIEW);
+    }
+
+    public static void open(ServerPlayer player, UUID village, int tab) {
+        view(player, village, tab).ifPresent(v -> PacketDistributor.sendToPlayer(player, new AffairsPayloads.View(v)));
     }
 
     public static Optional<AffairsView> view(ServerPlayer player, UUID village) {
+        return view(player, village, AffairsView.TAB_OVERVIEW);
+    }
+
+    /** @param tab 打开哪一页（{@link AffairsView#TAB_OVERVIEW}、{@link AffairsView#TAB_STOCK}） */
+    public static Optional<AffairsView> view(ServerPlayer player, UUID village, int tab) {
         Optional<VillageRegistry.Village> vo = VillageRegistry.get(player.server).byId(village);
         if (vo.isEmpty()) {
             return Optional.empty();
@@ -73,32 +83,7 @@ public final class VillageAffairs {
                 stock.add(new AffairsView.Entry(k, 0, s.stock.escrowed(k)));
             }
         }));
-        List<AffairsView.Line> shortages = new ArrayList<>();
-        data.ifPresent(d -> {
-            if (d.rations().belowFloor(s.stock)) {
-                shortages.add(AffairsView.Line.of("mythic_age.village.short.food",
-                        String.valueOf((int) d.rations().total(s.stock)), String.valueOf(d.rations().floor())));
-            }
-            for (ResourcePoint p : s.points.values()) {
-                if (p.remaining() <= 0) {
-                    shortages.add(AffairsView.Line.of("mythic_age.village.short.point", "@mythic_age.village.point." + p.kind()));
-                }
-            }
-        });
-        if (s.stock.free() == 0) {
-            shortages.add(AffairsView.Line.of("mythic_age.village.short.full"));
-        }
-        if (io.github.happysnappingturtle.mythicage.village.VillagePopulation.needsHousing(village)) {
-            shortages.add(AffairsView.Line.of("mythic_age.village.short.housing"));
-        }
-        shortages.addAll(0, projectLines(s));
-        String space = io.github.happysnappingturtle.mythicage.village.work.VillageScheduler.runtime(village).needsSpace();
-        io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spaceSpec =
-                io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(space);
-        if (spaceSpec != null && s.activeProject().isEmpty()) {
-            shortages.add(AffairsView.Line.of("mythic_age.village.short.space",
-                    io.github.happysnappingturtle.mythicage.village.build.Construction.nameArg(spaceSpec, "")));
-        }
+        List<AffairsView.Blocker> blockers = blockers(village, s, data);
         List<AffairsView.Line> log = new ArrayList<>();
         for (int i = s.log.size() - 1; i >= 0 && log.size() < 8; i--) {
             VillageEconomy.LogEntry e = s.log.get(i);
@@ -108,8 +93,7 @@ public final class VillageAffairs {
             args.addAll(e.args());
             log.add(new AffairsView.Line("mythic_age.village.log.line", List.copyOf(args)));
         }
-        AffairsView.Line title = v.patron().isEmpty() ? AffairsView.Line.of("mythic_age.village.title.plain")
-                : AffairsView.Line.of("mythic_age.village.title", "@mythic_age.god." + v.patron());
+        AffairsView.Line title = titleLine(v);
         AffairsView.Line date = data.map(d -> {
             VillageCalendar.Date dt = d.calendar().date(MythDays.today(player.server), VillageData.offset(d, s));
             return dt.period().isEmpty() ? AffairsView.Line.of("mythic_age.village.date.plain", String.valueOf(dt.dayOfYear()))
@@ -117,7 +101,67 @@ public final class VillageAffairs {
                     String.valueOf(dt.dayInPeriod()));
         }).orElse(AffairsView.Line.of("mythic_age.village.date.plain", "?"));
         List<AffairsView.Line> notes = data.map(d -> calendarNotes(player.server, v, d, s)).orElse(List.of());
-        return Optional.of(new AffairsView(village, title, date, notes, s.stock.total(), s.stock.capacity(), stock, shortages, log));
+        AffairsView.Overview overview = VillageOverview.build(player, v, s, data, blockers);
+        return Optional.of(new AffairsView(village, tab, title, date, notes, s.stock.total(), s.stock.capacity(), stock, blockers, log,
+                overview));
+    }
+
+    /**
+     * 缺口按三类分开（T24 设计文档 §4.3）：自主会解决 / 需要稀有材料 / 被占地。「能否自产」看文明数据，与委托发布同一规则。
+     */
+    public static List<AffairsView.Blocker> blockers(UUID village, VillageEconomy.State s, Optional<CivVillageData> data) {
+        List<AffairsView.Blocker> out = new ArrayList<>();
+        s.activeProject().ifPresent(p -> {
+            if (p.state == io.github.happysnappingturtle.mythicage.core.village.build.BuildProject.State.STOCKING) {
+                p.missing().forEach((k, n) -> out.add(blocker(VillageBlockers.Kind.MISSING_MATERIAL,
+                        data.map(d -> d.producible(k)).orElse(false),
+                        AffairsView.Line.of("mythic_age.village.short.material", "@" + itemKey(k), String.valueOf(n)))));
+            } else if (p.state == io.github.happysnappingturtle.mythicage.core.village.build.BuildProject.State.BLOCKED) {
+                io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spec =
+                        io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(p.building);
+                String name = spec == null ? p.building
+                        : io.github.happysnappingturtle.mythicage.village.build.Construction.nameArg(spec, p.god);
+                String at = p.blockedAt == null ? "?" : p.blockedAt.x() + ", " + p.blockedAt.y() + ", " + p.blockedAt.z();
+                out.add(blocker(VillageBlockers.Kind.PROJECT_BLOCKED, false,
+                        AffairsView.Line.of("mythic_age.village.project.blocked_line", name, at)));
+            }
+        });
+        data.ifPresent(d -> {
+            if (d.rations().belowFloor(s.stock)) {
+                out.add(blocker(VillageBlockers.Kind.FOOD_LOW, false, AffairsView.Line.of("mythic_age.village.short.food",
+                        String.valueOf((int) d.rations().total(s.stock)), String.valueOf(d.rations().floor()))));
+            }
+            for (ResourcePoint p : s.points.values()) {
+                if (p.remaining() <= 0) {
+                    out.add(blocker(VillageBlockers.Kind.POINT_DEPLETED, false,
+                            AffairsView.Line.of("mythic_age.village.short.point", "@mythic_age.village.point." + p.kind())));
+                }
+            }
+        });
+        if (s.stock.free() == 0) {
+            out.add(blocker(VillageBlockers.Kind.STOCK_FULL, false, AffairsView.Line.of("mythic_age.village.short.full")));
+        }
+        if (io.github.happysnappingturtle.mythicage.village.VillagePopulation.needsHousing(village)) {
+            out.add(blocker(VillageBlockers.Kind.NEEDS_HOUSING, false, AffairsView.Line.of("mythic_age.village.short.housing")));
+        }
+        String space = VillageScheduler.runtime(village).needsSpace();
+        io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec spaceSpec =
+                io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings.all().get(space);
+        if (spaceSpec != null && s.activeProject().isEmpty()) {
+            out.add(blocker(VillageBlockers.Kind.NEEDS_SPACE, false, AffairsView.Line.of("mythic_age.village.short.space",
+                    io.github.happysnappingturtle.mythicage.village.build.Construction.nameArg(spaceSpec, ""))));
+        }
+        return List.copyOf(out);
+    }
+
+    private static AffairsView.Blocker blocker(VillageBlockers.Kind kind, boolean producible, AffairsView.Line line) {
+        return new AffairsView.Blocker(VillageBlockers.classify(kind, producible).id(), line);
+    }
+
+    /** 村名（主神之村）的文本行。 */
+    public static AffairsView.Line titleLine(VillageRegistry.Village v) {
+        return v.patron().isEmpty() ? AffairsView.Line.of("mythic_age.village.title.plain")
+                : AffairsView.Line.of("mythic_age.village.title", "@mythic_age.god." + v.patron());
     }
 
     /** 历法提示（§1.10 J8）：英雄起显示下一个节日还有几日（今天就是则说今天）；有神谕所时显示下一个神谕日。 */
@@ -177,6 +221,10 @@ public final class VillageAffairs {
     }
 
     /** 物品（或 {@code #组}）的语言键。 */
+    public static String itemKeyOf(String id) {
+        return itemKey(id);
+    }
+
     static String itemKey(String id) {
         if (id.startsWith("#")) {
             return "mythic_age.village.cost_group." + id.substring(1);
@@ -184,12 +232,60 @@ public final class VillageAffairs {
         return BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse(id)).getDescriptionId();
     }
 
+    /**
+     * 切换分页 / 从祭司对话页打开（T24 §4.1，D8）：要在谷仓管事 {@value #REACH} 格内，或者正和本村祭司说话。
+     * village 为全零时用当前祭司会话所在的村。
+     */
+    public static void handleOpen(AffairsPayloads.Open payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer p) {
+                resolve(p, payload.village()).ifPresent(v -> open(p, v, payload.tab()));
+            }
+        });
+    }
+
+    public static void handleBounds(AffairsPayloads.BoundsRequest payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer p) {
+                // 村界不是隐私：能看村务的人，或站在钟附近的人都能看
+                Optional<UUID> v = resolve(p, payload.village()).or(() -> nearBell(p, payload.village()) ? Optional.of(payload.village())
+                        : Optional.empty());
+                v.flatMap(id -> io.github.happysnappingturtle.mythicage.village.VillageBounds.build(p.server, id))
+                        .ifPresent(b -> PacketDistributor.sendToPlayer(p, b));
+            }
+        });
+    }
+
+    static boolean nearBell(ServerPlayer player, UUID village) {
+        return VillageRegistry.get(player.server).byId(village)
+                .filter(v -> v.bell().dimension() == player.level().dimension())
+                .map(v -> player.blockPosition().closerThan(v.bell().pos(),
+                        io.github.happysnappingturtle.mythicage.village.VillageService.LEAVE_RANGE))
+                .orElse(false);
+    }
+
+    /** 能看哪个村的村务：谷仓管事身边，或本村祭司的会话里。 */
+    public static Optional<UUID> resolve(ServerPlayer player, UUID requested) {
+        Optional<UUID> priest = io.github.happysnappingturtle.mythicage.trade.TradeService.session(player)
+                .filter(s -> io.github.happysnappingturtle.mythicage.trade.TradeService.valid(player, s))
+                .map(io.github.happysnappingturtle.mythicage.trade.TradeService.Session::villageId);
+        if (requested.equals(AffairsPayloads.Open.FROM_PRIEST)) {
+            return priest;
+        }
+        // 管理员（权限 2，可以用 /mythicage village affairs）在哪都能看
+        if (priest.filter(requested::equals).isPresent() || nearKeeper(player, requested)
+                || (player.hasPermissions(2) && VillageRegistry.get(player.server).byId(requested).isPresent())) {
+            return Optional.of(requested);
+        }
+        return Optional.empty();
+    }
+
     /** 捐赠主手物品：容量够多少收多少，其余留在手上。 */
     public static void handleDonate(AffairsPayloads.Donate payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer p) {
                 donate(p, payload.village());
-                open(p, payload.village());
+                open(p, payload.village(), AffairsView.TAB_STOCK);
             }
         });
     }
@@ -213,12 +309,22 @@ public final class VillageAffairs {
             held.shrink(got);
             s.seenBy.add(player.getUUID());
             eco.setDirty();
+            creditDonation(player, village, got);
             // 捐赠恰好补上了某个委托的缺口：任务当刻转「需求已满足」（T21 §5.3）
             io.github.happysnappingturtle.mythicage.village.quest.QuestService.refreshNow(player.server, village);
         }
         player.displayClientMessage(Component.translatable(got > 0 ? "mythic_age.village.donate.done"
                 : "mythic_age.village.donate.full", name, got, held.getCount()), true);
         return got;
+    }
+
+    /** 捐献记贡献（T24 §3.3）：每件与委托交付同权重；贡献只是记录，不换东西（D7）。 */
+    static void creditDonation(ServerPlayer player, UUID village, int count) {
+        VillageRegistry.get(player.server).byId(village).flatMap(v -> VillageData.civ(v.civ())).ifPresent(d -> {
+            int points = count * d.quests().contribution().item();
+            io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(player.server).book(village)
+                    .contribute(player.getUUID(), "donate", points, MythDays.today(player.server));
+        });
     }
 
     /** 离谷仓管事 {@value #REACH} 格内（T21 顺手修正：以前任意居民身边都能捐）。 */
@@ -232,6 +338,9 @@ public final class VillageAffairs {
         int got = s.stock.deposit(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString(), stack.getCount());
         stack.shrink(got);
         s.seenBy.add(player.getUUID());
+        if (got > 0) {
+            creditDonation(player, village, got);
+        }
         return got;
     }
 }

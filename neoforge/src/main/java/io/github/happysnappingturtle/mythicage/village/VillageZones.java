@@ -132,6 +132,16 @@ public final class VillageZones {
         return area;
     }
 
+    /** 已建范围的盒子（已含外扩边距）：生成村庄用规划，原版村庄用兴趣点；算不出来时为空表（T24 村界显示）。 */
+    public static List<Box> builtBoxes(ServerLevel level, VillageRegistry.Village v) {
+        Optional<VillagePlans.Plan> plan = VillagePlans.get(level.getServer()).byVillage(v.id());
+        if (plan.isPresent()) {
+            return plan.get().area().boxes();
+        }
+        BuiltArea area = vanillaArea(level, v);
+        return area == null ? List.of() : area.boxes();
+    }
+
     /** 立刻重算（测试与管理用）。 */
     public static BuiltArea refresh(ServerLevel level, VillageRegistry.Village v) {
         BuiltArea area = scan(level, v.bell().pos());

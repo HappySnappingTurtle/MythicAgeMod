@@ -419,7 +419,7 @@ public final class VillageWorkGameTests {
             h.assertTrue(s.points.get("rock_0").remaining() == 2, "余量 10 → 2");
             VillageScheduler.processNowForTest(h.getLevel(), tv.id());
             h.assertTrue(s.stock.count(COBBLE) == 8, "不重复补算");
-            h.assertTrue(s.log.stream().anyMatch(e -> e.key().equals("mythic_age.village.log.catch_up")), "写了记录");
+            h.assertTrue(s.log.stream().anyMatch(e -> e.key().startsWith("mythic_age.village.log.catch_up_")), "写了记录");
         } finally {
             cleanup(h, tv);
         }

@@ -7,7 +7,6 @@ import io.github.happysnappingturtle.mythicage.core.village.quest.Quest;
 import io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules;
 import io.github.happysnappingturtle.mythicage.core.village.quest.QuestRules;
 import io.github.happysnappingturtle.mythicage.core.village.quest.SupplyRules;
-import io.github.happysnappingturtle.mythicage.core.village.recipe.VillageRecipe;
 import io.github.happysnappingturtle.mythicage.village.economy.AffairsView;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
 import io.github.happysnappingturtle.mythicage.village.work.VillageContext;
@@ -108,38 +107,9 @@ final class SupplyQuests {
         return out;
     }
 
-    /** 本村有没有这种料的来源：配方产物、采集点产物、作物与果树的收成、登记林地的原木；物品组看组里任一成员。 */
+    /** 本村有没有这种料的来源（规则在 {@link CivVillageData#producible}）。 */
     static boolean producible(CivVillageData d, String key) {
-        for (String item : d.buildCosts().items(key)) {
-            if (producibleItem(d, item)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean producibleItem(CivVillageData d, String item) {
-        for (VillageRecipe r : d.recipes().values()) {
-            if (r.outputs().containsKey(item)) {
-                return true;
-            }
-        }
-        for (CivVillageData.PointKind p : d.points().values()) {
-            if (p.outputs().containsKey(item)) {
-                return true;
-            }
-        }
-        for (CivVillageData.CropKind c : d.crops().values()) {
-            if (c.expected().containsKey(item)) {
-                return true;
-            }
-        }
-        for (CivVillageData.FruitKind f : d.fruits().values()) {
-            if (f.expected().containsKey(item)) {
-                return true;
-            }
-        }
-        return d.woodland() != null && (item.endsWith("_log") || item.endsWith("_wood"));
+        return d.producible(key);
     }
 
     // ───────────── 发布 ─────────────
