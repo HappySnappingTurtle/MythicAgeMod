@@ -499,7 +499,26 @@ def run(root: Path, design: Path | None) -> Report:
     check_village_dialogue(paths, report)
     check_equipment(root, report)
     check_rigs(root, report)
+    check_warning_fx(root, report)
     return report
+
+
+# 战斗预警所在的代码（T24 §7.1）：这些文件发出的预警粒子、预警声不能被「装饰粒子」客户端选项减掉，
+# 所以不许引用 ClientFx（装饰特效开关）。新增 Boss / 竞技场时把文件加进来。
+WARNING_FX_DIRS = [
+    "neoforge/src/main/java/io/github/happysnappingturtle/mythicage/boss",
+    "neoforge/src/main/java/io/github/happysnappingturtle/mythicage/content/greek/knossos",
+]
+
+
+def check_warning_fx(root: Path, report: Report) -> None:
+    for rel in WARNING_FX_DIRS:
+        d = root / rel
+        if not d.is_dir():
+            continue
+        for f in sorted(d.rglob("*.java")):
+            if "ClientFx" in f.read_text(encoding="utf-8"):
+                report.errors.append(f"战斗预警代码引用了装饰特效开关 ClientFx：{f.relative_to(root)}")
 
 
 def check_village_dialogue(paths: Paths, report: Report) -> None:

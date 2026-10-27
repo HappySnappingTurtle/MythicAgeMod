@@ -108,7 +108,8 @@ public final class LureFx implements PowerFxRenderer {
     }
 
     static boolean minimal() {
-        return Minecraft.getInstance().options.particles().get() == net.minecraft.client.ParticleStatus.MINIMAL;
+        // 装饰粒子跟随模组的客户端选项（T24 §7.1，默认跟随原版「粒子效果」）
+        return io.github.happysnappingturtle.mythicage.client.ClientFx.decorativeMinimal();
     }
 
     static BlockParticleOption stoneChip() {

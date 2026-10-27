@@ -51,6 +51,10 @@ public final class PowerHud {
         g.fill(x - 1, y - 1, x + WIDTH + 1, y + 4, (int) (alpha * 0xAA) << 24);
         g.fill(x, y, x + (int) Math.round(WIDTH * p), y + 3, a | fill);
         Component name = Component.translatableWithFallback("mythic_age.power." + c.powerId(), c.powerId());
-        g.drawCenteredString(mc.font, name, g.guiWidth() / 2, y + 6, a | 0xE8D27A);
+        // 被打断不只靠红色：名字后面写「被打断」（12 号 §6）
+        if (c.cancelled()) {
+            name = name.copy().append(" · ").append(Component.translatable("mythic_age.power.interrupted"));
+        }
+        g.drawCenteredString(mc.font, name, g.guiWidth() / 2, y + 6, a | (c.cancelled() ? 0xE59A6A : 0xE8D27A));
     }
 }

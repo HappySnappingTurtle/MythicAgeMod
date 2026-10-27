@@ -73,6 +73,11 @@ public final class TransientBudget {
         entries.remove(id);
     }
 
+    /** 某玩家现有的临时实体，按登记先后（召唤管理界面「临时效果」用，T24 §5.2）。 */
+    public synchronized List<Entry> entries(UUID owner) {
+        return entries.values().stream().filter(e -> e.owner().equals(owner)).sorted(Comparator.comparingLong(Entry::seq)).toList();
+    }
+
     public synchronized int count(UUID owner) {
         return (int) entries.values().stream().filter(e -> e.owner().equals(owner)).count();
     }

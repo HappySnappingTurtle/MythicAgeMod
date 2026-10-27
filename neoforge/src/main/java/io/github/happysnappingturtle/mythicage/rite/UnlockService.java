@@ -121,7 +121,10 @@ public final class UnlockService {
         PromotionTable table = RiteTables.promotion(s.civ());
         Optional<AgeUnlockedPayload.Next> next = RiteRules.next(s.age()).flatMap(n -> table.entry(n).map(e ->
                 new AgeUnlockedPayload.Next(n, e.favor(), e.offerings().stream()
-                        .map(a -> TradeService.stack(a.item(), a.count())).toList(), e.trial())));
+                        .map(a -> TradeService.stack(a.item(), a.count())).toList(), e.trial(),
+                        e.requirements().stream().map(r -> PromotionRequirements.get(r.type())
+                                .map(req -> req.preview(r.params())).orElse(null))
+                                .filter(java.util.Objects::nonNull).toList())));
         return new AgeUnlockedPayload(s.civ(), s.age(), s.minorGod(), stacks(s.powers()), stacks(s.summons()),
                 stacks(s.recipes()), s.caps().stream().map(c -> new AgeUnlockedPayload.Cap(c.key(), c.before(), c.after())).toList(),
                 s.extras().stream().map(e -> new AgeUnlockedPayload.Extra(TradeService.stack(e.icon(), 1), e.key())).toList(), next);

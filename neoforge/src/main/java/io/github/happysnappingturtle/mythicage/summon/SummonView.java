@@ -14,7 +14,20 @@ import java.util.UUID;
  * @param occupied 占用（存活与等待重生的常驻单位 cost 之和）
  * @param cap      上限
  */
-public record SummonView(int occupied, int cap, List<Row> rows) {
+public record SummonView(int occupied, int cap, List<Row> rows, List<Temp> temps) {
+
+    /**
+     * 临时效果（T24 §5.2，12 号 §4「临时效果另列」）：神力生成的临时实体与产物，不占常驻槽位、只读、到期自然消失。
+     * 同种的合成一行。
+     *
+     * @param entity      实体类型 id；全都未载入、认不出种类时为空串
+     * @param count       几个
+     * @param where       最近那个在哪（NEAR 时 value 是距离；未载入的不算消失）
+     * @param secondsLeft 最早到期的剩余秒数；产物没有寿命时为 −1
+     */
+    public record Temp(String entity, int count, Where where, int value, String dimension, int secondsLeft) {
+    }
+
 
     /** 单位在哪里。 */
     public enum Where {
@@ -60,6 +73,15 @@ public record SummonView(int occupied, int cap, List<Row> rows) {
             buf.writeUtf(r.dimension);
             buf.writeBoolean(r.recallable);
         }
+        buf.writeVarInt(v.temps.size());
+        for (Temp t : v.temps) {
+            buf.writeUtf(t.entity);
+            buf.writeVarInt(t.count);
+            buf.writeEnum(t.where);
+            buf.writeVarInt(t.value);
+            buf.writeUtf(t.dimension);
+            buf.writeVarInt(t.secondsLeft + 1);
+        }
     }
 
     private static SummonView read(FriendlyByteBuf buf) {
@@ -72,6 +94,12 @@ public record SummonView(int occupied, int cap, List<Row> rows) {
                     buf.readFloat(), buf.readEnum(SummonMode.class), buf.readEnum(Where.class), buf.readVarInt(), buf.readUtf(),
                     buf.readBoolean()));
         }
-        return new SummonView(occupied, cap, List.copyOf(rows));
+        int nt = buf.readVarInt();
+        List<Temp> temps = new ArrayList<>(nt);
+        for (int i = 0; i < nt; i++) {
+            temps.add(new Temp(buf.readUtf(), buf.readVarInt(), buf.readEnum(Where.class), buf.readVarInt(), buf.readUtf(),
+                    buf.readVarInt() - 1));
+        }
+        return new SummonView(occupied, cap, List.copyOf(rows), List.copyOf(temps));
     }
 }

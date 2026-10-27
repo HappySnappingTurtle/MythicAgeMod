@@ -56,14 +56,20 @@ public final class FavorHud {
 
     private static void render(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.player == null) {
+        if (mc.options.hideGui || mc.player == null || !io.github.happysnappingturtle.mythicage.config.ClientConfig.favorHud()) {
             return;
         }
         Font font = mc.font;
         long now = System.currentTimeMillis();
-        // 屏幕左下角，快捷栏左侧，避开快捷栏上方的生命、护甲和经验条
-        int x = 4;
-        int y = graphics.guiHeight() - 14;
+        // 默认屏幕左下角（快捷栏左侧，避开生命、护甲和经验条）；可在客户端选项里换到四角之一（T24 §7.1）
+        var anchor = io.github.happysnappingturtle.mythicage.config.ClientConfig.favorHudAnchor();
+        boolean right = anchor == io.github.happysnappingturtle.mythicage.config.ClientConfig.Anchor.TOP_RIGHT
+                || anchor == io.github.happysnappingturtle.mythicage.config.ClientConfig.Anchor.BOTTOM_RIGHT;
+        boolean topSide = anchor == io.github.happysnappingturtle.mythicage.config.ClientConfig.Anchor.TOP_LEFT
+                || anchor == io.github.happysnappingturtle.mythicage.config.ClientConfig.Anchor.TOP_RIGHT;
+        int x = right ? graphics.guiWidth() - 4 - 150 : 4;
+        int y = topSide ? 14 : graphics.guiHeight() - 14;
+        int step = topSide ? 18 : -18;
         for (Civilization civ : Civilization.values()) {
             if (!visible(civ, now)) {
                 continue;
@@ -72,10 +78,19 @@ public final class FavorHud {
             Component text = Component.translatableWithFallback("mythic_age.hud.favor", "%s %s/%s",
                     Component.translatable("mythic_age.civ." + civ.id()), e.favor(), e.cap());
             graphics.drawString(font, text, x, y - 9, 0xFFE8D27A, true);
+            // 最近变化与来源（3 秒内的合并成一条；没有变化不显示）
+            io.github.happysnappingturtle.mythicage.core.player.FavorDelta d = ClientMythData.delta(civ);
+            if (d.visible(now, SHOW_MILLIS)) {
+                net.minecraft.network.chat.MutableComponent change = Component.literal((d.delta() > 0 ? "+" : "") + d.delta());
+                if (!d.source().isEmpty()) {
+                    change.append(" ").append(Component.translatable(d.source()));
+                }
+                graphics.drawString(font, change, x + font.width(text) + 6, y - 9, d.delta() > 0 ? 0xFF9AD07A : 0xFFE59A6A, true);
+            }
             int filled = e.cap() <= 0 ? 0 : (int) Math.min(BAR_WIDTH, BAR_WIDTH * e.favor() / e.cap());
             graphics.fill(x, y + 1, x + BAR_WIDTH, y + 4, 0xAA000000);
             graphics.fill(x, y + 1, x + filled, y + 4, 0xFFE0B341);
-            y -= 18;
+            y += step;
         }
     }
 }

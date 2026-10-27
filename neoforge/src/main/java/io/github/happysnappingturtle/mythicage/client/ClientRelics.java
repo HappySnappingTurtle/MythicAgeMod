@@ -1,6 +1,6 @@
 package io.github.happysnappingturtle.mythicage.client;
 
-import io.github.happysnappingturtle.mythicage.client.screen.GreekAltarScreen;
+import io.github.happysnappingturtle.mythicage.client.screen.ShrineInspectScreen;
 import io.github.happysnappingturtle.mythicage.relic.RelicPayloads;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -15,7 +15,7 @@ public final class ClientRelics {
 
     public static void accept(RelicPayloads.Shelf shelf) {
         latest = shelf;
-        if (Minecraft.getInstance().screen instanceof GreekAltarScreen s && s.pos().equals(shelf.pos())) {
+        if (Minecraft.getInstance().screen instanceof ShrineInspectScreen s && s.pos().equals(shelf.pos())) {
             s.relicsChanged();
         }
     }

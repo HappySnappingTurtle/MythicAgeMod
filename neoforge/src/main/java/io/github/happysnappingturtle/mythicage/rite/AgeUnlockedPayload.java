@@ -32,7 +32,8 @@ public record AgeUnlockedPayload(Civilization civ, Age age, String minorGod, Lis
     public record Extra(ItemStack icon, String key) {
     }
 
-    public record Next(Age age, long favor, List<ItemStack> offerings, Age trial) {
+    /** @param requirements 建筑条件的预告（如「神庙达到前柱式神庙」），不判定是否满足 */
+    public record Next(Age age, long favor, List<ItemStack> offerings, Age trial, List<net.minecraft.network.chat.Component> requirements) {
     }
 
     private static void stacks(RegistryFriendlyByteBuf buf, List<ItemStack> l) {
@@ -74,6 +75,8 @@ public record AgeUnlockedPayload(Civilization civ, Age age, String minorGod, Lis
                     buf.writeVarLong(n.favor());
                     stacks(buf, n.offerings());
                     buf.writeEnum(n.trial());
+                    buf.writeVarInt(n.requirements().size());
+                    n.requirements().forEach(c -> net.minecraft.network.chat.ComponentSerialization.STREAM_CODEC.encode(buf, c));
                 });
             },
             buf -> {
@@ -93,9 +96,19 @@ public record AgeUnlockedPayload(Civilization civ, Age age, String minorGod, Lis
                 for (int i = 0; i < ne; i++) {
                     extras.add(new Extra(ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), buf.readUtf()));
                 }
-                Optional<Next> next = buf.readBoolean()
-                        ? Optional.of(new Next(buf.readEnum(Age.class), buf.readVarLong(), stacks(buf), buf.readEnum(Age.class)))
-                        : Optional.empty();
+                Optional<Next> next = Optional.empty();
+                if (buf.readBoolean()) {
+                    Age na = buf.readEnum(Age.class);
+                    long favor = buf.readVarLong();
+                    List<ItemStack> offerings = stacks(buf);
+                    Age trial = buf.readEnum(Age.class);
+                    int nr = Math.min(buf.readVarInt(), 16);
+                    List<net.minecraft.network.chat.Component> reqs = new ArrayList<>(nr);
+                    for (int i = 0; i < nr; i++) {
+                        reqs.add(net.minecraft.network.chat.ComponentSerialization.STREAM_CODEC.decode(buf));
+                    }
+                    next = Optional.of(new Next(na, favor, offerings, trial, List.copyOf(reqs)));
+                }
                 return new AgeUnlockedPayload(civ, age, god, powers, summons, recipes, caps, extras, next);
             });
 

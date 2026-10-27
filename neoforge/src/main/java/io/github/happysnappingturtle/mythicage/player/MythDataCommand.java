@@ -90,7 +90,7 @@ public final class MythDataCommand {
             PlayerMythData.CivState s = data.civ(c);
             long cap = MythData.cap(player, c);
             ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.favor.get",
-                    "%s %s: %s/%s (%s)", player.getDisplayName(), c.id(), s.favor(), cap, s.age().id()), false);
+                    "%s %s: %s/%s (%s)", player.getDisplayName(), civName(c), s.favor(), cap, ageName(s.age())), false);
         }
         return 1;
     }
@@ -104,7 +104,7 @@ public final class MythDataCommand {
                 "cmd:" + UUID.randomUUID(), TxSteps.addFavor(c, amount, bonus)));
         long now = MythData.get(player).civ(c).favor();
         ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.favor.add",
-                "%s %s +%s → %s (%s)", player.getDisplayName(), c.id(), amount, now, result.status().name()), true);
+                "%s %s +%s → %s (%s)", player.getDisplayName(), civName(c), amount, now, result.status().name()), true);
         return result.committed() ? 1 : 0;
     }
 
@@ -116,7 +116,7 @@ public final class MythDataCommand {
         MythData.get(player).civ(c).setFavor(amount);
         MythData.changed(player);
         ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.favor.set",
-                "%s %s = %s", player.getDisplayName(), c.id(), amount), true);
+                "%s %s = %s", player.getDisplayName(), civName(c), amount), true);
         return 1;
     }
 
@@ -137,7 +137,16 @@ public final class MythDataCommand {
         io.github.happysnappingturtle.mythicage.rite.UnlockService.flush(player);
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, c, age.ordinal());
         ctx.getSource().sendSuccess(() -> Component.translatableWithFallback("commands.mythic_age.age.set",
-                "%s %s → %s", player.getDisplayName(), c.id(), age.id()), true);
+                "%s %s → %s", player.getDisplayName(), civName(c), ageName(age)), true);
         return 1;
+    }
+
+    /** 命令反馈里的文明名（T4 §136 留到 T24：不显示 id）。 */
+    public static net.minecraft.network.chat.Component civName(io.github.happysnappingturtle.mythicage.core.player.Civilization c) {
+        return net.minecraft.network.chat.Component.translatable("mythic_age.civ." + c.id());
+    }
+
+    public static net.minecraft.network.chat.Component ageName(io.github.happysnappingturtle.mythicage.core.player.Age a) {
+        return net.minecraft.network.chat.Component.translatable("mythic_age.age." + a.id());
     }
 }

@@ -24,6 +24,13 @@ public interface PromotionRequirement {
      */
     Line check(ServerPlayer player, Civilization civ, Age target, VillageRegistry.Village village, JsonObject params);
 
+    /**
+     * 晋升成功界面「下一时代需要」里的预告（12 号 §4.3 A：只预告、不判定是否满足）。默认用类型名的语言键。
+     */
+    default Component preview(JsonObject params) {
+        return Component.translatable("mythic_age.rite.req." + type().replace(':', '.'));
+    }
+
     /** 晋升页上的一行：「你的神庙：中神庙」✓、「本村青铜工坊 0 / 2」✗。 */
     record Line(Component label, boolean met, Component progress) {
     }

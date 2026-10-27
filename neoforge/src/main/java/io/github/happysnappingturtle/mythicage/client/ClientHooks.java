@@ -1,8 +1,8 @@
 package io.github.happysnappingturtle.mythicage.client;
 
-import io.github.happysnappingturtle.mythicage.client.screen.GreekAltarScreen;
+import io.github.happysnappingturtle.mythicage.client.screen.ShrineInspectScreen;
 import io.github.happysnappingturtle.mythicage.client.screen.GuardianScreen;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
+import io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey;
 import io.github.happysnappingturtle.mythicage.trade.TradePayloads;
 import net.minecraft.client.Minecraft;
 
@@ -24,8 +24,9 @@ public final class ClientHooks {
         ThreadTrailRenderer.accept(payload);
     }
 
-    public static void openAltar(AltarSurveyPayload payload) {
-        Minecraft.getInstance().setScreen(new GreekAltarScreen(payload));
+    /** 神坛检视（T24 §5.1：五文明通用外壳）。 */
+    public static void openShrine(ShrineSurvey payload) {
+        Minecraft.getInstance().setScreen(new ShrineInspectScreen(payload));
     }
 
     /** 打开或刷新交易界面（T9）。 */
@@ -124,6 +125,11 @@ public final class ClientHooks {
         } else {
             mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.VillageAffairsScreen(payload.view()));
         }
+    }
+
+    /** 试炼 Boss 血条下的一行（T24 §5.3）。 */
+    public static void arenaHud(io.github.happysnappingturtle.mythicage.boss.ArenaHudPayload payload) {
+        ArenaHud.accept(payload);
     }
 
     /** 村界显示（T24 §4.4）。 */

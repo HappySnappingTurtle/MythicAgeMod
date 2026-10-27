@@ -3,7 +3,8 @@ package io.github.happysnappingturtle.mythicage.gametest;
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
 import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekShrineSurvey;
+import io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.BrazierBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlockEntity;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
@@ -553,14 +554,22 @@ public final class TempleGameTests {
         build(h, new Build(4, 48, 1, 0, 0, 20, Age.ARCHAIC));
         FakePlayer viewer = player(h, "ma_viewer", Age.ARCHAIC);
         whenScanned(h, be -> {
-            AltarSurveyPayload p = AltarSurveyPayload.of(be, viewer, TempleService.rules());
+            ShrineSurvey p = GreekShrineSurvey.of(be, viewer, TempleService.rules());
             h.assertTrue(p.grantedLevel() == 0 && p.rows().stream()
                     .anyMatch(r -> r.key().equals("roof") && r.have() == 48 && r.need() == 49), "应列出屋顶 48/49");
-            h.assertTrue(p.uncoveredRoof().size() == 33, "无屋顶的列应为 33，实际 " + p.uncoveredRoof().size());
-            h.assertTrue(p.shortColumns().size() == 4 && p.countedColumns().isEmpty(), "贴地的 4 根柱应标黄");
+            h.assertTrue(p.cells("roof").size() == 33, "无屋顶的列应为 33，实际 " + p.cells("roof").size());
+            h.assertTrue(p.cells("short").size() == 4 && p.cells("counted").isEmpty(), "贴地的 4 根柱应标黄");
+            // T24 §5.1：通用外壳——文明、形状分组、离开时的记账与台账一致（TC-T24-50～53）
+            h.assertTrue(p.civ() == io.github.happysnappingturtle.mythicage.core.player.Civilization.GREEK, "文明");
+            h.assertTrue(p.highlights().stream().anyMatch(x -> x.kind().equals("roof")
+                    && x.shape() == ShrineSurvey.Shape.COLUMN), "没有屋顶的列画细高柱");
+            boolean ledger = io.github.happysnappingturtle.mythicage.runtime.RuntimeLedgers.get(h.getLevel().getServer())
+                    .get(io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService.ledgerId(
+                            net.minecraft.core.GlobalPos.of(h.getLevel().dimension(), be.getBlockPos()))).isPresent();
+            h.assertTrue(p.away().present() == ledger, "离开时的记账与台账一致：" + p.away());
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            AltarSurveyPayload.STREAM_CODEC.encode(buf, p);
-            AltarSurveyPayload back = AltarSurveyPayload.STREAM_CODEC.decode(buf);
+            ShrineSurvey.STREAM_CODEC.encode(buf, p);
+            ShrineSurvey back = ShrineSurvey.STREAM_CODEC.decode(buf);
             h.assertTrue(back.equals(p), "编解码应往返一致");
         });
     }

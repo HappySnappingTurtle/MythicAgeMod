@@ -251,5 +251,68 @@
         "pitch": 1.2
       }
     ]
+  },
+  "arena.wall_warning": {
+    "subtitle": "subtitles.mythic_age.arena.wall_warning",
+    "sounds": [
+      {
+        "name": "minecraft:block.grindstone.use",
+        "type": "event"
+      }
+    ]
+  },
+  "arena.wall_move": {
+    "subtitle": "subtitles.mythic_age.arena.wall_move",
+    "sounds": [
+      {
+        "name": "minecraft:block.piston.extend",
+        "type": "event"
+      }
+    ]
+  },
+  "arena.pillar_break": {
+    "subtitle": "subtitles.mythic_age.arena.pillar_break",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event"
+      }
+    ]
+  },
+  "boss.minotaur.charge_windup": {
+    "subtitle": "subtitles.mythic_age.boss.minotaur.charge_windup",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.step",
+        "type": "event"
+      }
+    ]
+  },
+  "boss.minotaur.roar": {
+    "subtitle": "subtitles.mythic_age.boss.minotaur.roar",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.roar",
+        "type": "event"
+      }
+    ]
+  },
+  "boss.minotaur.throw": {
+    "subtitle": "subtitles.mythic_age.boss.minotaur.throw",
+    "sounds": [
+      {
+        "name": "minecraft:entity.snowball.throw",
+        "type": "event"
+      }
+    ]
+  },
+  "boss.minotaur.stunned": {
+    "subtitle": "subtitles.mythic_age.boss.minotaur.stunned",
+    "sounds": [
+      {
+        "name": "minecraft:entity.zombie.attack_wooden_door",
+        "type": "event"
+      }
+    ]
   }
 }

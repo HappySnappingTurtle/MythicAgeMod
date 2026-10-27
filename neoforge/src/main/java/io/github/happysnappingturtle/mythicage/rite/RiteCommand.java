@@ -93,7 +93,8 @@ public final class RiteCommand {
         MythData.changed(player);
         RiteService.afterPromotion(player, civ, target, god, v.orElse(null));
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.rite.promoted",
-                player.getDisplayName(), civ.id(), target.id(), god), true);
+                player.getDisplayName(), MythDataCommand.civName(civ), MythDataCommand.ageName(target),
+                god.isEmpty() ? Component.literal("—") : Component.translatable("mythic_age.god." + god)), true);
         return 1;
     }
 
@@ -114,7 +115,7 @@ public final class RiteCommand {
             reg.byId(v.get().id()).ifPresent(x -> RiteService.announceStage(ctx.getSource().getPlayer(), v.get(), x));
         }
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.village.stage_set",
-                bell.toShortString(), age.id()), true);
+                bell.toShortString(), MythDataCommand.ageName(age)), true);
         return 1;
     }
 
@@ -128,7 +129,8 @@ public final class RiteCommand {
         }
         TrialService.grant(player, civ, tier, count);
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.trial.granted",
-                player.getDisplayName(), civ.id(), tier.id(), MythData.get(player).civ(civ).vouchers(tier)), true);
+                player.getDisplayName(), MythDataCommand.civName(civ), MythDataCommand.ageName(tier),
+                MythData.get(player).civ(civ).vouchers(tier)), true);
         return 1;
     }
 }

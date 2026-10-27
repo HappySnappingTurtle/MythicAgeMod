@@ -192,7 +192,10 @@ public final class SentinelFx implements PowerFxRenderer {
                 if (flashAt >= 0) {
                     float f = Math.min(1, (now - flashAt + pt) / FADE);
                     alpha = 1 - f;
-                    size *= 1 + 0.35f * (float) Math.sin(Math.min(1, f * 4) * Math.PI);
+                    // 减少闪光：符文只淡出、不再胀缩闪一下
+                    if (!io.github.happysnappingturtle.mythicage.client.ClientFx.reduceFlashes()) {
+                        size *= 1 + 0.35f * (float) Math.sin(Math.min(1, f * 4) * Math.PI);
+                    }
                 } else {
                     alpha = appear * (0.7f + 0.25f * (float) Math.sin(age * 0.2 + i));
                 }

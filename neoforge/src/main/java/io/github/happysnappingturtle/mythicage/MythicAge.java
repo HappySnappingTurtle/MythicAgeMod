@@ -55,6 +55,8 @@ public final class MythicAge {
 
     public MythicAge(IEventBus modBus, ModContainer container) {
         LOGGER.info("Mythic Age loading ({} {})", MythicAgeIds.MOD_ID, container.getModInfo().getVersion());
+        // 客户端选项（T24 §7.1）：只在客户端载入；服务端用默认值
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, io.github.happysnappingturtle.mythicage.config.ClientConfig.SPEC);
         // 内容声明（T6）：先触发各内容类的类加载，再把 DeferredRegister 挂到 mod 总线
         GreekMaterials.init();
         GreekAgriculture.init();

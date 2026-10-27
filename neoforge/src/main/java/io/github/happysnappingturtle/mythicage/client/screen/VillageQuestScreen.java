@@ -116,6 +116,9 @@ public class VillageQuestScreen extends Screen {
     /** 第二行：状态（或剩余日）· 范围 · 奖励类别 · 我的份额 / 不能接的原因。 */
     private static Component detail(QuestView.Row r) {
         MutableComponent c = Component.empty();
+        if (!r.sourceKey().isEmpty()) {
+            c.append(Component.translatable(r.sourceKey())).append(Component.literal(" · "));
+        }
         if (r.state().equals("open")) {
             c.append(r.daysLeft() >= 0 ? Component.translatable("mythic_age.quest.screen.days", r.daysLeft())
                     : Component.translatable("mythic_age.quest.state.open"));

@@ -31,6 +31,10 @@ public final class ClientSetup {
             Sheets.addWoodType(ModWoodTypes.OLIVE);
             EquipmentItemProperties.register();
         });
+        // 模组列表里的「配置」按钮：NeoForge 自带的配置界面（T24 §7.1 客户端选项）
+        net.neoforged.fml.ModList.get().getModContainerById(io.github.happysnappingturtle.mythicage.core.MythicAgeIds.MOD_ID)
+                .ifPresent(c -> c.registerExtensionPoint(net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                        net.neoforged.neoforge.client.gui.ConfigurationScreen::new));
     }
 
     @SubscribeEvent

@@ -49,6 +49,13 @@ public final class GreekTempleRequirement implements PromotionRequirement {
     }
 
     @Override
+    public Component preview(JsonObject params) {
+        TempleRules rules = TempleService.rules();
+        int need = Math.max(0, Math.min(rules.maxLevel(), params != null && params.has("level") ? params.get("level").getAsInt() : 1));
+        return Component.translatable("mythic_age.rite.preview_temple", Component.translatable("mythic_age.temple.tier." + rules.tier(need).name()));
+    }
+
+    @Override
     public Line check(ServerPlayer player, Civilization civ, Age target, VillageRegistry.Village village, JsonObject params) {
         TempleRules rules = TempleService.rules();
         int need = Math.max(0, Math.min(rules.maxLevel(), params != null && params.has("level") ? params.get("level").getAsInt() : 1));

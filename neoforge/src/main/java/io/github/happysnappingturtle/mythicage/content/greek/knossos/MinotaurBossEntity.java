@@ -20,7 +20,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
@@ -372,7 +371,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
             roar = roarTicks;
             stand();
             playOnce(MythAnimState.ROAR, roarTicks);
-            level.playSound(null, blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 2.0F, 0.7F);
+            level.playSound(null, blockPosition(), io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("boss.minotaur.roar"), SoundSource.HOSTILE, 2.0F, 0.7F);
             return;
         }
         if (pausedForTest || pauseAllForTest) {
@@ -434,7 +433,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
             Vec3 f = Vec3.directionFromRotation(0, getYRot());
             sl.sendParticles(ParticleTypes.CLOUD, getX() + f.x * 1.2, getY() + getBbHeight() * 0.8, getZ() + f.z * 1.2,
                     4, 0.1, 0.05, 0.1, 0.02);
-            sl.playSound(null, blockPosition(), SoundEvents.RAVAGER_STEP, SoundSource.HOSTILE, 1.2F, 0.6F);
+            sl.playSound(null, blockPosition(), io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("boss.minotaur.charge_windup"), SoundSource.HOSTILE, 1.2F, 0.6F);
         }
     }
 
@@ -511,7 +510,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
         double dist = Math.sqrt(dx * dx + dz * dz);
         rock.shoot(dx, dy + dist * 0.18, dz, 1.3F, 0);
         level.addFreshEntity(rock);
-        level.playSound(null, blockPosition(), SoundEvents.SNOWBALL_THROW, SoundSource.HOSTILE, 1.5F, 0.4F);
+        level.playSound(null, blockPosition(), io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("boss.minotaur.throw"), SoundSource.HOSTILE, 1.5F, 0.4F);
     }
 
     private void endMove() {
@@ -624,7 +623,7 @@ public class MinotaurBossEntity extends MinotaurEntity implements TrialBoss {
             charge().cancel();
             stun = out.stunTicks();
             level.sendParticles(ParticleTypes.CRIT, getX(), getY() + getBbHeight(), getZ(), 12, 0.4, 0.2, 0.4, 0.1);
-            level.playSound(null, blockPosition(), SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR, SoundSource.HOSTILE, 1.5F, 0.5F);
+            level.playSound(null, blockPosition(), io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("boss.minotaur.stunned"), SoundSource.HOSTILE, 1.5F, 0.5F);
         }
     }
 

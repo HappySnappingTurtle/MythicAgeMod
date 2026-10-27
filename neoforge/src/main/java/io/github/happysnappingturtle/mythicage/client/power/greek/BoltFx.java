@@ -47,8 +47,11 @@ public final class BoltFx implements PowerFxRenderer {
                 Vec3 bottom = t != null ? t.position() : p.origin();
                 double h = t != null ? t.getBbHeight() : 1.8;
                 ClientPowerFx.add(new Strike(bottom, bottom.add(0, CLOUD_HEIGHT - 0.6, 0), p.seed(), level.getGameTime()));
-                level.setSkyFlashTime(3);
-                level.addParticle(ParticleTypes.FLASH, bottom.x, bottom.y + h * 0.5, bottom.z, 0, 0, 0);
+                // 减少闪光（T24 §7.1）：不闪天空、不放全白闪光粒子；闪电本体照画
+                if (!io.github.happysnappingturtle.mythicage.client.ClientFx.reduceFlashes()) {
+                    level.setSkyFlashTime(3);
+                    level.addParticle(ParticleTypes.FLASH, bottom.x, bottom.y + h * 0.5, bottom.z, 0, 0, 0);
+                }
                 RandomSource r = RandomSource.create(p.seed());
                 for (int i = 0; i < 40; i++) {
                     level.addParticle(PowerRegistries.SPARK.get(), bottom.x, bottom.y + 0.1, bottom.z,
@@ -71,7 +74,8 @@ public final class BoltFx implements PowerFxRenderer {
     }
 
     static boolean minimal() {
-        return Minecraft.getInstance().options.particles().get() == net.minecraft.client.ParticleStatus.MINIMAL;
+        // 装饰粒子跟随模组的客户端选项（T24 §7.1，默认跟随原版「粒子效果」）
+        return io.github.happysnappingturtle.mythicage.client.ClientFx.decorativeMinimal();
     }
 
     /** 预警：落点环 + 跟随目标的高空乌云。 */

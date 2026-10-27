@@ -8,7 +8,8 @@ import io.github.happysnappingturtle.mythicage.content.greek.prayer.GreekPrayer;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayAtAltar;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerRecord;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekShrineSurvey;
+import io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.BrazierBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlockEntity;
@@ -776,7 +777,7 @@ public final class PrayerGameTests {
             PrayerService.sampleForTest(h.getLevel().getServer());
             PrayerService.Stats st = PrayerService.stats(be, TempleService.rules());
             h.assertTrue(Math.abs(st.estimate() - PrayerFormula.estimate(3, 2, 1.0, 0)) < EPS, "预计日产按信徒 3、祈祷位 2：" + st);
-            AltarSurveyPayload payload = AltarSurveyPayload.of(be, p, TempleService.rules());
+            ShrineSurvey payload = GreekShrineSurvey.of(be, p, TempleService.rules());
             h.assertTrue(payload.estimate() == st.estimate() && payload.prayer().believers() == st.believers()
                     && payload.prayer().today() == st.today() && payload.prayer().praying() == st.praying(),
                     "检视界面与统计一致：" + payload.prayer());

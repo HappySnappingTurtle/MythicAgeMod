@@ -101,6 +101,9 @@ public final class RuntimeDriver {
                 long bonus = CapBonusProvider.Holder.get().capBonus(owner, l.civ());
                 MythData.transact(owner, Transactions.Request.internal(TxSteps.addFavor(l.civ(), s.credited(), bonus)));
                 io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(owner, io.github.happysnappingturtle.mythicage.advancement.MythEvents.FAVOR_GAINED, l.civ(), (int) Math.min(Integer.MAX_VALUE, s.credited()));
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(owner,
+                        new io.github.happysnappingturtle.mythicage.player.FavorSourcePayload(l.civ(),
+                                io.github.happysnappingturtle.mythicage.player.FavorSourcePayload.ledgerSource(l.id().value())));
             }
         }
         return s;

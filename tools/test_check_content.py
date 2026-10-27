@@ -233,5 +233,23 @@ class VillageDialogueTest(unittest.TestCase):
         self.assertEqual([], self.run_with({}, []))
 
 
+class WarningFxTest(unittest.TestCase):
+    """TC-T24-94：预警代码引用装饰特效开关时报错。"""
+
+    def test_warning_dir_must_not_use_client_fx(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            boss = root / cc.WARNING_FX_DIRS[0]
+            boss.mkdir(parents=True)
+            (boss / "Arena.java").write_text("class Arena { void warn() { spawnWarning(); } }", encoding="utf-8")
+            r = cc.Report()
+            cc.check_warning_fx(root, r)
+            self.assertEqual([], r.errors)
+            (boss / "Bad.java").write_text("class Bad { int n = ClientFx.decorativeCount(8); }", encoding="utf-8")
+            cc.check_warning_fx(root, r)
+            self.assertEqual(1, len(r.errors))
+            self.assertIn("Bad.java", r.errors[0])
+
+
 if __name__ == "__main__":
     unittest.main()

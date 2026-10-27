@@ -14,6 +14,9 @@ public final class ClientMythData {
     private static volatile Map<Civilization, PlayerSyncPayload.CivEntry> civs = Map.of();
     /** 每个文明恩宠最近一次变化的时间（System.currentTimeMillis），供 HUD 决定是否显示。 */
     private static final Map<Civilization, Long> lastChange = new EnumMap<>(Civilization.class);
+    /** 每个文明的最近变化（合并 3 秒内的连续变化，T24 §5.4）。 */
+    private static final Map<Civilization, io.github.happysnappingturtle.mythicage.core.player.FavorDelta> deltas =
+            new EnumMap<>(Civilization.class);
 
     private ClientMythData() {
     }
@@ -31,6 +34,8 @@ public final class ClientMythData {
             PlayerSyncPayload.CivEntry old = civs.get(e.civ());
             if (!first && (old == null || old.favor() != e.favor() || old.cap() != e.cap())) {
                 lastChange.put(e.civ(), now);
+                long change = e.favor() - (old == null ? 0 : old.favor());
+                deltas.put(e.civ(), delta(e.civ()).add(change, now, ""));
             }
         }
         civs = Map.copyOf(next);
@@ -42,6 +47,20 @@ public final class ClientMythData {
         dataVersion = -1;
         civs = Map.of();
         lastChange.clear();
+        deltas.clear();
+    }
+
+    /** 来源包（与数值包先后不定）。 */
+    public static synchronized void source(Civilization c, String key) {
+        deltas.put(c, delta(c).withSource(key, System.currentTimeMillis()));
+        if (delta(c).delta() == 0) {
+            // 来源先到：先记一个 0 变化的来源，数值到了再合并
+            deltas.put(c, new io.github.happysnappingturtle.mythicage.core.player.FavorDelta(0, System.currentTimeMillis(), key));
+        }
+    }
+
+    public static synchronized io.github.happysnappingturtle.mythicage.core.player.FavorDelta delta(Civilization c) {
+        return deltas.getOrDefault(c, io.github.happysnappingturtle.mythicage.core.player.FavorDelta.NONE);
     }
 
     public static long dataVersion() {

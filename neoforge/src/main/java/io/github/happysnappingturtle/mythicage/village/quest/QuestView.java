@@ -31,7 +31,7 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
      */
     public record Row(String id, String type, AffairsView.Line title, int done, int need, int daysLeft, String scope,
                       List<String> rewards, String state, AffairsView.Line reason, boolean accepted, String refusal,
-                      boolean canDeliver, int mine) {
+                      boolean canDeliver, int mine, String sourceKey) {
     }
 
     public static final StreamCodec<FriendlyByteBuf, QuestView> STREAM_CODEC = StreamCodec.of(
@@ -55,6 +55,7 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
                     buf.writeUtf(r.refusal());
                     buf.writeBoolean(r.canDeliver());
                     buf.writeVarInt(r.mine());
+                    buf.writeUtf(r.sourceKey());
                 }
                 buf.writeVarInt(v.active());
                 buf.writeVarInt(v.max());
@@ -82,7 +83,7 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
                     String state = buf.readUtf();
                     AffairsView.Line reason = AffairsView.LINE.decode(buf);
                     rows.add(new Row(rid, type, t, done, need, days, scope, List.copyOf(rewards), state, reason, buf.readBoolean(),
-                            buf.readUtf(), buf.readBoolean(), buf.readVarInt()));
+                            buf.readUtf(), buf.readBoolean(), buf.readVarInt(), buf.readUtf()));
                 }
                 return new QuestView(id, title, List.copyOf(rows), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
                         buf.readBoolean());

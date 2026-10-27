@@ -36,6 +36,17 @@ public final class ProductGroups {
         return List.copyOf(groups.getOrDefault(new Key(owner, power), List.of()));
     }
 
+    /** 某玩家各神力的产物组：神力 id → 实体 id（按神力 id 排序；T24 §5.2）。 */
+    public synchronized Map<String, List<String>> groups(UUID owner) {
+        Map<String, List<String>> out = new java.util.TreeMap<>();
+        groups.forEach((k, v) -> {
+            if (k.owner().equals(owner) && !v.isEmpty()) {
+                out.put(k.power(), List.copyOf(v));
+            }
+        });
+        return out;
+    }
+
     public synchronized void clear() {
         groups.clear();
     }

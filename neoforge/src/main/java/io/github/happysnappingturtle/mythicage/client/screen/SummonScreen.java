@@ -23,10 +23,13 @@ import javax.annotation.Nullable;
 public class SummonScreen extends Screen {
     private static final int W = 360;
     private static final int ROW = 24;
-    private static final int ROWS = 6;
+    /** 临时效果区占了地方：常驻单位一页 5 行（GUI 缩放 4 时整屏放得下），多的翻页。 */
+    private static final int ROWS = 5;
     private static final int LIST_TOP = 44;
     private static final int BOTTOM = 26;
-    private static final int H = LIST_TOP + ROW * ROWS + BOTTOM + 4;
+    /** 临时效果区（T24 §5.2）：标题一行 + 最多 3 行。 */
+    private static final int TEMP = 44;
+    private static final int H = LIST_TOP + ROW * ROWS + TEMP + BOTTOM + 4;
     private static final int PANEL = 0xF0201A14;
     private static final int BORDER = 0xFFB89A5A;
     private static final int TEXT = 0xFFEDE8DC;
@@ -182,6 +185,7 @@ public class SummonScreen extends Screen {
         g.renderOutline(left, top, W, H, BORDER);
         g.fill(left + 6, top + LIST_TOP - 2, left + W - 6, top + LIST_TOP - 1, 0x60B89A5A);
         g.fill(left + 6, top + H - BOTTOM, left + W - 6, top + H - BOTTOM + 1, 0x60B89A5A);
+        g.fill(left + 6, top + LIST_TOP + ROW * ROWS + 1, left + W - 6, top + LIST_TOP + ROW * ROWS + 2, 0x30B89A5A);
     }
 
     @Override
@@ -190,6 +194,7 @@ public class SummonScreen extends Screen {
         g.drawString(font, title, left + 8, top + 8, GOLD, false);
         Component cap = Component.translatable("mythic_age.summon.cap", view.occupied(), view.cap());
         g.drawString(font, cap, left + W - 8 - font.width(cap), top + 8, view.occupied() >= view.cap() ? GOLD : DIM, false);
+        renderTemps(g, top + LIST_TOP + ROW * ROWS + 5);
         if (view.rows().isEmpty()) {
             centered(g, Component.translatable("mythic_age.summon.empty"), top + LIST_TOP + 50, TEXT);
             centered(g, Component.translatable("mythic_age.summon.empty_hint"), top + LIST_TOP + 64, DIM);
@@ -226,6 +231,35 @@ public class SummonScreen extends Screen {
         } else {
             Component dash = Component.literal("—");
             g.drawString(font, dash, bx + (bw - font.width(dash)) / 2, y + 13, DIM, false);
+        }
+    }
+
+    /** 临时效果：不占常驻槽位、只读，到期自然消失；未载入的写「未载入」，不当作消失。 */
+    private void renderTemps(GuiGraphics g, int y) {
+        g.drawString(font, Component.translatable("mythic_age.summon.temps"), left + 8, y, GOLD, false);
+        Component note = Component.translatable("mythic_age.summon.temps_note");
+        g.drawString(font, note, left + W - 8 - font.width(note), y, DIM, false);
+        y += 11;
+        if (view.temps().isEmpty()) {
+            g.drawString(font, Component.translatable("mythic_age.summon.temps_none"), left + 14, y, DIM, false);
+            return;
+        }
+        for (SummonView.Temp t : view.temps()) {
+            Component name = t.entity().isEmpty() ? Component.translatable("mythic_age.summon.temp_unknown")
+                    : BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(t.entity())).getDescription();
+            Component where = switch (t.where()) {
+                case NEAR -> Component.translatable("mythic_age.summon.where_distance", t.value());
+                case DIMENSION -> Component.translatable("mythic_age.summon.where_dimension",
+                        Component.translatableWithFallback("mythic_age.summon.dim." + t.dimension().replace(':', '.'), t.dimension()));
+                default -> Component.translatable("mythic_age.summon.where_unloaded");
+            };
+            net.minecraft.network.chat.MutableComponent line = Component.empty().append(name).append(" ×" + t.count())
+                    .append(" · ").append(where);
+            if (t.secondsLeft() >= 0) {
+                line.append(" · ").append(Component.translatable("mythic_age.summon.temp_left", t.secondsLeft()));
+            }
+            g.drawString(font, line, left + 14, y, TEXT, false);
+            y += 10;
         }
     }
 

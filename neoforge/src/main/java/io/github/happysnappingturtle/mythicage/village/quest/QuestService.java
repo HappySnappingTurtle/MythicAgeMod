@@ -374,6 +374,29 @@ public final class QuestService {
         return new Outcome("ok", units);
     }
 
+    /**
+     * 委托的来源事件（T24 §5.4，12 号 §4「来源事件」）：按来源前缀给语言键，界面在第二行前写「因：……」。
+     */
+    public static String sourceKey(String source) {
+        String kind;
+        if (source.startsWith(SupplyQuests.PROJECT)) {
+            kind = "project";
+        } else if (source.startsWith(SupplyQuests.SHORT)) {
+            kind = "short";
+        } else if (source.equals(SupplyQuests.FOOD)) {
+            kind = "food";
+        } else if (source.startsWith(SupplyQuests.REPAIR) || source.startsWith(RepairQuests.PREFIX)) {
+            kind = "damage";
+        } else if (source.startsWith(EscortQuests.PREFIX)) {
+            kind = "migrant";
+        } else if (source.startsWith(RescueQuests.PREFIX)) {
+            kind = "raid";
+        } else {
+            return "";
+        }
+        return "mythic_age.quest.source." + kind;
+    }
+
     /** 背包里这种物品（不带组件的）有几件。 */
     static int count(ServerPlayer player, String item) {
         int n = 0;
@@ -510,7 +533,8 @@ public final class QuestService {
                     && (q.accepted.contains(me) || refusal.isEmpty());
             rows.add(new QuestView.Row(q.id(), q.type, title(ctx.get(), q), q.done, Math.max(q.need, q.done),
                     q.deadline < 0 || !q.state.active() ? -1 : (int) Math.max(0, q.deadline - today), scope, List.copyOf(rewards),
-                    q.state.id(), reason, q.accepted.contains(me), refusal, canDeliver, q.contrib.getOrDefault(me, 0)));
+                    q.state.id(), reason, q.accepted.contains(me), refusal, canDeliver, q.contrib.getOrDefault(me, 0),
+                    sourceKey(q.source)));
         }
         b.seen.put(me, seen);
         VillageQuests.get(server).setDirty();

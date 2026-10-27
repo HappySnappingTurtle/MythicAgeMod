@@ -58,5 +58,11 @@ public final class PegasusStaminaHud {
             g.fill(x, y, x + fill, y + 5, 0xFFE3C98A);
             g.fill(x, y, x + fill, y + 1, 0xFFF4E6BC);
         }
+        // 体力低不只靠暗红：低于 1/4 时条右边写「疲惫」，耗尽写「力竭」（12 号 §6）
+        if (p.stamina() * 4 < max) {
+            net.minecraft.network.chat.Component t = net.minecraft.network.chat.Component.translatable(p.stamina() <= 0
+                    ? "mythic_age.pegasus.exhausted" : "mythic_age.pegasus.tired");
+            g.drawString(mc.font, t, x + WIDTH + 4, y - 1, 0xFFE59A6A, true);
+        }
     }
 }

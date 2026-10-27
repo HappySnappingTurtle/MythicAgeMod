@@ -116,8 +116,16 @@ public class AgeUnlockedScreen extends Screen {
                 nx += 18;
             }
             if (n.trial() != Age.NONE) {
-                g.drawString(font, Component.translatable("mythic_age.age_unlocked.next_trial",
-                        Component.translatable("mythic_age.trial." + n.trial().id())), nx + 4, ny, DIM, false);
+                Component trial = Component.translatable("mythic_age.age_unlocked.next_trial",
+                        Component.translatable("mythic_age.trial." + n.trial().id()));
+                g.drawString(font, trial, nx + 4, ny, DIM, false);
+            }
+            // 建筑条件（如神庙等级）另起一行，只预告不判定
+            int rx = left + 10;
+            for (Component r : n.requirements()) {
+                Component line = Component.literal("+ ").append(r);
+                g.drawString(font, line, rx, ny + 14, DIM, false);
+                rx += font.width(line) + 10;
             }
         }, () -> g.drawString(font, Component.translatable("mythic_age.age_unlocked.top"), left + 10, ny, DIM, false));
     }

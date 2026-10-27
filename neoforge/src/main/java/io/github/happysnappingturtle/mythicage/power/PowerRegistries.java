@@ -35,7 +35,10 @@ public final class PowerRegistries {
                 "gp.gr.restoration.cast", "gp.gr.restoration.pulse", "gp.gr.restoration.repair",
                 "gp.gr.pestilence.shatter", "gp.gr.pestilence.spawner_seal", "gp.gr.pestilence.end",
                 "gp.gr.bronze.cast", "gp.gr.bronze.harden", "gp.gr.bronze.fade",
-                "gp.gr.curse.impact", "gp.gr.curse.transform", "gp.gr.curse.immune"}) {
+                "gp.gr.curse.impact", "gp.gr.curse.transform", "gp.gr.curse.immune",
+                // 试炼竞技场与弥诺陶洛斯（T24 §7.2）：声音仍是原版的，换成说明危险含义的字幕
+                "arena.wall_warning", "arena.wall_move", "arena.pillar_break",
+                "boss.minotaur.charge_windup", "boss.minotaur.roar", "boss.minotaur.throw", "boss.minotaur.stunned"}) {
             SOUND_EVENTS.put(id, SOUNDS.register(id,
                     () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, id))));
         }
@@ -69,7 +72,7 @@ public final class PowerRegistries {
     public static SoundEvent sound(String id) {
         DeferredHolder<SoundEvent, SoundEvent> h = SOUND_EVENTS.get(id);
         if (h == null) {
-            throw new IllegalArgumentException("未登记的神力音效：" + id);
+            throw new IllegalArgumentException("未登记的音效：" + id);
         }
         return h.get();
     }

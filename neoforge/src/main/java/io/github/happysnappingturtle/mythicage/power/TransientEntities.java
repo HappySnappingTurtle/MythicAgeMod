@@ -144,6 +144,16 @@ public final class TransientEntities {
         PRODUCTS.clear();
     }
 
+    /** 某玩家现有的临时实体（召唤管理界面「临时效果」，T24 §5.2）。 */
+    public static List<io.github.happysnappingturtle.mythicage.core.power.TransientBudget.Entry> transientsOf(UUID owner) {
+        return BUDGET.entries(owner);
+    }
+
+    /** 某玩家各神力的产物组。 */
+    public static java.util.Map<String, List<String>> productsOf(UUID owner) {
+        return PRODUCTS.groups(owner);
+    }
+
     public static int countForTest(UUID owner) {
         return BUDGET.count(owner);
     }

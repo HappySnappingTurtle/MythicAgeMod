@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "22";
+    private static final String PROTOCOL_VERSION = "23";
 
     private MythNetwork() {
     }
@@ -21,9 +21,9 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.content.greek.knossos.ThreadTrailPayload.TYPE,
                         io.github.happysnappingturtle.mythicage.content.greek.knossos.ThreadTrailPayload.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.threadTrail(payload))
-                .playToClient(io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload.TYPE,
-                        io.github.happysnappingturtle.mythicage.content.greek.temple.AltarSurveyPayload.STREAM_CODEC,
-                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openAltar(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey.TYPE,
+                        io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.openShrine(payload))
                 // 希腊信徒的状态（T10：橄榄枝饰、跪姿）
                 .playToClient(io.github.happysnappingturtle.mythicage.content.greek.prayer.BelieverStatePayload.TYPE,
                         io.github.happysnappingturtle.mythicage.content.greek.prayer.BelieverStatePayload.STREAM_CODEC,
@@ -116,6 +116,13 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Toast.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageToast(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.player.FavorSourcePayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.player.FavorSourcePayload.STREAM_CODEC,
+                        (payload, context) -> ClientMythData.source(payload.civ(), payload.sourceKey()))
+                // 试炼 Boss 提示行（T24 阶段 ②）
+                .playToClient(io.github.happysnappingturtle.mythicage.boss.ArenaHudPayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.boss.ArenaHudPayload.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.arenaHud(payload))
                 // 善恶与贡献（T24 阶段 ①）
                 .playToServer(io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.Request.TYPE,
                         io.github.happysnappingturtle.mythicage.conduct.ConductPayloads.Request.STREAM_CODEC,

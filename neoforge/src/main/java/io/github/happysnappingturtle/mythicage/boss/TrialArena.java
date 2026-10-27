@@ -444,7 +444,7 @@ public final class TrialArena {
         if (level.getBlockState(rubble).isAir()) {
             change(level, rubble, BuiltInRegistries.BLOCK.get(spec.rubble()).defaultBlockState());
         }
-        level.playSound(null, base, net.minecraft.sounds.SoundEvents.ANVIL_LAND, net.minecraft.sounds.SoundSource.HOSTILE,
+        level.playSound(null, base, io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("arena.pillar_break"), net.minecraft.sounds.SoundSource.HOSTILE,
                 1.5F, 0.6F);
         markPillarBroken(i);
         return true;
@@ -552,7 +552,7 @@ public final class TrialArena {
             }
             wallLayers.put(g, layers + 1);
             if (layers == 0) {
-                level.playSound(null, walls.get(g).get(walls.get(g).size() / 2), net.minecraft.sounds.SoundEvents.PISTON_EXTEND,
+                level.playSound(null, walls.get(g).get(walls.get(g).size() / 2), io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("arena.wall_move"),
                         net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.5F);
             }
             TrialArenas.markDirty();
@@ -626,7 +626,7 @@ public final class TrialArena {
         for (WallCycle.Action a : actions) {
             switch (a.kind()) {
                 case WARN -> level.playSound(null, walls.get(a.group()).get(walls.get(a.group()).size() / 2),
-                        net.minecraft.sounds.SoundEvents.GRINDSTONE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.6F);
+                        io.github.happysnappingturtle.mythicage.power.PowerRegistries.sound("arena.wall_warning"), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 0.6F);
                 case RAISE -> setWallTarget(a.group(), true);
                 case LOWER -> setWallTarget(a.group(), false);
                 case CANCEL -> {
@@ -665,7 +665,7 @@ public final class TrialArena {
             case FIGHT_P1, FIGHT_P2 -> tickFight(level, inHall);
             case VICTORY -> {
                 if (clock.tick(!inHall.isEmpty(), now, ArenaClock.EMPTY_RESET)) {
-                    reset(level, "胜利后大厅空了");
+                    reset(level, ResetCause.AFTER_VICTORY, "胜利后大厅空了");
                 }
             }
             default -> {
@@ -687,7 +687,7 @@ public final class TrialArena {
         Entity e = type.create(level);
         if (!(e instanceof Mob mob)) {
             MythicAge.LOGGER.error("竞技场 {} 的 Boss 类型 {} 不是生物", id, spec.boss());
-            reset(level, "Boss 生成失败");
+            reset(level, ResetCause.SPAWN_FAILED, "Boss 生成失败");
             return;
         }
         mob.moveTo(bossOrigin.getX() + 0.5, bossOrigin.getY(), bossOrigin.getZ() + 0.5, 0, 0);
@@ -715,13 +715,13 @@ public final class TrialArena {
         }
         // 先看空场：大厅区块刚重新载入时 Boss 实体可能还没载入，不能等找到 Boss 才计时
         if (clock.tick(!inHall.isEmpty(), level.getGameTime(), ArenaClock.EMPTY_RESET)) {
-            reset(level, "大厅里连续 " + clock.empty(level.getGameTime()) + " 刻没有合格玩家");
+            reset(level, ResetCause.EMPTY, "大厅里连续 " + clock.empty(level.getGameTime()) + " 刻没有合格玩家");
             return;
         }
         Optional<Mob> b = boss(level);
         if (b.isEmpty()) {
             if (++bossMissing >= BOSS_MISSING_RESET) {
-                reset(level, "Boss 实体 " + bossMissing + " 刻找不到，不算胜利");
+                reset(level, ResetCause.BOSS_MISSING, "Boss 实体 " + bossMissing + " 刻找不到，不算胜利");
             }
             return;
         }
@@ -755,6 +755,65 @@ public final class TrialArena {
             tickDevices(level, mob, inHall);
         }
         tickWalls(level, level.getGameTime());
+        tickHud(level, inHall);
+    }
+
+    // ───────────── 血条下的提示（T24 §5.3） ─────────────
+
+    /** 收到过提示行的玩家（离开大厅或战斗结束时清掉他们的那一行）。 */
+    private final java.util.Set<java.util.UUID> hudShown = new java.util.HashSet<>();
+    public static final int HUD_INTERVAL = 20;
+
+    private void tickHud(ServerLevel level, List<ServerPlayer> inHall) {
+        java.util.Set<java.util.UUID> here = new java.util.HashSet<>();
+        inHall.forEach(p -> here.add(p.getUUID()));
+        // 离开大厅的人：清掉提示行，告诉他空场多久会复原
+        for (java.util.Iterator<java.util.UUID> it = hudShown.iterator(); it.hasNext(); ) {
+            java.util.UUID u = it.next();
+            if (!here.contains(u)) {
+                it.remove();
+                ServerPlayer p = level.getServer().getPlayerList().getPlayer(u);
+                if (p != null) {
+                    net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, ArenaHudPayload.OFF);
+                    p.displayClientMessage(Component.translatable("mythic_age.arena.left", ArenaClock.EMPTY_RESET / 20), true);
+                }
+            }
+        }
+        boolean due = level.getGameTime() % HUD_INTERVAL == 0;
+        int intact = pillars.size() - Integer.bitCount(brokenPillars);
+        String walls = phase == ArenaPhase.FIGHT_P2 ? wallCycle.current().name().toLowerCase(java.util.Locale.ROOT) : "";
+        String trial = spec().map(ArenaSpec::trial).orElse("");
+        for (ServerPlayer p : inHall) {
+            if (due || hudShown.add(p.getUUID())) {
+                hudShown.add(p.getUUID());
+                boolean first = !trial.isEmpty() && io.github.happysnappingturtle.mythicage.player.MythData.get(p).firstKills().contains(trial);
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p,
+                        new ArenaHudPayload(true, intact, pillars.size(), walls, first));
+            }
+        }
+    }
+
+    private void hudOff(ServerLevel level) {
+        for (java.util.UUID u : hudShown) {
+            ServerPlayer p = level.getServer().getPlayerList().getPlayer(u);
+            if (p != null) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, ArenaHudPayload.OFF);
+            }
+        }
+        hudShown.clear();
+    }
+
+    /** 只供 GameTest：最近一次推送的提示行里有哪些玩家。 */
+    public java.util.Set<java.util.UUID> hudShownForTest() {
+        return java.util.Set.copyOf(hudShown);
+    }
+
+    /** 只供 GameTest：提示行此刻的内容（与推送给 p 的一致）。 */
+    public ArenaHudPayload hudForTest(ServerPlayer p) {
+        String trial = spec().map(ArenaSpec::trial).orElse("");
+        return new ArenaHudPayload(phase.fighting(), pillars.size() - Integer.bitCount(brokenPillars), pillars.size(),
+                phase == ArenaPhase.FIGHT_P2 ? wallCycle.current().name().toLowerCase(java.util.Locale.ROOT) : "",
+                !trial.isEmpty() && io.github.happysnappingturtle.mythicage.player.MythData.get(p).firstKills().contains(trial));
     }
 
     /** Boss 死了：胜利、结算（{@link TrialRewards}）、开门、开宝库门、落墙。只在战斗中、且是本场的 Boss 时生效（重复的死亡事件不再结算）。 */
@@ -772,6 +831,7 @@ public final class TrialArena {
         level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.RAVAGER_DEATH,
                 net.minecraft.sounds.SoundSource.HOSTILE, 3.0F, 0.6F);
         TrialRewards.settle(level, this);
+        hudOff(level);
         wallCycle.stop();
         for (WallCycle.Group g : WallCycle.Group.values()) {
             setWall(level, g, false);
@@ -796,14 +856,39 @@ public final class TrialArena {
 
     /** 复原：Boss 消失、墙落下、柱写回、关门 → IDLE。 */
     public void reset(ServerLevel level) {
-        reset(level, "命令或测试");
+        reset(level, ResetCause.COMMAND, "命令或测试");
     }
 
-    /** 复原并记下原因（日志里查「竞技场 … 复原」）。 */
-    public void reset(ServerLevel level, String reason) {
+    /** 复原的原因（T24 §5.3）：除胜利后与命令外，都会告诉参战者，并提示怎样再挑战。 */
+    public enum ResetCause {
+        EMPTY, BOSS_MISSING, SPAWN_FAILED, AFTER_VICTORY, COMMAND;
+
+        boolean tellPlayers() {
+            return this == EMPTY || this == BOSS_MISSING || this == SPAWN_FAILED;
+        }
+
+        String key() {
+            return "mythic_age.arena.reset." + name().toLowerCase(java.util.Locale.ROOT);
+        }
+    }
+
+    /** 复原并记下原因（日志里查「竞技场 … 复原」；玩家收到聊天消息）。 */
+    public void reset(ServerLevel level, ResetCause cause, String reason) {
         if (phase != ArenaPhase.IDLE) {
             MythicAge.LOGGER.info("竞技场 {} 第 {} 场复原（{}，原阶段 {}）", id, fightId, reason, phase);
+            if (cause.tellPlayers() && phase.fighting()) {
+                java.util.Set<java.util.UUID> told = new java.util.HashSet<>(participants.entries().keySet());
+                told.addAll(hudShown);
+                for (java.util.UUID u : told) {
+                    ServerPlayer p = level.getServer().getPlayerList().getPlayer(u);
+                    if (p != null) {
+                        p.sendSystemMessage(Component.translatable(cause.key()).append(" ")
+                                .append(Component.translatable("mythic_age.arena.retry")));
+                    }
+                }
+            }
         }
+        hudOff(level);
         boss(level).ifPresent(Entity::discard);
         boss = null;
         wallCycle.stop();
