@@ -60,6 +60,7 @@ import java.util.UUID;
 @PrefixGameTestTemplate(false)
 public final class LureSentinelGameTests {
     private static final String BATCH = "greek_power3";
+    private static final String CAPACITY_BATCH = "greek_power3_capacity";
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
     /** 诱兽石在本批次只持续 400 刻（正式 3600）。 */
     static final int LURE_TEST_TICKS = 400;
@@ -84,6 +85,25 @@ public final class LureSentinelGameTests {
         SentinelPower.lifetimeOverrideForTest(null);
         PowerService.clearForTest();
         TestMobs.clear(level, e -> e instanceof SentinelEntity);
+    }
+
+    /** 容量/寻路用例不能与 48 格内的其他诱兽石并行：同一头牛可能被挂上多个 MOVE 目标。 */
+    @BeforeBatch(batch = CAPACITY_BATCH)
+    public static void beforeCapacity(ServerLevel level) {
+        endLures(level);
+        TestMobs.clear(level, e -> false);
+        before(level);
+    }
+
+    @AfterBatch(batch = CAPACITY_BATCH)
+    public static void afterCapacity(ServerLevel level) {
+        endLures(level);
+        after(level);
+    }
+
+    private static void endLures(ServerLevel level) {
+        PowerZones.all(level.getServer()).stream().filter(z -> z.kind().equals("lure"))
+                .forEach(z -> PowerZones.end(level.getServer(), z));
     }
 
     // ───────────── 搭建 ─────────────
@@ -207,23 +227,26 @@ public final class LureSentinelGameTests {
         });
     }
 
-    @GameTest(template = T, batch = BATCH, timeoutTicks = 300)
+    @GameTest(template = T, batch = CAPACITY_BATCH, timeoutTicks = 300)
     public static void lure_pulls_at_most_24(GameTestHelper h) {
         TestTimeline tl = new TestTimeline(h);
         pen(h);
         PowerGameTests.Vulnerable p = caster(h, "lure24", GreekPowers.LURE_ITEM.get(), 1);
         List<Cow> cows = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
-            cows.add(animal(h, EntityType.COW, 1 + (i % 6) * 3, 20 + (i / 6) * 3));
+            // 原来的第六列 x=16 正好在屏障墙里；现在 5 列全在围栏内，仍有 30 只真实寻路的牛。
+            Cow cow = animal(h, EntityType.COW, 2 + (i % 5) * 3, 20 + (i / 5) * 2);
+            h.assertTrue(h.getLevel().noCollision(cow), "测试牛不能生成在墙内");
+            cows.add(cow);
         }
         lure(h, tl, p, 8, 10, castId -> {
             h.assertTrue(stoneAt(h, 8, 10), "立起两格高的诱兽石");
             LurePower.pullForTest(h.getLevel(), castId);
             h.assertTrue(LurePower.pulledForTest(castId) == 24, "最多 24 只：" + LurePower.pulledForTest(castId));
             Vec3 stone = h.absoluteVec(new Vec3(8.5, 2, 10.5));
-            // 只看本结构里被这块石头吸引的牛（相邻测试结构的动物也可能排进 24 只）
+            // 独立批次没有相邻诱兽石抢移动目标，24 个名额应全属于本用例的牛。
             List<Cow> mine = cows.stream().filter(c -> LurePower.luresOnForTest(c).contains(castId)).toList();
-            h.assertTrue(mine.size() >= 10, "本结构的牛大多被吸引：" + mine.size());
+            h.assertTrue(mine.size() == 24, "应吸引本结构的 24 只牛：" + mine.size());
             long nearBefore = mine.stream().filter(c -> c.position().distanceTo(stone) <= 6).count();
             tl.later(120, () -> {
                 // 二十几头牛挤在石头周围会互相推开，所以看「走到石头 6 格内的头数」而不是平均距离
@@ -232,7 +255,7 @@ public final class LureSentinelGameTests {
                 LurePower.pullForTest(h.getLevel(), castId);
                 h.assertTrue(LurePower.pulledForTest(castId) == 24, "满额后不再挑新的");
                 clearAnimals(h);
-            h.succeed();
+                h.succeed();
             });
         });
     }

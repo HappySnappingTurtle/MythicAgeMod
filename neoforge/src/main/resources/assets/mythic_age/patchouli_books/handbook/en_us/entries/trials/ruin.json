@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Collapsed temples dot the Greek lands: broken columns, rubble and toppled statues. Three $(l)ruin sentinels$() guard each one and shoot at anyone who comes close."
+      "text": "Collapsed temples dot the plains, meadows, swamps, stony shores and windswept hills: broken columns, rubble and toppled statues. Three $(l)ruin sentinels$() guard each one and shoot at anyone who comes close."
     },
     {
       "type": "patchouli:spotlight",

@@ -41,7 +41,8 @@ public final class ConfigCommand {
                         .then(Commands.literal("show")
                                 .then(Commands.argument("name", StringArgumentType.word())
                                         .suggests((ctx, b) -> SharedSuggestionProvider.suggest(
-                                                ModConfigs.all().keySet(), b))
+                                                java.util.stream.Stream.concat(java.util.stream.Stream.of("all"),
+                                                        ModConfigs.all().keySet().stream()), b))
                                         .executes(ctx -> show(ctx, StringArgumentType.getString(ctx, "name")))))));
     }
 
@@ -85,6 +86,13 @@ public final class ConfigCommand {
     }
 
     private static int show(CommandContext<CommandSourceStack> ctx, String name) {
+        if (name.equals("all")) {
+            int n = 0;
+            for (String each : ModConfigs.all().keySet()) {
+                n += show(ctx, each);
+            }
+            return n;
+        }
         CommandSourceStack source = ctx.getSource();
         ConfigHolder<?> holder = ModConfigs.all().get(name);
         if (holder == null) {

@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(o)Source$(): Daedalus built the labyrinth for King Minos of Crete to hold the Minotaur — Apollodorus, $(o)Library$() 3.1.4. The layout, gate and devices are this mod's adaptation."
+      "text": "$(o)Source$(): Daedalus built the labyrinth for King Minos of Crete to hold the Minotaur (Apollodorus, $(o)Library$() 3.1.4). The layout, gate and devices are this mod's own."
     }
   ]
 }

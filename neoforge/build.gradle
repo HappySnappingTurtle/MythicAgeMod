@@ -38,7 +38,7 @@ neoForge {
             if (agentEnabled) {
                 sourceSet = sourceSets.agent
                 systemProperty 'mythicage.agent', 'remote'
-                ['World', 'Fresh', 'Lang', 'Realtime', 'Structures', 'IdleMinutes'].each { key ->
+                ['World', 'Fresh', 'Lang', 'Realtime', 'Structures', 'IdleMinutes', 'Server'].each { key ->
                     def value = project.findProperty("remote${key}")
                     if (value != null) {
                         systemProperty "mythicage.remote.${key.uncapitalize()}", value.toString()
@@ -167,6 +167,9 @@ neoForge.ideSyncTask generateModMetadata
 // core 不是独立库：把它的类直接打进 mod jar。
 tasks.named('jar', Jar) {
     from(project(':core').sourceSets.main.output)
+    from(rootProject.file('LICENSE')) {
+        into 'META-INF'
+    }
 }
 
 // TC-T2-05：检查发布 jar 的内容。
@@ -180,6 +183,7 @@ def verifyModJar = tasks.register('verifyModJar') {
         try {
             def coreClass = 'io/github/happysnappingturtle/mythicage/core/MythicAgeIds.class'
             if (zip.getEntry(coreClass) == null) throw new GradleException("jar 中缺少 core 类 ${coreClass}")
+            if (zip.getEntry('META-INF/LICENSE') == null) throw new GradleException('jar 中缺少 MIT LICENSE')
             if (zip.entries().toList().any { it.name.startsWith('mezz/jei/') }) throw new GradleException('jar 中不应包含 JEI')
             if (zip.entries().toList().any { it.name.startsWith('io/github/happysnappingturtle/mythicage/agent/') }) {
                 throw new GradleException('jar 中不应包含遥控口（agent 源集）的类')

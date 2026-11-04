@@ -446,6 +446,13 @@ public final class QuestService {
             conduct(player, b, q);
             player.sendSystemMessage(Component.translatable("mythic_age.quest.settled", titleComponent(player.server, b.village, q),
                     emeralds, points));
+            if (q.state == QuestState.COMPLETE) {
+                io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player,
+                        io.github.happysnappingturtle.mythicage.advancement.MythEvents.QUEST_DONE,
+                        io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(player.server).byId(b.village)
+                                .flatMap(v -> io.github.happysnappingturtle.mythicage.core.player.Civilization.byId(v.civ()))
+                                .orElse(null));
+            }
         }
         q.settled.add(me);
     }

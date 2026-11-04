@@ -9,7 +9,11 @@
       "entity": "mythic_age:harpy",
       "scale": 0.6,
       "offset": 0.15,
-      "text": "嵐の高地とエーゲ海の$(l)崖の巣$()に 2–4 羽。岩の白い汚れ、羽根、甲高い笑い声がしるし。"
+      "text": "吹きさらしの丘・吹きさらしの森・石だらけの海岸の$(l)崖の巣$()に 2–4 羽。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "岩の白い汚れ、羽根、甲高い笑い声がしるし。"
     },
     {
       "type": "patchouli:text",

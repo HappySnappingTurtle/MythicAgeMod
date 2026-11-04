@@ -21,6 +21,8 @@ public final class MythEvents {
     public static final String FAVOR_GAINED = "favor_gained";
     public static final String TEMPLE_LEVEL = "temple_level";
     public static final String AGE_REACHED = "age_reached";
+    /** 委托完成并给这名玩家结算（GA-3）。 */
+    public static final String QUEST_DONE = "quest_done";
 
     private static final DeferredRegister<CriterionTrigger<?>> TRIGGERS =
             DeferredRegister.create(Registries.TRIGGER_TYPE, MythicAgeIds.MOD_ID);
@@ -57,7 +59,22 @@ public final class MythEvents {
         if (l != null) {
             l.accept(new Fired(player.getUUID(), event, civ, value));
         }
+        for (java.util.function.BiConsumer<ServerPlayer, Fired> x : LISTENERS) {
+            x.accept(player, new Fired(player.getUUID(), event, civ, value));
+        }
         TRIGGER.get().trigger(player, event, Optional.ofNullable(civ), value);
+    }
+
+    private static final java.util.List<java.util.function.BiConsumer<ServerPlayer, Fired>> LISTENERS =
+            new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    /** 常驻监听（GA-3 试玩记录）；{@link #testListener} 仍只给 GameTest 用。 */
+    public static void addListener(java.util.function.BiConsumer<ServerPlayer, Fired> listener) {
+        LISTENERS.add(listener);
+    }
+
+    public static void removeListener(java.util.function.BiConsumer<ServerPlayer, Fired> listener) {
+        LISTENERS.remove(listener);
     }
 
     /** 只供 GameTest：假玩家的进度是空实现，测试改为监听发出的事件。 */

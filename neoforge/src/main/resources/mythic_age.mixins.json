@@ -12,6 +12,8 @@
     "LivingEntityJumpingAccessor",
     "LivingEntitySwingMixin",
     "ResultSlotMixin",
+    "StructurePerfMixin",
+    "StructureStartPerfMixin",
     "TrialSpawnerDataAccessor",
     "TrialSpawnerMixin",
     "VillagerGoalPackagesMixin",

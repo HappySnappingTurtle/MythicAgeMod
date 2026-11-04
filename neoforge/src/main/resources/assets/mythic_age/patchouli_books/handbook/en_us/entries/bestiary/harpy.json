@@ -9,7 +9,11 @@
       "entity": "mythic_age:harpy",
       "scale": 0.6,
       "offset": 0.15,
-      "text": "$(l)Cliff nests$() on the stormy highlands and Aegean coast, 2–4 to a nest. Look for white streaks, feathers and shrill laughter."
+      "text": "$(l)Cliff nests$() on windswept hills, windswept forests and stony shores, 2–4 to a nest."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Look for white streaks, feathers and shrill laughter."
     },
     {
       "type": "patchouli:text",

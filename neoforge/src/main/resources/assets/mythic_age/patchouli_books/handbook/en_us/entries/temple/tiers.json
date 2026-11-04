@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Open-air Altar$(): 2 prayer spots, factor 1.0.$(br2)$(l)Naiskos$() (Archaic): ≥4 Greek columns (≥3 tall), ≥60% roofed between them, altar under open sky, ≥1 lit brazier. 4 spots, factor 1.5."
+      "text": "$(l)Open-air Altar$(): 2 prayer spots, factor 1.0.$(br2)$(l)Naiskos$() (Archaic): ≥4 Greek columns (≥3 tall), ≥60%% roofed between them, altar under open sky, ≥1 lit brazier. 4 spots, factor 1.5."
     },
     {
       "type": "patchouli:text",

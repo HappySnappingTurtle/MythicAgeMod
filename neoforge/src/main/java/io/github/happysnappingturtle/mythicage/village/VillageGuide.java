@@ -104,6 +104,20 @@ public final class VillageGuide {
         return true;
     }
 
+    /**
+     * 管理用搜索（GA-3 快速验证）：不跳过去过的村庄、不占玩家的搜索名额。结果在主线程交给 {@code done}。
+     */
+    public static void searchAny(ServerLevel level, BlockPos from, Civilization civ, Consumer<Optional<Found>> done) {
+        List<Target> targets = targets(level, civ);
+        ChunkPos chunk = new ChunkPos(from);
+        CompletableFuture.supplyAsync(() -> search(level, chunk, targets, Set.of()), Util.backgroundExecutor())
+                .exceptionally(e -> {
+                    MythicAge.LOGGER.warn("村庄搜索失败", e);
+                    return Optional.empty();
+                })
+                .thenAcceptAsync(hit -> done.accept(hit.flatMap(h -> locate(level, h))), level.getServer());
+    }
+
     /** 结构标签里每座结构与它的随机散布放置。 */
     record Target(Holder<Structure> structure, RandomSpreadStructurePlacement placement) {
     }

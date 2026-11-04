@@ -1,6 +1,6 @@
 {
   "name": "神话单位",
-  "description": "召唤符、传令杖与召唤管理。",
+  "description": "凭召唤符唤出传说中的生灵，以传令杖号令它们随行作战或驻守一方，并在召唤管理中统御你的麾下。",
   "icon": "mythic_age:summon_token_pegasus",
   "sortnum": 40
 }

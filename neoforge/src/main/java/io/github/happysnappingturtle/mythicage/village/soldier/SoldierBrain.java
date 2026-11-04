@@ -1,6 +1,8 @@
 package io.github.happysnappingturtle.mythicage.village.soldier;
 
+import io.github.happysnappingturtle.mythicage.core.village.WalkSpeed;
 import io.github.happysnappingturtle.mythicage.core.village.soldier.AttackTimeline;
+import io.github.happysnappingturtle.mythicage.core.village.soldier.Backstep;
 import io.github.happysnappingturtle.mythicage.core.village.soldier.DutyRules;
 import io.github.happysnappingturtle.mythicage.core.village.soldier.InterceptRules;
 import io.github.happysnappingturtle.mythicage.core.village.soldier.ShieldRules;
@@ -41,8 +43,9 @@ public final class SoldierBrain {
     public static final int SCAN_INTERVAL = 10;
     /** 战斗后这么久才开始回血（§3.2）。 */
     public static final int CALM_TICKS = 600;
-    static final double WALK = 0.55 / 0.5;
-    static final double RUN = 0.85 / 0.5;
+    public static final double WALK = ResidentEntity.WALK_SPEED;
+    /** 追敌、拦截、后撤、回岗（约 3.5 米/秒，GA-1）。 */
+    public static final double RUN = WalkSpeed.modifier(ResidentEntity.ATTRIBUTE, WalkSpeed.SOLDIER_RUN);
 
     private final ResidentEntity soldier;
     @Nullable
@@ -506,10 +509,17 @@ public final class SoldierBrain {
 
     private boolean fired;
     private boolean backstepPending;
-    /** 后撤一步用的时间（刻）；退完之后这么久内不再退（够出一次手）。 */
-    static final int BACKSTEP_TICKS = 12;
+    /** 退完之后这么久内不再退（够出一次手）。 */
     static final int BACKSTEP_GAP = 40;
+    /** 后撤一步最远多少格。 */
+    static final double BACKSTEP_MAX = 8;
+    /** 后撤用居民跑步的速度（约 5 米/秒）：轻装兵要跑得开追兵（T20 §9.2，GA-1）。 */
+    static final double BACKSTEP_SPEED = ResidentEntity.RUN_SPEED;
     private long backstepAt = Long.MIN_VALUE / 2;
+    /** 这一步要退多久（刻），由 {@link Backstep#plan} 按自己和追兵的速度算。 */
+    private int backstepTicks;
+    /** 调试：后撤了几次。 */
+    private int backsteps;
 
     private void ranged(SoldierOrders o, long now) {
         SoldierProfile p = o.profile();
@@ -528,17 +538,25 @@ public final class SoldierBrain {
                 return;
             }
             if (backstepPending || dist < r.minRange()) {
-                if (now - backstepAt < BACKSTEP_TICKS) {
-                    // 正在退这一步
-                    face(target);
+                if (now - backstepAt < backstepTicks) {
+                    // 正在退这一步：只转头盯着目标，身子朝跑的方向。以前每刻把身子转向目标，和寻路的朝向打架，
+                    // 速度正常（GA-1）后就原地不动了
+                    soldier.getLookControl().setLookAt(target, 30, 30);
                     return;
                 }
                 // 一次只退一步：刚退过还被贴身（敌人跟得上）就就近出手。以前每刻都重新后撤，尸壳追着走，投矛兵一直退、一支不投（实机）
-                if (now - backstepAt >= BACKSTEP_TICKS + BACKSTEP_GAP) {
+                if (now - backstepAt >= backstepTicks + BACKSTEP_GAP) {
                     backstepPending = false;
-                    if (backstep(Math.max(r.backstep(), r.minRange() - dist + 1))) {
+                    double gain = Math.max(r.backstep(), r.minRange() - dist + 1);
+                    Optional<Backstep> plan = Backstep.plan(gain, WalkSpeed.RUN, chaserSpeed(target), BACKSTEP_MAX);
+                    // 身后没有那么大的空地：至少退原定的格数
+                    Optional<Backstep> step = plan.filter(b -> backstep(b.distance()))
+                            .or(() -> plan.flatMap(b -> Backstep.plan(gain, WalkSpeed.RUN, 0, BACKSTEP_MAX)).filter(b -> backstep(b.distance())));
+                    if (step.isPresent()) {
+                        backsteps++;
                         backstepAt = now;
-                        face(target);
+                        backstepTicks = step.get().ticks();
+                        soldier.getLookControl().setLookAt(target, 30, 30);
                         return;
                     }
                 }
@@ -613,6 +631,15 @@ public final class SoldierBrain {
         return Optional.empty();
     }
 
+    /** 追兵的米/秒：生物按倍率 1 估，不会动的（无 AI）算 0，玩家按疾跑估。 */
+    private static double chaserSpeed(LivingEntity e) {
+        if (e instanceof net.minecraft.world.entity.Mob m && m.isNoAi()) {
+            return 0;
+        }
+        double attr = e.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        return e instanceof net.minecraft.world.entity.player.Player ? WalkSpeed.K * attr * 1.3 : WalkSpeed.metersPerSecond(attr, 1.0);
+    }
+
     /**
      * 面朝目标往后退 {@code dist} 格（投后撤步、近身后撤）：只退到能站、高差不超过 1 格的地方（不退下坎、不退进坑）；
      * 正后方不行就试左后、右后。返回是否退了。
@@ -636,7 +663,7 @@ public final class SoldierBrain {
                 }
             }
             if (s != null) {
-                soldier.getNavigation().moveTo(s.getX() + 0.5, s.getY(), s.getZ() + 0.5, RUN);
+                soldier.getNavigation().moveTo(s.getX() + 0.5, s.getY(), s.getZ() + 0.5, BACKSTEP_SPEED);
                 repathIn = 10;
                 return true;
             }
@@ -982,7 +1009,7 @@ public final class SoldierBrain {
         SoldierOrders o = orders();
         String phase = o == null || !o.profile().isMelee() ? "-" : AttackTimeline.phase(o.profile().timeline(),
                 (int) Math.min(Integer.MAX_VALUE, Math.max(-1, soldier.level().getGameTime() - attackStart))).name();
-        return "出手 " + starts + " 命中 " + strikes + " 收手 " + withholds + " 最近 " + last + " 阶段 " + phase
+        return "出手 " + starts + " 命中 " + strikes + " 收手 " + withholds + " 后撤 " + backsteps + " 最近 " + last + " 阶段 " + phase
                 + (o == null ? "" : " 岗位 " + (o.postPos() == null ? "-" : o.postPos().toShortString()) + " 谷仓 " + o.keeper().toShortString())
                 + " 目标 " + (target == null ? "-" : target.getName().getString() + "@" + target.blockPosition().toShortString()
                 + " 距 " + String.format("%.2f", soldier.distanceTo(target))) + " 睡=" + soldier.resting() + " 导航=" + !soldier.getNavigation().isDone()

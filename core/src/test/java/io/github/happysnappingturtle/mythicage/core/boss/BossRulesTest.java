@@ -57,6 +57,17 @@ class BossRulesTest {
     }
 
     @Test
+    void reconnectInsideHallCannotReviveExpiredFight() {
+        ArenaClock clock = new ArenaClock();
+        clock.reset(1000);
+        assertTrue(clock.tick(true, 1600, ArenaClock.EMPTY_RESET), "在大厅内重新上线也应先处理已过期的战斗");
+        assertEquals(1000, clock.lastPresent(), "不能用新到场时间覆盖超时证据");
+        clock.reset(1000);
+        assertFalse(clock.tick(true, 1599, ArenaClock.EMPTY_RESET), "30 秒内回场仍可续战");
+        assertEquals(1599, clock.lastPresent());
+    }
+
+    @Test
     void tc09to14Windows() {
         MechanicWindows w = new MechanicWindows();
         MechanicWindows.Outcome first = w.onImpact(Impact.INTACT_PILLAR, 1000, false);

@@ -656,6 +656,24 @@ public final class TradeService {
         return new Outcome(TradeReason.OK, 0, gifts.isEmpty() ? ItemStack.EMPTY : gifts.getFirst());
     }
 
+    /**
+     * 不经过祭司对话直接祝福（GA-3 快速验证）：与 {@link #blessing} 同一张回执、同样进入远古并触发同样的事件；
+     * {@code gifts} 为 false 时不发首次见面的赠礼。已受祝福（或回执已在）时返回 false。
+     */
+    public static boolean grantBlessing(ServerPlayer player, Civilization civ, boolean gifts) {
+        Transactions.Result r = MythData.transact(player, Transactions.Request.unique(GuardianRules.blessingReceipt(civ.id()),
+                TxSteps.requireAgeExactly(civ, Age.NONE), TxSteps.setAge(civ, Age.ARCHAIC)));
+        if (!r.committed()) {
+            return false;
+        }
+        if (gifts) {
+            FaithProfiles.get(civ).ifPresent(f -> f.firstMeetGifts().forEach(g -> give(player, stack(g.item(), g.count()))));
+        }
+        io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.BLESSED, civ);
+        io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, civ, Age.ARCHAIC.ordinal());
+        return true;
+    }
+
     // ───────────── 网络入口 ─────────────
 
     public static void handleBuy(TradePayloads.Buy p, IPayloadContext ctx) {

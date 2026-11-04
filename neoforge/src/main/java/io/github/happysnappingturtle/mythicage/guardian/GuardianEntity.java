@@ -1,6 +1,7 @@
 package io.github.happysnappingturtle.mythicage.guardian;
 
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+import io.github.happysnappingturtle.mythicage.core.village.WalkSpeed;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -70,10 +71,15 @@ public abstract class GuardianEntity extends PathfinderMob {
         builder.define(GESTURE_START, 0);
     }
 
+    /** 移动速度属性（与原版村民相同）。 */
+    public static final double ATTRIBUTE = 0.5;
+    /** 跑腿、回到活动范围的寻路倍率（约 2.5 米/秒，GA-1）。 */
+    public static final double ERRAND_SPEED = WalkSpeed.modifier(ATTRIBUTE, WalkSpeed.ERRAND);
+
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 40)
-                .add(Attributes.MOVEMENT_SPEED, 0.5)
+                .add(Attributes.MOVEMENT_SPEED, ATTRIBUTE)
                 .add(Attributes.FOLLOW_RANGE, 16);
     }
 
@@ -83,7 +89,7 @@ public abstract class GuardianEntity extends PathfinderMob {
         goalSelector.addGoal(1, new HoldForTradeGoal());
         goalSelector.addGoal(2, new ErrandGoal());
         goalSelector.addGoal(2, new PanicGoal(this, 0.7));
-        goalSelector.addGoal(3, new MoveTowardsRestrictionGoal(this, 0.6));
+        goalSelector.addGoal(3, new MoveTowardsRestrictionGoal(this, ERRAND_SPEED));
         goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.4));
         goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 8));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -272,7 +278,7 @@ public abstract class GuardianEntity extends PathfinderMob {
             }
             if (--errandRepath <= 0 || getNavigation().isDone()) {
                 errandRepath = 40;
-                getNavigation().moveTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5, 1.2);
+                getNavigation().moveTo(t.getX() + 0.5, t.getY(), t.getZ() + 0.5, ERRAND_SPEED);
             }
             return;
         }

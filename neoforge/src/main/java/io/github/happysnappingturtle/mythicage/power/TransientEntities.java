@@ -158,6 +158,11 @@ public final class TransientEntities {
         return BUDGET.count(owner);
     }
 
+    /** 已加载的预算内临时实体数量；不包含另一本账里的常驻神力产物。 */
+    public static int loadedCount() {
+        return BUDGET.count();
+    }
+
     public static List<String> productsForTest(UUID owner, String power) {
         return PRODUCTS.group(owner, power);
     }

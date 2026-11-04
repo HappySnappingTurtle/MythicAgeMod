@@ -130,7 +130,24 @@ def hide_game():
     return hid
 
 
+def start_props(a) -> list[str]:
+    """runClient 的 Gradle 参数。"""
+    if getattr(a, "server", None) and a.fresh:
+        raise SystemExit("--server 不能与 --fresh 同用：连接专服不应删除本地存档")
+    props = ["-Pagent=remote", f"-PremoteWorld={a.world}", f"-PremoteLang={a.lang}"]
+    if a.fresh:
+        props.append("-PremoteFresh=true")
+    if a.realtime:
+        props.append("-PremoteRealtime=true")
+    if a.structures:
+        props.append("-PremoteStructures=true")
+    if getattr(a, "server", None):
+        props.append(f"-PremoteServer={a.server}")
+    return props
+
+
 def cmd_start(a):
+    props = start_props(a)  # 先验证，不能在参数错误时结束现有客户端
     if client_alive():
         r = read_json(READY)
         if responsive():
@@ -140,13 +157,6 @@ def cmd_start(a):
         kill_clients()
     old = (read_json(READY) or {}).get("sessionId")
     prev = None if a.foreground else front_app()
-    props = ["-Pagent=remote", f"-PremoteWorld={a.world}", f"-PremoteLang={a.lang}"]
-    if a.fresh:
-        props.append("-PremoteFresh=true")
-    if a.realtime:
-        props.append("-PremoteRealtime=true")
-    if a.structures:
-        props.append("-PremoteStructures=true")
     LOG.parent.mkdir(parents=True, exist_ok=True)
     with open(LOG, "w") as log:
         proc = subprocess.Popen(["./gradlew", ":neoforge:runClient", *props], cwd=ROOT,
@@ -338,6 +348,7 @@ def main():
     s.add_argument("--realtime", action="store_true")
     s.add_argument("--structures", action="store_true", help="新建世界时生成结构")
     s.add_argument("--world", default="ma_autotest")
+    s.add_argument("--server", help="连进专服（主机:端口，如 localhost:25599），不打开本地世界（T24 §10.2）")
     s.add_argument("--lang", default="zh_cn")
     s.add_argument("--timeout", type=int, default=360)
     s.set_defaults(fn=cmd_start)

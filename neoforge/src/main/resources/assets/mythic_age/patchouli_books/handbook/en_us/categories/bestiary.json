@@ -1,6 +1,6 @@
 {
   "name": "Bestiary",
-  "description": "Every creature I've run into goes in here. The ones I haven't laid eyes on yet get blank pages for now.",
+  "description": "Mythic creatures you meet are recorded here. Ones you haven't met stay locked.",
   "icon": "mythic_age:storm_feather",
   "sortnum": 60
 }

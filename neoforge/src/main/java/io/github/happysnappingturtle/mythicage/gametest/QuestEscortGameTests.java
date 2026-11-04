@@ -238,7 +238,8 @@ public final class QuestEscortGameTests {
     }
 
     /** D10：附近没有玩家时，寻不到路的在途移民照旧回到床位（传送兜底不变）。 */
-    @GameTest(template = T, batch = "quest_escort_walk_a", timeoutTicks = 600)
+    // 超时 600 → 800（GA-1）：走路改成 2 米/秒后，走到墙边 12 格约 120 刻，再加「卡住」兜底 400 刻，600 刻太紧
+    @GameTest(template = T, batch = "quest_escort_walk_a", timeoutTicks = 800)
     public static void migrant_unreachable_alone_teleports(GameTestHelper h) {
         VillageWorkGameTests.TV tv = QuestGameTests.village(h);
         ResidentEntity m = walledMigrant(h, tv);

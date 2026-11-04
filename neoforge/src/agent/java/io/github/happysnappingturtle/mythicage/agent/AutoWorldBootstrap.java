@@ -58,7 +58,7 @@ public final class AutoWorldBootstrap {
     }
 
     public static String worldName() {
-        return worldName;
+        return AgentMode.server().isEmpty() ? worldName : "server:" + AgentMode.server();
     }
 
     public static void onClientTickPost(ClientTickEvent.Post event) {
@@ -85,6 +85,16 @@ public final class AutoWorldBootstrap {
         }
         state = State.LOADING;
         loadingTicks = 0;
+        if (!AgentMode.server().isEmpty()) {
+            // 专服实测（T24 §10.2）：不开本地世界，连进指定的专服
+            String addr = AgentMode.server();
+            AgentEntrypoint.LOG.info("[agent] 连接专服 {}", addr);
+            net.minecraft.client.gui.screens.ConnectScreen.startConnecting(mc.screen, mc,
+                    net.minecraft.client.multiplayer.resolver.ServerAddress.parseString(addr),
+                    new net.minecraft.client.multiplayer.ServerData("ma_server", addr, net.minecraft.client.multiplayer.ServerData.Type.OTHER),
+                    false, null);
+            return;
+        }
         if (deleteBeforeCreate) {
             deleteBeforeCreate = false; // 只删一次
             deleteExistingSave(mc);

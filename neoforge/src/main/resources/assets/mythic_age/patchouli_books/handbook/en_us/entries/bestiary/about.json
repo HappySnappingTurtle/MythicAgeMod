@@ -6,15 +6,15 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Bestiary entries light up in three steps:$(li)$(l)Seen$(): it is within 24 blocks and in sight$(li)$(l)Fought$(): you (or your units or powers) hurt it, or it hurts you$(li)$(l)Defeated$(): the kill counts as yours; trial bosses count every participant; summoning counts as taming$(br2)Unseen entries stay locked. What you learn stays with you even if the book is lost."
+      "text": "Entries have three levels:$(li)$(l)Seen$(): it is within 24 blocks and in view$(li)$(l)Fought$(): you (or your units or powers) hurt it, or it hurt you$(li)$(l)Defeated$(): the kill is credited to you; for trial bosses every participant counts; summoning counts as taming$(br2)Entries you haven't seen are locked. The record is kept on your character, so losing the book doesn't reset it."
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Travellers' tales$():$(li)Centaurs camp in woodland meadows and windswept forests$(li)Noisy flocks roost on dead trees in the Lernaean marshes$(li)Shrill laughter echoes off the cliffs of the stormy highlands and the coast$(li)Something big walks sideways along marshes and stony shores"
+      "text": "$(l)Things people say$():$(li)Centaurs camp in meadows, plains, flower forests and windswept forests$(li)Noisy flocks nest in the dead trees of swamps$(li)You hear shrill laughter from the cliffs of windswept hills, windswept forests and stony shores$(li)Something big walks sideways along marshes and rocky shores"
     },
     {
       "type": "patchouli:text",
-      "text": "$(li)By old oaks in flower forests and meadows, a spirit guards the grove$(li)In collapsed temples the statues turn their heads$(li)Deep in the Labyrinth of Knossos lives a bull-headed monster$(li)Some say a priest will trade you a token for a winged horse"
+      "text": "$(li)A spirit guards old oaks in flower forests and meadows$(li)In collapsed temples, the statues turn to watch you$(li)A bull-headed monster lives deep in the Labyrinth of Knossos$(li)Trade favor for the winged horse's summon token at a Patron Statue"
     }
   ]
 }

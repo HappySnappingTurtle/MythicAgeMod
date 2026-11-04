@@ -34,7 +34,7 @@ public final class RelicEvents {
         game.addListener(RelicEvents::onRespawn);
         game.addListener(RelicEvents::onChangedDimension);
         game.addListener(RelicEvents::onCurioChange);
-        game.addListener(RelicEvents::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "relic_events", RelicEvents::onServerTickPost);
         game.addListener(RelicEvents::onIncomingDamage);
         game.addListener(RelicEvents::onConversion);
         game.addListener(RelicEvents::onRightClickBlock);

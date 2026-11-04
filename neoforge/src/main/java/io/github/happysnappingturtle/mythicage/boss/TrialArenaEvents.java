@@ -23,7 +23,7 @@ public final class TrialArenaEvents {
     }
 
     public static void register(IEventBus game) {
-        game.addListener(TrialArenaEvents::onServerTick);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "trial_arena_events", TrialArenaEvents::onServerTick);
         game.addListener(TrialArenaEvents::onServerStarted);
         game.addListener(TrialArenaEvents::onBreak);
         game.addListener(TrialArenaEvents::onPlace);

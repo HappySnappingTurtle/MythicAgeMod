@@ -187,7 +187,7 @@ public final class RemoteScenario {
             mc.getTutorial().setStep(TutorialSteps.NONE);
             mc.getToasts().clear();
         }));
-        if (!AgentMode.realtime()) {
+        if (!AgentMode.realtime() && AgentMode.server().isEmpty()) {
             for (String cmd : new String[]{"gamerule doDaylightCycle false", "time set noon", "weather clear",
                     "gamerule doWeatherCycle false", "gamerule doMobSpawning false"}) {
                 steps.add(Steps.runCommand(cmd));

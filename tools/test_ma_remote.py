@@ -38,5 +38,23 @@ class ParseShortTest(unittest.TestCase):
         self.assertEqual((0, 120, 0, True), (d["x"], d["y"], d["z"], d["fly"]))
 
 
+class StartPropsTest(unittest.TestCase):
+    """TC-T24-96：--server 传给 Gradle。"""
+
+    def test_server_prop(self):
+        import argparse
+        a = argparse.Namespace(world="w", lang="zh_cn", fresh=False, realtime=False, structures=False, server="localhost:25599")
+        self.assertIn("-PremoteServer=localhost:25599", ma_remote.start_props(a))
+        a.server = None
+        self.assertFalse(any(p.startswith("-PremoteServer") for p in ma_remote.start_props(a)))
+
+    def test_remote_fresh_cannot_delete_local_world(self):
+        import argparse
+        a = argparse.Namespace(world="precious", lang="zh_cn", fresh=True, realtime=False,
+                               structures=False, server="localhost:25599")
+        with self.assertRaises(SystemExit):
+            ma_remote.start_props(a)
+
+
 if __name__ == "__main__":
     unittest.main()

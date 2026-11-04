@@ -13,11 +13,15 @@ public final class ArenaClock {
 
     /** 这一刻（now）是否有人；返回 true 表示已经连续 limit 刻没人。 */
     public boolean tick(boolean anyonePresent, long now, int limit) {
+        // 区块卸载/断线后，玩家可能直接在大厅里重连。先判旧时限，不能被这次到场覆盖。
+        if (now - lastPresent >= limit) {
+            return true;
+        }
         if (anyonePresent) {
             lastPresent = now;
             return false;
         }
-        return now - lastPresent >= limit;
+        return false;
     }
 
     public long empty(long now) {

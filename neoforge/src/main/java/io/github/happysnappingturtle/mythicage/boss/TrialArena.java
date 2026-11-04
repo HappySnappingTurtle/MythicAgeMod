@@ -653,6 +653,7 @@ public final class TrialArena {
         }
         switch (phase) {
             case OPEN -> {
+                // 有人进大厅就开战（T23 §1.2）：久别回来直接站在大厅里也开战，不在玩家身后关门回 IDLE
                 if (!inHall.isEmpty()) {
                     startFight(level, inHall);
                 } else if (clock.tick(false, now, ArenaClock.OPEN_TIMEOUT)) {

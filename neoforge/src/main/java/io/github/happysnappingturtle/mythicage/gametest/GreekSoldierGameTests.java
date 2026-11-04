@@ -481,7 +481,24 @@ public final class GreekSoldierGameTests {
         m.setInvulnerable(true);
         h.succeedWhen(() -> {
             h.assertTrue(j.soldierBrain().target() == m, "盯上了");
-            h.assertTrue(j.distanceTo(m) >= 4, "拉开距离：" + j.distanceTo(m));
+            h.assertTrue(j.distanceTo(m) >= 4, "拉开距离：" + j.distanceTo(m) + "；" + j.soldierBrain().debug());
+            cleanup(h, tv, m);
+        });
+    }
+
+    /** TC-GA1-15：尸壳追着走（约 2.3 米/秒）：投矛兵按跑步速度后撤，仍能拉开到 ≥ 4 格。 */
+    @GameTest(template = T, batch = "greek_soldier_throw_b", timeoutTicks = 300)
+    public static void javelin_outruns_chasing_husk(GameTestHelper h) {
+        VillageWorkGameTests.TV tv = village(h, Age.CLASSICAL, Map.of());
+        List<ResidentEntity> ls = laborers(h, tv, 5);
+        ResidentEntity j = javelineer(h, tv, ls, 8, 10);
+        ammo(h, tv, j, Map.of(JAVELIN, 6));
+        Husk m = husk(h, 8.5, 12.5, false);
+        m.setInvulnerable(true);
+        m.setTarget(j);
+        h.succeedWhen(() -> {
+            h.assertTrue(j.soldierBrain().target() == m, "盯上了");
+            h.assertTrue(j.distanceTo(m) >= 4, "拉开距离：" + j.distanceTo(m) + "；" + j.soldierBrain().debug());
             cleanup(h, tv, m);
         });
     }

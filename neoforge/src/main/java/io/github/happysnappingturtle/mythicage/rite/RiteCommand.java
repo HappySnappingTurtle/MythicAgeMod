@@ -79,7 +79,20 @@ public final class RiteCommand {
             ctx.getSource().sendFailure(Component.translatable("commands.mythic_age.rite.cannot", s.age().id()));
             return 0;
         }
-        Age target = next.get();
+        Age target = promoteDirect(player, civ, god);
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.rite.promoted",
+                player.getDisplayName(), MythDataCommand.civName(civ), MythDataCommand.ageName(target),
+                god.isEmpty() ? Component.literal("—") : Component.translatable("mythic_age.god." + god)), true);
+        return 1;
+    }
+
+    /**
+     * 不检查代价直接晋升一级（调用方先确认能晋升）：玩家在本文明村庄里时同时推进该村、立祠。
+     * 管理命令与快速验证（GA-3）共用。
+     */
+    public static Age promoteDirect(ServerPlayer player, Civilization civ, String god) {
+        PlayerMythData.CivState s = MythData.get(player).civ(civ);
+        Age target = RiteRules.next(s.age()).orElseThrow();
         s.setAge(target);
         s.minorGods().put(target, god);
         s.pendingUnlocks().add(target);
@@ -92,10 +105,7 @@ public final class RiteCommand {
         });
         MythData.changed(player);
         RiteService.afterPromotion(player, civ, target, god, v.orElse(null));
-        ctx.getSource().sendSuccess(() -> Component.translatable("commands.mythic_age.rite.promoted",
-                player.getDisplayName(), MythDataCommand.civName(civ), MythDataCommand.ageName(target),
-                god.isEmpty() ? Component.literal("—") : Component.translatable("mythic_age.god." + god)), true);
-        return 1;
+        return target;
     }
 
     private static int stage(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

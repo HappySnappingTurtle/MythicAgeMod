@@ -125,7 +125,7 @@ public final class PatronStatues {
         game.addListener(PatronStatues::onNeighborNotify);
         game.addListener(PatronStatues::onBreak);
         game.addListener(PatronStatues::onExplosion);
-        game.addListener(PatronStatues::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "patron_statues", PatronStatues::onServerTickPost);
         game.addListener((ServerStoppedEvent e) -> PENDING.clear());
     }
 

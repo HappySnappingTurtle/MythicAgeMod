@@ -50,7 +50,7 @@ final class ResidentFleeGoal extends Goal {
         calmTicks = 0;
         BlockPos home = resident.home();
         if (home != null) {
-            resident.getNavigation().moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, 1.4);
+            resident.getNavigation().moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, ResidentEntity.FLEE_SPEED);
         }
     }
 
@@ -66,7 +66,7 @@ final class ResidentFleeGoal extends Goal {
                 calmTicks = 0;
                 BlockPos home = resident.home();
                 if (home != null && resident.getNavigation().isDone() && !resident.reached(home)) {
-                    resident.getNavigation().moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, 1.4);
+                    resident.getNavigation().moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, ResidentEntity.FLEE_SPEED);
                 }
             } else {
                 calmTicks += 10;

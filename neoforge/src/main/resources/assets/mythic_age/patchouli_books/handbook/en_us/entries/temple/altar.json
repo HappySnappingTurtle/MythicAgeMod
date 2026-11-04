@@ -7,15 +7,19 @@
     {
       "type": "patchouli:spotlight",
       "item": "mythic_age:greek_altar",
-      "text": "The altar is where all favor begins. Speak to a $(l)temple priest$() in a Greek village for the first time and you receive one for free.$(br2)Place it $(l)inside a Greek village$() (or within 48 blocks of its edge) with $(l)open sky$() above it."
+      "text": "The first time you talk to a $(l)temple priest$() in a Greek village, you get an altar for free. All your favor comes from it.$(br2)Place it $(l)inside a Greek village$() (or within 48 blocks of its edge), with $(l)open sky$() above."
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Limit$(): 1 altar in the Archaic age, 2 in the Classical, 3 in the Heroic and Mythic.$(br2)Right-click the altar with an empty hand to open the $(l)shrine inspector$(). Sneak-right-click with a relic to enshrine it here (one per altar).$(br2)Villagers take turns kneeling at the $(l)prayer spots$() around the altar during the day; your favor comes from their prayers."
+      "text": "$(l)Limit$(): 1 altar in the Archaic age, 2 in the Classical, 3 in the Heroic and Mythic.$(br2)Villagers take turns kneeling at the $(l)prayer spots$() around the altar during the day; your favor comes from their prayers."
     },
     {
       "type": "patchouli:text",
-      "text": "$(o)Source$(): Greek altars (bōmos) stood in the open in front of the temple door; sacrifice took place at the altar, not inside the temple. That is why the altar here must be under open sky."
+      "text": "Right-click the altar with an empty hand to open the $(l)shrine inspector$(). Sneak-right-click with a relic to enshrine it here (one per altar)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(o)Source$(): Greek altars (bōmos) stood in the open in front of the temple door, and sacrifice happened at the altar, outside the temple. That is why the altar here needs open sky."
     }
   ]
 }

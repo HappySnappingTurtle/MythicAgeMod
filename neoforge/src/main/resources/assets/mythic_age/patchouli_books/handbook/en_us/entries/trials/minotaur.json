@@ -9,7 +9,11 @@
       "entity": "mythic_age:minotaur_boss",
       "scale": 0.45,
       "offset": 0.15,
-      "text": "A bull-headed giant in the hall of Knossos. 320 health, more when several players fight. It $(l)cleaves$() with its axe and $(l)charges$()."
+      "text": "A bull-headed giant in the hall of Knossos. 320 health, more when several players fight."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "It $(l)cleaves$() with its axe and $(l)charges$()."
     },
     {
       "type": "patchouli:text",
@@ -18,7 +22,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(o)A hint from the myth$(): the labyrinth held a bull-headed monster. Theseus did not win by the labyrinth's rules but by Ariadne's thread, finding it and finding his way back — let the labyrinth's own stones stop it.",
+      "text": "$(o)From the myth$(): Theseus found the monster with Ariadne's thread and followed it back out. In this fight, the pillars in the hall are worth using.",
       "advancement": "mythic_age:bestiary/greek/minotaur/engaged"
     },
     {

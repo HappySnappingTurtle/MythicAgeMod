@@ -2,6 +2,7 @@ package io.github.happysnappingturtle.mythicage.village.resident;
 
 import io.github.happysnappingturtle.mythicage.core.village.work.Job;
 import io.github.happysnappingturtle.mythicage.core.village.work.JobStep;
+import io.github.happysnappingturtle.mythicage.core.village.WalkSpeed;
 import io.github.happysnappingturtle.mythicage.entity.MythVariantHolder;
 import io.github.happysnappingturtle.mythicage.village.work.VillageScheduler;
 import net.minecraft.core.BlockPos;
@@ -50,9 +51,14 @@ import java.util.UUID;
 public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVariantHolder,
         io.github.happysnappingturtle.mythicage.conduct.VillageDefender {
     public static final double REACH = 2.0;
-    public static final double WALK_SPEED = 0.55;
-    /** 跑（火炬接力、赛跑）。 */
-    public static final double RUN_SPEED = 0.9;
+    /** 移动速度属性（与原版村民相同）。下面几个倍率按它换算成目标米/秒（GA-1）。 */
+    public static final double ATTRIBUTE = 0.5;
+    /** 走路的寻路倍率（约 2 米/秒）。 */
+    public static final double WALK_SPEED = WalkSpeed.modifier(ATTRIBUTE, WalkSpeed.WALK);
+    /** 跑（火炬接力、赛跑）的寻路倍率（约 5 米/秒）。 */
+    public static final double RUN_SPEED = WalkSpeed.modifier(ATTRIBUTE, WalkSpeed.RUN);
+    /** 逃回家的寻路倍率（约 4 米/秒）。 */
+    public static final double FLEE_SPEED = WalkSpeed.modifier(ATTRIBUTE, WalkSpeed.FLEE);
     /** 连续这么多次算不出路（起点四周都走不通）就回床位锚点脱困。 */
     public static final int STUCK_LIMIT = 3;
     /** 走路时多久没进展就挪一步、多久就直接到位或放弃（刻）。 */
@@ -124,7 +130,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20)
-                .add(Attributes.MOVEMENT_SPEED, 0.5)
+                .add(Attributes.MOVEMENT_SPEED, ATTRIBUTE)
                 .add(Attributes.FOLLOW_RANGE, 48);
     }
 
@@ -429,7 +435,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                 for (int i = 0; i < 8; i++) {
                     BlockPos p = here.offset(random.nextInt(5) - 2, random.nextInt(3) - 1, random.nextInt(5) - 2);
                     if (standable(p)) {
-                        getNavigation().moveTo(p.getX() + 0.5, p.getY(), p.getZ() + 0.5, 1.0);
+                        getNavigation().moveTo(p.getX() + 0.5, p.getY(), p.getZ() + 0.5, WALK_SPEED);
                         break;
                     }
                 }
@@ -570,7 +576,7 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
                     repathIn = 1;
                 } else if (repathIn <= 0 || getNavigation().isDone()) {
                     repathIn = 40;
-                    double speed = (s.running() ? RUN_SPEED : WALK_SPEED) / 0.5;
+                    double speed = s.running() ? RUN_SPEED : WALK_SPEED;
                     boolean moving = getNavigation().moveTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5, speed);
                     net.minecraft.world.level.pathfinder.Path p = getNavigation().getPath();
                     if (!moving || p == null || p.getNodeCount() <= 1) {

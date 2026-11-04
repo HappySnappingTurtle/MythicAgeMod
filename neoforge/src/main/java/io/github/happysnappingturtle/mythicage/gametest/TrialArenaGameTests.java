@@ -276,6 +276,25 @@ public final class TrialArenaGameTests {
         });
     }
 
+    /** T24 专服回归：重连位置就是大厅内，不能先刷新 lastPresent 而跳过已过期战斗。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 100)
+    public static void reconnect_inside_expired_arena_resets(GameTestHelper h) {
+        Setup s = setup(h, 99);
+        ServerPlayer p = inHall(h, s, "gt_reconnect_inside", 0, 8);
+        open(h, s, p);
+        h.runAtTickTime(10, () -> {
+            boss(h, s);
+            s.arena().awayForTest(h.getLevel().getGameTime(), 5000);
+            // 保留玩家在大厅里，模拟重新加载第一刻就已在场的登录位置。
+        });
+        h.runAtTickTime(14, () -> {
+            h.assertTrue(s.arena().phase() == ArenaPhase.IDLE, "超时后在大厅内重连也复原");
+            h.assertTrue(s.arena().boss(h.getLevel()).isEmpty(), "旧 Boss 消失而非结算胜利");
+            cleanup(h, s);
+            h.succeed();
+        });
+    }
+
     /** TC-T23-49（补）：玩家跑远、大厅区块卸载期间计时不推进——回来第一刻按离开时长复原；过期的 Boss 实体自行消失。 */
     @GameTest(template = T, batch = BATCH, timeoutTicks = 300)
     public static void long_absence_resets_and_stale_boss_vanishes(GameTestHelper h) {

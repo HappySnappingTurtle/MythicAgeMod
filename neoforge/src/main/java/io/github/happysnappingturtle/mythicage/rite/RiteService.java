@@ -330,7 +330,7 @@ public final class RiteService {
     }
 
     /** 晋升之后：钩子、刷新玩家神庙认定（按新时代重扫）、弹出成功界面。 */
-    static void afterPromotion(ServerPlayer player, Civilization civ, Age age, String god, VillageRegistry.Village v) {
+    public static void afterPromotion(ServerPlayer player, Civilization civ, Age age, String god, VillageRegistry.Village v) {
         io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, civ, age.ordinal());
         RiteHooks.runAfterPromotion(player, civ, age, god, v);
         refreshShrines(player, civ);

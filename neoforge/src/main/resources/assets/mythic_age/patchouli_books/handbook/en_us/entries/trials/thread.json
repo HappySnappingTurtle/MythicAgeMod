@@ -11,7 +11,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(o)Source$(): Ariadne gave Theseus a ball of thread; he tied it at the entrance and, after killing the Minotaur, followed it out — Apollodorus, $(o)Epitome$() 1.8–9."
+      "text": "$(o)Source$(): Ariadne gave Theseus a ball of thread. He tied it at the entrance and, after killing the Minotaur, followed it back out (Apollodorus, $(o)Epitome$() 1.8–9)."
     }
   ]
 }

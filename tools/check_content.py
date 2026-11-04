@@ -508,7 +508,30 @@ def run(root: Path, design: Path | None) -> Report:
 
 CJK = re.compile(r"[\u4e00-\u9fff]")
 # 日文与中文同形的词（汉字相同）属于正常情况：只提示含中文专用字形或整句相同的值，交给 codex 核对（T24 §6.5，TC-T24-93）
-JA_SAME_OK: set[str] = set()
+# 2026-10-28 人工核对：日语本来同形的汉字术语/方向/单位，按键放行而非放宽整类检测。
+JA_SAME_OK: set[str] = {
+    "block.mythic_age.greek_statue",
+    "item.mythic_age.patron_statue",
+    "item.mythic_age.patron_statue.of",
+    "mythic_age.age.classical",
+    "mythic_age.age.heroic",
+    "mythic_age.age.none",
+    "mythic_age.age_unlocked.powers",
+    "mythic_age.altar.row.statues",
+    "mythic_age.civ.norse",
+    "mythic_age.dir.north",
+    "mythic_age.dir.south",
+    "mythic_age.dir.west",
+    "mythic_age.direction.n",
+    "mythic_age.direction.s",
+    "mythic_age.direction.w",
+    "mythic_age.faith.tab",
+    "mythic_age.faith.title",
+    "mythic_age.jei.pressing_time",
+    "mythic_age.profession.greek.potter",
+    "mythic_age.quest.reward.conduct",
+    "mythic_age.trade.category.god_power",
+}
 
 
 def check_untranslated(paths: Paths, report: Report) -> None:
@@ -606,6 +629,9 @@ def check_handbook(paths: Paths, report: Report) -> None:
                         report.errors.append(f"{where} 第 {i + 1} 页：{key} {page[key]} 不存在")
                 if "advancement" in page and page["advancement"] not in advs:
                     report.errors.append(f"{where} 第 {i + 1} 页：锁页的进度 {page['advancement']} 不存在")
+                # 手札文字经 I18n.get 走 String.format：单个 % 会让整页变成「Format error」，要写成 %%
+                if "%" in page.get("text", "").replace("%%", ""):
+                    report.errors.append(f"{where} 第 {i + 1} 页：单个 % 要写成 %%（否则整页显示 Format error）")
             ref = base.get(name)
             if ref is not None and lang != HANDBOOK_LANGS[0]:
                 if len(ref.get("pages", [])) != len(o.get("pages", [])):

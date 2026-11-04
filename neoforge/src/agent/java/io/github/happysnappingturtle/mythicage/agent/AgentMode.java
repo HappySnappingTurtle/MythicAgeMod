@@ -34,6 +34,11 @@ public final class AgentMode {
         return System.getProperty("mythicage.remote.lang", "zh_cn");
     }
 
+    /** 连进专服的地址（主机:端口）；空串表示打开本地世界（T24 §10.2）。 */
+    public static String server() {
+        return System.getProperty("mythicage.remote.server", "");
+    }
+
     public static int idleMinutes() {
         return Integer.getInteger("mythicage.remote.idleMinutes", 30);
     }

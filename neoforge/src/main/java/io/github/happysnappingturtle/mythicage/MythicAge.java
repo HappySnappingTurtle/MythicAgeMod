@@ -101,7 +101,7 @@ public final class MythicAge {
         game.addListener(EventPriority.HIGHEST, ModConfigs::onServerAboutToStart);
         game.addListener(ConfigCommand::onRegisterCommands);
         game.addListener(MythDataCommand::onRegisterCommands);
-        game.addListener(MythData::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "myth_data", MythData::onServerTickPost);
         game.addListener(MythData::onLoggedIn);
         game.addListener(MythData::onRespawn);
         game.addListener(MythData::onChangedDimension);
@@ -109,7 +109,7 @@ public final class MythicAge {
         // 运行时钟（T5）：钩子在普通优先级注册到 ModConfigs 刚创建的 holder 上
         game.addListener(RuntimeDriver::onServerAboutToStart);
         game.addListener(RuntimeDriver::onServerStopped);
-        game.addListener(RuntimeDriver::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "runtime_driver", RuntimeDriver::onServerTickPost);
         game.addListener(RuntimeCommand::onRegisterCommands);
         PlayerActivity.register(game);
         io.github.happysnappingturtle.mythicage.boss.TrialArenaEvents.register(game);
@@ -122,13 +122,13 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.wild.WildDevCommand::onRegisterCommands);
 
         // 神庙通用职责（T10b）与希腊神庙判定（T8a）
-        game.addListener(ShrineService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "shrine_service", ShrineService::onServerTickPost);
         game.addListener(ShrineService::onServerStopped);
         game.addListener(ShrineService::onBreak);
         game.addListener(TempleRulesLoader::onAddReloadListeners);
         game.addListener(TempleService::onServerStarted);
         game.addListener(TempleService::onServerStopped);
-        game.addListener(TempleService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "temple_service", TempleService::onServerTickPost);
         game.addListener(TempleService::onNeighborNotify);
 
         // 文明档案（T10b）
@@ -136,44 +136,46 @@ public final class MythicAge {
 
         // 祭司与恩宠兑换（T9）
         game.addListener(TradeTableLoader::onAddReloadListeners);
-        game.addListener(TradeService::onServerTickPost);
-        game.addListener(GuardianSpawner::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "trade_service", TradeService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "guardian_spawner", GuardianSpawner::onServerTickPost);
         game.addListener(GuardianSpawner::onEntityJoin);
         game.addListener(GuardianCommand::onRegisterCommands);
 
         // 聚落归属与主神（T10a）
         game.addListener(PantheonLoader::onAddReloadListeners);
-        game.addListener(VillageService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "village_service", VillageService::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.advancement.MythEvents::onLoggedIn);
+        // 性能探针（T24 阶段 ④）：每刻处理器都经 Perf.tick 注册
+        io.github.happysnappingturtle.mythicage.perf.Perf.register(game);
         // 神话图鉴点亮（T24 阶段 ③）
         game.addListener(io.github.happysnappingturtle.mythicage.bestiary.BestiaryLoader::onAddReloadListeners);
-        game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "bestiary", io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onDamagePost);
         game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onDeath);
         game.addListener(io.github.happysnappingturtle.mythicage.bestiary.Bestiary::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.handbook.Handbook::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.handbook.Handbook::onRegisterCommands);
-        game.addListener(io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "village_population", io.github.happysnappingturtle.mythicage.village.VillagePopulation::onServerTickPost);
         game.addListener(VillageService::onServerStopped);
         game.addListener(VillageCommand::onRegisterCommands);
         // 文明村庄生成与登记（T13b）
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageBuildings::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onChunkLoad);
-        game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "village_registration", io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.VillageRegistration::onServerStopped);
         // T22 遗迹与迷宫：生成即登记、遗迹宝库表
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onChunkLoad);
-        game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "structure_registration", io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.RuinVaults::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureSpecs::onAddReloadListeners);
-        game.addListener(io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "plot_watch", io.github.happysnappingturtle.mythicage.village.PlotWatch::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.gen.DensityTool::onRegisterCommands);
         // 居民框架（T19）
         io.github.happysnappingturtle.mythicage.village.work.BasicJobTypes.registerAll();
         io.github.happysnappingturtle.mythicage.content.greek.village.GreekVillageWork.init();
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageData::onAddReloadListeners);
-        game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "village_scheduler", io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.village.life.OracleService::onRightClickBlock);
         game.addListener(io.github.happysnappingturtle.mythicage.village.FoundationService::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
@@ -217,21 +219,21 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onTravel);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onChangedDimension);
-        game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "summon_service", io.github.happysnappingturtle.mythicage.summon.SummonService::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onChangeTarget);
         game.addListener(io.github.happysnappingturtle.mythicage.summon.SummonService::onRegisterCommands);
         game.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent e) ->
                 io.github.happysnappingturtle.mythicage.summon.SummonService.onServerStopped());
         // 神力执行框架（T12）
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerSpecLoader::onAddReloadListeners);
-        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "power_service", io.github.happysnappingturtle.mythicage.power.PowerService::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onDamage);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedOut);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onChunkWatch);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerFx::onServerStopped);
-        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerTasks::onServerTickPost);
-        game.addListener(io.github.happysnappingturtle.mythicage.power.PowerZones::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "power_tasks", io.github.happysnappingturtle.mythicage.power.PowerTasks::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "power_zones", io.github.happysnappingturtle.mythicage.power.PowerZones::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerZones::onChunkWatch);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerTasks::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.power.Auras::onAdded);
@@ -241,15 +243,22 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerDevCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerService::onRightClickItem);
         game.addListener(io.github.happysnappingturtle.mythicage.power.PowerShields::onServerStopped);
-        game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "transient_entities", io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onEntityJoin);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onEntityLeave);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TransientEntities::onServerStopped);
-        game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerTickPost);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "temp_blocks", io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerTickPost);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onChunkUnload);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onChunkLoad);
         game.addListener(io.github.happysnappingturtle.mythicage.power.TempBlocks::onServerStopping);
         game.addListener(io.github.happysnappingturtle.mythicage.rite.RiteCommand::onRegisterCommands);
+
+        // 快速验证（GA-3）：分站进入、试玩记录
+        game.addListener(io.github.happysnappingturtle.mythicage.playtest.PlaytestCommand::onRegisterCommands);
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "playtest",
+                io.github.happysnappingturtle.mythicage.playtest.PlaytestJobs::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.playtest.PlaytestJobs::onLogout);
+        io.github.happysnappingturtle.mythicage.playtest.PlaytestLog.init();
         game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEvents::onPlayerAttack);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onBreak);
