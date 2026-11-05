@@ -64,10 +64,18 @@ public final class LangKeys {
         add("mythic_age.altar.row.statues", "神像", "Cult statues", "神像");
         add("mythic_age.altar.row.pediments", "三角楣石", "Pediments", "ペディメント");
         add("mythic_age.altar.row.marbleFloor", "大理石地面", "Marble floor", "大理石の床");
-        add("mythic_age.altar.slots", "祈祷位：%s / %s", "Prayer spots: %s / %s", "祈りの場：%s / %s");
+        add("mythic_age.altar.slots", "同时可祈祷：%s / %s 人", "Can pray at once: %s / %s", "同時に祈れる人数：%s / %s");
+        add("mythic_age.altar.today_believers", "今日信徒：%s 人", "Believers today: %s", "今日の信徒：%s 人");
+        add("mythic_age.altar.offered", "今日已献供：这座祭坛今天的祈祷恩宠 %s", "Offering made today: prayer favor here %s today", "今日は供物を捧げた：この祭壇の今日の祈りの恩寵 %s");
+        add("mythic_age.altar.offer_hint", "今天还没献供：手持奠酒、蜂蜜瓶、熟肉、面包或小麦右键祭坛，今天的祈祷恩宠 %s", "No offering yet today: right-click the altar holding a libation, honey bottle, cooked meat, bread or wheat for %s prayer favor today", "今日はまだ供物なし：献酒、ハチミツ入りの瓶、焼いた肉、パン、小麦を持って祭壇を右クリックすると、今日の祈りの恩寵 %s");
+        add("mythic_age.offering.ok", "献上了%s：这座祭坛今天的祈祷恩宠 %s", "Offered %s: prayer favor at this altar %s today", "%sを捧げた：この祭壇の今日の祈りの恩寵 %s");
+        add("mythic_age.jei.offering", "献供：手持供品右键自己的奥林匹斯祭坛，每座祭坛每天一次，当天这座祭坛的祈祷恩宠 +50%%。供品任选一种：奠酒 1、蜂蜜瓶 1、熟牛肉 / 熟羊肉 / 熟猪排 2、面包 2、小麦 8。", "Offerings: right-click your own Olympian altar holding an offering, once per altar per day, for +50%% prayer favor at that altar today. Any one of: libation 1, honey bottle 1, cooked beef / mutton / porkchop 2, bread 2, wheat 8.", "供物：供物を持って自分のオリュンポスの祭壇を右クリック。祭壇ごとに一日一回、その日の祈りの恩寵 +50%%。供物はどれか一つ：献酒 1、ハチミツ入りの瓶 1、焼き牛肉 / 焼き羊肉 / 焼き豚肉 2、パン 2、小麦 8。");
+        add("mythic_age.offering.already", "今天已经在这座祭坛献过供了", "You already made an offering at this altar today", "今日はこの祭壇にもう供物を捧げた");
+        add("mythic_age.offering.not_owner", "这不是你的祭坛", "This is not your altar", "これはあなたの祭壇ではない");
+        add("mythic_age.offering.not_enough", "献%s要 %s 个", "Offering %s takes %s", "%sを捧げるには %s 個必要");
         add("mythic_age.altar.slots.short", "只找到 %s 个可站立且可达的祈祷位", "Only %s standable, reachable prayer spot(s) found", "立てて到達できる祈りの場が %s か所しかありません");
         add("mythic_age.altar.estimate", "预计日产：%s 恩宠（估算）", "Expected: about %s favor per day", "見込み：1日あたり約 %s の恩寵");
-        add("mythic_age.altar.estimate.note", "按近7日信徒与祈祷位估算，不是发放承诺", "Based on the last 7 days' worshippers and the prayer spots; not a promise", "直近7日の信徒と祈りの場から見積もった値で、支給の約束ではありません");
+        add("mythic_age.altar.estimate.note", "按近 7 日信徒估算，不含献供，不是发放承诺", "Based on the last 7 days' worshippers, without offerings; not a promise", "直近7日の信徒から見積もった値（供物なし）で、支給の約束ではありません");
         add("mythic_age.altar.praying", "正在祈祷：%s 人", "Praying now: %s", "祈祷中：%s 人");
         add("mythic_age.altar.believers", "近 7 日信徒：%s 人", "Worshippers (last 7 days): %s", "直近7日の信徒：%s 人");
         add("mythic_age.altar.today", "今日已得：%s 恩宠", "Earned today: %s favor", "本日の獲得：%s の恩寵");
@@ -319,7 +327,7 @@ public final class LangKeys {
         add("commands.mythic_age.playtest.ready", "第 %s 站「%s」准备好了，约 %s 分钟", "Station %s \"%s\" is ready, about %s minutes", "地点 %s「%s」の準備ができました。約 %s 分");
         add("commands.mythic_age.playtest.watch", "看什么：%s", "What to look at: %s", "見るところ：%s");
         add("commands.mythic_age.playtest.hint", "看完输入 /mythicage dev playtest done；有问题随时 /mythicage dev playtest note <一句话>", "When finished, type /mythicage dev playtest done; note problems any time with /mythicage dev playtest note <text>", "見終わったら /mythicage dev playtest done。気づいたことはいつでも /mythicage dev playtest note <一言>");
-        add("commands.mythic_age.playtest.first_warning", "进站会清掉你的神话数据（已存快照，/mythicage dev playtest restore 可恢复），请在测试世界里用", "Entering a station clears your myth data (a snapshot was saved; /mythicage dev playtest restore brings it back). Use a test world.", "地点に入ると神話データが消えます（スナップショットを保存済み。/mythicage dev playtest restore で戻せます）。テスト用の世界で使ってください");
+        add("commands.mythic_age.playtest.first_warning", "进站会清掉你的神话数据、背包和经验（已存快照，/mythicage dev playtest restore 可恢复），请在测试世界里用", "Entering a station clears your myth data, inventory and experience (a snapshot was saved; /mythicage dev playtest restore brings them back). Use a test world.", "地点に入ると神話データ・持ち物・経験値が消えます（スナップショットを保存済み。/mythicage dev playtest restore で戻せます）。テスト用の世界で使ってください");
         add("commands.mythic_age.playtest.failed", "第 %s 站没准备好：%s", "Station %s could not be prepared: %s", "地点 %s を準備できませんでした：%s");
         add("commands.mythic_age.playtest.reason.timeout", "卡在「%s」，超时了", "Timed out at \"%s\"", "「%s」で時間切れ");
         add("commands.mythic_age.playtest.reason.no_village", "出生点 100 区块内没有希腊村庄，换个种子", "No Greek village within 100 chunks of spawn; try another seed", "スポーンから100チャンク以内にギリシャの村がありません。別のシードを使ってください");
@@ -338,7 +346,7 @@ public final class LangKeys {
         add("commands.mythic_age.playtest.noted", "记下了（%s）", "Noted (%s)", "記録しました（%s）");
         add("commands.mythic_age.playtest.station_done", "%s 站结束，用时 %s", "Station %s finished in %s", "地点 %s 終了、所要 %s");
         add("commands.mythic_age.playtest.no_station", "现在不在任何一站", "You are not in a station", "いまはどの地点にもいません");
-        add("commands.mythic_age.playtest.restored", "已恢复第一次进站前的神话数据；重新进入世界后进度会补上", "Myth data from before your first station is restored; advancements catch up when you rejoin", "最初の地点に入る前の神話データを戻しました。入り直すと進捗が反映されます");
+        add("commands.mythic_age.playtest.restored", "已恢复第一次进站前的神话数据、背包和经验；重新进入世界后进度会补上", "Myth data, inventory and experience from before your first station are restored; advancements catch up when you rejoin", "最初の地点に入る前の神話データ・持ち物・経験値を戻しました。入り直すと進捗が反映されます");
         add("commands.mythic_age.playtest.no_snapshot", "没有可恢复的快照", "No snapshot to restore", "戻せるスナップショットがありません");
         add("commands.mythic_age.playtest.anchors_reset", "已清掉固定的村庄、迷宫和神庙位置，下次进站重新找", "Cleared the saved village, labyrinth and temple spots; the next station searches again", "保存した村・迷宮・神殿の位置を消しました。次の地点で探し直します");
         add("mythic_age.trade.favor", "%s %s/%s · %s时代", "%s %s/%s · %s Age", "%s %s/%s・%s時代");

@@ -50,6 +50,12 @@ public final class MythicJeiPlugin implements IModPlugin {
         List<PressingRecipe> pressing = level.getRecipeManager().getAllRecipesFor(ModRecipes.PRESSING.get()).stream()
                 .map(RecipeHolder::value).toList();
         registration.addRecipes(PressingCategory.TYPE, pressing);
+        // GA-4 供奉：说明页挂在奥林匹斯祭坛与奠酒上（供品表在服务端数据包里，说明按默认表写）
+        net.minecraft.network.chat.Component offering = net.minecraft.network.chat.Component.translatable("mythic_age.jei.offering");
+        registration.addIngredientInfo(List.of(
+                        new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple.GREEK_ALTAR.get()),
+                        new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.LIBATION.get())),
+                mezz.jei.api.constants.VanillaTypes.ITEM_STACK, offering);
     }
 
     @Override

@@ -69,6 +69,11 @@ public final class GreekShrineSurvey {
         List<String> tiers = rules.tiers().stream().map(t -> "mythic_age.temple.tier." + t.name()).toList();
         PrayerService.Stats stats = PrayerService.stats(be, rules);
         List<ShrineSurvey.Note> notes = new ArrayList<>();
+        // GA-4：今日信徒与供奉
+        notes.add(ShrineSurvey.Note.of("mythic_age.altar.today_believers", false, String.valueOf(stats.todayBelievers())));
+        String percent = "+" + Math.round(io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader.greek().bonus() * 100) + "%";
+        notes.add(stats.offered() ? ShrineSurvey.Note.of("mythic_age.altar.offered", false, percent)
+                : ShrineSurvey.Note.of("mythic_age.altar.offer_hint", false, percent));
         if (stats.rainHalved()) {
             notes.add(ShrineSurvey.Note.of("mythic_age.altar.rain", true));
         }

@@ -71,9 +71,13 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         }
         readShrines(root.object("shrines"), shrines);
         ObjectReader g = root.object("greek");
-        greek = new WorldRulesConfig.Greek(readGrowth(g.object("growth"), greek.growth()),
-                readTempleBudget(g.object("temple"), greek.temple()),
-                new WorldRulesConfig.Prayer(g.object("prayer").intIn("restockLimit", greek.prayer().restockLimit(), 0, 2)));
+        WorldRulesConfig.Growth growth = readGrowth(g.object("growth"), greek.growth());
+        WorldRulesConfig.TempleBudget templeBudget = readTempleBudget(g.object("temple"), greek.temple());
+        ObjectReader prayer = g.object("prayer");
+        greek = new WorldRulesConfig.Greek(growth, templeBudget,
+                new WorldRulesConfig.Prayer(prayer.intIn("restockLimit", greek.prayer().restockLimit(), 0, 2),
+                        prayer.doubleIn("rateMultiplier", greek.prayer().rateMultiplier(),
+                                WorldRulesConfig.Prayer.MIN_MULTIPLIER, WorldRulesConfig.Prayer.MAX_MULTIPLIER)));
         return new WorldRulesConfig(
                 root.bool("beneficialConversions", base.beneficialConversions()),
                 root.bool("mobBlockDamage", base.mobBlockDamage()),
@@ -217,6 +221,7 @@ public final class WorldRulesSchema implements ConfigSchema<WorldRulesConfig> {
         greek.add("temple", temple);
         JsonObject prayer = new JsonObject();
         prayer.addProperty("restockLimit", value.greek().prayer().restockLimit());
+        prayer.addProperty("rateMultiplier", value.greek().prayer().rateMultiplier());
         greek.add("prayer", prayer);
         root.add("greek", greek);
         return root;

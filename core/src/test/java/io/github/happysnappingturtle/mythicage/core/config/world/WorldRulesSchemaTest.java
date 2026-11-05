@@ -157,4 +157,19 @@ class WorldRulesSchemaTest {
         assertEquals(1, bad.value().greek().prayer().restockLimit());
         assertEquals(1, bad.issues().size());
     }
+
+    /** TC-GA4-30、31：greek.prayer.rateMultiplier 默认 1，取 0.1–10，越界回退并记一条问题。 */
+    @Test
+    void tc_ga4_30_rateMultiplier() {
+        assertEquals(1.0, S.defaults().greek().prayer().rateMultiplier());
+        ConfigLoadResult<WorldRulesConfig> ok = ConfigLoader.load(S,
+                "{\"greek\":{\"prayer\":{\"restockLimit\":0,\"rateMultiplier\":1.5}}}", null);
+        assertEquals(1.5, ok.value().greek().prayer().rateMultiplier());
+        assertEquals(0, ok.value().greek().prayer().restockLimit(), "同一个对象里的两个字段都读到");
+        for (String v : new String[]{"0.05", "20"}) {
+            ConfigLoadResult<WorldRulesConfig> bad = ConfigLoader.load(S, "{\"greek\":{\"prayer\":{\"rateMultiplier\":" + v + "}}}", null);
+            assertEquals(1.0, bad.value().greek().prayer().rateMultiplier(), v);
+            assertEquals(1, bad.issues().size(), v);
+        }
+    }
 }

@@ -283,16 +283,17 @@ public final class VillageMigrationGameTests {
                 h.assertTrue(pious.getData(GreekPrayer.RECORD).prayedOn(today), "记下今天祈祷过（F7 用）");
                 double before = PrayerService.pending(key);
                 PrayerService.sampleForTest(h.getLevel().getServer());
+                h.assertTrue(PrayerService.pending(key) == before, "GA-4：采样不再入账");
                 GreekAltarBlockEntity be = (GreekAltarBlockEntity) h.getLevel().getBlockEntity(key.pos());
-                double expect = PrayerFormula.distribute(List.of(new PrayerFormula.Altar(1,
-                        TempleService.rules().tier(be.verdict(TempleService.rules()).grantedLevel()).coefficient(), 1)), 0,
-                        PrayerService.SAMPLE_INTERVAL)[0];
-                double got = PrayerService.pending(key) - before;
-                h.assertTrue(Math.abs(got - expect) < 1e-9, "与原版信徒同一公式：" + got + " vs " + expect);
+                double expect = PrayerFormula.credit(1,
+                        TempleService.rules().tier(be.verdict(TempleService.rules()).grantedLevel()).coefficient(), 1, 0, 0, 1);
                 for (int i = 0; i < ResidentPrayer.SHIFT + 2 && pious.job().isPresent(); i++) {
                     pious.tickJobForTest();
                 }
-                h.assertTrue(pious.job().isEmpty(), "TC-114 一班到点离开");
+                double got = PrayerService.pending(key) - before;
+                h.assertTrue(Math.abs(got - expect) < 1e-9, "TC-GA4-40 祈祷满 600 刻入一笔，与原版信徒同一公式：" + got + " vs " + expect);
+                h.assertTrue(be.believersToday(today) == 1, "记为今日信徒");
+                h.assertTrue(pious.job().isEmpty(), "TC-114 一次祈祷到点离开");
                 h.assertTrue(!PrayerService.claimants(key, h.getLevel().getServer()).contains(pious.getUUID()), "让出祈祷位");
                 h.assertTrue(ResidentPrayer.jobs(ctx(h, tv)).stream().noneMatch(x -> pious.getUUID().equals(x.assignee())),
                         "同一天不再派");

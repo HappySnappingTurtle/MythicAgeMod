@@ -36,17 +36,16 @@ public final class PacingEstimate {
     }
 
     /**
-     * 估算表：每个信徒数 × 每级神庙一行。信徒数超过该级祈祷位时按祈祷位计。
+     * 估算表：每个信徒数 × 每级神庙一行（GA-4 起祈祷位不再限制信徒数）。
      *
-     * @param levels 神庙等级 → {祈祷位, 系数}，下标即等级
+     * @param levels 神庙等级 → {祈祷位, 系数}，下标即等级；只用系数
      */
     public static List<Row> table(double deficit, int[] believers, int[] levelIds, double[][] levels) {
         List<Row> out = new ArrayList<>();
         for (int level : levelIds) {
-            int slots = (int) levels[level][0];
             double tier = levels[level][1];
             for (int n : believers) {
-                int counted = Math.min(n, slots);
+                int counted = n;
                 double daily = PrayerFormula.daily(counted, tier, 0);
                 double d = days(deficit, counted, tier, 0).orElse(Double.POSITIVE_INFINITY);
                 out.add(new Row(counted, level, tier, daily, d, d * MINUTES_PER_DAY));

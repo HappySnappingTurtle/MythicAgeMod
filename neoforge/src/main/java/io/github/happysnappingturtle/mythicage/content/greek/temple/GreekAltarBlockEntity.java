@@ -115,6 +115,36 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
         return changed;
     }
 
+    /** 这名村民今天已经在这里计入过（GA-4：一天只入一笔）。 */
+    public boolean prayedHereToday(UUID villager, long today) {
+        Long d = recentPrayers.get(villager);
+        return d != null && d == today;
+    }
+
+    /** 今天在这里计入的信徒数（GA-4 今日信徒）。 */
+    public int believersToday(long today) {
+        int n = 0;
+        for (long d : recentPrayers.values()) {
+            if (d == today) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    // ───────────── 供奉（GA-4） ─────────────
+
+    private long offeredDay = Long.MIN_VALUE;
+
+    public boolean offeredOn(long day) {
+        return offeredDay == day;
+    }
+
+    public void markOffered(long day) {
+        offeredDay = day;
+        setChanged();
+    }
+
     /** 测试与检视用的只读副本。 */
     public Map<UUID, Long> recentPrayers() {
         return Map.copyOf(recentPrayers);
@@ -170,6 +200,9 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
             recent.add(c);
         });
         tag.put("RecentPrayers", recent);
+        if (offeredDay != Long.MIN_VALUE) {
+            tag.putLong("OfferedDay", offeredDay);
+        }
     }
 
     @Override
@@ -194,5 +227,6 @@ public class GreekAltarBlockEntity extends ShrineBlockEntity {
                 recentPrayers.put(c.getUUID("Id"), c.getLong("Day"));
             }
         }
+        offeredDay = tag.contains("OfferedDay") ? tag.getLong("OfferedDay") : Long.MIN_VALUE;
     }
 }

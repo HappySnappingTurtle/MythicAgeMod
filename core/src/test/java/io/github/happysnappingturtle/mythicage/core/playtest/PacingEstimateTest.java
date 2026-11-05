@@ -47,8 +47,8 @@ class PacingEstimateTest {
     void tc35Table() {
         List<PacingEstimate.Row> rows = PacingEstimate.table(50, new int[]{2, 4, 8}, new int[]{1, 2}, LEVELS);
         assertEquals(6, rows.size());
-        // 一级神庙只有 4 个祈祷位：8 人按 4 计
-        assertEquals(4, rows.get(2).believers());
+        // GA-4：祈祷位不再限制信徒数，8 人按 8 计
+        assertEquals(8, rows.get(2).believers());
         assertTrue(rows.get(0).days() > rows.get(1).days());
         assertTrue(rows.get(3).days() > rows.get(4).days() && rows.get(4).days() > rows.get(5).days());
     }

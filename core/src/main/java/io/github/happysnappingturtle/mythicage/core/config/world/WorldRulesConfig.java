@@ -133,9 +133,15 @@ public record WorldRulesConfig(boolean beneficialConversions, boolean mobBlockDa
     /**
      * 信徒祈祷（T10 设计文档 §7，决策 F7）。
      *
-     * @param restockLimit 当天祈祷过的有职业村民每日最多补货几次（原版 2，取 0–2）
+     * @param restockLimit   当天祈祷过的有职业村民每日最多补货几次（原版 2，取 0–2）
+     * @param rateMultiplier 祈祷恩宠的总倍率（GA-4，取 0.1–10，默认 1）
      */
-    public record Prayer(int restockLimit) {
+    public record Prayer(int restockLimit, double rateMultiplier) {
+        public static final double MIN_MULTIPLIER = 0.1, MAX_MULTIPLIER = 10;
+
+        public Prayer(int restockLimit) {
+            this(restockLimit, 1);
+        }
     }
 
     /**

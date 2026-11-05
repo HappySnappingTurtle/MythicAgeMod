@@ -36,14 +36,16 @@ import java.util.UUID;
  * 神坛选择、祈祷位预留、√n 递减、「同一天只为一位主人」「离家 ≥ 8 格才计入」全部沿用 T10（{@link PrayerService}、
  * {@link BelieverRules}），与原版村民信徒用同一张祈祷位表、同一套采样结算。
  * <ul>
- *   <li>每人每天一班 {@link #SHIFT} 刻（原版信徒整个窗口都跪着；居民还要干活，按班轮换，祈祷位一直有人）；</li>
+ *   <li>每人每天祈祷一次，满 {@link PrayerFormula#PRAY_TICKS} 刻算一名今日信徒并入账，然后回去干活（GA-4；
+ *   原来是一班 2400 刻、按同时在场人数计）；</li>
  *   <li>只派空闲的居民（烧窑、施工段上的人本来就不空闲）；优先级「缺口生产」、权重 {@link #WEIGHT}，缺粮时让位给口粮链；</li>
  *   <li>姿势：站立、双手上举（古希腊人祈祷的常见姿势）；女性居民有时跪下（同一资料）。祈祷记录用原版信徒同一个附件。</li>
  * </ul>
  */
 public final class ResidentPrayer implements JobType {
     public static final String ID = "pray";
-    public static final int SHIFT = 2400;
+    /** 一次祈祷的时长（GA-4）。 */
+    public static final int SHIFT = PrayerFormula.PRAY_TICKS;
     public static final double WEIGHT = 10;
     public static final String STAND = "pray", KNEEL = "pray_kneel";
     private static final DustParticleOptions GOLD = new DustParticleOptions(new Vector3f(1.0F, 0.82F, 0.35F), 0.9F);
@@ -89,8 +91,9 @@ public final class ResidentPrayer implements JobType {
         }
         long today = MythDays.today(level.getServer());
         long now = level.getGameTime();
-        int remaining = (int) Math.min(SHIFT, PrayerFormula.WINDOW_END - Math.floorMod(level.getDayTime(), 24000L));
-        if (remaining < 200) {
+        // 时段里剩下的时间不够祈祷满一次就不派了
+        int remaining = SHIFT;
+        if (PrayerFormula.WINDOW_END - Math.floorMod(level.getDayTime(), 24000L) < SHIFT) {
             return List.of();
         }
         List<ShrineRegistry.Entry> altars = ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id()).stream()
@@ -190,10 +193,6 @@ public final class ResidentPrayer implements JobType {
             if (counted) {
                 long today = MythDays.today(level.getServer());
                 r.getData(GreekPrayer.RECORD).record(today, refOwner(job.ref()), altar);
-                GreekAltarBlockEntity be = PrayerService.altarAt(level.getServer(), altar);
-                if (be != null && be.notePrayer(r.getUUID(), today)) {
-                    PrayerService.refreshEstimate(be);
-                }
             }
         } else if (ticks % PrayerSlots.REPORT_INTERVAL == 0
                 && !PrayerService.SLOTS.report(altar, r.getUUID(), now, true, counted, !counted)) {
@@ -209,7 +208,13 @@ public final class ResidentPrayer implements JobType {
         if (counted && now % 40 == r.getId() % 40) {
             level.sendParticles(GOLD, r.getX(), r.getY() + 1.1, r.getZ(), 3, 0.3, 0.3, 0.3, 0);
         }
+        // 祈祷将满：记为今日信徒并入账（一天只入一笔，重复调用无效；留 20 刻余量，不依赖最后一刻一定被调用）
+        if (counted && ticks >= SHIFT - CREDIT_MARGIN) {
+            PrayerService.credit(level, altar, r.getUUID());
+        }
     }
+
+    private static final int CREDIT_MARGIN = 20;
 
     @Override
     public boolean settle(VillageContext ctx, ResidentEntity resident, Job job) {

@@ -98,7 +98,8 @@ public final class PlaytestStations {
     public static final List<Station> ALL = List.of(
             new Station(1, "start", 5, new Spec(Age.NONE, "", 0, false, -1, List.of(), Offerings.NONE,
                     false, false, true, Spot.VILLAGE_EDGE, MORNING)),
-            new Station(2, "temple", 10, new Spec(Age.ARCHAIC, "", 0, true, -1, TEMPLE_MATERIALS, Offerings.NONE,
+            new Station(2, "temple", 10, new Spec(Age.ARCHAIC, "", 0, true, -1, concat(TEMPLE_MATERIALS,
+                    List.of(new Give("mythic_age:libation", 1))), Offerings.NONE,
                     false, false, false, Spot.VILLAGE_PRIEST, MORNING)),
             new Station(3, "powers", 10, new Spec(Age.CLASSICAL, ATHENA, 150, false, 1, List.of(), Offerings.NONE,
                     false, false, false, Spot.VILLAGE_PRIEST, DAY)),

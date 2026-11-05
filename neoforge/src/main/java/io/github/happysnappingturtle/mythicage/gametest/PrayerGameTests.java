@@ -47,6 +47,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
@@ -78,8 +80,6 @@ import java.util.UUID;
 public final class PrayerGameTests {
     private static final String T = GameTestTemplates.EMPTY_17X16X36;
     private static final BlockPos ALTAR = new BlockPos(8, 3, 2);
-    private static final double PER_SAMPLE = PrayerFormula.BASE_PER_MINUTE / PrayerFormula.TICKS_PER_MINUTE
-            * PrayerService.SAMPLE_INTERVAL;
     private static final double EPS = 1e-9;
 
     private PrayerGameTests() {
@@ -291,7 +291,8 @@ public final class PrayerGameTests {
             h.assertTrue(rec.prayedOn(today(h)) && p.getUUID().equals(rec.lastPrayOwner()) && a.equals(rec.lastAltar()),
                     "应记下今天为这位主人在这座神坛祈祷：" + rec);
             PrayerService.Stats st = PrayerService.stats(be(h, a), TempleService.rules());
-            h.assertTrue(st.praying() == 1 && st.believers() == 1 && st.tooClose() == 0, "统计：" + st);
+            // GA-4：跪满 600 刻才记为信徒并离开，跪拜当中信徒数还是 0（入账见 believer_prays_once_then_leaves）
+            h.assertTrue(st.praying() == 1 && st.tooClose() == 0, "统计：" + st);
             cleanup(h, List.of(village), a);
         });
     }
@@ -485,16 +486,17 @@ public final class PrayerGameTests {
         GlobalPos a = altar(h, ALTAR, owner(h, "pr_yield"));
         h.succeedWhen(() -> {
             assertScanned(h, a);
-            long now = h.getLevel().getGameTime();
             PrayerService.resetForTest(a);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.east(), true, now);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.west(), true, now);
-            PrayerService.sampleForTest(h.getLevel().getServer());
-            double expected = PER_SAMPLE * Math.sqrt(2) * 1.0;
+            // GA-4（TC-GA4-40、44）：两名信徒各祈祷满一次，按今日信徒 √2 入账；同一人第二次不再入账
+            UUID v1 = UUID.randomUUID();
+            h.assertTrue(PrayerService.credit(h.getLevel(), a, v1), "第一名入账");
+            h.assertTrue(PrayerService.credit(h.getLevel(), a, UUID.randomUUID()), "第二名入账");
+            h.assertFalse(PrayerService.credit(h.getLevel(), a, v1), "同一人当天第二次不入账");
+            double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.0;
             h.assertTrue(Math.abs(PrayerService.pending(a) - expected) < EPS,
                     "待领产出应为 " + expected + "，实际 " + PrayerService.pending(a));
             PrayerService.Stats st = PrayerService.stats(be(h, a), TempleService.rules());
-            h.assertTrue(st.praying() == 2 && Math.abs(st.today() - expected) < EPS, "统计：" + st);
+            h.assertTrue(st.todayBelievers() == 2 && Math.abs(st.today() - expected) < EPS, "统计：" + st);
             PrayerService.resetForTest(a);
         });
     }
@@ -507,18 +509,17 @@ public final class PrayerGameTests {
         GlobalPos b = altar(h, new BlockPos(12, 3, 33), p);
         h.succeedWhen(() -> {
             assertScanned(h, a, b);
-            long now = h.getLevel().getGameTime();
             PrayerService.resetForTest(a);
             PrayerService.resetForTest(b);
+            // GA-4（TC-GA4-43）：同一主人两座神坛，今日信徒合计算 √
             for (int i = 0; i < 3; i++) {
-                PrayerService.putClaimForTest(a, UUID.randomUUID(), a.pos().offset(i, 0, 1), true, now);
+                PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
             }
-            PrayerService.putClaimForTest(b, UUID.randomUUID(), b.pos().north(), true, now);
-            PrayerService.sampleForTest(h.getLevel().getServer());
+            PrayerService.credit(h.getLevel(), b, UUID.randomUUID());
             double pa = PrayerService.pending(a);
             double pb = PrayerService.pending(b);
-            h.assertTrue(Math.abs(pa / pb - 3) < 1e-6, "份额应为 3:1，实际 " + pa + " : " + pb);
-            h.assertTrue(Math.abs(pa + pb - PER_SAMPLE * Math.sqrt(4)) < EPS, "合计按 √4，实际 " + (pa + pb));
+            h.assertTrue(Math.abs(pa - PrayerFormula.DAILY_BASE * Math.sqrt(3)) < EPS, "前 3 名在 a：" + pa);
+            h.assertTrue(Math.abs(pa + pb - PrayerFormula.DAILY_BASE * Math.sqrt(4)) < EPS, "合计按 √4，实际 " + (pa + pb));
             PrayerService.resetForTest(a);
             PrayerService.resetForTest(b);
         });
@@ -526,14 +527,11 @@ public final class PrayerGameTests {
 
     /** 下雨只在本刻内生效，不影响同时运行的其他测试。 */
     private static double sampleInRain(GameTestHelper h, GlobalPos a) {
-        Level level = h.getLevel();
-        long now = level.getGameTime();
         PrayerService.resetForTest(a);
-        PrayerService.putClaimForTest(a, UUID.randomUUID(), a.pos().east(), true, now);
-        PrayerService.putClaimForTest(a, UUID.randomUUID(), a.pos().west(), true, now);
         PrayerService.overrideRainForTest((l, pos) -> true);
         try {
-            PrayerService.sampleForTest(h.getLevel().getServer());
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
             h.assertTrue(PrayerService.stats(be(h, a), TempleService.rules()).rainHalved()
                     == (be(h, a).verdict(TempleService.rules()).grantedLevel() == 0), "面板雨天提示");
         } finally {
@@ -551,7 +549,7 @@ public final class PrayerGameTests {
         h.succeedWhen(() -> {
             assertScanned(h, a);
             double v = sampleInRain(h, a);
-            double expected = PER_SAMPLE * Math.sqrt(2) * 1.0 * PrayerFormula.RAIN_FACTOR;
+            double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.0 * PrayerFormula.RAIN_FACTOR;
             h.assertTrue(Math.abs(v - expected) < EPS, "露天祭坛下雨减半：应为 " + expected + "，实际 " + v);
         });
     }
@@ -576,7 +574,7 @@ public final class PrayerGameTests {
             assertScanned(h, a);
             h.assertTrue(be(h, a).verdict(TempleService.rules()).grantedLevel() == 1, "前提：认定为小神庙");
             double v = sampleInRain(h, a);
-            double expected = PER_SAMPLE * Math.sqrt(2) * 1.5;
+            double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.5;
             h.assertTrue(Math.abs(v - expected) < EPS, "小神庙下雨不减：应为 " + expected + "，实际 " + v);
         });
     }
@@ -597,11 +595,8 @@ public final class PrayerGameTests {
             long now = WorldClock.now(server);
             PlayerActivity.markActive(p);
             PrayerService.resetForTest(a);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.east(), true, now);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.west(), true, now);
-            for (int i = 0; i < 100; i++) {
-                PrayerService.sampleForTest(server);
-            }
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
             double pending = PrayerService.pending(a);
             long before = MythData.get(p).civ(Civilization.GREEK).favor();
             l.setLastSettledTick(now - 20);
@@ -650,10 +645,7 @@ public final class PrayerGameTests {
             long now = WorldClock.now(server);
             PlayerActivity.markActive(p);
             PrayerService.resetForTest(a);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.east(), true, now);
-            for (int i = 0; i < 100; i++) {
-                PrayerService.sampleForTest(server);
-            }
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
             RuntimeLedgers ledgers = RuntimeLedgers.get(server);
             ProducerLedger l = ledgers.get(PrayerService.ledgerId(a)).orElseThrow();
             l.setLastSettledTick(now - 20);
@@ -776,7 +768,9 @@ public final class PrayerGameTests {
             PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.east(), true, now);
             PrayerService.sampleForTest(h.getLevel().getServer());
             PrayerService.Stats st = PrayerService.stats(be, TempleService.rules());
-            h.assertTrue(Math.abs(st.estimate() - PrayerFormula.estimate(3, 2, 1.0, 0)) < EPS, "预计日产按信徒 3、祈祷位 2：" + st);
+            // GA-4：预计日产按近 7 日信徒，不再受祈祷位限制（succeedWhen 每刻重试会多记几名，按统计里的人数比）
+            h.assertTrue(st.believers() >= 3 && Math.abs(st.estimate() - PrayerFormula.estimate(st.believers(), 1.0, 0, 1)) < EPS,
+                    "预计日产按近 7 日信徒：" + st);
             ShrineSurvey payload = GreekShrineSurvey.of(be, p, TempleService.rules());
             h.assertTrue(payload.estimate() == st.estimate() && payload.prayer().believers() == st.believers()
                     && payload.prayer().today() == st.today() && payload.prayer().praying() == st.praying(),
@@ -799,6 +793,127 @@ public final class PrayerGameTests {
                     && String.format(java.util.Locale.ROOT, "%.1f", row.perDay()).equals(
                     ((TranslatableContents) panelRow.value().getContents()).getArgs()[0]), "面板行与来源一致：" + panelRow);
             PrayerService.resetForTest(a);
+        });
+    }
+
+    // ───────────── GA-4：按今日信徒入账与供奉（TC-GA4-45、50～58） ─────────────
+
+    /** TC-GA4-45：原版信徒跪满 600 刻入一笔，然后离开，当天不再来。 */
+    @GameTest(template = T, batch = "prayer_walk", timeoutTicks = 1400)
+    public static void believer_prays_once_then_leaves(GameTestHelper h) {
+        ground(h);
+        FakePlayer p = owner(h, "pr_once");
+        GlobalPos a = altar(h, ALTAR, p);
+        VillageRegistry.Village village = greekVillage(h);
+        Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 32)));
+        h.succeedWhen(() -> {
+            assertScanned(h, a);
+            long today = today(h);
+            PrayerRecord rec = PrayAtAltar.record(v);
+            h.assertTrue(rec.creditedOn(today), "跪满 600 刻后记为今天已入账：" + describe(h, v, a));
+            h.assertTrue(!rec.praying(), "入账后离开祈祷位");
+            h.assertTrue(be(h, a).believersToday(today) == 1 && PrayerService.pending(a) > 0, "今日信徒 1、有待领产出");
+            cleanup(h, List.of(village), a);
+        });
+    }
+
+    private static ItemStack libation(int n) {
+        return new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.LIBATION.get(), n);
+    }
+
+    /** TC-GA4-50、51：主人献奠酒：扣 1、记今天；已入账的部分按 +50% 补发，之后的每笔 ×1.5。 */
+    @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
+    public static void offering_bonus_whole_day(GameTestHelper h) {
+        ground(h);
+        FakePlayer p = owner(h, "pr_offer");
+        GlobalPos a = altar(h, ALTAR, p);
+        h.succeedWhen(() -> {
+            assertScanned(h, a);
+            PrayerService.resetForTest(a);
+            GreekAltarBlockEntity be = be(h, a);
+            long today = today(h);
+            be.markOffered(today - 1);
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            double before = PrayerService.pending(a);
+            ItemStack st = libation(3);
+            h.assertTrue(PrayerService.offer(p, be, st) == PrayerService.OfferResult.OK, "献供成功");
+            h.assertTrue(st.getCount() == 2 && be.offeredOn(today), "扣 1 个、记今天");
+            h.assertTrue(Math.abs(PrayerService.pending(a) - before * 1.5) < EPS, "已入账部分补 50%：" + before + " → " + PrayerService.pending(a));
+            double mid = PrayerService.pending(a);
+            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            double third = PrayerService.pending(a) - mid;
+            h.assertTrue(Math.abs(third - 1.5 * PrayerFormula.credit(3, 1.0, 1, 0, 0, 1)) < EPS, "第 3 名按 ×1.5：" + third);
+            h.assertTrue(Math.abs(PrayerService.pending(a) - PrayerFormula.daily(3, 1.0, 0, 0.5, 1)) < EPS, "合计等于献供日产");
+            h.assertTrue(PrayerService.stats(be, TempleService.rules()).offered(), "统计显示今日已献");
+            PrayerService.resetForTest(a);
+        });
+    }
+
+    /** TC-GA4-52～55：再献、非主人、数量不够、不是供品：都不扣物品。 */
+    @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
+    public static void offering_refusals(GameTestHelper h) {
+        ground(h);
+        FakePlayer p = owner(h, "pr_offer_no");
+        FakePlayer other = owner(h, "pr_offer_other");
+        GlobalPos a = altar(h, ALTAR, p);
+        h.succeedWhen(() -> {
+            assertScanned(h, a);
+            GreekAltarBlockEntity be = be(h, a);
+            long today = today(h);
+            be.markOffered(today - 1);
+            ItemStack beef = new ItemStack(Items.COOKED_BEEF, 1);
+            h.assertTrue(PrayerService.offer(p, be, beef) == PrayerService.OfferResult.NOT_ENOUGH && beef.getCount() == 1, "熟牛肉要 2 个");
+            ItemStack stone = new ItemStack(Items.STONE, 5);
+            h.assertTrue(PrayerService.offer(p, be, stone) == PrayerService.OfferResult.NOT_OFFERING && stone.getCount() == 5, "石头不是供品");
+            ItemStack mine = libation(1);
+            h.assertTrue(PrayerService.offer(other, be, mine) == PrayerService.OfferResult.NOT_OWNER && mine.getCount() == 1, "别人不能献");
+            h.assertTrue(PrayerService.offer(p, be, mine) == PrayerService.OfferResult.OK && mine.isEmpty(), "主人献成");
+            ItemStack again = libation(1);
+            h.assertTrue(PrayerService.offer(p, be, again) == PrayerService.OfferResult.ALREADY && again.getCount() == 1, "当天再献被拒");
+            h.assertFalse(be.offeredOn(today + 1), "TC-GA4-56 第二天可以再献");
+        });
+    }
+
+    /** TC-GA4-57：「今天已献」存进方块实体，重载后保留。 */
+    @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
+    public static void offering_survives_reload(GameTestHelper h) {
+        ground(h);
+        FakePlayer p = owner(h, "pr_offer_save");
+        GlobalPos a = altar(h, ALTAR, p);
+        h.succeedWhen(() -> {
+            assertScanned(h, a);
+            GreekAltarBlockEntity be = be(h, a);
+            long today = today(h);
+            be.markOffered(today);
+            var tag = be.saveWithoutMetadata(h.getLevel().registryAccess());
+            GreekAltarBlockEntity copy = new GreekAltarBlockEntity(be.getBlockPos(), be.getBlockState());
+            copy.loadWithComponents(tag, h.getLevel().registryAccess());
+            h.assertTrue(copy.offeredOn(today) && !copy.offeredOn(today - 1), "重载后仍是今天已献");
+        });
+    }
+
+    /** TC-GA4-58：服务器倍率 2 → 一名信徒入账翻倍。单独一批：改配置不影响同批其他用例。 */
+    @GameTest(template = T, batch = "prayer_mult", timeoutTicks = 200)
+    public static void rate_multiplier_scales_credit(GameTestHelper h) {
+        ground(h);
+        FakePlayer p = owner(h, "pr_mult");
+        GlobalPos a = altar(h, ALTAR, p);
+        h.succeedWhen(() -> {
+            assertScanned(h, a);
+            ConfigHolder<WorldRulesConfig> holder = ModConfigs.worldRules();
+            WorldRulesConfig original = holder.current();
+            try {
+                holder.reload(ConfigLoader.toPrettyJson(holder.schema(),
+                        original.withGreek(original.greek().withPrayer(new WorldRulesConfig.Prayer(1, 2.0)))));
+                PrayerService.resetForTest(a);
+                PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+                h.assertTrue(Math.abs(PrayerService.pending(a) - 2 * PrayerFormula.DAILY_BASE) < EPS,
+                        "倍率 2：" + PrayerService.pending(a));
+            } finally {
+                holder.reload(ConfigLoader.toPrettyJson(holder.schema(), original));
+                PrayerService.resetForTest(a);
+            }
         });
     }
 }

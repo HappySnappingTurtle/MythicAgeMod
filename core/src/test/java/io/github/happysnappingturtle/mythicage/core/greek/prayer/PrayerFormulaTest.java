@@ -5,27 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** T10 信徒祈祷的 core 用例（TC-T10-01～14）。 */
+/** T10 信徒祈祷的 core 用例（TC-T10-01、10～14）与 GA-4 按今日信徒入账（TC-GA4-01～10）。 */
 class PrayerFormulaTest {
-    private static final double PER_TICK = PrayerFormula.BASE_PER_MINUTE / PrayerFormula.TICKS_PER_MINUTE;
-
-    private static PrayerFormula.Altar altar(int n, double t) {
-        return new PrayerFormula.Altar(n, t, 1);
-    }
-
-    private static double sum(double[] a) {
-        double s = 0;
-        for (double v : a) {
-            s += v;
-        }
-        return s;
-    }
-
     @Test
     void tc01_dailyTable() {
         // 01_希腊 §3.3 算例表：n、T̄、R → 日产
@@ -37,67 +22,79 @@ class PrayerFormulaTest {
         }
     }
 
-    @Test
-    void tc02_splitByHeadcount() {
-        double[] out = PrayerFormula.distribute(List.of(altar(3, 1.5), altar(1, 1.5)), 0, 20);
-        assertEquals(3.0, out[0] / out[1], 1e-9);
-        assertEquals(PER_TICK * 20 * Math.sqrt(4) * 1.5, sum(out), 1e-12);
+    // ───── GA-4：按今日信徒入账（TC-GA4-01～10，取代原 TC-T10-02～09 的按刻分配） ─────
+
+    private static double sumCredits(int from, int to, double tier) {
+        double s = 0;
+        for (int n = from; n <= to; n++) {
+            s += PrayerFormula.credit(n, tier, 1, 0, 0, 1);
+        }
+        return s;
     }
 
     @Test
-    void tc03_splitByTier() {
-        double[] out = PrayerFormula.distribute(List.of(altar(3, 3.0), altar(1, 1.5)), 0, 20);
-        double tBar = (3 * 3.0 + 1 * 1.5) / 4;
-        assertEquals(PER_TICK * 20 * Math.sqrt(4) * tBar, sum(out), 1e-12);
-        assertEquals(3 * 3.0 / (1 * 1.5), out[0] / out[1], 1e-9);
+    void ga4_01_firstBeliever() {
+        assertEquals(3.5 * 1.5, PrayerFormula.credit(1, 1.5, 1, 0, 0, 1), 1e-12);
     }
 
     @Test
-    void tc04_nobodyPraying() {
-        assertArrayEquals(new double[]{0, 0}, PrayerFormula.distribute(List.of(altar(0, 1), altar(0, 3)), 0, 20));
-        assertArrayEquals(new double[0], PrayerFormula.distribute(List.of(), 0, 20));
+    void ga4_02_creditsTelescopeToDaily() {
+        assertEquals(3.5 * 1.5 * Math.sqrt(8), sumCredits(1, 8, 1.5), 1e-9);
+        assertEquals(PrayerFormula.daily(8, 1.5, 0), sumCredits(1, 8, 1.5), 1e-9);
+        assertEquals(14.85, sumCredits(1, 8, 1.5), 0.01);
+    }
+
+    @Test
+    void ga4_03_capAt24() {
+        assertTrue(PrayerFormula.credit(24, 1, 1, 0, 0, 1) > 0);
+        assertEquals(0, PrayerFormula.credit(25, 1, 1, 0, 0, 1));
+        assertEquals(0, PrayerFormula.credit(30, 1, 1, 0, 0, 1));
+        assertEquals(3.5 * Math.sqrt(24), sumCredits(1, 30, 1), 1e-9);
+    }
+
+    @Test
+    void ga4_04_rainHalves() {
+        assertEquals(PrayerFormula.credit(3, 1, 1, 0, 0, 1) / 2,
+                PrayerFormula.credit(3, 1, PrayerFormula.RAIN_FACTOR, 0, 0, 1), 1e-12);
+    }
+
+    @Test
+    void ga4_05_offering() {
+        assertEquals(PrayerFormula.credit(3, 1.5, 1, 0, 0, 1) * 1.5, PrayerFormula.credit(3, 1.5, 1, 0, 0.5, 1), 1e-12);
+        assertEquals(PrayerFormula.credit(3, 1.5, 1, 0, 0, 1), PrayerFormula.credit(3, 1.5, 1, 0, -1, 1), 1e-12);
+    }
+
+    @Test
+    void ga4_06_relicClamped() {
+        double base = PrayerFormula.credit(4, 1, 1, 0, 0, 1);
+        assertEquals(base * 1.15, PrayerFormula.credit(4, 1, 1, 0.3, 0, 1), 1e-12);
+        assertEquals(base, PrayerFormula.credit(4, 1, 1, -1, 0, 1), 1e-12);
+    }
+
+    @Test
+    void ga4_07_multiplier() {
+        assertEquals(PrayerFormula.credit(1, 1.5, 1, 0, 0, 1) * 2, PrayerFormula.credit(1, 1.5, 1, 0, 0, 2), 1e-12);
+        assertEquals(0, PrayerFormula.credit(1, 1.5, 1, 0, 0, 0));
+    }
+
+    @Test
+    void ga4_08_badInput() {
+        assertEquals(0, PrayerFormula.credit(0, 1.5, 1, 0, 0, 1));
+        assertEquals(0, PrayerFormula.credit(-3, 1.5, 1, 0, 0, 1));
+        assertFalse(Double.isNaN(PrayerFormula.credit(-3, 1.5, 1, 0, 0, 1)));
         assertEquals(0, PrayerFormula.daily(0, 1, 0));
     }
 
     @Test
-    void tc05_capAt24() {
-        double[] out = PrayerFormula.distribute(List.of(altar(20, 1), altar(10, 1)), 0, 20);
-        assertEquals(PER_TICK * 20 * Math.sqrt(24), sum(out), 1e-12);
-        assertEquals(2.0, out[0] / out[1], 1e-9);
+    void ga4_09_dailyWithOffering() {
+        assertEquals(22.27, PrayerFormula.daily(8, 1.5, 0, 0.5, 1), 0.01);
     }
 
     @Test
-    void tc06_rainOnlyHitsOpenAltar() {
-        double[] dry = PrayerFormula.distribute(List.of(altar(2, 1.0), altar(2, 1.5)), 0, 20);
-        double[] wet = PrayerFormula.distribute(List.of(new PrayerFormula.Altar(2, 1.0, PrayerFormula.RAIN_FACTOR),
-                altar(2, 1.5)), 0, 20);
-        assertEquals(dry[0] / 2, wet[0], 1e-12);
-        assertEquals(dry[1], wet[1], 1e-12);
-    }
-
-    @Test
-    void tc07_relicBonusClamped() {
-        double base = sum(PrayerFormula.distribute(List.of(altar(4, 1)), 0, 20));
-        assertEquals(base * 1.15, sum(PrayerFormula.distribute(List.of(altar(4, 1)), 0.15, 20)), 1e-12);
-        assertEquals(base * 1.15, sum(PrayerFormula.distribute(List.of(altar(4, 1)), 0.4, 20)), 1e-12);
-        assertEquals(base, sum(PrayerFormula.distribute(List.of(altar(4, 1)), -1, 20)), 1e-12);
-    }
-
-    @Test
-    void tc08_samplesAddUpToDaily() {
-        double total = 0;
-        for (int i = 0; i < 350; i++) {
-            total += sum(PrayerFormula.distribute(List.of(altar(2, 1.0)), 0, 20));
-        }
-        assertEquals(PrayerFormula.daily(2, 1.0, 0), total, 1e-9);
-        assertEquals(4.9, total, 0.1);
-    }
-
-    @Test
-    void tc09_snapshotEstimate() {
-        assertEquals(10.5, PrayerFormula.estimate(9, 4, 1.5, 0), 1e-9);
-        assertEquals(0, PrayerFormula.estimate(0, 4, 1.5, 0), 1e-9);
-        assertEquals(PrayerFormula.daily(24, 3, 0), PrayerFormula.estimate(40, 30, 3, 0), 1e-9);
+    void ga4_10_estimateIgnoresSlots() {
+        assertEquals(PrayerFormula.daily(8, 1.5, 0), PrayerFormula.estimate(8, 1.5, 0, 1), 1e-9);
+        assertEquals(0, PrayerFormula.estimate(0, 1.5, 0, 1), 1e-9);
+        assertEquals(PrayerFormula.daily(24, 3, 0), PrayerFormula.estimate(40, 3, 0, 1), 1e-9);
     }
 
     @Test

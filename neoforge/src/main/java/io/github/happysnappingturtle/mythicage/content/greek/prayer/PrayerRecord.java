@@ -60,6 +60,17 @@ public final class PrayerRecord {
         return lastPrayDay == day;
     }
 
+    private long creditedDay = NEVER;
+
+    /** 今天已经祈祷满一次并入账（GA-4：一天只来一次）。 */
+    public boolean creditedOn(long day) {
+        return creditedDay == day;
+    }
+
+    public void markCredited(long day) {
+        creditedDay = day;
+    }
+
     /** 一次计入的祈祷。 */
     public void record(long day, UUID owner, GlobalPos altar) {
         this.lastPrayDay = day;
@@ -75,6 +86,7 @@ public final class PrayerRecord {
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putLong("LastPrayDay", lastPrayDay);
+        tag.putLong("CreditedDay", creditedDay);
         if (lastPrayOwner != null) {
             tag.putUUID("LastPrayOwner", lastPrayOwner);
         }
@@ -88,6 +100,7 @@ public final class PrayerRecord {
     public static PrayerRecord load(CompoundTag tag) {
         PrayerRecord r = new PrayerRecord();
         r.lastPrayDay = tag.contains("LastPrayDay") ? tag.getLong("LastPrayDay") : NEVER;
+        r.creditedDay = tag.contains("CreditedDay") ? tag.getLong("CreditedDay") : NEVER;
         r.lastPrayOwner = tag.hasUUID("LastPrayOwner") ? tag.getUUID("LastPrayOwner") : null;
         ResourceLocation dim = ResourceLocation.tryParse(tag.getString("AltarDim"));
         r.lastAltar = dim == null || !tag.contains("AltarPos") ? null

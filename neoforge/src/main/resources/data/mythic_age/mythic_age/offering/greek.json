@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "civilization": "greek",
+  "bonus": 0.5,
+  "items": [
+    {"item": "mythic_age:libation", "count": 1, "kind": "spondai"},
+    {"item": "minecraft:honey_bottle", "count": 1, "kind": "spondai"},
+    {"item": "minecraft:cooked_beef", "count": 2, "kind": "thysia"},
+    {"item": "minecraft:cooked_mutton", "count": 2, "kind": "thysia"},
+    {"item": "minecraft:cooked_porkchop", "count": 2, "kind": "thysia"},
+    {"item": "minecraft:bread", "count": 2, "kind": "pelanos"},
+    {"item": "minecraft:wheat", "count": 8, "kind": "aparchai"}
+  ]
+}

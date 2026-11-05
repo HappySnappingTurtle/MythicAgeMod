@@ -126,6 +126,7 @@ public final class MythicAge {
         game.addListener(ShrineService::onServerStopped);
         game.addListener(ShrineService::onBreak);
         game.addListener(TempleRulesLoader::onAddReloadListeners);
+        game.addListener(io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader::onAddReloadListeners);
         game.addListener(TempleService::onServerStarted);
         game.addListener(TempleService::onServerStopped);
         io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "temple_service", TempleService::onServerTickPost);

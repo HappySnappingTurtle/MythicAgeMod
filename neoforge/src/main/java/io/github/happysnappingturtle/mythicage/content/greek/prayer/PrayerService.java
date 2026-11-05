@@ -24,6 +24,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -39,8 +40,9 @@ import java.util.function.BiPredicate;
 import java.util.function.ToDoubleFunction;
 
 /**
- * 信徒祈祷的产出（T10 设计文档 §5）：每 20 刻（世界时钟）采样一次正在祈祷的信徒，按玩家合计 √n 分到各神坛的
- * 「待领产出」；T5 的结算通过探针 {@value #PROBE_TYPE} 取走。神坛有主人时登记台账
+ * 信徒祈祷的产出（T10 设计文档 §5；GA-4 改为按今日信徒计）：信徒祈祷满 {@link PrayerFormula#PRAY_TICKS} 刻时
+ * 按这位主人今天的信徒总数入一笔（√n 递减）到这座神坛的「待领产出」；T5 的结算通过探针 {@value #PROBE_TYPE} 取走。
+ * 主人当天在神坛献供后，这座神坛当天的入账按供品表的加成提高。神坛有主人时登记台账
  * {@code greek_temple:<维度>:<x,y,z>}，拆除时注销。
  * <p>
  * 采样只遍历有祈祷位预留的神坛，不扫实体；祈祷中的村民自己报到（{@link PrayAtAltar}）。
@@ -83,6 +85,7 @@ public final class PrayerService {
         SLOTS.clear();
         PENDING.clear();
         TODAY.clear();
+        TODAY_BASE.clear();
         UNREACHABLE.clear();
         lastSample = Long.MIN_VALUE;
     }
@@ -137,6 +140,7 @@ public final class PrayerService {
         SLOTS.releaseAll(key);
         PENDING.remove(key);
         TODAY.remove(key);
+        TODAY_BASE.remove(key);
         UNREACHABLE.remove(key);
     }
 
@@ -175,43 +179,127 @@ public final class PrayerService {
         sample(server, WorldClock.now(server), SAMPLE_INTERVAL);
     }
 
-    private record Sampled(GlobalPos pos, PrayerFormula.Altar altar) {
-    }
-
+    /** GA-4：采样只清理失效神坛的预留，不再入账（入账改在信徒祈祷满 {@link PrayerFormula#PRAY_TICKS} 刻时）。 */
     private static void sample(MinecraftServer server, long now, long dt) {
         ShrineRegistry reg = ShrineRegistry.get(server);
-        TempleRules rules = TempleService.rules();
-        Map<UUID, List<Sampled>> byOwner = new LinkedHashMap<>();
         for (GlobalPos key : SLOTS.altars(now)) {
-            Optional<ShrineRegistry.Entry> entry = reg.get(key);
             ServerLevel level = server.getLevel(key.dimension());
-            if (entry.isEmpty() || level == null || !level.isLoaded(key.pos())
-                    || !(level.getBlockEntity(key.pos()) instanceof GreekAltarBlockEntity be)) {
+            if (reg.get(key).isEmpty() || level == null || !level.isLoaded(key.pos())
+                    || !(level.getBlockEntity(key.pos()) instanceof GreekAltarBlockEntity)) {
                 SLOTS.releaseAll(key);
-                continue;
             }
-            int n = (int) SLOTS.live(key, now).stream().filter(c -> c.arrived() && c.counted()).count();
-            if (n == 0) {
-                continue;
+        }
+    }
+
+    // ───────────── 入账（GA-4） ─────────────
+
+    /** 神坛 → {MC 日序号, 当日不含供奉的入账}：当天献供时按它补发。 */
+    private static final Map<GlobalPos, double[]> TODAY_BASE = new HashMap<>();
+
+    static double multiplier() {
+        return io.github.happysnappingturtle.mythicage.config.ModConfigs.worldRules().current().greek().prayer().rateMultiplier();
+    }
+
+    /** 主人今天各希腊神坛合计的信徒数（只数已载入的神坛）。 */
+    static int believersToday(MinecraftServer server, UUID owner, long today) {
+        int n = 0;
+        for (ShrineRegistry.Entry e : ShrineRegistry.get(server).ownedBy(owner, Civilization.GREEK)) {
+            GreekAltarBlockEntity be = altarAt(server, e.pos());
+            if (be != null) {
+                n += be.believersToday(today);
             }
-            byOwner.computeIfAbsent(entry.get().owner(), k -> new ArrayList<>())
-                    .add(new Sampled(key, new PrayerFormula.Altar(n, tier(be, rules).coefficient(), weather(level, be, rules))));
+        }
+        return n;
+    }
+
+    /**
+     * 一名信徒在这座神坛祈祷满 {@link PrayerFormula#PRAY_TICKS} 刻：记为今日信徒并入一笔（GA-4 设计文档 §2.2）。
+     * 今天已在这里计入过、神坛无主或不是希腊神坛时什么都不做，返回 false。
+     */
+    public static boolean credit(ServerLevel level, GlobalPos key, UUID villager) {
+        MinecraftServer server = level.getServer();
+        GreekAltarBlockEntity be = altarAt(server, key);
+        if (be == null || be.owner().isEmpty()) {
+            return false;
         }
         long today = MythDays.today(server);
-        byOwner.forEach((owner, list) -> {
-            double[] shares = PrayerFormula.distribute(list.stream().map(Sampled::altar).toList(),
-                    relicBonus.applyAsDouble(owner), dt);
-            for (int i = 0; i < shares.length; i++) {
-                GlobalPos key = list.get(i).pos();
-                PENDING.merge(key, shares[i], Double::sum);
-                double[] t = TODAY.computeIfAbsent(key, k -> new double[]{today, 0});
-                if (t[0] != today) {
-                    t[0] = today;
-                    t[1] = 0;
-                }
-                t[1] += shares[i];
-            }
-        });
+        if (be.prayedHereToday(villager, today)) {
+            return false;
+        }
+        if (be.notePrayer(villager, today)) {
+            refreshEstimate(be);
+        }
+        UUID owner = be.owner().get();
+        int n = believersToday(server, owner, today);
+        TempleRules rules = TempleService.rules();
+        double t = tier(be, rules).coefficient();
+        double w = weather(level, be, rules);
+        double r = relicBonus.applyAsDouble(owner);
+        double m = multiplier();
+        double base = PrayerFormula.credit(n, t, w, r, 0, m);
+        double gain = PrayerFormula.credit(n, t, w, r, offering(be, today), m);
+        PENDING.merge(key, gain, Double::sum);
+        addToday(TODAY, key, today, gain);
+        addToday(TODAY_BASE, key, today, base);
+        return true;
+    }
+
+    private static void addToday(Map<GlobalPos, double[]> map, GlobalPos key, long today, double v) {
+        double[] t = map.computeIfAbsent(key, k -> new double[]{today, 0});
+        if (t[0] != today) {
+            t[0] = today;
+            t[1] = 0;
+        }
+        t[1] += v;
+    }
+
+    private static double todayOf(Map<GlobalPos, double[]> map, GlobalPos key, long today) {
+        double[] t = map.get(key);
+        return t != null && t[0] == today ? t[1] : 0;
+    }
+
+    /** 当天这座神坛的供奉加成 O。 */
+    static double offering(GreekAltarBlockEntity be, long today) {
+        return be.offeredOn(today) ? OfferingLoader.greek().bonus() : 0;
+    }
+
+    // ───────────── 供奉（GA-4） ─────────────
+
+    public enum OfferResult { OK, NOT_OFFERING, NOT_ENOUGH, NOT_OWNER, ALREADY }
+
+    /**
+     * 主人手持供品献给这座神坛：扣物品、记今天已献、把今天已入账的部分按加成补一笔（GA-4 设计文档 §2.5）。
+     * 不成功时不扣物品。
+     */
+    public static OfferResult offer(ServerPlayer player, GreekAltarBlockEntity be, ItemStack stack) {
+        var table = OfferingLoader.greek();
+        String id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+        var offering = table.of(id);
+        if (offering.isEmpty()) {
+            return OfferResult.NOT_OFFERING;
+        }
+        if (be.owner().filter(player.getUUID()::equals).isEmpty()) {
+            return OfferResult.NOT_OWNER;
+        }
+        MinecraftServer server = player.server;
+        long today = MythDays.today(server);
+        if (be.offeredOn(today)) {
+            return OfferResult.ALREADY;
+        }
+        if (stack.getCount() < offering.get().count()) {
+            return OfferResult.NOT_ENOUGH;
+        }
+        if (!player.getAbilities().instabuild) {
+            stack.shrink(offering.get().count());
+        }
+        be.markOffered(today);
+        GlobalPos key = GlobalPos.of(be.getLevel().dimension(), be.getBlockPos());
+        double back = todayOf(TODAY_BASE, key, today) * table.bonus();
+        if (back > 0) {
+            PENDING.merge(key, back, Double::sum);
+            addToday(TODAY, key, today, back);
+        }
+        return OfferResult.OK;
     }
 
     static TempleRules.Tier tier(GreekAltarBlockEntity be, TempleRules rules) {
@@ -269,8 +357,8 @@ public final class PrayerService {
      * @param favorFull   主人的希腊恩宠已满（只在主人在线时可知）
      */
     public record Stats(int praying, int believers, double today, double estimate, boolean rainHalved, int tooClose,
-                        boolean unreachable, boolean favorFull) {
-        public static final Stats EMPTY = new Stats(0, 0, 0, 0, false, 0, false, false);
+                        boolean unreachable, boolean favorFull, int todayBelievers, boolean offered) {
+        public static final Stats EMPTY = new Stats(0, 0, 0, 0, false, 0, false, false, 0, false);
     }
 
     public static Stats stats(GreekAltarBlockEntity be, TempleRules rules) {
@@ -291,14 +379,15 @@ public final class PrayerService {
                 .map(p -> MythData.get(p).civ(Civilization.GREEK).favor() >= MythData.cap(p, Civilization.GREEK))
                 .orElse(false);
         return new Stats(praying, be.believers(today), todayYield, estimate(be, rules),
-                weather(level, be, rules) < 1, tooClose, gaveUp != null && now - gaveUp < UNREACHABLE_MEMORY, full);
+                weather(level, be, rules) < 1, tooClose, gaveUp != null && now - gaveUp < UNREACHABLE_MEMORY, full,
+                be.believersToday(today), be.offeredOn(today));
     }
 
-    /** 预计日产：3.5 × √min(近 7 日信徒, 祈祷位, 24) × T × (1 + R)（T10 设计文档 §5.2）。 */
+    /** 预计日产：3.5 × √min(近 7 日信徒, 24) × T × (1 + R) × M（GA-4：不再受祈祷位限制，不含供奉）。 */
     public static double estimate(GreekAltarBlockEntity be, TempleRules rules) {
         long today = be.getLevel() instanceof ServerLevel level ? MythDays.today(level.getServer()) : 0;
         double r = be.owner().map(relicBonus::applyAsDouble).orElse(0.0);
-        return PrayerFormula.estimate(be.believers(today), be.prayerSlots(rules).size(), tier(be, rules).coefficient(), r);
+        return PrayerFormula.estimate(be.believers(today), tier(be, rules).coefficient(), r, multiplier());
     }
 
     static void markUnreachable(GlobalPos altar, long now) {
@@ -320,6 +409,7 @@ public final class PrayerService {
         SLOTS.releaseAll(altar);
         PENDING.remove(altar);
         TODAY.remove(altar);
+        TODAY_BASE.remove(altar);
         UNREACHABLE.remove(altar);
     }
 

@@ -107,8 +107,11 @@ public final class PlaytestGameTests {
         ShrineRegistry.get(h.getLevel().getServer()).add(new ShrineRegistry.Entry(fake, p.getUUID(), "pt50",
                 net.minecraft.core.Direction.SOUTH, GREEK, GreekTemple.ALTAR_KIND.id()));
         p.setHealth(5);
+        p.getInventory().add(new ItemStack(Items.DIAMOND, 3));
+        p.setExperienceLevels(5);
         long version = MythData.get(p).dataVersion();
         PlaytestSetup.reset(p, PlaytestState.get(h.getLevel().getServer()));
+        h.assertTrue(p.getInventory().countItem(Items.DIAMOND) == 0 && p.experienceLevel == 0, "背包与经验清空");
         h.assertTrue(MythData.get(p).dataVersion() > version, "版本号要比清场前大，客户端才收同步");
         PlayerMythData.CivState after = MythData.get(p).civ(GREEK);
         h.assertTrue(after.age() == Age.NONE && after.favor() == 0, "时代、恩宠归零：" + after.age() + " " + after.favor());
@@ -128,6 +131,8 @@ public final class PlaytestGameTests {
         MythData.get(p).civ(GREEK).setAge(Age.CLASSICAL);
         MythData.get(p).civ(GREEK).setFavor(80);
         MythData.get(p).firstKills().add("mythic_age:minotaur");
+        p.getInventory().add(new ItemStack(Items.DIAMOND, 5));
+        p.setExperienceLevels(7);
         h.assertTrue(PlaytestSetup.reset(p, st), "第一次进站");
         PlaytestSetup.apply(p, spec("powers"));
         h.assertFalse(PlaytestSetup.reset(p, st), "第二次不再存快照");
@@ -137,6 +142,9 @@ public final class PlaytestGameTests {
         PlayerMythData d = MythData.get(p);
         h.assertTrue(d.civ(GREEK).age() == Age.CLASSICAL && d.civ(GREEK).favor() == 80
                 && d.firstKills().contains("mythic_age:minotaur"), "恢复成第一次进站前：" + d.civ(GREEK).age() + " " + d.civ(GREEK).favor());
+        h.assertTrue(p.getInventory().countItem(Items.DIAMOND) == 5 && p.experienceLevel == 7,
+                "背包与经验也恢复：钻石 " + p.getInventory().countItem(Items.DIAMOND) + " 级 " + p.experienceLevel);
+        h.assertTrue(count(p, "mythic_age:greek_altar") == 0, "上一站给的东西不留");
         h.assertFalse(st.hasSnapshot(p.getUUID()), "快照用掉");
         h.assertFalse(PlaytestSetup.restore(p, st), "没有快照时失败");
         cleanup(h, p);
@@ -183,6 +191,8 @@ public final class PlaytestGameTests {
         h.assertTrue(count(p, "mythic_age:greek_altar") == 1, "祭坛 1");
         h.assertTrue(count(p, "mythic_age:marble_pillar") == 16 && count(p, "mythic_age:smooth_marble") == 128
                 && count(p, "mythic_age:greek_brazier") == 2 && p.getInventory().countItem(Items.FLINT_AND_STEEL) == 1, "一级材料");
+        h.assertTrue(count(p, "mythic_age:libation") == 1, "奠酒 1（试供奉）");
+        h.assertTrue(p.getInventory().contains(Handbook.stack()), "每站都有手札");
         cleanup(h, p);
         h.succeed();
     }

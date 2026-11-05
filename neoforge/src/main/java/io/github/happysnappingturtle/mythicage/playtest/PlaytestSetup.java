@@ -26,6 +26,9 @@ import io.github.happysnappingturtle.mythicage.village.quest.QuestService;
 import io.github.happysnappingturtle.mythicage.village.work.VillageScheduler;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -48,13 +51,24 @@ public final class PlaytestSetup {
     }
 
     /**
-     * 清场：第一次时存快照；神话数据换新（保留手札回执，免得重新登录再发一本）；撤销本模组进度；
-     * 拆掉名下的祭坛、遣散召唤物；生存模式、满血、清效果。不清背包。
+     * 清场：第一次时存快照（神话数据、背包、经验）；神话数据换新（保留手札回执，免得重新登录再发一本）；撤销本模组进度；
+     * 拆掉名下的祭坛、遣散召唤物；清空背包与经验；生存模式、满血、清效果。
      *
      * @return 这次是否第一次进站（新存了快照）
      */
     public static boolean reset(ServerPlayer p, PlaytestState state) {
-        boolean first = state.snapshotIfAbsent(p.getUUID(), PlayerDataNbt.write(MythData.get(p)));
+        CompoundTag snap = new CompoundTag();
+        snap.put(SNAP_MYTH, PlayerDataNbt.write(MythData.get(p)));
+        snap.put(SNAP_INVENTORY, p.getInventory().save(new ListTag()));
+        snap.putInt(SNAP_XP_LEVEL, p.experienceLevel);
+        snap.putFloat(SNAP_XP_PROGRESS, p.experienceProgress);
+        snap.putInt(SNAP_XP_TOTAL, p.totalExperience);
+        boolean first = state.snapshotIfAbsent(p.getUUID(), snap);
+        p.getInventory().clearContent();
+        p.setExperienceLevels(0);
+        p.experienceProgress = 0;
+        p.totalExperience = 0;
+        p.setExperiencePoints(0);
         boolean hadBook = MythData.get(p).receipts().contains(ReceiptBook.Scope.UNIQUE, HANDBOOK_RECEIPT);
         PlayerMythData fresh = new PlayerMythData();
         // 版本号接着往上走：客户端丢弃版本号不比已有的新的同步包
@@ -113,9 +127,22 @@ public final class PlaytestSetup {
         removeShrines(p);
     }
 
-    /** 恢复快照；没有快照时返回 false。 */
+    static final String SNAP_MYTH = "Myth", SNAP_INVENTORY = "Inventory", SNAP_XP_LEVEL = "XpLevel",
+            SNAP_XP_PROGRESS = "XpProgress", SNAP_XP_TOTAL = "XpTotal";
+
+    /** 恢复快照（神话数据、背包、经验）；没有快照时返回 false。早期只存了神话数据的快照也能读。 */
     public static boolean restore(ServerPlayer p, PlaytestState state) {
-        return state.takeSnapshot(p.getUUID()).map(tag -> {
+        return state.takeSnapshot(p.getUUID()).map(snap -> {
+            boolean full = snap.contains(SNAP_MYTH, Tag.TAG_COMPOUND);
+            CompoundTag tag = full ? snap.getCompound(SNAP_MYTH) : snap;
+            if (full) {
+                p.getInventory().clearContent();
+                p.getInventory().load(snap.getList(SNAP_INVENTORY, Tag.TAG_COMPOUND));
+                p.setExperienceLevels(snap.getInt(SNAP_XP_LEVEL));
+                p.experienceProgress = snap.getFloat(SNAP_XP_PROGRESS);
+                p.totalExperience = snap.getInt(SNAP_XP_TOTAL);
+                p.setExperiencePoints((int) (p.experienceProgress * p.getXpNeededForNextLevel()));
+            }
             revokeAdvancements(p);
             PlayerMythData restored = PlayerDataNbt.read(tag);
             restored.setDataVersion(Math.max(restored.dataVersion(), MythData.get(p).dataVersion()) + 1);
@@ -164,6 +191,10 @@ public final class PlaytestSetup {
         }
         if (spec.handbook()) {
             Handbook.giveOnce(p);
+        }
+        // 背包已清空：每站都放一本手札
+        if (!p.getInventory().contains(Handbook.stack())) {
+            TradeService.give(p, Handbook.stack());
         }
         return missing;
     }

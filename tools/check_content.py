@@ -502,6 +502,7 @@ def run(root: Path, design: Path | None) -> Report:
     check_rigs(root, report)
     check_warning_fx(root, report)
     check_handbook(paths, report)
+    check_offerings(paths, report)
     check_untranslated(paths, report)
     return report
 
@@ -595,6 +596,30 @@ def advancement_ids(paths: Paths) -> set[str]:
             for f in base.rglob("*.json"):
                 out.add(f"{MOD}:" + "/".join(f.relative_to(base).with_suffix("").parts))
     return out
+
+
+def check_offerings(paths: Paths, report: Report) -> None:
+    """GA-4 供品表：本模组物品要有物品形态；数量 ≥ 1；加成 0–2。"""
+    items = item_ids(paths)
+    for data in paths.data():
+        base = data / MOD / MOD / "offering"
+        if not base.is_dir():
+            continue
+        for f in sorted(base.glob("*.json")):
+            d = json.loads(f.read_text(encoding="utf-8"))
+            bonus = d.get("bonus")
+            if not isinstance(bonus, (int, float)) or not 0 <= bonus <= 2:
+                report.error(f"供品表 {f.name}：bonus 应在 0–2，实际 {bonus}")
+            seen = set()
+            for e in d.get("items", []):
+                item = e.get("item", "")
+                if item in seen:
+                    report.error(f"供品表 {f.name}：重复的 {item}")
+                seen.add(item)
+                if int(e.get("count", 1)) < 1:
+                    report.error(f"供品表 {f.name}：{item} 的 count 应 ≥ 1")
+                if item.startswith(MOD + ":") and item not in items:
+                    report.error(f"供品表 {f.name}：没有物品 {item}")
 
 
 def check_handbook(paths: Paths, report: Report) -> None:

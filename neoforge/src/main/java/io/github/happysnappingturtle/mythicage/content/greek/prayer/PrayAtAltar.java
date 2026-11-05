@@ -34,6 +34,7 @@ import java.util.UUID;
 /**
  * 信徒到神坛的祈祷位跪拜（T10 设计文档 §4）。由 Mixin 追加到村民的工作包与闲逛包末尾，
  * 只对希腊村庄的成年成员生效；白天 2000–9000 走到祈祷位，面向神坛跪拜，每 20 刻向 {@link PrayerService} 报到。
+ * 跪满 {@link PrayerFormula#PRAY_TICKS} 刻入账后结束，当天不再来（GA-4）。
  * <p>
  * 每个村民的两个包各有一个实例，用 {@link PrayerRecord#running} 保证同一时刻只有一个在跑。
  */
@@ -58,6 +59,9 @@ public final class PrayAtAltar extends Behavior<Villager> {
     private long startedAt;
     private boolean arrived;
     private boolean counted;
+    /** 到达祈祷位的刻；满 {@link PrayerFormula#PRAY_TICKS} 刻入账后结束（GA-4）。 */
+    private long arrivedAt;
+    private boolean done;
     private boolean lost;
     private boolean gaveUp;
 
@@ -111,6 +115,9 @@ public final class PrayAtAltar extends Behavior<Villager> {
     private boolean choose(ServerLevel level, Villager v, PrayerRecord rec, VillageRegistry.Village village) {
         TempleRules rules = TempleService.rules();
         long today = MythDays.today(level.getServer());
+        if (rec.creditedOn(today)) {
+            return false;
+        }
         BlockPos bell = village.bell().pos();
         boolean sameDim = village.bell().dimension().equals(level.dimension());
         List<BelieverRules.Candidate<GlobalPos>> candidates = new ArrayList<>();
@@ -157,6 +164,7 @@ public final class PrayAtAltar extends Behavior<Villager> {
         startedAt = gameTime;
         arrived = false;
         counted = false;
+        done = false;
         lost = false;
         gaveUp = false;
         v.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
@@ -170,7 +178,7 @@ public final class PrayAtAltar extends Behavior<Villager> {
 
     @Override
     protected boolean canStillUse(ServerLevel level, Villager v, long gameTime) {
-        if (lost || !free(v) || !PrayerFormula.inWindow(level.getDayTime())
+        if (done || lost || !free(v) || !PrayerFormula.inWindow(level.getDayTime())
                 || !PrayerService.isGreekAltar(level.getServer(), altar)) {
             return false;
         }
@@ -214,20 +222,21 @@ public final class PrayAtAltar extends Behavior<Villager> {
         if (counted && gameTime % 40 == v.getId() % 40) {
             level.sendParticles(GOLD, v.getX(), v.getY() + 1.1, v.getZ(), 3, 0.3, 0.3, 0.3, 0);
         }
+        if (arrived && counted && !done && gameTime - arrivedAt >= PrayerFormula.PRAY_TICKS) {
+            PrayerService.credit(level, altar, v.getUUID());
+            record(v).markCredited(MythDays.today(level.getServer()));
+            done = true;
+        }
     }
 
     private void arrive(ServerLevel level, Villager v) {
         arrived = true;
+        arrivedAt = level.getGameTime();
         GlobalPos home = v.getBrain().getMemory(MemoryModuleType.HOME).orElseThrow();
         counted = BelieverRules.pilgrimageOk(home.pos().getX() + 0.5, home.pos().getZ() + 0.5, slot.getX() + 0.5, slot.getZ() + 0.5);
         PrayerService.SLOTS.report(altar, v.getUUID(), level.getGameTime(), true, counted, !counted);
         if (counted) {
-            long today = MythDays.today(level.getServer());
-            record(v).record(today, owner, altar);
-            GreekAltarBlockEntity be = PrayerService.altarAt(level.getServer(), altar);
-            if (be != null && be.notePrayer(v.getUUID(), today)) {
-                PrayerService.refreshEstimate(be);
-            }
+            record(v).record(MythDays.today(level.getServer()), owner, altar);
         }
         BelieverEvents.sync(v, record(v), true, true);
     }
