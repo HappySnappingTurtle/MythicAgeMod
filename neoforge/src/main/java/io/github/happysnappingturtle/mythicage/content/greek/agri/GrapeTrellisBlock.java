@@ -169,12 +169,18 @@ public class GrapeTrellisBlock extends Block implements BonemealableBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
+        // GA-2：拿葡萄点空架子时提示要用插条（不吃葡萄）
+        if (stack.is(GreekAgriculture.GRAPE.get()) && state.getValue(STAGE) == 0) {
+            hint(level, player, "mythic_age.grape.hint.need_cutting");
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (!stack.is(GreekAgriculture.GRAPE_CUTTING.get()) || state.getValue(STAGE) != 0) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         BlockPos bottom = bottomOf(pos, state);
         BlockState b = level.getBlockState(bottom);
         if (!isPart(b, Part.BOTTOM) || !plantableOn(level.getBlockState(bottom.below()))) {
+            hint(level, player, "mythic_age.grape.hint.need_dirt");
             return ItemInteractionResult.FAIL;
         }
         if (!level.isClientSide) {
@@ -183,6 +189,12 @@ public class GrapeTrellisBlock extends Block implements BonemealableBlock {
             stack.consume(1, player);
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    private static void hint(Level level, Player player, String key) {
+        if (!level.isClientSide && player != null) {
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable(key), true);
+        }
     }
 
     @Override

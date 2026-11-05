@@ -56,6 +56,10 @@ public final class MythicJeiPlugin implements IModPlugin {
                         new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple.GREEK_ALTAR.get()),
                         new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.LIBATION.get())),
                 mezz.jei.api.constants.VanillaTypes.ITEM_STACK, offering);
+        // GA-2 种葡萄
+        registration.addIngredientInfo(List.of(new ItemStack(GreekAgriculture.GRAPE_CUTTING.get()),
+                        new ItemStack(GreekAgriculture.GRAPE_TRELLIS.get()), new ItemStack(GreekAgriculture.WILD_GRAPEVINE.get())),
+                mezz.jei.api.constants.VanillaTypes.ITEM_STACK, net.minecraft.network.chat.Component.translatable("mythic_age.jei.grape"));
     }
 
     @Override

@@ -2,7 +2,7 @@
 
 Minecraft 生存模组，目标是在同一世界中呈现希腊、埃及、北欧、中华与亚特兰蒂斯的神话文明。通过村庄、神庙、恩宠、一次性神力、神话单位与试炼推进游戏。
 
-**当前版本：`0.1.0-alpha.A`，阶段 A 试玩候选，仅希腊 MVP。** 这不是五文明完整版，也不表示 G-A 用户试玩已通过。建议新建世界；不要直接覆盖旧版或重要存档。
+**当前版本：`0.1.0-alpha.A2`，阶段 A 试玩候选，仅希腊 MVP。** 这不是五文明完整版，也不表示 G-A 用户试玩已通过。建议新建世界；不要直接覆盖旧版或重要存档。
 
 ## 环境与依赖
 
@@ -33,13 +33,13 @@ Minecraft 生存模组，目标是在同一世界中呈现希腊、埃及、北�
 
 ## 安装与构建
 
-普通玩家：安装上述 Minecraft/NeoForge 环境，把 `mythic_age-0.1.0-alpha.A.jar` 与必需依赖放进该实例的 `mods/`，新建世界。多人游戏的客户端与专服需使用一致的本模组版本。
+普通玩家：安装上述 Minecraft/NeoForge 环境，把 `mythic_age-0.1.0-alpha.A2.jar` 与必需依赖放进该实例的 `mods/`，新建世界。多人游戏的客户端与专服需使用一致的本模组版本。
 
 开发构建（仓库根目录；先确保 Java 21）：
 
 ```sh
 ./gradlew build
-# 产物：neoforge/build/libs/mythic_age-0.1.0-alpha.A.jar
+# 产物：neoforge/build/libs/mythic_age-0.1.0-alpha.A2.jar
 ./gradlew :neoforge:runClient
 # 专服首次运行须由操作者阅读并同意 Minecraft EULA
 ./gradlew :neoforge:runServer
@@ -76,11 +76,11 @@ python3 -m unittest discover -s tools/blockbench -p 'test_*.py'
 
 ## English
 
-Mythic Age is a survival-oriented mythology mod. This **0.1.0-alpha.A playtest candidate** contains the Greek MVP, not all five planned civilizations. It includes autonomous villages, prayer and favor, seven one-shot god powers, three summon types, Greek creatures and ruins, the Knossos Minotaur trial, relics and early equipment.
+Mythic Age is a survival-oriented mythology mod. This **0.1.0-alpha.A2 playtest candidate** contains the Greek MVP, not all five planned civilizations. It includes autonomous villages, prayer and favor, seven one-shot god powers, three summon types, Greek creatures and ruins, the Knossos Minotaur trial, relics and early equipment.
 
 Use Minecraft **1.21.1**, **Java 21**, and **NeoForge 21.1.259**. Required NeoForge mods: **GeckoLib 4.9.3**, **Curios 9.5.1+1.21.1**, and **Patchouli 1.21.1-93-NEOFORGE**. **JEI 19.51.0.418** is optional. Put the runtime jars in a fresh instance's `mods` folder; back up important worlds. These are pinned project versions, not a claim about the latest available releases.
 
-Build with `./gradlew build`; the playable jar is `neoforge/build/libs/mythic_age-0.1.0-alpha.A.jar`. `./gradlew :neoforge:runClient` launches the development client. Press **J** for the faith panel; the handbook is granted on first login. Speak to a Greek temple priest to begin.
+Build with `./gradlew build`; the playable jar is `neoforge/build/libs/mythic_age-0.1.0-alpha.A2.jar`. `./gradlew :neoforge:runClient` launches the development client. Press **J** for the faith panel; the handbook is granted on first login. Speak to a Greek temple priest to begin.
 
 Handbook prose is unfinished and awaiting the author's text; some chapters are placeholders. Passing automated tests does not constitute final user playtest approval. Other civilizations, sailing and the full Greek progression remain future work. Development remote-control code is excluded from the release jar.
 

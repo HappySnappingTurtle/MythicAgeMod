@@ -211,7 +211,8 @@ public final class GreekAgriculture {
             .lang("葡萄", "Grapes", "ブドウ")
             .register();
 
-    public static final DeferredItem<Item> GRAPE_CUTTING = Content.item("grape_cutting", GREEK)
+    public static final DeferredItem<io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeCuttingItem> GRAPE_CUTTING =
+            Content.item("grape_cutting", GREEK, io.github.happysnappingturtle.mythicage.content.greek.agri.GrapeCuttingItem::new)
             .tags(ModTags.cItem("seeds"))
             .lang("葡萄插条", "Grape Cutting", "ブドウの挿し木")
             .register();

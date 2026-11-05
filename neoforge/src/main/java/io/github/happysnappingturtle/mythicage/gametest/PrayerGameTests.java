@@ -798,8 +798,8 @@ public final class PrayerGameTests {
 
     // ───────────── GA-4：按今日信徒入账与供奉（TC-GA4-45、50～58） ─────────────
 
-    /** TC-GA4-45：原版信徒跪满 600 刻入一笔，然后离开，当天不再来。 */
-    @GameTest(template = T, batch = "prayer_walk", timeoutTicks = 1400)
+    /** TC-GA4-45：原版信徒跪满 600 刻入一笔，然后离开，当天不再来。单独一批：和 believer_walks_and_kneels 同批时，两边的村民会去隔壁场地的祭坛。 */
+    @GameTest(template = T, batch = "prayer_once", timeoutTicks = 1400)
     public static void believer_prays_once_then_leaves(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_once");
@@ -812,7 +812,10 @@ public final class PrayerGameTests {
             PrayerRecord rec = PrayAtAltar.record(v);
             h.assertTrue(rec.creditedOn(today), "跪满 600 刻后记为今天已入账：" + describe(h, v, a));
             h.assertTrue(!rec.praying(), "入账后离开祈祷位");
-            h.assertTrue(be(h, a).believersToday(today) == 1 && PrayerService.pending(a) > 0, "今日信徒 1、有待领产出");
+            // 入账后 T5 的定时结算可能已经把待领产出转成了恩宠：两边有一边大于 0 即可
+            boolean credited = PrayerService.pending(a) > 0 || MythData.get(p).civ(Civilization.GREEK).favor() > 0;
+            h.assertTrue(be(h, a).believersToday(today) == 1 && credited,
+                    "今日信徒 1、已入账：待领 " + PrayerService.pending(a) + "，恩宠 " + MythData.get(p).civ(Civilization.GREEK).favor());
             cleanup(h, List.of(village), a);
         });
     }

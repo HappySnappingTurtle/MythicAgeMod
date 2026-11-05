@@ -70,6 +70,16 @@ public final class LangKeys {
         add("mythic_age.altar.offer_hint", "今天还没献供：手持奠酒、蜂蜜瓶、熟肉、面包或小麦右键祭坛，今天的祈祷恩宠 %s", "No offering yet today: right-click the altar holding a libation, honey bottle, cooked meat, bread or wheat for %s prayer favor today", "今日はまだ供物なし：献酒、ハチミツ入りの瓶、焼いた肉、パン、小麦を持って祭壇を右クリックすると、今日の祈りの恩寵 %s");
         add("mythic_age.offering.ok", "献上了%s：这座祭坛今天的祈祷恩宠 %s", "Offered %s: prayer favor at this altar %s today", "%sを捧げた：この祭壇の今日の祈りの恩寵 %s");
         add("mythic_age.jei.offering", "献供：手持供品右键自己的奥林匹斯祭坛，每座祭坛每天一次，当天这座祭坛的祈祷恩宠 +50%%。供品任选一种：奠酒 1、蜂蜜瓶 1、熟牛肉 / 熟羊肉 / 熟猪排 2、面包 2、小麦 8。", "Offerings: right-click your own Olympian altar holding an offering, once per altar per day, for +50%% prayer favor at that altar today. Any one of: libation 1, honey bottle 1, cooked beef / mutton / porkchop 2, bread 2, wheat 8.", "供物：供物を持って自分のオリュンポスの祭壇を右クリック。祭壇ごとに一日一回、その日の祈りの恩寵 +50%%。供物はどれか一つ：献酒 1、ハチミツ入りの瓶 1、焼き牛肉 / 焼き羊肉 / 焼き豚肉 2、パン 2、小麦 8。");
+        add("mythic_age.grape.tooltip.cutting", "种在葡萄架上：葡萄架放在泥土或耕地上，再拿插条右键", "Plant on a grape trellis: place the trellis on dirt or farmland, then right-click it with the cutting", "ブドウ棚に植える：棚を土か耕地に置き、挿し木を持って右クリック");
+        add("mythic_age.grape.tooltip.cutting.source", "破坏野葡萄藤可以得到", "Dropped by wild grapevines", "野生のブドウの蔓を壊すと手に入る");
+        add("mythic_age.grape.tooltip.trellis", "放在泥土或耕地上，拿葡萄插条右键种下", "Place on dirt or farmland, then right-click with a grape cutting to plant", "土か耕地に置き、ブドウの挿し木を持って右クリックで植える");
+        add("mythic_age.grape.tooltip.trellis.harvest", "结果后右键采摘，架子留着继续结果", "When ripe, right-click to pick; the trellis stays and fruits again", "実ったら右クリックで収穫。棚は残り、また実る");
+        add("mythic_age.grape.tooltip.wild", "破坏后掉葡萄插条，成熟时还有葡萄", "Drops grape cuttings when broken, and grapes when ripe", "壊すとブドウの挿し木が落ちる。熟していればブドウも");
+        add("mythic_age.grape.hint.need_cutting", "葡萄要用插条种：破坏野葡萄藤可以得到葡萄插条", "Grapes are planted from cuttings: break a wild grapevine to get grape cuttings", "ブドウは挿し木で植える：野生のブドウの蔓を壊すと挿し木が手に入る");
+        add("mythic_age.grape.hint.need_dirt", "葡萄架要放在泥土或耕地上才能种", "The trellis must stand on dirt or farmland to plant", "ブドウ棚は土か耕地の上でないと植えられない");
+        add("mythic_age.grape.hint.need_trellis", "插条要种在葡萄架上：6 根木棍可以合成 3 个葡萄架", "Cuttings go on a grape trellis: 6 sticks make 3 trellises", "挿し木はブドウ棚に植える：棒 6 本で棚が 3 つ作れる");
+        add("mythic_age.grape.hint.planted", "这架已经种上了，等它长大结果", "This trellis is already planted; wait for it to grow and fruit", "この棚はもう植えてある。育って実るのを待とう");
+        add("mythic_age.jei.grape", "种葡萄：破坏野葡萄藤得到葡萄插条；6 根木棍合成 3 个葡萄架，放在泥土或耕地上；拿插条右键架子种下。长四个阶段后结果，右键采摘，架子留着继续结果。", "Growing grapes: break wild grapevines for grape cuttings; 6 sticks make 3 grape trellises, placed on dirt or farmland; right-click a trellis with a cutting to plant. It grows through four stages, then fruits; right-click to pick, and the trellis stays to fruit again.", "ブドウの育て方：野生のブドウの蔓を壊して挿し木を得る。棒 6 本でブドウ棚 3 つ、土か耕地に置く。挿し木を持って棚を右クリックで植える。4 段階育つと実り、右クリックで収穫、棚は残ってまた実る。");
         add("mythic_age.offering.already", "今天已经在这座祭坛献过供了", "You already made an offering at this altar today", "今日はこの祭壇にもう供物を捧げた");
         add("mythic_age.offering.not_owner", "这不是你的祭坛", "This is not your altar", "これはあなたの祭壇ではない");
         add("mythic_age.offering.not_enough", "献%s要 %s 个", "Offering %s takes %s", "%sを捧げるには %s 個必要");

@@ -362,6 +362,37 @@ public final class AgricultureGameTests {
         helper.succeed();
     }
 
+    /** TC-GA2-01、03、04：拿葡萄点空架子不吃也不种；插条点已种的架子、点普通泥土都不扣插条（只给提示）。 */
+    @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
+    public static void grape_hints(GameTestHelper helper) {
+        BlockPos p = new BlockPos(5, 1, 5);
+        trellis(helper, p, Blocks.DIRT, 0);
+        FakePlayer pl = player(helper);
+        ItemStack grapes = new ItemStack(GreekAgriculture.GRAPE.get(), 4);
+        pl.setItemInHand(InteractionHand.MAIN_HAND, grapes);
+        var r = helper.getBlockState(p.above()).useItemOn(grapes, helper.getLevel(), pl, InteractionHand.MAIN_HAND,
+                hit(helper, p.above()));
+        helper.assertTrue(r.consumesAction() && grapes.getCount() == 4, "拿葡萄点空架子：拦下、不扣：" + r);
+        assertTrellisStage(helper, p, 0, "葡萄种不下");
+
+        ItemStack cuttings = new ItemStack(GreekAgriculture.GRAPE_CUTTING.get(), 3);
+        pl.setItemInHand(InteractionHand.MAIN_HAND, cuttings);
+        helper.getBlockState(p.above()).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND, hit(helper, p.above()));
+        assertTrellisStage(helper, p, 1, "照常种下");
+        var again = helper.getBlockState(p.above()).useItemOn(cuttings, helper.getLevel(), pl, InteractionHand.MAIN_HAND,
+                hit(helper, p.above()));
+        helper.assertTrue(!again.consumesAction(), "已种的架子交给插条物品处理：" + again);
+        var planted = cuttings.useOn(new net.minecraft.world.item.context.UseOnContext(pl, InteractionHand.MAIN_HAND, hit(helper, p.above())));
+        helper.assertTrue(planted.consumesAction() && cuttings.getCount() == 2, "已种的架子：提示、不扣");
+        assertTrellisStage(helper, p, 1, "stage 不变");
+
+        BlockPos dirt = new BlockPos(2, 1, 2);
+        helper.setBlock(dirt, Blocks.DIRT);
+        var ground = cuttings.useOn(new net.minecraft.world.item.context.UseOnContext(pl, InteractionHand.MAIN_HAND, hit(helper, dirt)));
+        helper.assertTrue(ground.consumesAction() && cuttings.getCount() == 2, "点普通泥土：提示、不扣");
+        helper.succeed();
+    }
+
     /** TC-T6b-38、39、41：破坏底格或中格只掉一份；创造模式不掉落；下方的土被换掉后整架掉落。 */
     @GameTest(template = GameTestTemplates.EMPTY_11X11, batch = BATCH)
     public static void grape_trellis_breaking(GameTestHelper helper) {
