@@ -39,7 +39,7 @@ public final class GreekArchitecture {
             Block.box(1, 14, 1, 15, 16, 15));
     private static final VoxelShape RIDGE_Z = Shapes.or(Block.box(0, 0, 0, 16, 8, 16), Block.box(3, 8, 0, 13, 13, 16));
     private static final VoxelShape RIDGE_X = Shapes.or(Block.box(0, 0, 0, 16, 8, 16), Block.box(0, 8, 3, 16, 13, 13));
-    private static final VoxelShape ANTEFIX = Block.box(0, 0, 0, 16, 9, 2);
+    private static final VoxelShape ANTEFIX = Block.box(0, 0, 14, 16, 9, 16);
 
     public static final DeferredBlock<ShapedBlock> MARBLE_COLUMN_BASE = Content.block("marble_column_base", GREEK,
                     p -> new ShapedBlock(p, BASE_SHAPE))
@@ -150,8 +150,8 @@ public final class GreekArchitecture {
             .register();
 
     public static final DeferredBlock<FacingShapedBlock> TERRACOTTA_ANTEFIX = Content.block("terracotta_antefix", GREEK,
-                    p -> new FacingShapedBlock(p, false, ANTEFIX))
-            .properties(() -> terracotta().noOcclusion().noCollission().strength(0.5f))
+                    p -> new FacingShapedBlock(p, false, ANTEFIX, true))
+            .properties(() -> terracotta().noOcclusion().strength(0.5f))
             .model(new BlockModelSpec.StateModels(s -> "", true, ""))
             .tags(BlockTags.MINEABLE_WITH_PICKAXE)
             .lang("瓦当", "Antefix", "軒先瓦")

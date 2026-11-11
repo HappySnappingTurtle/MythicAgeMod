@@ -1,0 +1,298 @@
+{
+  "note": "GA-6：选择数据表，Python NBT 检查与 core JUnit 共用，不复制方向常量。directions 为空表示已排查的结构本体；多个方向表示任一支撑有效。back 为 facing 的反向，left/right 为相对正面横向。实心白名单保守显式维护，不把非空气误当支撑；非整格许可按装饰件单独登记。",
+  "solid_blocks": [
+    "minecraft:stone",
+    "minecraft:cobblestone",
+    "minecraft:clay",
+    "minecraft:coarse_dirt",
+    "minecraft:dirt",
+    "minecraft:grass_block",
+    "minecraft:gravel",
+    "minecraft:packed_mud",
+    "minecraft:sand",
+    "minecraft:tuff",
+    "minecraft:polished_blackstone_bricks",
+    "minecraft:oak_log",
+    "minecraft:oak_wood",
+    "minecraft:hay_block",
+    "minecraft:brown_wool",
+    "minecraft:shroomlight",
+    "mythic_age:marble",
+    "mythic_age:smooth_marble",
+    "mythic_age:polished_marble",
+    "mythic_age:marble_ashlar",
+    "mythic_age:polygonal_marble",
+    "mythic_age:marble_pillar",
+    "mythic_age:blue_meander_marble",
+    "mythic_age:red_meander_marble",
+    "mythic_age:plaster",
+    "mythic_age:plaster_dado",
+    "mythic_age:mudbrick",
+    "mythic_age:olive_planks",
+    "mythic_age:olive_log",
+    "mythic_age:cypress_log",
+    "mythic_age:terracotta_roof_tiles",
+    "mythic_age:marble_architrave",
+    "mythic_age:triglyph_frieze",
+    "mythic_age:grave_relief",
+    "mythic_age:lion_spout",
+    "mythic_age:labrys_lintel",
+    "mythic_age:pebble_mosaic",
+    "mythic_age:threshing_floor"
+  ],
+  "blocks": {
+    "mythic_age:terracotta_antefix": {
+      "owner": "GreekArchitecture",
+      "directions": [
+        "back"
+      ],
+      "allowed_supports": [
+        "mythic_age:marble_cornice",
+        "mythic_age:terracotta_roof_stairs",
+        "mythic_age:terracotta_roof_slab",
+        "mythic_age:terracotta_ridge"
+      ],
+      "note": "朝北时立板 z=15、压边 z=14..16；背面贴屋檐。修复几何、碰撞及点击面放置。"
+    },
+    "mythic_age:marble_architrave": {
+      "owner": "GreekArchitecture",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "整格承重檐部；朝向只决定纹样，不要求身后有墙。"
+    },
+    "mythic_age:triglyph_frieze": {
+      "owner": "GreekArchitecture",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "整格承重檐部；朝向只决定纹样，不要求身后有墙。"
+    },
+    "mythic_age:pediment_thunderbolt": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "back"
+      ],
+      "allowed_supports": [
+        "mythic_age:greek_pediment"
+      ],
+      "note": "朝北时浮雕 z≈14..17，背板嵌入山花前表面；几何、旋转和点击面放置已正确。"
+    },
+    "mythic_age:pediment_trident": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "back"
+      ],
+      "allowed_supports": [
+        "mythic_age:greek_pediment"
+      ],
+      "note": "朝北时浮雕 z≈14..17，背板嵌入山花前表面；几何、旋转和点击面放置已正确。"
+    },
+    "mythic_age:amphora_stack": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "瓶堆位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:pottery_wheel": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "陶轮位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:mason_bench": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "石作台位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:greek_anvil": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "砧座位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:village_altar": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "祭坛底座位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:boundary_stone": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "界石位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:bronze_tripod": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "铜鼎足位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:oracle_tripod": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "神谕鼎足位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:omphalos": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "圣石位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:herm_head": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [
+        "mythic_age:marble_wall"
+      ],
+      "note": "胸像柱座位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:marble_lekythos": {
+      "owner": "GreekVillageBlocks",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "油瓶底座位于 y=0，落地或放在底座上，不是贴墙件。"
+    },
+    "mythic_age:lion_spout": {
+      "owner": "GreekVillageBlocks",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "自带整格石墙/碑体；浮雕与本格相连，无外置薄板悬空问题。"
+    },
+    "mythic_age:grave_relief": {
+      "owner": "GreekVillageBlocks",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "自带整格石墙/碑体；浮雕与本格相连，无外置薄板悬空问题。"
+    },
+    "mythic_age:marble_rubble": {
+      "owner": "GreekRuins",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "碎石底部 y=0，落地。"
+    },
+    "mythic_age:horns_of_consecration": {
+      "owner": "GreekRuins",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "圣角底座 y=0，立在墙顶或门楣。"
+    },
+    "mythic_age:labrys_lintel": {
+      "owner": "GreekRuins",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "浮雕自带整格门楣，z=-1..16，与本格相连。"
+    },
+    "mythic_age:greek_pediment": {
+      "owner": "GreekTemple",
+      "directions": [],
+      "allowed_supports": [],
+      "note": "结构性山花，厚度到 z=16；可横向跨接组成楣墙，不是挂在墙外的楣饰。"
+    },
+    "mythic_age:greek_brazier": {
+      "owner": "GreekTemple",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "火盆支脚落地；用于共表检查快速神庙蓝图。"
+    },
+    "mythic_age:greek_statue": {
+      "owner": "GreekTemple",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [
+        "mythic_age:greek_statue"
+      ],
+      "note": "下半依附地面，上半依附同种下半；用于共表检查快速神庙蓝图。"
+    },
+    "mythic_age:olive_wall_sign": {
+      "owner": "GreekAgriculture",
+      "directions": [
+        "back"
+      ],
+      "allowed_supports": [],
+      "note": "原版墙牌：背面贴墙，沿用原版模型、形状及放置。"
+    },
+    "mythic_age:olive_hanging_sign": {
+      "owner": "GreekAgriculture",
+      "directions": [
+        "up"
+      ],
+      "allowed_supports": [
+        "mythic_age:olive_hanging_sign",
+        "mythic_age:olive_wall_hanging_sign"
+      ],
+      "note": "原版吊牌：锁链依附上方。"
+    },
+    "mythic_age:olive_wall_hanging_sign": {
+      "owner": "GreekAgriculture",
+      "directions": [
+        "left",
+        "right"
+      ],
+      "allowed_supports": [
+        "mythic_age:olive_wall_hanging_sign"
+      ],
+      "note": "原版墙吊牌：横梁沿正面的左右方向依附，任一端有支撑即可。"
+    },
+    "mythic_age:broken_greek_statue": {
+      "owner": "GreekRuins",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [
+        "mythic_age:broken_greek_statue"
+      ],
+      "note": "残缺神像沿用两格神像形状，上半依附下半，下半落地。"
+    },
+    "mythic_age:greek_oil_lamp": {
+      "owner": "GreekAgriculture",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [
+        "mythic_age:pithos",
+        "mythic_age:marble_wall",
+        "mythic_age:smooth_marble_slab"
+      ],
+      "support_properties": {
+        "mythic_age:smooth_marble_slab": {
+          "type": [
+            "top",
+            "double"
+          ]
+        }
+      },
+      "note": "底部 y=0，原有 canSurvive 要求下方中心支撑。排查出赫尔墨斯祠、庭院住宅各一盏灯在下半台阶上浮空；两处改用同材质整块支撑。台阶只允许顶面到格顶的 top/double。"
+    }
+  }
+}

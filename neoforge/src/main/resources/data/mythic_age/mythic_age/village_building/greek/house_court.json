@@ -61,7 +61,7 @@
   },
   "materials": {
     "mythic_age:plaster": 137,
-    "mythic_age:marble_ashlar": 96,
+    "mythic_age:marble_ashlar": 97,
     "mythic_age:terracotta_roof_slab": 72,
     "mythic_age:terracotta_ridge": 72,
     "mythic_age:olive_log": 64,
@@ -73,7 +73,6 @@
     "mythic_age:pithos": 3,
     "mythic_age:olive_door": 2,
     "minecraft:campfire": 1,
-    "mythic_age:marble_ashlar_slab": 1,
     "minecraft:water_cauldron": 1,
     "mythic_age:greek_oil_lamp": 1
   },

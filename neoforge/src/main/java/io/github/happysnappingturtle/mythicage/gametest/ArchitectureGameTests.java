@@ -161,12 +161,12 @@ public final class ArchitectureGameTests {
         h.succeed();
     }
 
-    /** TC-T8b-11、12：瓦当没有碰撞；柱身顶面不是完整面。 */
+    /** TC-T8b-11、12（GA-6 修订）：瓦当具有贴檐碰撞；柱身顶面不是完整面。 */
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = BATCH)
     public static void shapes(GameTestHelper h) {
         h.setBlock(1, 0, 1, GreekArchitecture.TERRACOTTA_ANTEFIX.get());
         BlockPos a = h.absolutePos(new BlockPos(1, 0, 1));
-        h.assertTrue(h.getLevel().getBlockState(a).getCollisionShape(h.getLevel(), a).isEmpty(), "瓦当不应有碰撞");
+        h.assertTrue(!h.getLevel().getBlockState(a).getCollisionShape(h.getLevel(), a).isEmpty(), "瓦当应有贴檐碰撞");
         h.setBlock(1, 1, 1, GreekArchitecture.MARBLE_COLUMN.get());
         BlockPos c = h.absolutePos(new BlockPos(1, 1, 1));
         h.assertTrue(!h.getLevel().getBlockState(c).isFaceSturdy(h.getLevel(), c, Direction.UP), "柱身顶面不应是完整面");

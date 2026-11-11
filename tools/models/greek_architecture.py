@@ -366,8 +366,8 @@ model("terracotta_ridge_x", RID, rotate_y90(ridge))
 # 瓦当：贴在屋檐边缘的立板（正面朝北）与一条压边
 model("terracotta_antefix", {"particle": tex("terracotta_roof_tiles"), "face": tex("terracotta_antefix"),
                              "under": tex("terracotta_roof_under")}, [
-    plane((0, 0, 1), (16, 9, 1), "face", "north", uv=[0, 7, 16, 16], comment="棕榈纹立板"),
-    box((0, 0, 0), (16, 1, 2), "under", comment="压边"),
+    plane((0, 0, 15), (16, 9, 15), "face", "north", uv=[0, 7, 16, 16], comment="棕榈纹立板"),
+    box((0, 0, 14), (16, 1, 16), "under", comment="压边"),
 ], render_type="minecraft:cutout")
 
 # 卵石马赛克：四个象限各一个整格模型

@@ -100,7 +100,7 @@ def minor_shrine(god: str) -> Building:
         for (x, z, h) in ((hx, hz, 1), (hx + 1, hz, 0), (hx, hz + 1, 0), (hx + 1, hz + 1, 0)):
             b.set(x, -1, z, "minecraft:cobblestone")
             b.fill(x, 0, z, x, h, z, "minecraft:cobblestone")
-        b.set(hx + 1, 0, hz, "minecraft:cobblestone_slab", type="bottom")
+        b.set(hx + 1, 0, hz, "minecraft:cobblestone")  # 油灯底部在上一格，支撑顶面必须到格顶
         b.set(hx, 0, hz + 1, "minecraft:cobblestone_slab", type="bottom")
         b.set(hx, 2, hz, "lamp")
         b.set(hx + 1, 1, hz, "lamp")
@@ -206,7 +206,7 @@ def house_court() -> Building:
     for (x, z) in ((3, 9), (4, 9), (7, 9)):
         b.set(x, 0, z, "pithos")
     b.set(6, 0, 4, "minecraft:water_cauldron", level=3)  # 井
-    b.set(4, 0, 6, "mythic_age:marble_ashlar_slab", type="bottom")  # 家神小祭坛
+    b.set(4, 0, 6, "mythic_age:marble_ashlar")  # 家神小祭坛：整块顶面与上方油灯相接
     b.set(4, 1, 6, "lamp")
     for p in ((1, 0, 3), (9, 0, 3), (1, 0, 7), (9, 0, 7)):
         b.anchor("home", *p)
