@@ -6,7 +6,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    private static final String PROTOCOL_VERSION = "24";
+    // GA-7：委托行新增 accepts，新旧客户端不能混用该负载。
+    private static final String PROTOCOL_VERSION = "25";
 
     private MythNetwork() {
     }

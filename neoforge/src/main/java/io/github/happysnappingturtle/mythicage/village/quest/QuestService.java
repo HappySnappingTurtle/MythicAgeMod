@@ -541,7 +541,7 @@ public final class QuestService {
             rows.add(new QuestView.Row(q.id(), q.type, title(ctx.get(), q), q.done, Math.max(q.need, q.done),
                     q.deadline < 0 || !q.state.active() ? -1 : (int) Math.max(0, q.deadline - today), scope, List.copyOf(rewards),
                     q.state.id(), reason, q.accepted.contains(me), refusal, canDeliver, q.contrib.getOrDefault(me, 0),
-                    sourceKey(q.source)));
+                    sourceKey(q.source), q.type.equals(SupplyQuests.TYPE) ? SupplyQuests.accepts(ctx.get(), q) : List.of()));
         }
         b.seen.put(me, seen);
         VillageQuests.get(server).setDirty();

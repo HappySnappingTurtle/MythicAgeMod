@@ -203,6 +203,11 @@ final class SupplyQuests {
         return ctx.data().buildCosts().items(q.target);
     }
 
+    /** 委托页直接使用交付规则的清单与折算，避免显示和实际收取不一致（GA-7）。 */
+    static List<QuestView.Accept> accepts(VillageContext ctx, Quest q) {
+        return items(ctx, q).stream().map(item -> new QuestView.Accept(item, unitValue(ctx, q, item))).toList();
+    }
+
     /** 每件算几份进度（口粮按口粮值，其余 1）。 */
     static double unitValue(VillageContext ctx, Quest q, String item) {
         if (q.source.equals(FOOD)) {

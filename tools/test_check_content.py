@@ -233,6 +233,36 @@ class VillageDialogueTest(unittest.TestCase):
         self.assertEqual([], self.run_with({}, []))
 
 
+class RationDialogueTest(unittest.TestCase):
+    """TC-GA7-30～31：声明的物品必须在本文明口粮表，不能把小麦说成口粮。"""
+
+    def run_check(self, mentions):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            paths = cc.Paths(root)
+            data = paths.main / "data/mythic_age/mythic_age"
+            key = "mythic_age.village.say.greek.farmer.quest"
+            write(data / "village_civ/greek.json",
+                  {"rations": {"portions": {"minecraft:bread": 1, "mythic_age:olive_flatbread": 1}}})
+            write(data / "village_profession/greek/farmer.json",
+                  {"dialogue": {"quest": {"mentions": mentions}}})
+            for loc in cc.LOCALES:
+                write(paths.gen / f"assets/mythic_age/lang/{loc}.json", {key: "台词"})
+            report = cc.Report()
+            cc.check_ration_dialogue(paths, report)
+            return report.errors
+
+    def test_ga7_30_ration_mentions_pass(self):
+        self.assertEqual([], self.run_check(["minecraft:bread", "mythic_age:olive_flatbread"]))
+
+    def test_ga7_31_wheat_is_rejected(self):
+        errors = self.run_check(["minecraft:bread", "minecraft:wheat"])
+        self.assertEqual(1, len(errors), errors)
+        self.assertIn("mythic_age.village.say.greek.farmer.quest", errors[0])
+        self.assertIn("minecraft:wheat", errors[0])
+        self.assertIn("rations.portions", errors[0])
+
+
 class WarningFxTest(unittest.TestCase):
     """TC-T24-94：预警代码引用装饰特效开关时报错。"""
 

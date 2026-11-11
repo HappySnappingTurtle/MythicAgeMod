@@ -27,11 +27,19 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
      * @param state     open / paused / complete / invalid / expired / failed / settled
      * @param reason    暂停、失效、失败的原因（语言键行；没有时 key 为空）
      * @param refusal   不能接的原因（语言键后缀；能接为空）
+     * @param accepts   可交物品及每件折算值；非供给委托为空
      * @param mine      这名玩家在这个任务里的份额（交了几件 / 修了几格）
      */
     public record Row(String id, String type, AffairsView.Line title, int done, int need, int daysLeft, String scope,
                       List<String> rewards, String state, AffairsView.Line reason, boolean accepted, String refusal,
-                      boolean canDeliver, int mine, String sourceKey) {
+                      boolean canDeliver, int mine, String sourceKey, List<Accept> accepts) {
+        public Row {
+            accepts = List.copyOf(accepts);
+        }
+    }
+
+    /** 可交物品：口粮按份数，其余每件算 1。 */
+    public record Accept(String item, double value) {
     }
 
     public static final StreamCodec<FriendlyByteBuf, QuestView> STREAM_CODEC = StreamCodec.of(
@@ -56,6 +64,11 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
                     buf.writeBoolean(r.canDeliver());
                     buf.writeVarInt(r.mine());
                     buf.writeUtf(r.sourceKey());
+                    buf.writeVarInt(r.accepts().size());
+                    for (Accept a : r.accepts()) {
+                        buf.writeUtf(a.item());
+                        buf.writeDouble(a.value());
+                    }
                 }
                 buf.writeVarInt(v.active());
                 buf.writeVarInt(v.max());
@@ -82,8 +95,18 @@ public record QuestView(UUID village, AffairsView.Line title, List<Row> rows, in
                     }
                     String state = buf.readUtf();
                     AffairsView.Line reason = AffairsView.LINE.decode(buf);
-                    rows.add(new Row(rid, type, t, done, need, days, scope, List.copyOf(rewards), state, reason, buf.readBoolean(),
-                            buf.readUtf(), buf.readBoolean(), buf.readVarInt(), buf.readUtf()));
+                    boolean accepted = buf.readBoolean();
+                    String refusal = buf.readUtf();
+                    boolean canDeliver = buf.readBoolean();
+                    int mine = buf.readVarInt();
+                    String sourceKey = buf.readUtf();
+                    int an = buf.readVarInt();
+                    List<Accept> accepts = new ArrayList<>(an);
+                    for (int k = 0; k < an; k++) {
+                        accepts.add(new Accept(buf.readUtf(), buf.readDouble()));
+                    }
+                    rows.add(new Row(rid, type, t, done, need, days, scope, List.copyOf(rewards), state, reason, accepted,
+                            refusal, canDeliver, mine, sourceKey, accepts));
                 }
                 return new QuestView(id, title, List.copyOf(rows), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
                         buf.readBoolean());

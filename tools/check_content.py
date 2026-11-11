@@ -498,6 +498,7 @@ def run(root: Path, design: Path | None) -> Report:
     check_village_buildings(paths, report)
     check_village_anims(paths, report)
     check_village_dialogue(paths, report)
+    check_ration_dialogue(paths, report)
     check_equipment(root, report)
     check_rigs(root, report)
     check_warning_fx(root, report)
@@ -711,6 +712,41 @@ def check_village_dialogue(paths: Paths, report: Report) -> None:
                 for loc in LOCALES:
                     if key not in langs[loc]:
                         report.error(f"{f.relative_to(d)}：缺 {loc} 的对话 {key}")
+
+
+def check_ration_dialogue(paths: Paths, report: Report) -> None:
+    """GA-7：职业 dialogue.<台词后缀>.mentions 声明口粮台词提到的物品，必须属于本文明口粮表。
+
+    这里只校验显式声明，不用三语物品名反推 ID；文字与声明是否一致仍由文案审核确认。
+    """
+    civs = {}
+    professions = {}
+    for d in paths.data():
+        for f in sorted(d.glob(f"{MOD}/{MOD}/village_civ/*.json")):
+            civs[f.stem] = json.loads(f.read_text(encoding="utf-8"))
+        for f in sorted(d.glob(f"{MOD}/{MOD}/village_profession/*/*.json")):
+            professions[(f.parent.name, f.stem)] = json.loads(f.read_text(encoding="utf-8"))
+    langs = {}
+    for loc in LOCALES:
+        langs[loc] = {}
+        for a in paths.assets():
+            f = a / "lang" / f"{loc}.json"
+            if f.exists():
+                langs[loc].update(json.loads(f.read_text(encoding="utf-8")))
+    for (civ, name), prof in professions.items():
+        portions = civs.get(civ, {}).get("rations", {}).get("portions", {})
+        for suffix, line in prof.get("dialogue", {}).items():
+            key = f"{MOD}.village.say.{civ}.{name}.{suffix}"
+            mentions = line.get("mentions", [])
+            if not isinstance(mentions, list) or not all(isinstance(item, str) for item in mentions):
+                report.error(f"{key}：mentions 必须是物品 ID 列表")
+                continue
+            for item in mentions:
+                if item not in portions:
+                    report.error(f"{key}：mentions 的 {item} 不在 {civ} 的 rations.portions 里")
+            for loc in LOCALES:
+                if key not in langs[loc]:
+                    report.error(f"{key}：口粮台词缺少 {loc} 翻译")
 
 
 def check_village_anims(paths: Paths, report: Report) -> None:

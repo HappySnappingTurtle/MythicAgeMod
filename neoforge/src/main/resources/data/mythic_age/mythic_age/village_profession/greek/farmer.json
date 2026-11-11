@@ -9,6 +9,11 @@
   "shortWhen": {
     "food": true
   },
+  "dialogue": {
+    "quest": {
+      "mentions": ["minecraft:bread", "mythic_age:olive_flatbread"]
+    }
+  },
   "trades": {
     "sell": [
       {

@@ -509,7 +509,7 @@ public final class LangKeys {
         add("mythic_age.village.say.greek.farmer.chat.5", "头一道压出来的橄榄油最好，点灯、做饭、抹身子都用它。", "The first pressing gives the best oil — for lamps, for cooking, for the skin.", "最初に搾った油が一番。灯りにも料理にも体に塗るにも使います。");
         add("mythic_age.village.say.greek.farmer.chat.6", "橄榄树要修枝，剪下的枝条正好拿去烧窑。", "The olives need pruning, and the cuttings go to feed the kiln.", "オリーブは剪定が要ります。切った枝は窯の燃料になります。");
         add("mythic_age.village.say.greek.farmer.short", "口粮不多了，这几天先紧着收麦烤饼。", "Food is running low — for now it's harvesting and baking first.", "食料が少ない。しばらくは麦の刈り入れとパン焼きが先です。");
-        add("mythic_age.village.say.greek.farmer.quest", "仓里的口粮见底了，管事在谷仓收饼和麦子，送去能换几块绿宝石。", "The stores are nearly empty. The steward at the granary is taking bread and grain, and pays in emeralds.", "蔵の食料が底をつきかけています。穀倉の管理人がパンや麦を集めていて、エメラルドと換えてくれます。");
+        add("mythic_age.village.say.greek.farmer.quest", "仓里的口粮见底了，管事在谷仓收面包、橄榄薄饼这类现成的吃食，送去能换几块绿宝石。", "The food stores are nearly empty. The steward at the granary is taking ready-to-eat food like bread and olive flatbread, and pays in emeralds.", "蔵の食料が底をつきかけています。穀倉の管理人がパンやオリーブのフラットブレッドなど、そのまま食べられるものを集めていて、エメラルドと換えてくれます。");
         add("mythic_age.village.say.greek.potter.chat.1", "黏土要先泡水沉淀，砂石去干净了才好拉坯。", "Clay has to be soaked and left to settle until the grit is gone before it goes on the wheel.", "粘土は水に浸して沈ませ、砂を除いてからろくろに載せます。");
         add("mythic_age.village.say.greek.potter.chat.2", "转陶轮的是我的学徒，我只管手上的形。", "My apprentice turns the wheel; I only shape the pot.", "ろくろを回すのは弟子で、わたしは形を作るだけです。");
         add("mythic_age.village.say.greek.potter.chat.3", "烧窑分三步：先通风让它发红，再闷住让它发黑，最后再通风。", "Firing goes in three stages: air in to redden it, air shut off to blacken it, then air in again.", "窯焚きは三段階：風を通して赤く、閉じて黒く、もう一度風を通します。");
@@ -982,6 +982,12 @@ public final class LangKeys {
         add("mythic_age.quest.screen.empty", "眼下没有委托", "No requests right now", "今のところ依頼はない");
         add("mythic_age.quest.screen.disabled", "委托已关闭（服务器配置）", "Requests are turned off (server config)", "依頼は無効になっている（サーバー設定）");
         add("mythic_age.quest.screen.progress", "%s  %s / %s", "%s  %s / %s", "%s  %s / %s");
+        add("mythic_age.quest.screen.accepts", "可交", "Accepts", "渡せる品");
+        add("mythic_age.quest.screen.portions", "%s 份", "%s portions", "%s 食分");
+        add("mythic_age.quest.screen.units", "每件算 %s 个", "%s per item", "1 個につき %s 個分");
+        add("mythic_age.quest.screen.remaining_food", "还差 %s 份", "%s portions still needed", "あと %s 食分");
+        add("mythic_age.quest.screen.remaining_items", "还差 %s 个", "%s items still needed", "あと %s 個");
+        add("mythic_age.quest.screen.accepts_more", "等 %s 种", "%s types in total", "など全 %s 種類");
         add("mythic_age.quest.screen.days", "还剩 %s 日", "%s days left", "残り %s 日");
         add("mythic_age.quest.screen.mine", "我的份额 %s", "my share %s", "自分の分 %s");
         add("mythic_age.quest.screen.footer", "已接 %s / %s · 你在本村的贡献：%s", "Taken %s / %s · Your contribution here: %s", "受けた依頼 %s / %s・この村への貢献：%s");
@@ -1015,7 +1021,7 @@ public final class LangKeys {
         add("mythic_age.quest.act.taken", "已经有人接了", "Someone else has taken it", "ほかの人が受けている");
         add("mythic_age.quest.act.full", "在这个村接的委托已满", "You can't take more requests here", "これ以上依頼を受けられない");
         add("mythic_age.quest.act.event", "这是突发的事，不用接", "This is an event; no need to accept", "突発の出来事なので受ける必要はない");
-        add("mythic_age.quest.act.missing", "背包里没有要交的东西", "You don't have what's needed", "必要な品を持っていない");
+        add("mythic_age.quest.act.missing", "背包里没有可交清单中的物品", "You have no items from the accepted list", "持ち物に渡せる品の一覧にあるものがない");
         add("mythic_age.quest.act.stock_full", "村库已满，交不进去", "The storehouse is full", "倉庫がいっぱいだ");
         add("mythic_age.quest.act.satisfied", "这里已经不缺了", "It's no longer needed", "もう足りている");
         add("mythic_age.quest.settled", "委托「%s」结算：绿宝石 %s，贡献 +%s", "Request \"%s\" settled: %s emeralds, contribution +%s", "依頼「%s」の清算：エメラルド %s、貢献 +%s");
