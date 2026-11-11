@@ -9,6 +9,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,9 @@ public final class RigRegistry extends SimpleJsonResourceReloadListener {
     public static final String DIRECTORY = "mythic_age/rig";
     private static volatile Map<ResourceLocation, RigDefinition> rigs = Map.of();
 
+    // 与服务端注册表分开，避免依赖单机的共享静态变量；新快照会替换旧服务器的数据。
+    private static volatile Map<ResourceLocation, RigDefinition.HeadLook> clientHeadLooks = Map.of();
+
     private RigRegistry() {
         super(new Gson(), DIRECTORY);
     }
@@ -32,6 +37,21 @@ public final class RigRegistry extends SimpleJsonResourceReloadListener {
 
     public static Optional<RigDefinition> get(ResourceLocation id) {
         return Optional.ofNullable(rigs.get(id));
+    }
+
+    public static RigDefinition.HeadLook clientHeadLook(ResourceLocation id) {
+        return clientHeadLooks.getOrDefault(id, RigDefinition.HeadLook.DEFAULT);
+    }
+
+    public static void accept(RigHeadLookPayload payload) {
+        clientHeadLooks = payload.limits();
+    }
+
+    public static void onDatapackSync(OnDatapackSyncEvent event) {
+        Map<ResourceLocation, RigDefinition.HeadLook> limits = new HashMap<>();
+        rigs.forEach((id, rig) -> limits.put(id, rig.headLook()));
+        RigHeadLookPayload payload = new RigHeadLookPayload(limits);
+        event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
     }
 
     public static int size() {

@@ -12,18 +12,23 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 实体的服务端骨架数据（T7 设计文档 §6.2）：零姿势下的挂点、碰撞尺寸与变体。
+ * 实体的骨架数据（T7 设计文档 §6.2）：零姿势下的挂点、碰撞尺寸与变体。
  * GeckoLib 的骨骼只存在于客户端，服务端需要的位置（出手点、鼻息、放大后的碰撞）从这里读取。
  *
  * <p>坐标沿用设计卡约定：模型空间，单位 u（16u = 1 格），+X 为角色左、+Y 为上、+Z 为角色前，原点在脚底中心。
  */
 public record RigDefinition(String model, double width, double height, Map<String, Vec3> locators,
-                            Map<String, Variant> variants) {
+                            Map<String, Variant> variants, HeadLook headLook) {
     public static final double UNITS_PER_BLOCK = 16.0;
 
     public RigDefinition {
         locators = Collections.unmodifiableMap(new LinkedHashMap<>(locators));
         variants = Collections.unmodifiableMap(new LinkedHashMap<>(variants));
+    }
+
+    /** 视线叠加限幅（度）；未配置时沿用通用默认值。 */
+    public record HeadLook(float yaw, float pitch) {
+        public static final HeadLook DEFAULT = new HeadLook(50.0F, 30.0F);
     }
 
     public record Vec3(double x, double y, double z) {
@@ -117,7 +122,14 @@ public record RigDefinition(String model, double width, double height, Map<Strin
                 variants.put(e.getKey(), new Variant(scale, texture));
             }
         }
-        return new RigDefinition(model, width, height, locators, variants);
+        HeadLook headLook = HeadLook.DEFAULT;
+        if (o.has("headLook")) {
+            JsonObject look = object(o.get("headLook"), "headLook");
+            headLook = new HeadLook(
+                    look.has("yaw") ? angleLimit(look.get("yaw"), "headLook.yaw") : HeadLook.DEFAULT.yaw(),
+                    look.has("pitch") ? angleLimit(look.get("pitch"), "headLook.pitch") : HeadLook.DEFAULT.pitch());
+        }
+        return new RigDefinition(model, width, height, locators, variants, headLook);
     }
 
     private static JsonObject object(JsonElement e, String path) {
@@ -152,6 +164,14 @@ public record RigDefinition(String model, double width, double height, Map<Strin
             throw new RigParseException(path + ": 必须为正数，实际 " + d);
         }
         return d;
+    }
+
+    private static float angleLimit(JsonElement e, String path) {
+        double d = number(e, path);
+        if (d < 0 || d > Float.MAX_VALUE) {
+            throw new RigParseException(path + ": 必须为非负有限浮点数，实际 " + d);
+        }
+        return (float) d;
     }
 
     private static Vec3 vec3(JsonElement e, String path) {

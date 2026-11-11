@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Age;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
+import io.github.happysnappingturtle.mythicage.core.rig.RigDefinition;
 import io.github.happysnappingturtle.mythicage.core.summon.SummonMode;
 import io.github.happysnappingturtle.mythicage.core.summon.SummonUnitCard;
 import io.github.happysnappingturtle.mythicage.core.trade.TradeReason;
@@ -11,6 +12,8 @@ import io.github.happysnappingturtle.mythicage.guardian.GuardianEntity;
 import io.github.happysnappingturtle.mythicage.guardian.GuardianSpawner;
 import io.github.happysnappingturtle.mythicage.player.MythData;
 import io.github.happysnappingturtle.mythicage.power.TargetFactsCollector;
+import io.github.happysnappingturtle.mythicage.rig.RigHeadLookPayload;
+import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
 import io.github.happysnappingturtle.mythicage.summon.MythSummon;
 import io.github.happysnappingturtle.mythicage.summon.SummonPayloads;
@@ -25,11 +28,14 @@ import io.github.happysnappingturtle.mythicage.summon.greek.SummonMinotaurEntity
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonCentaurEntity;
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity;
 import io.github.happysnappingturtle.mythicage.trade.TradeService;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -48,6 +54,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -573,6 +580,77 @@ public final class SummonGameTests {
             h.assertTrue(dx * dx + dz * dz <= 64, "水平距离主人 ≤ 8 格");
             cleanup(h, p);
         });
+    }
+
+    // ───────────── GA-5 头部视线（独立批次 head_look） ─────────────
+
+    /** TC-GA5-20：真实召唤并起飞，离地超过 3 格时锁定头部视线。 */
+    @GameTest(template = T, batch = "head_look", timeoutTicks = 200)
+    public static void pegasus_head_look_locked_in_air(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_ga5_air", Age.ARCHAIC, new BlockPos(8, 2, 18));
+        SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 14));
+        double floorY = h.absolutePos(new BlockPos(0, 2, 0)).getY();
+        h.succeedWhen(() -> {
+            h.assertTrue(g.flying() && !g.onGround(), "天马应已起飞");
+            h.assertTrue(g.getY() - floorY > 3, "离地应超过 3 格");
+            h.assertTrue(g.anim() != SummonPegasusEntity.Anim.SKY_EYE, "排除天眼动作导致的锁头");
+            h.assertTrue(g.headLookLocked(), "飞行时应锁定头部视线");
+            cleanup(h, p);
+        });
+    }
+
+    /** TC-GA5-21：先起飞，再让主人进入屋顶下，等待天马真正落地后恢复视线。 */
+    @GameTest(template = T, batch = "head_look", timeoutTicks = 240)
+    public static void pegasus_head_look_unlocked_after_landing(GameTestHelper h) {
+        floor(h);
+        FakePlayer p = owner(h, "ma_ga5_land", Age.ARCHAIC, new BlockPos(8, 2, 18));
+        SummonPegasusEntity g = pegasus(h, p, new BlockPos(8, 2, 14));
+        double floorY = h.absolutePos(new BlockPos(0, 2, 0)).getY();
+        h.startSequence()
+                .thenWaitUntil(() -> {
+                    h.assertTrue(g.flying() && !g.onGround() && g.getY() - floorY > 3, "先等待离地飞行");
+                    h.assertTrue(g.headLookLocked(), "落地前应锁头");
+                })
+                .thenExecute(() -> {
+                    for (int x = 0; x < 17; x++) {
+                        for (int z = 0; z < 36; z++) {
+                            h.setBlock(new BlockPos(x, 5, z), Blocks.STONE);
+                        }
+                    }
+                })
+                .thenWaitUntil(() -> {
+                    h.assertTrue(g.onGround() && !g.flying(), "等待天马真正落地");
+                    h.assertTrue(!g.headLookLocked(), "落地后应恢复视线叠加");
+                })
+                .thenExecute(() -> cleanup(h, p))
+                .thenSucceed();
+    }
+
+    /** TC-GA5-22：可选 rig 限幅、默认值及客户端同步消费链。 */
+    @GameTest(template = T, batch = "head_look")
+    public static void rig_head_look_overrides_and_defaults(GameTestHelper h) {
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "pegasus");
+        RigDefinition defaults = RigRegistry.get(id).orElseThrow();
+        h.assertTrue(defaults.headLook().equals(new RigDefinition.HeadLook(50, 30)), "未配置的实际 rig 应为 50 / 30");
+        RigDefinition custom = RigDefinition.parse("""
+                {"model":"mythic_age:pegasus", "collision":{"width":1.4,"height":1.8},
+                 "headLook":{"yaw":30,"pitch":20}}
+                """);
+        h.assertTrue(custom.headLook().equals(new RigDefinition.HeadLook(30, 20)), "覆盖值应为 30 / 20");
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        try {
+            RigHeadLookPayload.STREAM_CODEC.encode(buf, new RigHeadLookPayload(Map.of(id, custom.headLook())));
+            RigRegistry.accept(RigHeadLookPayload.STREAM_CODEC.decode(buf));
+            h.assertTrue(RigRegistry.clientHeadLook(id).equals(custom.headLook()), "客户端应消费同步后的 30 / 20");
+            // 重载删除覆盖项后，整份快照替换旧缓存，不能残留上个服务器的值。
+            RigRegistry.accept(new RigHeadLookPayload(Map.of()));
+            h.assertTrue(RigRegistry.clientHeadLook(id).equals(defaults.headLook()), "无覆盖时应恢复默认 50 / 30");
+        } finally {
+            RigRegistry.accept(new RigHeadLookPayload(Map.of()));
+            buf.release();
+        }
+        h.succeed();
     }
 
     /** TC-T14-81：主人头顶 3 格有一层石头，天马留在地面。 */

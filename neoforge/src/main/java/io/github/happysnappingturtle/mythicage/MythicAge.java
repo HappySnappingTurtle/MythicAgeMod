@@ -118,6 +118,7 @@ public final class MythicAge {
 
         // 实体与美术管线（T7）
         game.addListener(RigRegistry::onAddReloadListeners);
+        game.addListener(RigRegistry::onDatapackSync);
         game.addListener(EntityDevCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.wild.WildDevCommand::onRegisterCommands);
 

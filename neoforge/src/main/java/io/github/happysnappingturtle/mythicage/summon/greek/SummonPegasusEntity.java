@@ -192,7 +192,8 @@ public class SummonPegasusEntity extends PathfinderMob implements GeoEntity, Myt
 
     @Override
     public boolean headLookLocked() {
-        return anim() == Anim.SKY_EYE;
+        // 离地时头跟身体走；落地恢复视线，天眼动作仍沿用原有锁头。
+        return !onGround() || anim() == Anim.SKY_EYE;
     }
 
     public Anim anim() {

@@ -100,4 +100,29 @@ class RigDefinitionTest {
     void unknownLocatorThrows() {
         assertThrows(IllegalArgumentException.class, () -> rig().locatorWorld("tail", 0, 0, 0, 0, 1));
     }
+
+    @Test
+    void headLookDefaultsAndOverrides() {
+        assertEquals(new RigDefinition.HeadLook(50, 30), rig().headLook());
+        assertEquals(new RigDefinition.HeadLook(30, 20),
+                RigDefinition.parse(MINOTAUR.replace("\"collision\":", "\"headLook\": {\"yaw\":30,\"pitch\":20}, \"collision\":")).headLook());
+    }
+
+    @Test
+    void headLookAllowsPartialOverridesAndZero() {
+        assertEquals(new RigDefinition.HeadLook(0, 30),
+                RigDefinition.parse(MINOTAUR.replace("\"collision\":", "\"headLook\": {\"yaw\":0}, \"collision\":")).headLook());
+        assertEquals(new RigDefinition.HeadLook(50, 20),
+                RigDefinition.parse(MINOTAUR.replace("\"collision\":", "\"headLook\": {\"pitch\":20}, \"collision\":")).headLook());
+    }
+
+    @Test
+    void headLookRejectsInvalidLimits() {
+        for (String value : new String[]{"-1", "1e100", "1e400", "\"NaN\"", "null"}) {
+            for (String axis : new String[]{"yaw", "pitch"}) {
+                String json = MINOTAUR.replace("\"collision\":", "\"headLook\": {\"" + axis + "\":" + value + "}, \"collision\":");
+                assertMessage(json, "headLook." + axis);
+            }
+        }
+    }
 }

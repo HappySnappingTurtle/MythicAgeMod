@@ -1,7 +1,10 @@
 package io.github.happysnappingturtle.mythicage.client.geo;
 
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
+import io.github.happysnappingturtle.mythicage.core.anim.HeadLook;
+import io.github.happysnappingturtle.mythicage.core.rig.RigDefinition;
 import io.github.happysnappingturtle.mythicage.entity.MythVariantHolder;
+import io.github.happysnappingturtle.mythicage.rig.RigRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -27,6 +30,7 @@ import java.util.Set;
  */
 public class MythGeoModel<T extends GeoAnimatable & MythVariantHolder> extends GeoModel<T> {
     private final String name;
+    private final ResourceLocation rig;
     private final ResourceLocation geo;
     private final ResourceLocation animation;
     private final ResourceLocation baseTexture;
@@ -35,6 +39,7 @@ public class MythGeoModel<T extends GeoAnimatable & MythVariantHolder> extends G
 
     public MythGeoModel(String name, Set<String> hiddenBones) {
         this.name = name;
+        this.rig = id(name);
         this.geo = id("geo/entity/" + name + ".geo.json");
         this.animation = id("animations/entity/" + name + ".animation.json");
         this.baseTexture = id("textures/entity/" + name + "/" + name + ".png");
@@ -79,9 +84,10 @@ public class MythGeoModel<T extends GeoAnimatable & MythVariantHolder> extends G
         }
         EntityModelData look = state.getData(DataTickets.ENTITY_MODEL_DATA);
         if (look != null && !animatable.headLookLocked()) {
+            RigDefinition.HeadLook limits = RigRegistry.clientHeadLook(rig);
             getBone("head").ifPresent(head -> {
-                head.setRotX(head.getRotX() + look.headPitch() * Mth.DEG_TO_RAD * 0.6F);
-                head.setRotY(head.getRotY() + look.netHeadYaw() * Mth.DEG_TO_RAD * 0.6F);
+                head.setRotX(head.getRotX() + HeadLook.pitch(look.headPitch(), limits.pitch()) * Mth.DEG_TO_RAD * 0.6F);
+                head.setRotY(head.getRotY() + HeadLook.yaw(look.netHeadYaw(), limits.yaw()) * Mth.DEG_TO_RAD * 0.6F);
             });
         }
     }
