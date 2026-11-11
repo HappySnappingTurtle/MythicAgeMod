@@ -6,14 +6,17 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    // GA-7：委托行新增 accepts，新旧客户端不能混用该负载。
-    private static final String PROTOCOL_VERSION = "25";
+    // GA-8：新增武器动作同步负载，新旧客户端不能混用。
+    private static final String PROTOCOL_VERSION = "26";
 
     private MythNetwork() {
     }
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
         event.registrar(PROTOCOL_VERSION)
+                .playToClient(io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState.Payload.TYPE,
+                        io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState.Payload.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.equipment.WeaponMotionClient.accept(payload))
                 .playToClient(io.github.happysnappingturtle.mythicage.rig.RigHeadLookPayload.TYPE,
                         io.github.happysnappingturtle.mythicage.rig.RigHeadLookPayload.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.rig.RigRegistry.accept(payload))

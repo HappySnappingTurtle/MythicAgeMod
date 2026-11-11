@@ -29,6 +29,7 @@ public final class PowerRegistries {
 
     static {
         for (String id : new String[]{
+                "item.xiphos.thrust", "item.xiphos.cleave", "item.xiphos.miss",
                 "gp.gr.bolt.lock", "gp.gr.bolt.charge", "gp.gr.bolt.strike",
                 "gp.gr.lure.place", "gp.gr.lure.pulse", "gp.gr.lure.chicken", "gp.gr.lure.sink",
                 "gp.gr.sentinel.rise", "gp.gr.sentinel.draw", "gp.gr.sentinel.shoot", "gp.gr.sentinel.crumble",
@@ -43,6 +44,8 @@ public final class PowerRegistries {
                     () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, id))));
         }
     }
+
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> THRUST_LINE = particle("thrust_line");
 
     // 粒子（贴图在 textures/particle/，由 tools/texgen/fxgen.py 生成）
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SPARK = particle("spark");

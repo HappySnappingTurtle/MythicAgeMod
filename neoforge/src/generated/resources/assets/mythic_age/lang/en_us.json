@@ -1206,5 +1206,8 @@
   "subtitles.mythic_age.gp.gr.sentinel.crumble": "Sentinel crumbles",
   "subtitles.mythic_age.gp.gr.sentinel.draw": "Sentinel draws",
   "subtitles.mythic_age.gp.gr.sentinel.rise": "Sentinel rises",
-  "subtitles.mythic_age.gp.gr.sentinel.shoot": "Sentinel shoots"
+  "subtitles.mythic_age.gp.gr.sentinel.shoot": "Sentinel shoots",
+  "subtitles.mythic_age.item.xiphos.cleave": "Blade cleaves",
+  "subtitles.mythic_age.item.xiphos.miss": "Blade whooshes",
+  "subtitles.mythic_age.item.xiphos.thrust": "Blade pierces"
 }

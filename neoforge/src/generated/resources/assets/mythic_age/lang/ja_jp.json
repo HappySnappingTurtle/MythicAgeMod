@@ -1206,5 +1206,8 @@
   "subtitles.mythic_age.gp.gr.sentinel.crumble": "番兵像が崩れる",
   "subtitles.mythic_age.gp.gr.sentinel.draw": "番兵像が弓を引く",
   "subtitles.mythic_age.gp.gr.sentinel.rise": "番兵像がせり上がる",
-  "subtitles.mythic_age.gp.gr.sentinel.shoot": "番兵像が矢を放つ"
+  "subtitles.mythic_age.gp.gr.sentinel.shoot": "番兵像が矢を放つ",
+  "subtitles.mythic_age.item.xiphos.cleave": "刃が振り下ろされる",
+  "subtitles.mythic_age.item.xiphos.miss": "刃が空を切る",
+  "subtitles.mythic_age.item.xiphos.thrust": "刃が突き刺さる"
 }

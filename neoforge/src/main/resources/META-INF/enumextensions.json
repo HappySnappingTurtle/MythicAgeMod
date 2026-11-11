@@ -35,6 +35,15 @@
         "class": "io/github/happysnappingturtle/mythicage/client/equipment/WeaponPoses",
         "field": "SMASH_PROXY"
       }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "MYTHIC_AGE_MOTION",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "io/github/happysnappingturtle/mythicage/client/equipment/WeaponPoses",
+        "field": "MOTION_PROXY"
+      }
     }
   ]
 }

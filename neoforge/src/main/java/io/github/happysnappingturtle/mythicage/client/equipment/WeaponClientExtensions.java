@@ -4,6 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.equipment.AttackStyle;
+import io.github.happysnappingturtle.mythicage.equipment.MeleeWeaponItem;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState;
+import io.github.happysnappingturtle.mythicage.core.equipment.WeaponMotion;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
@@ -28,6 +33,9 @@ public final class WeaponClientExtensions {
         public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
             if (entity.isUsingItem() && entity.getUsedItemHand() == hand) {
                 return null;
+            }
+            if (stack.getItem() instanceof MeleeWeaponItem) {
+                return WeaponMotionState.current(entity, stack) == WeaponMotion.SLASH ? null : WeaponPoses.motion();
             }
             return AttackStyle.of(stack).map(s -> switch (s) {
                 case STAB -> WeaponPoses.stab();
@@ -56,7 +64,8 @@ public final class WeaponClientExtensions {
     static void onRegister(RegisterClientExtensionsEvent event) {
         event.registerItem(BRONZE_ARMOR, GreekEquipment.BRONZE_HELMET.get(), GreekEquipment.BRONZE_CHESTPLATE.get(),
                 GreekEquipment.BRONZE_LEGGINGS.get(), GreekEquipment.BRONZE_BOOTS.get());
-        event.registerItem(STYLED, GreekEquipment.XIPHOS.get(), GreekEquipment.DORY.get(), GreekEquipment.OLIVE_CLUB.get(),
-                GreekEquipment.COMPOSITE_BOW.get());
+        // 所有文明的近战武器自动接入，不维护文明/物品白名单。
+        event.registerItem(STYLED, BuiltInRegistries.ITEM.stream().filter(item -> item instanceof MeleeWeaponItem).toArray(Item[]::new));
+        event.registerItem(STYLED, GreekEquipment.COMPOSITE_BOW.get());
     }
 }

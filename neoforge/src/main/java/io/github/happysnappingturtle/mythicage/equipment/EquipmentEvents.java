@@ -10,6 +10,8 @@ public final class EquipmentEvents {
 
     public static void register(IEventBus game) {
         game.addListener(SetBonuses::onServerTickPost);
+        game.addListener(EventPriority.LOWEST, WeaponMotionState::onAttack);
+        game.addListener(EventPriority.LOWEST, WeaponMotionState::onCritical);
         // 最后看结果：别的处理器取消了格挡就不开窗口
         game.addListener(EventPriority.LOWEST, CounterEvents::onShieldBlock);
         game.addListener(CounterEvents::onIncomingDamage);

@@ -1,6 +1,8 @@
 package io.github.happysnappingturtle.mythicage.mixin;
 
 import io.github.happysnappingturtle.mythicage.equipment.AttackStyle;
+import io.github.happysnappingturtle.mythicage.equipment.MeleeWeaponItem;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +20,11 @@ public abstract class LivingEntitySwingMixin {
     private void mythicAge$styleSwing(CallbackInfoReturnable<Integer> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         InteractionHand hand = self.swingingArm != null ? self.swingingArm : InteractionHand.MAIN_HAND;
+        if (self.getItemInHand(hand).getItem() instanceof MeleeWeaponItem) {
+            int ticks = WeaponMotionState.current(self, self.getItemInHand(hand)).swingTicks();
+            cir.setReturnValue(Math.max(1, ticks + cir.getReturnValue() - 6));
+            return;
+        }
         AttackStyle.of(self.getItemInHand(hand)).ifPresent(s -> cir.setReturnValue(Math.max(1, s.swingTicks() + cir.getReturnValue() - 6)));
     }
 }

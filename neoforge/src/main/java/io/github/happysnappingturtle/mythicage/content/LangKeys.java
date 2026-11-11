@@ -820,6 +820,9 @@ public final class LangKeys {
         add("subtitles.mythic_age.boss.minotaur.roar", "弥诺陶洛斯怒吼", "Minotaur roars", "ミノタウロスが咆哮する");
         add("subtitles.mythic_age.boss.minotaur.throw", "弥诺陶洛斯掷出碎石", "Minotaur hurls rubble", "ミノタウロスが瓦礫を投げる");
         add("subtitles.mythic_age.boss.minotaur.stunned", "弥诺陶洛斯撞柱硬直", "Minotaur stunned by the pillar", "ミノタウロスが柱に激突してよろめく");
+        add("subtitles.mythic_age.item.xiphos.thrust", "利刃刺入", "Blade pierces", "刃が突き刺さる");
+        add("subtitles.mythic_age.item.xiphos.cleave", "利刃劈落", "Blade cleaves", "刃が振り下ろされる");
+        add("subtitles.mythic_age.item.xiphos.miss", "利刃破风", "Blade whooshes", "刃が空を切る");
         add("subtitles.mythic_age.gp.gr.bolt.lock", "雷击锁定", "Bolt locks on", "雷撃が狙いを定める");
         add("subtitles.mythic_age.gp.gr.bolt.charge", "雷云蓄力", "Storm cloud gathers", "雷雲が集まる");
         add("subtitles.mythic_age.gp.gr.bolt.strike", "雷霆劈下", "Thunderbolt strikes", "雷霆が落ちる");

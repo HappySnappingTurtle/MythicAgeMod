@@ -33,6 +33,15 @@ public final class WeaponPoses {
                 a.yRot = 0;
             });
 
+    /** GA-8 通用动态姿势；动作与暴击选择来自装备数据。 */
+    @SuppressWarnings("unused")
+    public static final EnumProxy<HumanoidModel.ArmPose> MOTION_PROXY = new EnumProxy<>(HumanoidModel.ArmPose.class, false,
+            (IArmPoseTransformer) WeaponAnimations::pose);
+
+    public static HumanoidModel.ArmPose motion() {
+        return MOTION_PROXY.getValue();
+    }
+
     private WeaponPoses() {
     }
 

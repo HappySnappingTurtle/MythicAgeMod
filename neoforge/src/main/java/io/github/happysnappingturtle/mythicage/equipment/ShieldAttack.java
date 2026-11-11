@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 举盾时攻击（T17 §4.3，通用）：原版举盾期间攻击键被吞掉，客户端改发这个包；服务器校验后结算。
@@ -78,7 +79,16 @@ public final class ShieldAttack {
             return false;
         }
         float damage = (float) (p.getAttributeValue(Attributes.ATTACK_DAMAGE) * mult);
-        CounterEvents.thrusting(() -> le.hurt(p.damageSources().playerAttack(p), damage));
+        // 盾后刺击使用普通动作；成功伤害才播放通用命中反馈，不改变原有伤害和窗口结算。
+        var motion = ((MeleeWeaponItem) weapon.getItem()).stats().motion();
+        WeaponMotionState.remember(p, weapon, motion);
+        PacketDistributor.sendToPlayersTrackingEntity(p,
+                new WeaponMotionState.Payload(p.getId(), motion.ordinal()));
+        CounterEvents.thrusting(() -> {
+            if (le.hurt(p.damageSources().playerAttack(p), damage)) {
+                WeaponFeedback.hit(weapon, le, p);
+            }
+        });
         p.resetAttackStrengthTicker();
         weapon.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         p.swing(InteractionHand.MAIN_HAND, true);

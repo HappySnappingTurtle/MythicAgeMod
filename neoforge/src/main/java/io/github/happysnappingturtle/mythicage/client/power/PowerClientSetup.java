@@ -41,6 +41,8 @@ public final class PowerClientSetup {
 
     @SubscribeEvent
     static void onParticles(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(PowerRegistries.THRUST_LINE.get(), s -> MythParticle.provider(s,
+                new MythParticle.Style(4, 6, 0.07f, 0.10f, 0, 0, 1f, true, 0, 0.6f, 0, false, 1f)));
         // 寿命、大小、重力、上浮、阻力、自发光、淡入、淡出、旋转、逐帧、透明度
         event.registerSpriteSet(PowerRegistries.SPARK.get(), s -> MythParticle.provider(s,
                 new MythParticle.Style(4, 7, 0.08f, 0.16f, 0, 0, 0.82f, true, 0, 0.5f, 0, false, 1f)));

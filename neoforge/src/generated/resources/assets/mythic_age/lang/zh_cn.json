@@ -1206,5 +1206,8 @@
   "subtitles.mythic_age.gp.gr.sentinel.crumble": "哨兵石像崩碎",
   "subtitles.mythic_age.gp.gr.sentinel.draw": "哨兵石像拉弓",
   "subtitles.mythic_age.gp.gr.sentinel.rise": "哨兵石像升起",
-  "subtitles.mythic_age.gp.gr.sentinel.shoot": "哨兵石像射箭"
+  "subtitles.mythic_age.gp.gr.sentinel.shoot": "哨兵石像射箭",
+  "subtitles.mythic_age.item.xiphos.cleave": "利刃劈落",
+  "subtitles.mythic_age.item.xiphos.miss": "利刃破风",
+  "subtitles.mythic_age.item.xiphos.thrust": "利刃刺入"
 }

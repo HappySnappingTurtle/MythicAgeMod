@@ -61,7 +61,14 @@ public class MeleeWeaponItem extends Item {
     }
 
     @Override
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, net.minecraft.world.InteractionHand hand) {
+        WeaponMotionState.prepareSwing(entity, stack);
+        return false;
+    }
+
+    @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        WeaponFeedback.hit(stack, target, attacker);
         return true;
     }
 

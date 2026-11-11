@@ -314,5 +314,50 @@
         "type": "event"
       }
     ]
+  },
+  "item.xiphos.thrust": {
+    "subtitle": "subtitles.mythic_age.item.xiphos.thrust",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.strong",
+        "type": "event",
+        "pitch": 1.5,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:item.trident.hit",
+        "type": "event",
+        "pitch": 1.7,
+        "volume": 0.6
+      }
+    ]
+  },
+  "item.xiphos.cleave": {
+    "subtitle": "subtitles.mythic_age.item.xiphos.cleave",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.crit",
+        "type": "event",
+        "pitch": 0.75,
+        "volume": 1
+      },
+      {
+        "name": "minecraft:item.trident.hit",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.8
+      }
+    ]
+  },
+  "item.xiphos.miss": {
+    "subtitle": "subtitles.mythic_age.item.xiphos.miss",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "pitch": 1.6,
+        "volume": 0.35
+      }
+    ]
   }
 }

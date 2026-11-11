@@ -2,6 +2,11 @@ package io.github.happysnappingturtle.mythicage.client;
 
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.equipment.ShieldAttack;
+import io.github.happysnappingturtle.mythicage.equipment.MeleeWeaponItem;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponFeedback;
+import io.github.happysnappingturtle.mythicage.core.equipment.WeaponMotion;
+import io.github.happysnappingturtle.mythicage.power.PowerRegistries;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.api.distmarker.Dist;
@@ -33,7 +38,13 @@ public final class ShieldAttackClient {
             return;
         }
         // 没对准实体也照样出手（播放越盾下刺的动作），只是不发包
+        var weapon = (MeleeWeaponItem) mc.player.getMainHandItem().getItem();
+        WeaponMotionState.remember(mc.player, mc.player.getMainHandItem(), weapon.stats().motion());
         mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        if (!(mc.hitResult instanceof EntityHitResult) && weapon.stats().motion()
+                == WeaponMotion.THRUST) {
+            mc.player.playSound(PowerRegistries.sound(WeaponFeedback.MISS), 0.35F, 1);
+        }
         if (mc.hitResult instanceof EntityHitResult hit) {
             PacketDistributor.sendToServer(new ShieldAttack.Payload(hit.getEntity().getId()));
         }

@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * 文明装备数值表（T17 设计文档 §1）：{@code mythic_age/equipment/<文明>.json}，物品注册与校验脚本共用。
@@ -34,10 +35,10 @@ public record EquipmentTable(Map<String, ArmorSet> armor, Map<String, Weapon> we
         }
     }
 
-    /** 一件武器或盾、弓；没有的字段为 0 / false。 */
+    /** 一件武器或盾、弓；数值缺省为 0 / false，两个动作字段各自缺省为 slash。 */
     public record Weapon(String id, String source, double damage, double speed, double reach, int durability,
                          boolean sweep, boolean blunt, double thrustMultiplier, int counterTicks, double counterBonus,
-                         int drawTicks) {
+                         int drawTicks, WeaponMotion motion, WeaponMotion critMotion) {
     }
 
     /** 套装效果：穿满 pieces 件 armor 套，半径 radius 内每名友方 +perAlly，最多 max。 */
@@ -70,8 +71,13 @@ public record EquipmentTable(Map<String, ArmorSet> armor, Map<String, Weapon> we
         return parse(JsonParser.parseString(json).getAsJsonObject());
     }
 
-    /** 解析；不合格时抛出 {@link IllegalArgumentException}，消息指出字段。 */
+    /** 解析；数值不合格时抛出 {@link IllegalArgumentException}，动作字段不合格则警告并回退。 */
     public static EquipmentTable parse(JsonObject root) {
+        return parse(root, message -> System.getLogger(EquipmentTable.class.getName()).log(System.Logger.Level.WARNING, message));
+    }
+
+    /** 警告出口可注入：运行时记录日志，单测验证错误字段确实报警。 */
+    public static EquipmentTable parse(JsonObject root, Consumer<String> warning) {
         Map<String, ArmorSet> armor = new LinkedHashMap<>();
         Map<String, Weapon> weapons = new LinkedHashMap<>();
         Map<String, SetBonus> sets = new LinkedHashMap<>();
@@ -109,7 +115,8 @@ public record EquipmentTable(Map<String, ArmorSet> armor, Map<String, Weapon> we
                 weapons.put(id, new Weapon(id, str(o, "source"), damage, speed, num(o, "reach", id, 0), durability,
                         o.has("sweep") && o.get("sweep").getAsBoolean(), o.has("blunt") && o.get("blunt").getAsBoolean(),
                         num(o, "thrust_multiplier", id, 0), (int) num(o, "counter_ticks", id, 0),
-                        num(o, "counter_bonus", id, 0), (int) num(o, "draw_ticks", id, 0)));
+                        num(o, "counter_bonus", id, 0), (int) num(o, "draw_ticks", id, 0),
+                        motion(o, "motion", id, warning), motion(o, "critMotion", id, warning)));
             }
         }
         if (root.has("sets")) {
@@ -125,6 +132,23 @@ public record EquipmentTable(Map<String, ArmorSet> armor, Map<String, Weapon> we
             }
         }
         return new EquipmentTable(Map.copyOf(armor), Map.copyOf(weapons), Map.copyOf(sets));
+    }
+
+    private static WeaponMotion motion(JsonObject o, String key, String id, Consumer<String> warning) {
+        if (!o.has(key)) {
+            return WeaponMotion.SLASH;
+        }
+        JsonElement value = o.get(key);
+        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+            switch (value.getAsString()) {
+                case "thrust": return WeaponMotion.THRUST;
+                case "slash": return WeaponMotion.SLASH;
+                case "cleave": return WeaponMotion.CLEAVE;
+                default: break;
+            }
+        }
+        warning.accept("武器 " + id + "：" + key + " 无效（" + value + "），按默认 slash 处理");
+        return WeaponMotion.SLASH;
     }
 
     private static int[] ints(JsonObject o, String key, String id) {

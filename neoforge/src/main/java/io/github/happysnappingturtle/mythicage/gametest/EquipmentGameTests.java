@@ -1,6 +1,19 @@
 package io.github.happysnappingturtle.mythicage.gametest;
 
 import com.mojang.authlib.GameProfile;
+import com.google.gson.JsonParser;
+import io.github.happysnappingturtle.mythicage.content.LangKeys;
+import io.github.happysnappingturtle.mythicage.core.equipment.WeaponMotion;
+import io.github.happysnappingturtle.mythicage.equipment.MeleeWeaponItem;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponFeedback;
+import io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState;
+import io.github.happysnappingturtle.mythicage.power.PowerRegistries;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.PlayLevelSoundEvent;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 import io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.equipment.DrawRules;
@@ -499,6 +512,129 @@ public final class EquipmentGameTests {
         h.assertTrue(craft(h, Age.ARCHAIC, A, B, A, A, B, A, A, S, A).isEmpty(), "远古不能合成短剑");
         h.assertTrue(craft(h, Age.CLASSICAL, A, B, A, A, B, A, A, S, A).is(GreekEquipment.XIPHOS.get()), "古典能合成短剑");
         h.assertTrue(craft(h, Age.CLASSICAL, B, A, B, B, B, B, B, B, B).is(GreekEquipment.BRONZE_CHESTPLATE.get()), "青铜胸甲 8 锭");
+        h.succeed();
+    }
+    // ───────────── GA-8：通用动作与真实攻击反馈 ─────────────
+
+    /** TC-GA8-20：移除僵尸固有护甲以测面板 6；旁边目标放进原版横扫范围。 */
+    @GameTest(template = T, batch = BATCH)
+    public static void ga8_tc20_xiphos_damage_no_sweep(GameTestHelper h) {
+        FakePlayer p = player(h, "ga8_damage");
+        equip(p, EquipmentSlot.MAINHAND, GreekEquipment.XIPHOS.get());
+        fullStrength(p);
+        p.setOnGround(true);
+        Zombie target = still(h.spawn(EntityType.ZOMBIE, 8, 2, 10));
+        Zombie beside = still(h.spawn(EntityType.ZOMBIE, 9, 2, 10));
+        target.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        float before = target.getHealth();
+        float besideBefore = beside.getHealth();
+        p.attack(target);
+        close(h, 6, before - target.getHealth(), "短剑普通伤害");
+        close(h, besideBefore, beside.getHealth(), "旁边僵尸不得被横扫");
+        h.assertFalse(p.getMainHandItem().canPerformAction(ItemAbilities.SWORD_SWEEP), "不开放横扫能力");
+        close(h, 1.8, p.getAttributeValue(Attributes.ATTACK_SPEED), "攻速不变");
+        close(h, 375, p.getMainHandItem().getMaxDamage(), "耐久不变");
+        h.killAllEntitiesOfClass(Zombie.class);
+        h.succeed();
+    }
+
+    /** TC-GA8-21：监听真实 Level 播放事件，不能只测动作到声音的静态映射。 */
+    @GameTest(template = T, batch = BATCH)
+    public static void ga8_tc21_hit_sounds(GameTestHelper h) {
+        FakePlayer p = player(h, "ga8_sounds");
+        equip(p, EquipmentSlot.MAINHAND, GreekEquipment.XIPHOS.get());
+        Zombie target = still(h.spawn(EntityType.ZOMBIE, 8, 2, 10));
+        target.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        var played = new ArrayList<String>();
+        Consumer<PlayLevelSoundEvent.AtPosition> listener = event -> {
+            if (event.getLevel() == h.getLevel() && event.getSound() != null
+                    && event.getPosition().distanceToSqr(target.position()) < 0.01) {
+                played.add(event.getSound().value().getLocation().toString());
+            }
+        };
+        NeoForge.EVENT_BUS.addListener(listener);
+        try {
+            fullStrength(p);
+            p.setOnGround(true);
+            p.attack(target);
+            h.assertTrue(played.stream().filter(id -> id.equals("mythic_age:" + WeaponFeedback.THRUST)).count() == 1,
+                    "普通命中必须且只播放一次前刺音效：" + played);
+            h.assertFalse(played.contains("mythic_age:" + WeaponFeedback.CLEAVE), "普通命中不播下劈");
+            played.clear();
+            target.setHealth(target.getMaxHealth());
+            target.invulnerableTime = 0;
+            fullStrength(p);
+            p.setOnGround(false);
+            p.fallDistance = 1;
+            p.attack(target);
+            close(h, 9, target.getMaxHealth() - target.getHealth(), "原版暴击倍率仍是 1.5");
+            h.assertTrue(played.stream().filter(id -> id.equals("mythic_age:" + WeaponFeedback.CLEAVE)).count() == 1,
+                    "暴击必须且只播放一次下劈音效：" + played);
+            h.assertFalse(played.contains("mythic_age:" + WeaponFeedback.THRUST), "暴击不播前刺");
+            p.setOnGround(true);
+            p.fallDistance = 0;
+            p.resetAttackStrengthTicker();
+            h.assertTrue(WeaponMotionState.current(p, p.getMainHandItem()) == WeaponMotion.CLEAVE,
+                    "本次动作锁定，不随落地或冷却清零切回前刺");
+            played.clear();
+            target.setInvulnerable(true);
+            fullStrength(p);
+            p.attack(target);
+            h.assertFalse(played.contains("mythic_age:" + WeaponFeedback.THRUST)
+                    || played.contains("mythic_age:" + WeaponFeedback.CLEAVE), "伤害失败不能播放命中反馈");
+        } finally {
+            NeoForge.EVENT_BUS.unregister(listener);
+        }
+        h.killAllEntitiesOfClass(Zombie.class);
+        h.succeed();
+    }
+
+    /** TC-GA8-22：注册、sounds.json 字幕声明及 runData 生成的三语资源都存在。 */
+    @GameTest(template = T, batch = BATCH)
+    public static void ga8_tc22_sound_subtitles(GameTestHelper h) throws Exception {
+        try (var in = EquipmentGameTests.class.getResourceAsStream("/assets/mythic_age/sounds.json")) {
+            h.assertTrue(in != null, "sounds.json 必须存在");
+            var sounds = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            for (String id : List.of(WeaponFeedback.THRUST, WeaponFeedback.CLEAVE, WeaponFeedback.MISS)) {
+                h.assertTrue(PowerRegistries.sound(id).getLocation().getPath().equals(id), "音效已注册：" + id);
+                String key = sounds.getAsJsonObject(id).get("subtitle").getAsString();
+                h.assertTrue(key.equals("subtitles.mythic_age." + id), "字幕键匹配");
+                h.assertTrue(LangKeys.all().containsKey(key), "三语源登记");
+                for (String locale : List.of("zh_cn", "en_us", "ja_jp")) {
+                    try (var lang = EquipmentGameTests.class.getResourceAsStream("/assets/mythic_age/lang/" + locale + ".json")) {
+                        h.assertTrue(lang != null, "生成语言文件存在：" + locale);
+                        var values = JsonParser.parseReader(new InputStreamReader(lang, StandardCharsets.UTF_8)).getAsJsonObject();
+                        h.assertTrue(values.has(key) && !values.get(key).getAsString().isBlank(), locale + " 有字幕：" + key);
+                        h.assertTrue(values.get(key).getAsString().equals(LangKeys.all().get(key).get(locale)), "生成结果与登记一致");
+                    }
+                }
+            }
+        }
+        h.succeed();
+    }
+
+    /** TC-GA8-23：长矛动作改前刺，伤害、速度、触及与盾后刺击倍率均不变。 */
+    @GameTest(template = T, batch = BATCH)
+    public static void ga8_tc23_dory_motion_stats(GameTestHelper h) {
+        FakePlayer p = player(h, "ga8_dory");
+        double baseReach = p.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE);
+        equip(p, EquipmentSlot.MAINHAND, GreekEquipment.DORY.get());
+        var stats = ((MeleeWeaponItem) p.getMainHandItem().getItem()).stats();
+        h.assertTrue(stats.motion() == WeaponMotion.THRUST, "长矛配置前刺");
+        h.assertTrue(stats.critMotion() == WeaponMotion.SLASH, "缺省 critMotion 为 slash");
+        close(h, 7, p.getAttributeValue(Attributes.ATTACK_DAMAGE), "面板伤害不变");
+        close(h, 1.1, p.getAttributeValue(Attributes.ATTACK_SPEED), "攻速不变");
+        close(h, baseReach + 1, p.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE), "触及 +1 不变");
+        close(h, 375, p.getMainHandItem().getMaxDamage(), "耐久不变");
+        close(h, 0.6, stats.thrustMultiplier(), "盾后刺击倍率不变");
+        Zombie target = still(h.spawn(EntityType.ZOMBIE, 8, 2, 10));
+        target.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        fullStrength(p);
+        p.setOnGround(true);
+        float before = target.getHealth();
+        p.attack(target);
+        close(h, 7, before - target.getHealth(), "实际普通伤害不变");
+        h.killAllEntitiesOfClass(Zombie.class);
         h.succeed();
     }
 }
