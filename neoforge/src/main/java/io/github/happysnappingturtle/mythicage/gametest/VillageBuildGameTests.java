@@ -222,28 +222,47 @@ public final class VillageBuildGameTests {
         return p;
     }
 
+    static void step(GameTestHelper h, VillageWorkGameTests.TV tv, BuildProject p) {
+        Construction.tick(ctx(h, tv));
+        if (p.state != BuildProject.State.BUILDING) return;
+        for (int i = 0; i < p.segments; i++) {
+            if (p.placed.get(i)) continue;
+            var result = Construction.drop(ctx(h, tv), p, i);
+            if (result == Construction.Result.PLACED || result == Construction.Result.BLOCKED || result == Construction.Result.SHORT) return;
+        }
+    }
+
+    static void finishOverTicks(GameTestHelper h, VillageWorkGameTests.TV tv, BuildProject p, Runnable assertions) {
+        h.startSequence().thenWaitUntil(() -> {
+            step(h, tv, p);
+            h.assertTrue(!p.active(), "等待逐格落成：" + p.state + " " + BuildProject.count(p.placedCells) + " blocked=" + p.blockedCells);
+        }).thenExecute(() -> {
+            try { assertions.run(); h.succeed(); } finally { cleanup(h, tv); }
+        });
+    }
+
     // ───────────── 用例 ─────────────
 
     /** TC-T19-80（验收：测试文明跑通一次施工）+ TC-T19-92：备料 → 居民锤打 → 落段 → 验收 → 地块 built、范围并入、容量按 provides。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_full_cycle(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        try {
-            BuildProject p = hut(h, tv, 30, 4);
-            h.assertTrue(p.state == BuildProject.State.BUILDING, "料齐开工：" + p.state + " 缺 " + p.missing());
-            h.assertTrue(p.segments == 2, "25 个方块切成 2 段：" + p.segments);
-            ResidentEntity r = VillageWorkGameTests.resident(h, tv, "buildtest:worker", 8, 6);
-            VillageScheduler.processNowForTest(h.getLevel(), tv.id());
-            h.assertTrue(r.job().map(j -> j.type().equals(BuildJob.ID)).orElse(false), "居民领到施工单：" + r.job());
-            r.fastForwardForTest();
-            r.tickJobForTest();
-            h.assertTrue(Construction.queued(tv.id(), p.id, 0), "锤完进落段队列");
-            h.assertTrue(!p.placed.get(0), "落段前不算已放");
-            Construction.drain(h.getLevel().getServer());
-            h.assertTrue(p.placed.get(0) && doorAt(h), "第一段落下（含门的两半）");
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 1) == Construction.Result.PLACED, "第二段");
+        var tv = village(h);
+        BuildProject p = hut(h, tv, 30, 4);
+        h.assertTrue(p.state == BuildProject.State.BUILDING, "料齐开工");
+        h.assertTrue(p.segments == 2, "25 个方块切成 2 段：" + p.segments);
+        var r = VillageWorkGameTests.resident(h, tv, "buildtest:worker", 8, 6);
+        VillageScheduler.processNowForTest(h.getLevel(), tv.id());
+        h.assertTrue(r.job().map(j -> j.type().equals(BuildJob.ID)).orElse(false), "居民领到施工单");
+        int[] previous = {0};
+        h.onEachTick(() -> {
+            int now = BuildProject.count(p.placedCells);
+            h.assertTrue(now - previous[0] <= 1, "每名工人每刻最多一格"); previous[0] = now;
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(!p.active(), "等待居民逐块完成：" + p.state + " cells=" + BuildProject.count(p.placedCells) + " pos=" + r.blockPosition() + " job=" + r.job() + " " + BuildJob.diagnostic(r));
             VillageEconomy.State s = state(h, tv);
             h.assertTrue(s.projects.isEmpty() && s.constructed.stream().anyMatch(b -> b.building().equals(HUT)), "落成");
+            h.assertTrue(doorAt(h), "逐格落成后门两半完整");
             h.assertTrue(s.builtPlots.contains("classical_hut_1"), "地块 built");
             h.assertTrue(s.stock.count(BRICKS) == 7 && s.stock.count(PLANKS) == 2, "正好扣掉账单：" + s.stock.items());
             VillagePlans.Plan plan = VillagePlans.get(h.getLevel().getServer()).byVillage(tv.id()).orElseThrow();
@@ -255,10 +274,8 @@ public final class VillageBuildGameTests {
                     "空间索引看得到");
             VillageScheduler.processNowForTest(h.getLevel(), tv.id());
             h.assertTrue(s.stock.capacity() == 64 + 16 * 2, "TC-92 容量按 provides.storage：" + s.stock.capacity());
-            h.succeed();
-        } finally {
             cleanup(h, tv);
-        }
+        });
     }
 
     /** TC-T19-81：缺料时停在备料，缺口显示在村务里，缺的料会被生产补上。 */
@@ -296,56 +313,49 @@ public final class VillageBuildGameTests {
     }
 
     /** TC-T19-82 / 83（验收：挡路停工不拆）：段内有玩家的方块 → 停工记坐标、方块不动；拿走后恢复。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_blocked_then_resumes(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        try {
-            BuildProject p = hut(h, tv, 30, 4);
-            h.setBlock(new BlockPos(6, 2, 11), Blocks.OAK_PLANKS);
-            Construction.Result r = Construction.drop(ctx(h, tv), p, 0);
-            BlockPos at = rel(h, 6, 2, 11);
-            h.assertTrue(r == Construction.Result.BLOCKED && p.state == BuildProject.State.BLOCKED, "停工：" + r);
-            h.assertTrue(p.blockedAt.equals(new Pos(at.getX(), at.getY(), at.getZ())), "记坐标：" + p.blockedAt);
+        var tv = village(h);
+        BuildProject p = hut(h, tv, 30, 4);
+        h.setBlock(new BlockPos(6, 2, 11), Blocks.OAK_PLANKS);
+        BlockPos at = rel(h, 6, 2, 11);
+        h.startSequence().thenWaitUntil(() -> {
+            step(h, tv, p);
+            h.assertTrue(p.state == BuildProject.State.BLOCKED, "其他格完成后停工");
+        }).thenExecute(() -> {
+            h.assertTrue(p.blockedAt.equals(new Pos(at.getX(), at.getY(), at.getZ())), "记坐标");
             h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.OAK_PLANKS), "玩家方块不拆");
-            h.assertTrue(!doorAt(h) && !p.placed.get(0), "整段没落");
-            h.assertTrue(state(h, tv).stock.escrowed(BRICKS) == 23, "料没扣");
+            h.assertTrue(BuildProject.count(p.blockedCells) == 1 && doorAt(h), "仅一格被挡，其余包含门照放");
+            h.assertTrue(state(h, tv).stock.escrowed(BRICKS) == 1, "仅保留被挡一格的料");
             Construction.tick(ctx(h, tv));
-            h.assertTrue(p.state == BuildProject.State.BLOCKED, "还挡着就不恢复");
+            h.assertTrue(p.state == BuildProject.State.BLOCKED, "还挡着不恢复");
             h.setBlock(new BlockPos(6, 2, 11), Blocks.AIR);
-            Construction.tick(ctx(h, tv));
-            h.assertTrue(p.state == BuildProject.State.BUILDING, "拿走后恢复");
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 0) == Construction.Result.PLACED && doorAt(h), "复工落段");
-            h.succeed();
-        } finally {
-            cleanup(h, tv);
-        }
+        }).thenWaitUntil(() -> {
+            step(h, tv, p); h.assertTrue(!p.active(), "等待600刻复查并补放");
+        }).thenExecute(() -> { h.assertTrue(doorAt(h), "复工后门完整"); cleanup(h, tv); h.succeed(); });
     }
 
     /** TC-T19-84：施工中重启（存档往返、工地缓存清空）：已放的段不重放，托管不重复。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_survives_restart(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        try {
-            BuildProject p = hut(h, tv, 30, 4);
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 0) == Construction.Result.PLACED, "先落一段");
-            VillageEconomy eco = VillageEconomy.get(h.getLevel().getServer());
-            int escBefore = eco.state(tv.id()).stock.escrowed(BRICKS);
-            int stockBefore = eco.state(tv.id()).stock.count(BRICKS);
-            eco.replaceForTest(tv.id(), VillageEconomy.roundTripForTest(eco, h.getLevel().registryAccess()));
-            Construction.clearForTest(tv.id());
-            VillageEconomy.State s = eco.state(tv.id());
-            BuildProject q = s.projects.get(0);
-            h.assertTrue(q.id == p.id && q.placed.get(0) && q.state == BuildProject.State.BUILDING, "按项目 id 恢复");
-            h.assertTrue(s.stock.escrowed(BRICKS) == escBefore && s.stock.count(BRICKS) == stockBefore, "托管不重复、不丢");
-            Construction.tick(ctx(h, tv));
-            h.assertTrue(s.stock.escrowed(BRICKS) == escBefore, "再备料也不多锁");
-            h.assertTrue(Construction.drop(ctx(h, tv), q, 0) == Construction.Result.GONE, "已放的段不重放");
-            h.assertTrue(Construction.drop(ctx(h, tv), q, 1) == Construction.Result.PLACED, "续上第二段");
-            h.assertTrue(s.projects.isEmpty() && s.stock.count(BRICKS) == 7, "落成、账单正好：" + s.stock.items());
-            h.succeed();
-        } finally {
-            cleanup(h, tv);
-        }
+        var tv = village(h);
+        BuildProject p = hut(h, tv, 30, 4);
+        h.startSequence().thenWaitUntil(() -> h.assertTrue(Construction.drop(ctx(h,tv),p,0)==Construction.Result.PLACED,"先取得配额落一格"))
+                .thenExecute(() -> {
+        VillageEconomy eco = VillageEconomy.get(h.getLevel().getServer());
+        int escBefore = eco.state(tv.id()).stock.escrowed(BRICKS);
+        int stockBefore = eco.state(tv.id()).stock.count(BRICKS);
+        eco.replaceForTest(tv.id(), VillageEconomy.roundTripForTest(eco, h.getLevel().registryAccess()));
+        Construction.clearForTest(tv.id());
+        var state = eco.state(tv.id());
+        BuildProject q = state.projects.get(0);
+        h.assertTrue(q.id == p.id && q.cellPlaced(0, 0) && !q.placed.get(0) && q.state == BuildProject.State.BUILDING, "保留段内进度");
+        h.assertTrue(state.stock.escrowed(BRICKS) == escBefore && state.stock.count(BRICKS) == stockBefore, "托管不重复、不丢");
+        Construction.tick(ctx(h, tv));
+        h.assertTrue(state.stock.escrowed(BRICKS) == escBefore, "再备料也不多锁");
+        h.assertTrue(Construction.dropCell(ctx(h, tv), q, 0, 0) == Construction.Result.GONE, "已放的格不重放");
+        finishOverTicks(h, tv, q, () -> h.assertTrue(state.projects.isEmpty() && state.stock.count(BRICKS) == 7, "落成、账单正好"));
+                });
     }
 
     /** TC-T19-85：未运行时不落块；回来后累积施工储备，派单时锤打时长按倍率缩短、储备扣掉省下的刻数。 */
@@ -367,8 +377,9 @@ public final class VillageBuildGameTests {
             int base = j.steps().get(1).ticks();
             Job fast = BuildJob.withBankedTicks(ctx(h, tv), j);
             int ticks = fast.steps().get(1).ticks();
-            h.assertTrue(base == 160 && ticks == 80, "按倍率 2 缩短：" + base + " → " + ticks);
-            h.assertTrue(s.constructionBank == bank - 80, "储备扣掉省下的刻数：" + s.constructionBank);
+            h.assertTrue(base == 20 && ticks == 20, "取料固定20刻，追赶只影响逐格动作");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.core.village.build.BuildPacing.ticks(ctx(h,tv).data().construction(), bank, 1) == 5, "追赶每格5刻");
+            h.assertTrue(s.constructionBank == bank, "派单不预扣，放下每格才消耗储备");
             h.succeed();
         } finally {
             cleanup(h, tv);
@@ -393,17 +404,14 @@ public final class VillageBuildGameTests {
     }
 
     /** TC-T19-88：落成提示发给 64 格内的玩家；seenBy 里不在场的玩家下次进村补发；文字不含恩宠、时代。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_notice(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        FakePlayer near = player(h, "near", rel(h, 8, 2, 30));
-        FakePlayer far = player(h, "far", rel(h, 8, 2, 30).offset(300, 0, 0));
-        try {
-            VillageEconomy.State s = state(h, tv);
-            s.seenBy.add(far.getUUID());
-            BuildProject p = hut(h, tv, 30, 4);
-            Construction.drop(ctx(h, tv), p, 0);
-            Construction.drop(ctx(h, tv), p, 1);
+        var tv = village(h);
+        var near = player(h, "near", rel(h, 8, 2, 30));
+        var far = player(h, "far", rel(h, 8, 2, 30).offset(300, 0, 0));
+        var s = state(h, tv); s.seenBy.add(far.getUUID());
+        BuildProject p = hut(h, tv, 30, 4);
+        finishOverTicks(h, tv, p, () -> {
             h.assertTrue(BuildNotices.sentForTest(s, HUT, near.getUUID()), "在场的收到");
             h.assertTrue(!BuildNotices.sentForTest(s, HUT, far.getUUID()), "不在场的还没收到");
             h.assertTrue(BuildNotices.onEnter(far, tv.village()) == 1 && BuildNotices.sentForTest(s, HUT, far.getUUID()), "进村补发");
@@ -413,12 +421,8 @@ public final class VillageBuildGameTests {
             h.assertTrue(key.equals("mythic_age.village.built"), "提示语言键：" + key);
             String zh = io.github.happysnappingturtle.mythicage.content.LangKeys.all().get(key).zh();
             h.assertTrue(zh != null && !zh.contains("恩宠") && !zh.contains("时代"), "不含恩宠、时代：" + zh);
-            h.succeed();
-        } finally {
-            OnlinePlayers.forTest(near, false);
-            OnlinePlayers.forTest(far, false);
-            cleanup(h, tv);
-        }
+            OnlinePlayers.forTest(near, false); OnlinePlayers.forTest(far, false);
+        });
     }
 
     /** TC-T19-89：导出的古典 / 英雄 / 神话模板都能读到，尺寸与建筑数据一致，账单非空、方块都被折算表覆盖。 */
@@ -452,45 +456,47 @@ public final class VillageBuildGameTests {
     }
 
     /** TC-T19-90：验收发现门被拆了 → 含门的段标回未放、账单增加、回到备料；补料后重放并落成。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_inspection_repairs(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        try {
-            BuildProject p = hut(h, tv, 40, 6);
-            Construction.drop(ctx(h, tv), p, 0);
-            h.setBlock(new BlockPos(7, 3, 10), Blocks.AIR);
-            h.setBlock(new BlockPos(7, 2, 10), Blocks.AIR);
-            Construction.drop(ctx(h, tv), p, 1);
-            VillageEconomy.State s = state(h, tv);
-            h.assertTrue(s.projects.contains(p) && p.state == BuildProject.State.STOCKING, "回到备料：" + p.state);
-            h.assertTrue(!p.placed.get(0) && p.placed.get(1), "含门的段标回未放");
-            h.assertTrue(p.bill().get(BRICKS) == 23 + 16 - 2 && p.bill().get(PLANKS) == 4, "账单追加第一段的成本：" + p.bill());
-            Construction.tick(ctx(h, tv));
-            h.assertTrue(p.state == BuildProject.State.BUILDING, "库里还有料：" + p.missing() + " " + s.stock.items());
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 0) == Construction.Result.PLACED && doorAt(h), "重放");
-            h.assertTrue(s.projects.isEmpty(), "落成");
-            h.succeed();
-        } finally {
-            cleanup(h, tv);
-        }
+        var tv = village(h);
+        BuildProject p = hut(h, tv, 40, 6);
+        var site = Construction.site(ctx(h,tv),p).orElseThrow();
+        int doorSegment = site.segments.stream().filter(seg -> seg.cells().stream().anyMatch(c -> c.block().equals("minecraft:oak_door")))
+                .findFirst().orElseThrow().index();
+        h.startSequence().thenWaitUntil(() -> {
+            Construction.drop(ctx(h,tv),p,0);
+            h.assertTrue(p.placed.get(0), "先逐块完成第一段");
+        }).thenExecute(() -> {
+            h.setBlock(new BlockPos(7, 3, 10), Blocks.AIR); h.setBlock(new BlockPos(7, 2, 10), Blocks.AIR);
+        }).thenWaitUntil(() -> {
+            Construction.drop(ctx(h,tv),p,1);
+            h.assertTrue(p.state == BuildProject.State.STOCKING, "验收发现门缺失回备料");
+        }).thenExecute(() -> {
+            h.assertTrue(!p.placed.get(doorSegment), "含门段标回未放");
+            h.assertTrue(site.segments.stream().filter(seg -> seg.index() != doorSegment).allMatch(seg -> p.placed.get(seg.index())),
+                    "未损坏的其他段保持已完成");
+            var expected = new java.util.TreeMap<String,Double>(site.totalCost());
+            BuildCosts.add(expected,site.cost(doorSegment));
+            h.assertTrue(p.bill().equals(BuildCosts.ceil(expected)), "精确追加被损坏段成本");
+            Construction.tick(ctx(h,tv)); h.assertTrue(p.state == BuildProject.State.BUILDING, "库里还有料");
+            finishOverTicks(h,tv,p,() -> h.assertTrue(doorAt(h) && state(h,tv).projects.isEmpty(), "重放并落成"));
+        });
     }
 
     /** TC-T19-91：段内站着玩家 → 这一刻不落；离开后再落。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_waits_for_player(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        FakePlayer pl = player(h, "inside", rel(h, 6, 3, 12));
-        try {
-            BuildProject p = hut(h, tv, 30, 4);
-            Construction.drop(ctx(h, tv), p, 0);
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 1) == Construction.Result.WAIT && !p.placed.get(1), "有人站着就等");
-            pl.moveTo(Vec3.atBottomCenterOf(rel(h, 8, 2, 30)));
-            h.assertTrue(Construction.drop(ctx(h, tv), p, 1) == Construction.Result.PLACED, "离开后落下");
-            h.succeed();
-        } finally {
-            OnlinePlayers.forTest(pl, false);
-            cleanup(h, tv);
-        }
+        var tv = village(h);
+        var pl = player(h,"inside",rel(h,6,3,12));
+        BuildProject p=hut(h,tv,30,4);
+        var site=Construction.site(ctx(h,tv),p).orElseThrow();
+        var segment=site.segments.stream().filter(seg -> seg.cells().stream().anyMatch(c -> VillageContext.block(c.pos()).equals(rel(h,6,3,12)))).findFirst().orElseThrow();
+        int cell=java.util.stream.IntStream.range(0,segment.cells().size()).filter(i -> VillageContext.block(segment.cells().get(i).pos()).equals(rel(h,6,3,12))).findFirst().orElseThrow();
+        h.assertTrue(Construction.dropCell(ctx(h,tv),p,segment.index(),cell)==Construction.Result.WAIT && !p.cellPlaced(segment.index(),cell), "玩家所在格等待");
+        pl.moveTo(Vec3.atBottomCenterOf(rel(h,8,2,30)));
+        h.startSequence().thenWaitUntil(() -> h.assertTrue(
+                Construction.dropCell(ctx(h,tv),p,segment.index(),cell)==Construction.Result.PLACED,"离开后等待配额，落下这一格"))
+                .thenExecute(() -> { OnlinePlayers.forTest(pl,false); cleanup(h,tv); h.succeed(); });
     }
 
     /** TC-T19-93：锤到一半被打断 → 段没落、料没扣、不进队列；下一次重新派单。 */
@@ -514,24 +520,15 @@ public final class VillageBuildGameTests {
     }
 
     /** TC-T19-94：工地里有一棵天然的树：模板范围内的树干按空气格清掉，建筑上方剩下的那截也清掉。 */
-    @GameTest(template = T, batch = BATCH)
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 2400)
     public static void build_clears_cut_trunk(GameTestHelper h) {
-        VillageWorkGameTests.TV tv = village(h);
-        try {
-            for (int y = 2; y <= 7; y++) {
-                h.setBlock(new BlockPos(7, y, 11), Blocks.OAK_LOG);
-            }
-            BuildProject p = hut(h, tv, 30, 4);
-            Construction.drop(ctx(h, tv), p, 0);
-            Construction.drop(ctx(h, tv), p, 1);
-            for (int y = 2; y <= 7; y++) {
-                h.assertTrue(h.getLevel().getBlockState(rel(h, 7, y, 11)).isAir(), "y = " + y + " 的树干清掉了");
-            }
-            h.assertTrue(state(h, tv).projects.isEmpty(), "落成");
-            h.succeed();
-        } finally {
-            cleanup(h, tv);
-        }
+        var tv=village(h);
+        for(int y=2;y<=7;y++) h.setBlock(new BlockPos(7,y,11),Blocks.OAK_LOG);
+        BuildProject p=hut(h,tv,30,4);
+        finishOverTicks(h,tv,p,() -> {
+            for(int y=2;y<=7;y++) h.assertTrue(h.getLevel().getBlockState(rel(h,7,y,11)).isAir(), "y="+y+" 树干清掉");
+            h.assertTrue(state(h,tv).projects.isEmpty(),"落成");
+        });
     }
 
     /** TC-T19-95：地块地面是水（生成时预留在了湖面上）→ 不选它；换成实地后才选。 */
@@ -569,7 +566,7 @@ public final class VillageBuildGameTests {
      * TC-T19-86：远古小神庙 → 中神庙（原地替换）：选项目认出旧神庙；先拆后放，神像旁的段排在最后；拆下的方块折算回村库；
      * 祭司居所跟着神像走；建成后 T8a 认定 2 级（前柱式）。
      */
-    @GameTest(template = T, batch = "village_build_temple", timeoutTicks = 1200)
+    @GameTest(template = T, batch = "village_build_temple", timeoutTicks = 12000)
     public static void temple_replace_to_classical(GameTestHelper h) {
         Map<String, BuildingSpec> specs = VillageBuildings.all();
         BuildingSpec archaic = specs.get("greek:acropolis_archaic");
@@ -619,10 +616,9 @@ public final class VillageBuildGameTests {
         h.assertTrue(site.segments.get(0).kind() == BuildSegments.Kind.DEMOLISH, "先拆");
         BuildSegments.Segment last = site.segments.get(site.segments.size() - 1);
         h.assertTrue(last.cells().stream().allMatch(BuildSegments.Cell::last), "神像、祭司站位、仪式位附近的段在最后");
-        for (int i = 0; i < p.segments; i++) {
-            Construction.Result r = Construction.drop(ctx(h, tv), p, i);
-            h.assertTrue(r == Construction.Result.PLACED, "第 " + i + " 段：" + r + " " + p.blockedAt + " " + p.missing());
-        }
+        h.startSequence().thenWaitUntil(() -> {
+            step(h,tv,p); h.assertTrue(!p.active(), "逐块扩建中："+p.state+" "+BuildProject.count(p.placedCells)+" blocked="+p.blockedCells);
+        }).thenExecute(() -> {
         h.assertTrue(s.projects.isEmpty(), "落成（验收通过）");
         h.assertTrue(!p.returnedGiven.isEmpty(), "拆下的方块折算回村库：" + p.returnedGiven);
         h.assertTrue(s.constructed.stream().anyMatch(b -> b.building().equals("greek:acropolis_classical")), "记下中神庙");
@@ -651,6 +647,7 @@ public final class VillageBuildGameTests {
                     h.getLevel().setBlock(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
                 }
             }
+        });
         });
     }
 }

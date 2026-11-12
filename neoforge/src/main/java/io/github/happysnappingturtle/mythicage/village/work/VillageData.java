@@ -42,6 +42,10 @@ public final class VillageData {
         event.addListener(new Loader("mythic_age/village_recipe", Kind.RECIPE));
     }
 
+    public static int constructionLimit() {
+        return civs.values().stream().mapToInt(c -> c.construction().globalPerTick()).min().orElse(8);
+    }
+
     public static Optional<CivVillageData> civ(String civ) {
         synchronized (TEST) {
             CivVillageData t = TEST.get(civ);

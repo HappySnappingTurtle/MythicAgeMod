@@ -77,6 +77,36 @@ class SchedulerTest {
     }
 
     @Test
+    void ga10_buildJobsIgnoreWalkingCap() {
+        // 4 人已在走路（名额占满）：采集单派不出去，施工单照派（GA-10 实机发现）
+        List<Scheduler.ResidentView> rs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            rs.add(new Scheduler.ResidentView(UUID.randomUUID(), LABORER, new Pos(i, 0, 0), new Pos(0, 0, 0), false, true));
+        }
+        rs.add(r(LABORER, 10));
+        rs.add(r(LABORER, 11));
+        List<Job> js = List.of(job(1, "gather_point", Priority.SHORTAGE, Set.of(), 10, true),
+                job(2, "build", Priority.ACTIVE_BUILD, Set.of(), 11, true));
+        var out = Scheduler.plan(Scheduler.Snapshot.of(rs, js));
+        assertEquals(List.of(2L), out.stream().map(a -> a.job().id()).toList());
+    }
+
+    @Test
+    void ga10_buildJobsIgnoreFailureBook() {
+        // 同一目标当天失败到上限：采集单被屏蔽，施工单照派（逐格进度另有记录，GA-10 实机发现）
+        var rs = List.of(r(LABORER, 0), r(LABORER, 1));
+        Job gather = job(1, "gather_point", Priority.SHORTAGE, Set.of(), 0, false);
+        Job build = job(2, "build", Priority.ACTIVE_BUILD, Set.of(), 1, false);
+        FailureBook fb = new FailureBook();
+        for (int i = 0; i < 10; i++) {
+            fb.fail(gather.targetKey(), 7);
+            fb.fail(build.targetKey(), 7);
+        }
+        var out = Scheduler.plan(Scheduler.Snapshot.of(rs, List.of(gather, build)).withFailures(fb, 7));
+        assertEquals(List.of(2L), out.stream().map(a -> a.job().id()).toList());
+    }
+
+    @Test
     void tc12_availabilityRespected() {
         Scheduler.ResidentView a = r(LABORER, 0);
         Scheduler.ResidentView b = r(LABORER, 9);

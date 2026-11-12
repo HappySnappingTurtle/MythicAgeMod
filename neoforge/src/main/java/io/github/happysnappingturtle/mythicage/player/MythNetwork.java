@@ -14,6 +14,9 @@ public final class MythNetwork {
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
         event.registrar(PROTOCOL_VERSION)
+                .playToClient(io.github.happysnappingturtle.mythicage.village.build.ConstructionSitePayload.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.build.ConstructionSitePayload.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ConstructionSiteRenderer.accept(payload))
                 .playToClient(io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState.Payload.TYPE,
                         io.github.happysnappingturtle.mythicage.equipment.WeaponMotionState.Payload.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.equipment.WeaponMotionClient.accept(payload))

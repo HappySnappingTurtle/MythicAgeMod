@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.happysnappingturtle.mythicage.village.build.Construction;
+import io.github.happysnappingturtle.mythicage.village.build.SiteMarkers;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs;
 import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
 import io.github.happysnappingturtle.mythicage.village.work.VillageContext;
@@ -49,6 +50,11 @@ public final class VillageDevCommand {
 
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         register(event.getDispatcher(), event.getBuildContext());
+    }
+
+    /** 逐格位图里一共有几格（状态命令用）。 */
+    private static int count(java.util.Map<Integer, java.util.BitSet> cells) {
+        return cells.values().stream().mapToInt(java.util.BitSet::cardinality).sum();
     }
 
     private static Optional<VillageRegistry.Village> here(CommandContext<CommandSourceStack> c) {
@@ -108,7 +114,9 @@ public final class VillageDevCommand {
                                             + " 终=" + (path.getEndNode() == null ? "-" : path.getEndNode().asBlockPos().toShortString()));
                                 }).orElse("-") + " 到中心=" + java.util.Optional.ofNullable(r.getNavigation().createPath(v.bell().pos(), 1))
                                         .map(pp -> pp.canReach() + "/" + pp.getNodeCount()).orElse("null")
-                                        + " 可更新=" + r.onGround() + " 步高=" + r.maxUpStep() + " 寻路=" + r.getNavigation().getClass().getSimpleName()), false);
+                                        + " 可更新=" + r.onGround() + " 步高=" + r.maxUpStep() + " 寻路=" + r.getNavigation().getClass().getSimpleName()
+                                + (r.job().filter(j -> j.type().equals(io.github.happysnappingturtle.mythicage.village.build.BuildJob.ID)).isPresent()
+                                        ? " 施工=" + io.github.happysnappingturtle.mythicage.village.build.BuildJob.diagnostic(r) : "")), false);
                     }
                     return 1;
                 }).orElse(0)))
@@ -157,6 +165,15 @@ public final class VillageDevCommand {
                                     int got = VillageEconomy.get(c.getSource().getServer()).state(v.id()).stock
                                             .deposit(id, IntegerArgumentType.getInteger(c, "count"));
                                     c.getSource().sendSuccess(() -> Component.literal(id + " +" + got), false);
+                                    return 1;
+                                }).orElse(0)))))
+                        // 从村库取走（不进背包，直接销毁）：村库满了腾地方、测试缺料时用
+                        .then(Commands.literal("take").then(Commands.argument("item", ItemArgument.item(build))
+                                .then(Commands.argument("count", IntegerArgumentType.integer(1, 100000)).executes(c -> here(c).map(v -> {
+                                    String id = BuiltInRegistries.ITEM.getKey(ItemArgument.getItem(c, "item").getItem()).toString();
+                                    int got = VillageEconomy.get(c.getSource().getServer()).state(v.id()).stock
+                                            .take(id, IntegerArgumentType.getInteger(c, "count"), 0);
+                                    c.getSource().sendSuccess(() -> Component.literal(id + " -" + got), false);
                                     return 1;
                                 }).orElse(0)))))
                         .then(Commands.literal("run").then(Commands.argument("running", BoolArgumentType.bool()).executes(c -> here(c).map(v -> {
@@ -221,10 +238,21 @@ public final class VillageDevCommand {
                                     + " " + r.profession() + " @ " + r.blockPosition().toShortString() + " → 床 " + r.home().toShortString())
                                     .orElse("来不了（没空床或找不到落脚地）")), false);
                         })))
+                        .then(Commands.literal("build").then(Commands.literal("speed")
+                                .then(Commands.argument("multiplier", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(.01, 1000))
+                                        .executes(c -> withCtx(c, ctx -> {
+                                            double speed = com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c, "multiplier");
+                                            Construction.speed(ctx.village().id(), speed);
+                                            c.getSource().sendSuccess(() -> Component.literal("施工速度 ×" + speed), false);
+                                        })))))
                         .then(Commands.literal("project")
                                 .then(Commands.literal("status").executes(c -> withCtx(c, ctx -> {
-                                    String msg = ctx.state().activeProject().map(p -> p.building + " " + p.state + " 段 "
-                                            + p.placed.cardinality() + "/" + p.segments + " 缺 " + p.missing() + " 账单 " + p.bill()
+                                    String msg = ctx.state().activeProject().map(p -> p.building + " " + p.state + " @ " + p.origin
+                                            + " 段 " + p.placed.cardinality() + "/" + p.segments
+                                            + " 格 已放 " + count(p.placedCells) + " 被挡 " + count(p.blockedCells) + " 缺料 " + count(p.missingCells)
+                                            + (p.blockedReason.isEmpty() ? "" : "（" + p.blockedReason + "）")
+                                            + " 施工牌 " + SiteMarkers.sign(ctx, p).map(BlockPos::toShortString).orElse("无")
+                                            + " 缺 " + p.missing() + " 账单 " + p.bill()
                                             + (p.blockedAt == null ? "" : " 停工 " + p.blockedAt)).orElse("没有进行中的项目");
                                     c.getSource().sendSuccess(() -> Component.literal(msg + " · 已建 " + ctx.state().constructed.size()
                                             + " · 储备 " + ctx.state().constructionBank), false);

@@ -88,6 +88,13 @@ public final class TempBlocks extends SavedData {
         return Result.PLACED;
     }
 
+    /** A player has explicitly replaced this position, even with an identical state: relinquish ownership without editing it. */
+    public static void forget(ServerLevel level, BlockPos pos) {
+        TempBlocks data = get(level.getServer());
+        Entry entry = data.entries.get(GlobalPos.of(level.dimension(), pos));
+        if (entry != null) data.drop(entry);
+    }
+
     /** 立即复原一个临时方块（同一玩家新放的诱兽石替换旧石等）。返回是否复原了登记里的方块。 */
     public static boolean restoreNow(ServerLevel level, BlockPos pos) {
         TempBlocks data = get(level.getServer());

@@ -1000,5 +1000,14 @@
       "escort": 5,
       "rescue": 3
     }
+  },
+  "construction": {
+    "ticksPerBlock": 15,
+    "catchUpTicksPerBlock": 5,
+    "maxBuilders": 3,
+    "tripSize": 16,
+    "fetchTicks": 20,
+    "globalPerTick": 8,
+    "fetchRange": 32
   }
 }

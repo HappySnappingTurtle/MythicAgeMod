@@ -58,6 +58,7 @@ public final class MythicAge {
         // 客户端选项（T24 §7.1）：只在客户端载入；服务端用默认值
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, io.github.happysnappingturtle.mythicage.config.ClientConfig.SPEC);
         // 内容声明（T6）：先触发各内容类的类加载，再把 DeferredRegister 挂到 mod 总线
+        io.github.happysnappingturtle.mythicage.village.build.ConstructionSignBlock.init();
         GreekMaterials.init();
         GreekAgriculture.init();
         GreekWood.init();
@@ -182,6 +183,9 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.FoundationService::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.build.Construction::onServerStopped);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onChunkLoad);
+        game.addListener(EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onPlace);
+        game.addListener(EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityJoin);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onEntityLeave);
         game.addListener(io.github.happysnappingturtle.mythicage.village.resident.ResidentHostility::onEntityJoin);

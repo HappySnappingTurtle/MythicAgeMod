@@ -1,6 +1,8 @@
 # Gradle / IDE
 .gradle/
-build/
+/build/
+/core/build/
+/neoforge/build/
 out/
 .idea/
 *.iml

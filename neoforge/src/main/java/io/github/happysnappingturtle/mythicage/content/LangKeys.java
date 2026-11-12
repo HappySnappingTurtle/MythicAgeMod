@@ -24,6 +24,7 @@ public final class LangKeys {
         add("mythic_age.age.archaic", "远古", "Archaic", "アルカイック");
         add("mythic_age.age.classical", "古典", "Classical", "古典");
         add("mythic_age.age.heroic", "英雄", "Heroic", "英雄");
+        add("mythic_age.construction.summary", "%s · 进度 %s/%s · 缺料 %s · 被挡 %s 格", "%s · Progress %s/%s · Missing %s · Blocked %s cells", "%s · 進捗 %s/%s · 不足 %s · 障害 %s マス");
         add("mythic_age.age.mythic", "神话", "Mythic", "神話");
         add("mythic_age.hud.favor", "%s恩宠 %s/%s", "%s Favor %s/%s", "%sの恩寵 %s/%s");
         add("commands.mythic_age.unknown_civ", "未知文明：%s", "Unknown civilization: %s", "不明な文明：%s");

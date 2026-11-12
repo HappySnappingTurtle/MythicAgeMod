@@ -26,6 +26,11 @@ public final class PathBudget {
         return true;
     }
 
+    /** 本刻还剩几个名额。 */
+    public static int left() {
+        return Math.max(0, PER_TICK - used);
+    }
+
     /** 只供 GameTest：自上次清零以来单刻最多用了几个名额。 */
     public static int peakForTest() {
         return peak;

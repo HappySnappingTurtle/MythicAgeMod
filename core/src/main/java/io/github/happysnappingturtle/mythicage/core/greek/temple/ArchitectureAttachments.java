@@ -76,6 +76,17 @@ public final class ArchitectureAttachments {
         return new ArchitectureAttachments(rules);
     }
 
+    public boolean requiresSupport(String block) {
+        return rules.containsKey(block) && !rules.get(block).directions().isEmpty();
+    }
+
+    public java.util.List<Pos> supports(Pos pos, State state, java.util.function.Function<Pos, State> lookup) {
+        Rule rule = rules.get(state.id());
+        if (rule == null) return java.util.List.of();
+        return rule.directions().stream().map(d -> supportPos(pos, state.facing(), d))
+                .filter(p -> lookup.apply(p) != null && rule.accepts(lookup.apply(p))).toList();
+    }
+
     public boolean allowsSupport(String decoration, String support) {
         Rule rule = rules.get(decoration);
         return rule != null && rule.accepts(new State(support, "north"));

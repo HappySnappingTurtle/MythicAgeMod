@@ -363,6 +363,10 @@ public final class VillageScheduler {
     }
 
     /** 当前（或测试指定的）真实运行状态。 */
+    public static boolean isRunning(VillageContext ctx) {
+        return running(ctx.level(), ctx.village(), ctx.rt());
+    }
+
     static boolean running(ServerLevel level, VillageRegistry.Village village, Runtime rt) {
         if (rt.forceRunning != null) {
             return rt.forceRunning;

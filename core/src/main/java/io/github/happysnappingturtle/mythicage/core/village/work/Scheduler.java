@@ -116,7 +116,8 @@ public final class Scheduler {
             if (s.foodShort() && (k.priority() == Priority.NEW_BUILD || k.priority() == Priority.DECOR)) {
                 continue;
             }
-            if (s.failures() != null && s.failures().blocked(k.targetKey(), s.day())) {
+            // 施工单不受失败簿屏蔽：逐格进度与被挡格已单独记录，整段屏蔽一天只会让工地白白停工（GA-10 实机）
+            if (s.failures() != null && s.failures().blocked(k.targetKey(), s.day()) && k.priority() != Priority.ACTIVE_BUILD) {
                 continue;
             }
             if (s.busyTargets().contains(k.targetKey())) {
@@ -133,7 +134,8 @@ public final class Scheduler {
             if (!targets.add(j.targetKey())) {
                 continue;
             }
-            if (j.needsWalk() && walking >= s.maxWalking()) {
+            // 施工单不受同时走路上限：每个项目的工人数本身有上限（GA-10 实机：农夫占满名额时工地旁的人派不到活）
+            if (j.needsWalk() && walking >= s.maxWalking() && j.priority() != Priority.ACTIVE_BUILD) {
                 targets.remove(j.targetKey());
                 continue;
             }

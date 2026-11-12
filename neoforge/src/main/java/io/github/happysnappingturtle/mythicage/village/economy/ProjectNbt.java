@@ -18,11 +18,11 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 /** 施工项目、已建建筑、落成通告的存档格式（村庄运行数据的一部分）。 */
-final class ProjectNbt {
+public final class ProjectNbt {
     private ProjectNbt() {
     }
 
-    static CompoundTag write(BuildProject p) {
+    public static CompoundTag write(BuildProject p) {
         CompoundTag t = new CompoundTag();
         t.putLong("id", p.id);
         t.putString("building", p.building);
@@ -39,6 +39,12 @@ final class ProjectNbt {
         t.putString("state", p.state.name());
         t.putInt("segments", p.segments);
         t.putLongArray("placed", p.placed.toLongArray());
+        t.putInt("layoutVersion", p.layoutVersion);
+        t.putInt("tripSize", p.tripSize);
+        t.put("placedCells", bits(p.placedCells));
+        t.put("blockedCells", bits(p.blockedCells));
+        t.put("missingCells", bits(p.missingCells));
+        t.putLongArray("cleanupCells", p.cleanupCells.stream().mapToLong(ProjectNbt::pack).toArray());
         t.put("planned", doubles(p.planned));
         t.put("spent", doubles(p.spent));
         t.put("returned", doubles(p.returned));
@@ -54,7 +60,7 @@ final class ProjectNbt {
         return t;
     }
 
-    static BuildProject read(CompoundTag t) {
+    public static BuildProject read(CompoundTag t) {
         BuildProject p = new BuildProject(t.getLong("id"), t.getString("building"), t.getString("plot"), t.getString("god"),
                 t.getString("replaces"), unpack(t.getLong("origin")), Turn.valueOf(t.getString("turn")),
                 t.contains("oldOrigin") ? unpack(t.getLong("oldOrigin")) : null,
@@ -62,6 +68,12 @@ final class ProjectNbt {
         p.state = BuildProject.State.valueOf(t.getString("state"));
         p.segments = t.getInt("segments");
         p.placed.or(BitSet.valueOf(t.getLongArray("placed")));
+        p.layoutVersion = t.getInt("layoutVersion");
+        p.tripSize = t.contains("tripSize") ? Math.max(1, t.getInt("tripSize")) : 16;
+        readBits(t.getCompound("placedCells"), p.placedCells);
+        readBits(t.getCompound("blockedCells"), p.blockedCells);
+        readBits(t.getCompound("missingCells"), p.missingCells);
+        for (long pos : t.getLongArray("cleanupCells")) p.cleanupCells.add(unpack(pos));
         readDoubles(t.getCompound("planned"), p.planned);
         readDoubles(t.getCompound("spent"), p.spent);
         readDoubles(t.getCompound("returned"), p.returned);
@@ -76,6 +88,16 @@ final class ProjectNbt {
         p.blockedAt = t.contains("blockedAt") ? unpack(t.getLong("blockedAt")) : null;
         p.blockedReason = t.getString("blockedReason");
         return p;
+    }
+
+    private static CompoundTag bits(Map<Integer, BitSet> values) {
+        CompoundTag tag = new CompoundTag();
+        values.forEach((k, v) -> tag.putLongArray(k.toString(), v.toLongArray()));
+        return tag;
+    }
+
+    private static void readBits(CompoundTag tag, Map<Integer, BitSet> values) {
+        for (String key : tag.getAllKeys()) values.put(Integer.parseInt(key), BitSet.valueOf(tag.getLongArray(key)));
     }
 
     static CompoundTag writeBuilt(VillageEconomy.Built b) {
