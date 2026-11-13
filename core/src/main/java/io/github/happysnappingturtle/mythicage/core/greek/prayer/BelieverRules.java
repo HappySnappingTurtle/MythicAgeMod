@@ -1,55 +1,17 @@
 package io.github.happysnappingturtle.mythicage.core.greek.prayer;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 /**
- * 信徒的纯判定（T10 设计文档 §4、§6、§7）：神坛选择顺序、同日一主、朝圣距离、补货上限。
+ * 信徒的纯判定（T10 设计文档 §4、§6、§7）：朝圣距离、补货上限。GA-13 起信徒只去本村神庙，
+ * 原来的神坛选择顺序与「同一天只为一位主人祈祷」随玩家祭坛一起去掉。
  */
 public final class BelieverRules {
     /** 朝圣距离：家到祈祷位的水平距离不小于它才计入。 */
     public static final double PILGRIMAGE_MIN = 8;
-    /** 村庄范围外兜底神坛的最大水平距离（从村民量起）。 */
-    public static final double FALLBACK_RANGE = 48;
     /** 原版每日补货上限与两次补货的最小间隔。 */
     public static final int VANILLA_RESTOCKS = 2;
     public static final long RESTOCK_GAP_TICKS = 2400;
 
     private BelieverRules() {
-    }
-
-    /**
-     * 一座候选神坛。
-     *
-     * @param inVillage 在信徒所属村庄的范围内
-     * @param distance  到信徒的水平距离
-     */
-    public record Candidate<T>(T altar, UUID owner, boolean inVillage, double distance) {
-    }
-
-    /**
-     * 候选神坛的尝试顺序：村庄范围内有神坛时只考虑范围内的，按距离从近到远（T18 之前不看贡献）；
-     * 范围内一座都没有时，才考虑范围外 {@link #FALLBACK_RANGE} 格内的，同样由近到远。
-     * 调用方按顺序逐个尝试（同日一主、祈祷位是否空闲）。
-     */
-    public static <T> List<Candidate<T>> order(List<Candidate<T>> candidates) {
-        boolean anyInside = candidates.stream().anyMatch(Candidate::inVillage);
-        List<Candidate<T>> out = new ArrayList<>();
-        for (Candidate<T> c : candidates) {
-            if (anyInside ? c.inVillage() : c.distance() <= FALLBACK_RANGE) {
-                out.add(c);
-            }
-        }
-        out.sort(Comparator.comparingDouble(Candidate::distance));
-        return out;
-    }
-
-    /** 同一个村民一天只为一位主人祈祷：今天还没计入过，或者计入的就是这位主人。 */
-    public static boolean canPrayFor(long lastPrayDay, UUID lastOwner, long today, UUID owner) {
-        return lastPrayDay != today || Objects.equals(lastOwner, owner);
     }
 
     /** 朝圣距离：家到祈祷位的水平距离 ≥ 8 格。 */

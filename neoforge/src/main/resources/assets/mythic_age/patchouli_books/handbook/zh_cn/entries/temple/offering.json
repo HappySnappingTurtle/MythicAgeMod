@@ -1,0 +1,21 @@
+{
+  "name": "献供",
+  "icon": "mythic_age:libation",
+  "category": "mythic_age:temple",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:libation",
+      "text": "在你供奉的村子里，手持供品右键神庙前的村庄祭坛（还没有神庙的新村用奠基石），就是$(l)献供$()。$(br2)每人每村每天一次。当天你在这个村子的祈祷恩宠 $(l)+50%%$()，之前已经入账的也会补上，早献晚献一样。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "供品任选一种：$(li)奠酒 1$(li)蜂蜜瓶 1$(li)熟牛肉、熟羊肉或熟猪排 2$(li)面包 2$(li)小麦 8$(br)献供和圣物的$(l)供奉位$()是两回事：献供只管当天的祈祷恩宠。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "这几样供品各有来历：奠酒对应倾洒酒液的奠祭，熟肉对应宰牲的牲祭，面包对应面饼祭，小麦则是把新收的头一份献给神明。"
+    }
+  ]
+}

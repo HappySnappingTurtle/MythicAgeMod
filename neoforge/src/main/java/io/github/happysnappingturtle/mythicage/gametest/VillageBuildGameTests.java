@@ -564,7 +564,7 @@ public final class VillageBuildGameTests {
 
     /**
      * TC-T19-86：远古小神庙 → 中神庙（原地替换）：选项目认出旧神庙；先拆后放，神像旁的段排在最后；拆下的方块折算回村库；
-     * 祭司居所跟着神像走；建成后 T8a 认定 2 级（前柱式）。
+     * 祭司居所跟着神像走；建成后村庄神庙认定 2 级（GA-13，原来是放玩家神坛扫描）。
      */
     @GameTest(template = T, batch = "village_build_temple", timeoutTicks = 12000)
     public static void temple_replace_to_classical(GameTestHelper h) {
@@ -627,18 +627,13 @@ public final class VillageBuildGameTests {
         Pos guardian = BuildPlacement.worldAnchors(classical, BuildPlacement.replacing(classical, archaic, at)).get("guardian").get(0);
         h.assertTrue(plan.anchors("guardian").equals(List.of(guardian)), "神像站位换成新的：" + plan.anchors("guardian"));
         h.assertTrue(!plan.info().built().contains(at.box()), "旧包围盒去掉");
-        // T8a：在仪式位换上玩家的神坛，扫描认定等级
-        BlockPos altar = VillageInfoPiece.block(ritual);
-        h.getLevel().setBlockAndUpdate(altar, GreekTemple.GREEK_ALTAR.get().defaultBlockState()
-                .setValue(io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock.FACING, Direction.WEST));
-        ShrineService.bindForTest(h.getLevel(), altar, UUID.randomUUID(), "tester", Age.CLASSICAL, Direction.WEST);
+        // GA-13：村庄神庙按卫城认定 2 级（中神庙）、系数 2.0
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(id);
         h.succeedWhen(() -> {
-            if (!(h.getLevel().getBlockEntity(altar) instanceof GreekAltarBlockEntity be) || !be.hasResult()
-                    || TempleService.pending(h.getLevel(), altar)) {
-                throw new net.minecraft.gametest.framework.GameTestAssertException("扫描尚未完成");
-            }
-            int level = be.verdict(TempleService.rules()).grantedLevel();
-            h.assertTrue(level == 2, "中神庙满足 T8a 2 级，实际 " + level + "，统计 " + be.survey());
+            var temple = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(h.getLevel().getServer(), id)
+                    .orElseThrow(() -> new net.minecraft.gametest.framework.GameTestAssertException("没有村庄神庙"));
+            h.assertTrue(temple.level() == 2 && Math.abs(temple.coefficient() - 2.0) < 1e-9,
+                    "中神庙 2 级、系数 2.0，实际 " + temple.level() + " / " + temple.coefficient());
             VillageWorkGameTests.cleanup(h, tv);
             Construction.clearForTest(id);
             // 神庙比场地宽：场地外建的部分要拆掉，否则会留在世界里干扰后面复用这块地的用例（如找露头大理石）

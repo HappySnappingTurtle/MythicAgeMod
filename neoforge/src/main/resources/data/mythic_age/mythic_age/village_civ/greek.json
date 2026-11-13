@@ -1009,5 +1009,9 @@
     "fetchTicks": 20,
     "globalPerTick": 8,
     "fetchRange": 32
+  },
+  "projectPick": {
+    "minContribution": 64,
+    "patronFactor": 0.5
   }
 }

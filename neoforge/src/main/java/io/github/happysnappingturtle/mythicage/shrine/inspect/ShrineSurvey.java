@@ -26,8 +26,30 @@ import java.util.List;
 public record ShrineSurvey(Civilization civ, BlockPos pos, String ownerName, boolean viewerIsOwner, Age ownerAge,
                            boolean hasResult, boolean unverified, int structuralLevel, int grantedLevel, List<String> tierKeys,
                            double coefficient, int slotsCap, int slotsFound, List<Row> rows, String ageRequired, double estimate,
-                           Prayer prayer, Away away, BlockPos scanMin, BlockPos scanMax, List<Highlight> highlights)
+                           Prayer prayer, Away away, BlockPos scanMin, BlockPos scanMax, List<Highlight> highlights,
+                           Temple temple)
         implements CustomPacketPayload {
+    /** 玩家神坛（GA-13 之前）的构造：没有村庄神庙段。 */
+    public ShrineSurvey(Civilization civ, BlockPos pos, String ownerName, boolean viewerIsOwner, Age ownerAge,
+                        boolean hasResult, boolean unverified, int structuralLevel, int grantedLevel, List<String> tierKeys,
+                        double coefficient, int slotsCap, int slotsFound, List<Row> rows, String ageRequired, double estimate,
+                        Prayer prayer, Away away, BlockPos scanMin, BlockPos scanMax, List<Highlight> highlights) {
+        this(civ, pos, ownerName, viewerIsOwner, ownerAge, hasResult, unverified, structuralLevel, grantedLevel, tierKeys,
+                coefficient, slotsCap, slotsFound, rows, ageRequired, estimate, prayer, away, scanMin, scanMax, highlights,
+                Temple.NONE);
+    }
+
+    /**
+     * 村庄神庙段（GA-13）：present 为假时是玩家神坛。
+     *
+     * @param patron           村子主神 id（村名「某某之村」；空为无主神的村子）
+     * @param integrityPercent 完好度（百分比）
+     * @param devotee          看的人是这里的供奉者
+     * @param devotees         供奉者人数
+     */
+    public record Temple(boolean present, String patron, int integrityPercent, boolean devotee, int devotees) {
+        public static final Temple NONE = new Temple(false, "", 100, false, 0);
+    }
     public static final int HIGHLIGHT_LIMIT = 4096;
 
     /** 一项条件：have / need；布尔条件用 0/1，{@code bool} 为真。名称键 {@code mythic_age.altar.row.<key>}。 */
@@ -139,6 +161,12 @@ public record ShrineSurvey(Civilization civ, BlockPos pos, String ownerName, boo
                     buf.writeVarInt(h.cells().size());
                     h.cells().forEach(buf::writeBlockPos);
                 }
+                Temple t = p.temple();
+                buf.writeBoolean(t.present());
+                buf.writeUtf(t.patron());
+                buf.writeVarInt(t.integrityPercent());
+                buf.writeBoolean(t.devotee());
+                buf.writeVarInt(t.devotees());
             },
             buf -> {
                 Civilization civ = buf.readEnum(Civilization.class);
@@ -190,8 +218,9 @@ public record ShrineSurvey(Civilization civ, BlockPos pos, String ownerName, boo
                     }
                     highlights.add(new Highlight(kind, shape, color, List.copyOf(cells)));
                 }
+                Temple temple = new Temple(buf.readBoolean(), buf.readUtf(), buf.readVarInt(), buf.readBoolean(), buf.readVarInt());
                 return new ShrineSurvey(civ, pos, owner, isOwner, age, hasResult, unverified, structural, granted, tiers,
                         coefficient, cap, found, List.copyOf(rows), ageRequired, estimate,
-                        new Prayer(praying, believers, today, List.copyOf(notes)), away, min, max, List.copyOf(highlights));
+                        new Prayer(praying, believers, today, List.copyOf(notes)), away, min, max, List.copyOf(highlights), temple);
             });
 }

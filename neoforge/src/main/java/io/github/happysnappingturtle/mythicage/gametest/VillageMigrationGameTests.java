@@ -230,78 +230,66 @@ public final class VillageMigrationGameTests {
 
     // ───────────── 祈祷 ─────────────
 
-    /** 神坛在 (8, 2, 8) 朝南；床位在 z = 30（离祈祷位 ≥ 8 格）。等扫描出结果再继续。 */
-    static void altar(GameTestHelper h, UUID owner) {
-        BlockPos a = new BlockPos(8, 2, 8);
-        h.setBlock(a, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        ShrineService.bindForTest(h.getLevel(), h.absolutePos(a), owner, "tester", Age.ARCHAIC, Direction.SOUTH);
-    }
-
-    static boolean scanned(GameTestHelper h) {
-        BlockPos a = h.absolutePos(new BlockPos(8, 2, 8));
-        return h.getLevel().getBlockEntity(a) instanceof GreekAltarBlockEntity be && be.hasResult()
-                && !TempleService.pending(h.getLevel(), a);
-    }
-
     /**
-     * TC-T19-105（验收：祈祷迁移）+ 106 + 114：窗口内空闲居民被派去祈祷，到位后和原版信徒一样计入采样（同一公式）；
-     * 忙着的居民不抽；一班 2400 刻到点离开，同一天不再派。
+     * TC-T19-105（验收：祈祷迁移）+ 106 + 114（GA-13 改为村庄神庙）：窗口内空闲居民被派去本村神庙祈祷（测试村没有卫城：
+     * 0 级，祭坛在钟的位置 (8, 2, 2)，床位在 z = 30，离祈祷位 ≥ 8 格）；忙着的居民不抽；祈祷满 600 刻给供奉者入一笔、
+     * 与原版信徒同一公式；到点离开，同一天不再派。
      */
     @GameTest(template = T, batch = "village_prayer", timeoutTicks = 400)
     public static void residents_pray_like_believers(GameTestHelper h) {
         VillageWorkGameTests.TV tv = village(h, 3, Age.ARCHAIC, Map.of(), List.of());
+        var server = h.getLevel().getServer();
         UUID owner = UUID.randomUUID();
-        altar(h, owner);
-        GlobalPos key = GlobalPos.of(h.getLevel().dimension(), h.absolutePos(new BlockPos(8, 2, 8)));
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(tv.id());
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.addDevotee(server, tv.id(), owner,
+                MythDays.today(server), io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.JOIN);
         ResidentEntity pious = settler(h, tv, "greek:farmer", 0);
         ResidentEntity busy = settler(h, tv, "greek:potter", 1);
         ResidentEntity second = settler(h, tv, "greek:laborer", 2);
-        h.succeedWhen(() -> {
-            h.assertTrue(scanned(h), "等神坛扫描");
-            try {
-                h.getLevel().setDayTime(3000);
-                Job other = new Job(999_999, "leisure", VillageWorkGameTests.abs(h, 8, 2, 2), "busy", "",
-                        Job.walkActSettle("chat", 100), Map.of(), Map.of(), java.util.Set.of(), io.github.happysnappingturtle.mythicage.core.village.work.Priority.DECOR,
-                        0, false, 2000, busy.getUUID());
-                busy.assign(other);
-                List<Job> jobs = ResidentPrayer.jobs(ctx(h, tv));
-                h.assertTrue(jobs.size() == 2 && jobs.stream().noneMatch(x -> busy.getUUID().equals(x.assignee())),
-                        "TC-106 忙着的不抽：" + jobs);
-                VillageScheduler.processNowForTest(h.getLevel(), tv.id());
-                // 实机发现：派第二个人时续预留只传了自己那一格，把第一个人的预留清掉了
-                h.assertTrue(second.job().map(x -> x.type().equals(ResidentPrayer.ID)).orElse(false), "第二个人也派到祈祷");
-                List<UUID> holders = PrayerService.claimants(key, h.getLevel().getServer());
-                h.assertTrue(holders.contains(pious.getUUID()) && holders.contains(second.getUUID()), "两人的预留都在：" + holders);
-                Job j = pious.job().orElseThrow(() -> new net.minecraft.gametest.framework.GameTestAssertException("没派到祈祷"));
-                h.assertTrue(j.type().equals(ResidentPrayer.ID), "派到祈祷：" + j.type());
-                BlockPos slot = new BlockPos(j.target().x(), j.target().y(), j.target().z());
-                pious.moveTo(slot.getX() + 0.5, slot.getY(), slot.getZ() + 0.5);
+        var temple = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(server, tv.id()).orElseThrow();
+        GlobalPos key = temple.altar();
+        try {
+            h.getLevel().setDayTime(3000);
+            Job other = new Job(999_999, "leisure", VillageWorkGameTests.abs(h, 8, 2, 2), "busy", "",
+                    Job.walkActSettle("chat", 100), Map.of(), Map.of(), java.util.Set.of(), io.github.happysnappingturtle.mythicage.core.village.work.Priority.DECOR,
+                    0, false, 2000, busy.getUUID());
+            busy.assign(other);
+            List<Job> jobs = ResidentPrayer.jobs(ctx(h, tv));
+            h.assertTrue(jobs.size() == 2 && jobs.stream().noneMatch(x -> busy.getUUID().equals(x.assignee())),
+                    "TC-106 忙着的不抽：" + jobs + " 祈祷位 " + temple.prayerSlots());
+            VillageScheduler.processNowForTest(h.getLevel(), tv.id());
+            // 实机发现：派第二个人时续预留只传了自己那一格，把第一个人的预留清掉了
+            h.assertTrue(second.job().map(x -> x.type().equals(ResidentPrayer.ID)).orElse(false), "第二个人也派到祈祷");
+            List<UUID> holders = PrayerService.claimants(key, server);
+            h.assertTrue(holders.contains(pious.getUUID()) && holders.contains(second.getUUID()), "两人的预留都在：" + holders);
+            Job j = pious.job().orElseThrow(() -> new net.minecraft.gametest.framework.GameTestAssertException("没派到祈祷"));
+            h.assertTrue(j.type().equals(ResidentPrayer.ID), "派到祈祷：" + j.type());
+            BlockPos slot = new BlockPos(j.target().x(), j.target().y(), j.target().z());
+            pious.moveTo(slot.getX() + 0.5, slot.getY(), slot.getZ() + 0.5);
+            pious.tickJobForTest();
+            pious.tickJobForTest();
+            h.assertTrue(PrayerService.claimants(key, server).contains(pious.getUUID()), "占着祈祷位");
+            long today = MythDays.today(server);
+            h.assertTrue(pious.getData(GreekPrayer.RECORD).prayedOn(today), "记下今天祈祷过（F7 用）");
+            double before = io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.pending(tv.id(), owner);
+            double expect = PrayerFormula.credit(1, temple.coefficient(), 1, 0, 0, 1);
+            for (int i = 0; i < ResidentPrayer.SHIFT + 2 && pious.job().isPresent(); i++) {
                 pious.tickJobForTest();
-                pious.tickJobForTest();
-                h.assertTrue(PrayerService.claimants(key, h.getLevel().getServer()).contains(pious.getUUID()), "占着祈祷位");
-                long today = MythDays.today(h.getLevel().getServer());
-                h.assertTrue(pious.getData(GreekPrayer.RECORD).prayedOn(today), "记下今天祈祷过（F7 用）");
-                double before = PrayerService.pending(key);
-                PrayerService.sampleForTest(h.getLevel().getServer());
-                h.assertTrue(PrayerService.pending(key) == before, "GA-4：采样不再入账");
-                GreekAltarBlockEntity be = (GreekAltarBlockEntity) h.getLevel().getBlockEntity(key.pos());
-                double expect = PrayerFormula.credit(1,
-                        TempleService.rules().tier(be.verdict(TempleService.rules()).grantedLevel()).coefficient(), 1, 0, 0, 1);
-                for (int i = 0; i < ResidentPrayer.SHIFT + 2 && pious.job().isPresent(); i++) {
-                    pious.tickJobForTest();
-                }
-                double got = PrayerService.pending(key) - before;
-                h.assertTrue(Math.abs(got - expect) < 1e-9, "TC-GA4-40 祈祷满 600 刻入一笔，与原版信徒同一公式：" + got + " vs " + expect);
-                h.assertTrue(be.believersToday(today) == 1, "记为今日信徒");
-                h.assertTrue(pious.job().isEmpty(), "TC-114 一次祈祷到点离开");
-                h.assertTrue(!PrayerService.claimants(key, h.getLevel().getServer()).contains(pious.getUUID()), "让出祈祷位");
-                h.assertTrue(ResidentPrayer.jobs(ctx(h, tv)).stream().noneMatch(x -> pious.getUUID().equals(x.assignee())),
-                        "同一天不再派");
-            } finally {
-                PrayerService.resetForTest(key);
-                cleanup(h, tv);
             }
-        });
+            double got = io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.pending(tv.id(), owner) - before;
+            h.assertTrue(Math.abs(got - expect) < 1e-9, "TC-GA4-40 祈祷满 600 刻入一笔，与原版信徒同一公式：" + got + " vs " + expect);
+            h.assertTrue(state(h, tv).temple.believersToday(today) == 1, "记为今日信徒");
+            h.assertTrue(pious.job().isEmpty(), "TC-114 一次祈祷到点离开");
+            h.assertTrue(!PrayerService.claimants(key, server).contains(pious.getUUID()), "让出祈祷位");
+            h.assertTrue(ResidentPrayer.jobs(ctx(h, tv)).stream().noneMatch(x -> pious.getUUID().equals(x.assignee())),
+                    "同一天不再派");
+            h.succeed();
+        } finally {
+            PrayerService.resetForTest(key);
+            io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.dropLedger(server, tv.id(), owner);
+            io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.resetForTest(tv.id());
+            cleanup(h, tv);
+        }
     }
 
     // ───────────── 性能 ─────────────

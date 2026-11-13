@@ -36,7 +36,8 @@ public record TradeView(Civilization civ, Labels labels, TradeOffer.Venue venue,
     }
 
     /** 对话页要显示的按钮。 */
-    public enum Dialogue { NONE, FIRST, REISSUE }
+    /** REISSUE：补领神坛（玩家神坛的文明）；JOIN：在这里供奉（村庄神庙的文明，GA-13）。 */
+    public enum Dialogue { NONE, FIRST, REISSUE, JOIN }
 
     /**
      * @param favorPrice     恩宠价（已含折扣）；物品价商品为 0

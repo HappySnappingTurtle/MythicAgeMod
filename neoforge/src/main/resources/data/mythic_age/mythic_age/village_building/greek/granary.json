@@ -111,7 +111,7 @@
     "mythic_age:mudbrick": 76,
     "mythic_age:marble_ashlar": 63,
     "mythic_age:olive_slab": 35,
-    "mythic_age:olive_log": 28,
+    "mythic_age:olive_log": 30,
     "mythic_age:plaster_dado": 26,
     "mythic_age:pithos": 16,
     "mythic_age:olive_door": 4,
@@ -125,6 +125,7 @@
       1,
       4
     ],
-    "facing": "east"
+    "facing": "east",
+    "width": 2
   }
 }

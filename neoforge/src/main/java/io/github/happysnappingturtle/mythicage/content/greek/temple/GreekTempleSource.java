@@ -17,9 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 希腊的恩宠来源：神庙（T10b 设计文档 §6）。信仰面板上每座自己的希腊神坛一行：
- * 神庙等级、近 7 日信徒、今日已得、预计日产出、所在村庄。信徒祈祷（T10）的结算也挂在这个来源上；
- * 数字与神坛检视界面取自同一份 {@link PrayerService.Stats}。
+ * 希腊的恩宠来源：神庙（T10b 设计文档 §6；GA-13 神庙归村庄）。信仰面板上每个供奉的村子一行：
+ * 神庙等级、近 7 日信徒、今天在这里已得、预计日产出；数字与神庙检视取自同一份 {@code TemplePrayer.Stats}。
  */
 public final class GreekTempleSource implements GraceSource {
     public static final GreekTempleSource INSTANCE = new GreekTempleSource();
@@ -36,33 +35,23 @@ public final class GreekTempleSource implements GraceSource {
         return "greek:temple";
     }
 
-    /** 预计日产出（估算，不是发放承诺）：按近 7 日信徒、祈祷位与神庙系数（T10 设计文档 §5.2）。 */
-    public static double estimate(GreekAltarBlockEntity be, TempleRules rules) {
-        return PrayerService.estimate(be, rules);
-    }
-
+    /** GA-13：每个供奉的村子一行：村名、神庙等级、近 7 日信徒、你今天在这里已得、预计日产。 */
     @Override
     public List<Row> rows(ServerPlayer viewer) {
         List<Row> out = new ArrayList<>();
-        TempleRules rules = TempleService.rules();
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(viewer.server).ownedBy(viewer.getUUID(), Civilization.GREEK)) {
-            if (!e.kind().equals(GreekTemple.ALTAR_KIND.id())) {
+        for (UUID v : io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.devotedVillages(viewer.server, viewer.getUUID())) {
+            Optional<VillageRegistry.Village> village = VillageRegistry.get(viewer.server).byId(v);
+            Optional<io.github.happysnappingturtle.mythicage.village.temple.VillageTemple> t =
+                    io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(viewer.server, v);
+            if (village.isEmpty() || t.isEmpty()) {
                 continue;
             }
-            ServerLevel level = viewer.server.getLevel(e.pos().dimension());
-            Optional<UUID> village = level == null ? Optional.empty()
-                    : io.github.happysnappingturtle.mythicage.village.VillageSpace.villageAt(level, e.pos().pos()).map(VillageRegistry.Village::id);
-            Component name = GreekTemple.GREEK_ALTAR.get().getName();
-            if (level != null && level.isLoaded(e.pos().pos())
-                    && level.getBlockEntity(e.pos().pos()) instanceof GreekAltarBlockEntity be && be.hasResult()) {
-                TempleRules.Tier tier = rules.tier(be.verdict(rules).grantedLevel());
-                PrayerService.Stats st = PrayerService.stats(be, rules);
-                out.add(new Row(name, e.pos(), Component.translatable("mythic_age.grace.greek_temple.status",
-                        Component.translatable("mythic_age.temple.tier." + tier.name()), st.believers(),
-                        String.format(java.util.Locale.ROOT, "%.1f", st.today())), st.estimate(), village));
-            } else {
-                out.add(new Row(name, e.pos(), Component.translatable("mythic_age.grace.unloaded"), 0, village));
-            }
+            Component name = io.github.happysnappingturtle.mythicage.village.VillageService.title(village.get());
+            io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.Stats st =
+                    io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.stats(viewer.server, t.get(), viewer.getUUID());
+            out.add(new Row(name, t.get().altar(), Component.translatable("mythic_age.grace.greek_temple.status",
+                    Component.translatable("mythic_age.temple.tier." + t.get().tierName()), st.believers(),
+                    String.format(java.util.Locale.ROOT, "%.1f", st.today())), st.estimate(), Optional.of(v)));
         }
         return out;
     }

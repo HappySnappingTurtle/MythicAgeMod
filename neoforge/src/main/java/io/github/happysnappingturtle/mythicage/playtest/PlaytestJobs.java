@@ -59,6 +59,8 @@ public final class PlaytestJobs {
     /** 找钟、祭司、竞技场的范围。 */
     static final int NEAR = 96;
     static final int ARENA_NEAR = 160;
+    /** 要当场扩建神庙的站，准备时限放宽到这么多刻。 */
+    static final int TEMPLE_BUILD_TIMEOUT = 24000;
 
     static final class Job {
         final UUID player;
@@ -265,33 +267,35 @@ public final class PlaytestJobs {
         job.step = Step.BUILD;
     }
 
+    /**
+     * 神庙（GA-13：神庙归村庄）：受过祝福的玩家成为站点村子的供奉者；{@code temple} 是村庄神庙至少要到的等级，
+     * 不够就当场把卫城整段扩建上去；{@code upgrade}（「神庙扩建」站）开工下一级、备齐材料、施工加速，让玩家看着盖。
+     */
     private static void build(ServerLevel ow, PlaytestState st, ServerPlayer p, Job job) {
-        int need = job.station.spec().temple();
-        if (need <= 0) {
+        PlaytestStations.Spec spec = job.station.spec();
+        if (job.village == null) {
             job.step = Step.DONE;
             return;
         }
-        if (job.temple == null) {
-            BlockPos site = st.templeSite;
-            if (site == null) {
-                Optional<BlockPos> found = PlaytestTemple.findSite(ow, job.bell, p);
-                if (found.isEmpty()) {
-                    fail(p, job, Component.translatable("commands.mythic_age.playtest.reason.no_site"));
-                    return;
-                }
-                site = found.get();
-                st.setTempleSite(site);
+        if (spec.age().atLeast(io.github.happysnappingturtle.mythicage.core.player.Age.ARCHAIC)) {
+            io.github.happysnappingturtle.mythicage.trade.TradeService.becomeDevotee(p, job.village,
+                    io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.BLESSING);
+        }
+        int need = spec.temple();
+        int now = PlaytestTemple.level(ow, job.village);
+        if (need > 0 && now < need) {
+            // 当场扩建：开工下一级，之后每刻直接逐格落下，盖到要的等级为止（大工程要几分钟）
+            job.timeout = Math.max(job.timeout, TEMPLE_BUILD_TIMEOUT);
+            if (!PlaytestTemple.upgrading(ow, job.village)
+                    && PlaytestTemple.startUpgrade(ow, job.village, PlaytestTemple.UPGRADE_SPEED).isEmpty()) {
+                fail(p, job, Component.translatable("commands.mythic_age.playtest.reason.temple_level", now, need));
+                return;
             }
-            PlaytestTemple.build(ow, site, need, p);
-            job.temple = site;
+            PlaytestTemple.advance(ow, job.village);
             return;
         }
-        OptionalInt level = PlaytestTemple.scanned(ow, job.temple);
-        if (level.isEmpty()) {
-            return;
-        }
-        if (level.getAsInt() < need) {
-            fail(p, job, Component.translatable("commands.mythic_age.playtest.reason.temple_level", level.getAsInt(), need));
+        if (spec.upgrade() && PlaytestTemple.startUpgrade(ow, job.village, PlaytestTemple.UPGRADE_SPEED).isEmpty()) {
+            fail(p, job, Component.translatable("commands.mythic_age.playtest.reason.no_upgrade"));
             return;
         }
         job.step = Step.DONE;

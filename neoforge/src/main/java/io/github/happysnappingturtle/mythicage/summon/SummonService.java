@@ -593,12 +593,14 @@ public final class SummonService {
             if (card.isEmpty()) {
                 continue;
             }
-            Optional<ShrineRegistry.Entry> shrine = Civilization.byId(card.get().civ())
-                    .flatMap(c -> ShrineRegistry.get(server).ownedBy(u.owner, c).stream().findFirst());
+            // GA-13：复活在供奉的村庄神庙祭坛；没有时退回旧的玩家神坛
+            Optional<net.minecraft.core.GlobalPos> shrine = Civilization.byId(card.get().civ()).flatMap(c ->
+                    io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.devotedAltars(server, u.owner, c).stream().findFirst()
+                            .or(() -> ShrineRegistry.get(server).ownedBy(u.owner, c).stream().findFirst().map(ShrineRegistry.Entry::pos)));
             if (!RespawnRules.ready(now, u.respawnAt, shrine.isPresent())) {
                 continue;
             }
-            ServerLevel level = server.getLevel(shrine.get().pos().dimension());
+            ServerLevel level = server.getLevel(shrine.get().dimension());
             if (level == null) {
                 continue;
             }
@@ -608,7 +610,9 @@ public final class SummonService {
             }
             bind(s, u.owner, u.unitId, u.card);
             s.link().mode = u.mode == SummonMode.GUARD ? SummonMode.FOLLOW : u.mode;
-            BlockPos at = shrine.get().pos().pos().relative(shrine.get().facing(), 2);
+            // 祭坛旁能站的一格（同祈祷位的选法）；找不到就站在祭坛上
+            BlockPos at = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.prayerSlots(level, shrine.get().pos(), 1)
+                    .stream().findFirst().orElse(shrine.get().pos().above());
             e.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0, 0);
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.MOB_SUMMONED, null);
             s.applyStats(SummonUnits.stats(card.get().key()));

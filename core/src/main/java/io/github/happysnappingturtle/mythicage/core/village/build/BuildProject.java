@@ -52,8 +52,12 @@ public final class BuildProject {
     public final Map<Integer, BitSet> missingCells = new TreeMap<>();
     /** Natural trunk cleanup remains incremental and survives a save between construction ticks. */
     public final java.util.Set<Pos> cleanupCells = new java.util.LinkedHashSet<>();
-    /** Persist the segmentation algorithm and trip size; datapack edits must not shift progress. */
-    public int layoutVersion = 1;
+    /**
+     * Persist the segmentation algorithm and trip size; datapack edits must not shift progress.
+     * 0 = T19、1 = GA-10 逐块、2 = GA-11（依附在「最后放」格上的格也排到最后）。
+     */
+    public static final int LAYOUT = 2;
+    public int layoutVersion = LAYOUT;
     public int tripSize = BuildPacing.Settings.DEFAULT.tripSize();
 
     public boolean cellPlaced(int segment, int cell) {

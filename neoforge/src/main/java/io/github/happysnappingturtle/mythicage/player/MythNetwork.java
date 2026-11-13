@@ -6,8 +6,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
-    // GA-8：新增武器动作同步负载，新旧客户端不能混用。
-    private static final String PROTOCOL_VERSION = "26";
+    // GA-11：新增项目选择负载（候选列表、点名）；GA-13：神坛检视加村庄神庙段、圣物展示、退出供奉。新旧客户端不能混用。
+    private static final String PROTOCOL_VERSION = "28";
 
     private MythNetwork() {
     }
@@ -99,6 +99,13 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.TYPE,
                         io.github.happysnappingturtle.mythicage.relic.RelicPayloads.Retrieve.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.relic.RelicPayloads::handleRetrieve)
+                // 村庄神庙（GA-13）：祭坛上方的圣物展示、退出供奉
+                .playToClient(io.github.happysnappingturtle.mythicage.relic.TempleRelicDisplay.Display.TYPE,
+                        io.github.happysnappingturtle.mythicage.relic.TempleRelicDisplay.Display.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.TempleRelicRenderer.accept(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.content.greek.temple.TempleMembership.Leave.TYPE,
+                        io.github.happysnappingturtle.mythicage.content.greek.temple.TempleMembership.Leave.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.content.greek.temple.TempleMembership::handleLeave)
                 // 村务界面（T19）
                 // 奠基石选主神（T19 阶段 ⑥）
                 .playToClient(io.github.happysnappingturtle.mythicage.village.found.FoundationPayloads.Choose.TYPE,
@@ -110,6 +117,16 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageAffairs(payload))
+                // 项目选择（GA-11）：界面在 GA-12
+                .playToServer(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Request.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Request.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads::handleRequest)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Nominate.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Nominate.STREAM_CODEC,
+                        io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads::handleNominate)
+                .playToClient(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View.TYPE,
+                        io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageProjects(payload))
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleDonate)

@@ -11,7 +11,7 @@
         {"item": "minecraft:copper_ingot", "count": 16}
       ],
       "requirements": [{"type": "greek:temple_level", "level": 1}],
-      "extraUnlocks": [{"icon": "mythic_age:greek_altar", "key": "mythic_age.unlock.greek.temple_prostylos"}]
+      "extraUnlocks": [{"icon": "mythic_age:village_altar", "key": "mythic_age.unlock.greek.temple_prostylos"}]
     },
     "heroic": {
       "favor": 100,
@@ -23,7 +23,7 @@
       ],
       "requirements": [{"type": "greek:temple_level", "level": 2}],
       "trial": "classical",
-      "extraUnlocks": [{"icon": "mythic_age:greek_altar", "key": "mythic_age.unlock.greek.temple_peripteros"}]
+      "extraUnlocks": [{"icon": "mythic_age:village_altar", "key": "mythic_age.unlock.greek.temple_peripteros"}]
     }
   },
   "trials": {"classical": ["mythic_age:minotaur"]}

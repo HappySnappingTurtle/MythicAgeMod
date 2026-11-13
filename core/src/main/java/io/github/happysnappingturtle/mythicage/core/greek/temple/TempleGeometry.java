@@ -286,13 +286,22 @@ public final class TempleGeometry {
                 }
             }
         }
-        candidates.sort(Comparator
+        return pickSlots(candidates, ax, ay, az, limit);
+    }
+
+    /**
+     * 从候选格里按 {@link #prayerSlots} 的规则选祈祷位：按距离、再按方位角排序，任意两位水平切比雪夫距离 ≥2，
+     * 最多 limit 个。GA-13 的村庄祭坛用同一套规则（候选格由调用方按世界里能站的格子给出）。
+     */
+    public static List<int[]> pickSlots(List<int[]> candidates, int ax, int ay, int az, int limit) {
+        List<int[]> sorted = new ArrayList<>(candidates);
+        sorted.sort(Comparator
                 .comparingInt((int[] c) -> (c[0] - ax) * (c[0] - ax) + (c[2] - az) * (c[2] - az))
                 .thenComparingDouble(c -> Math.atan2(c[2] - az, c[0] - ax))
                 .thenComparingInt(c -> Math.abs(c[1] - ay))
                 .thenComparingInt(c -> c[1]));
         List<int[]> chosen = new ArrayList<>();
-        for (int[] c : candidates) {
+        for (int[] c : sorted) {
             if (chosen.size() >= limit) {
                 break;
             }

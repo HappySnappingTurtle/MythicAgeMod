@@ -6,7 +6,6 @@ import io.github.happysnappingturtle.mythicage.MythicAge;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.perf.PerfStats;
 import io.github.happysnappingturtle.mythicage.core.perf.ChunkTimings;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleService;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
 import io.github.happysnappingturtle.mythicage.boss.TrialArenas;
 import net.minecraft.commands.CommandSourceStack;
@@ -52,9 +51,6 @@ public final class Perf {
     private static volatile boolean running;
     private static volatile ChunkTimings chunks = new ChunkTimings();
     private static final Map<Entity, Long> ENTITY_START = new IdentityHashMap<>();
-    private static int scanPeak;
-    private static long scanCells;
-    private static int scanTicks;
     private static int remaining;
 
     private Perf() {
@@ -92,12 +88,6 @@ public final class Perf {
         });
         game.addListener(EventPriority.LOWEST, (ServerTickEvent.Post e) -> {
             if (running) {
-                int cells = TempleService.cellsLastTick();
-                scanPeak = Math.max(scanPeak, cells);
-                scanCells += cells;
-                if (cells > 0) {
-                    scanTicks++;
-                }
                 STATS.endTick();
                 if (--remaining <= 0) {
                     running = false;
@@ -119,9 +109,6 @@ public final class Perf {
         STATS.reset();
         ENTITY_START.clear();
         chunks = new ChunkTimings();
-        scanPeak = 0;
-        scanCells = 0;
-        scanTicks = 0;
         remaining = Math.max(1, Math.min(WINDOW, ticks));
         running = true;
     }
@@ -223,7 +210,6 @@ public final class Perf {
         long arenas = TrialArenas.get(server).all().stream().filter(a -> a.phase().fighting()).count();
         out.add("已加载村庄：" + villages + "；进行中竞技场：" + arenas
                 + "；已加载预算内临时实体：" + io.github.happysnappingturtle.mythicage.power.TransientEntities.loadedCount());
-        out.add("神庙扫描：" + scanCells + " 格 / " + scanTicks + " 个工作刻；单刻峰值 " + scanPeak + " 格");
         PerfStats.Summary generation = chunks.summary();
         out.add("结构生成：" + generation.samples() + " 个有规划/落块调用的区块；" + fmt("每区块", generation)
                 + "；容量丢弃 " + chunks.dropped() + "。包含失败的规划尝试，不含原版地形/寻址；0 样本不代表达标。");

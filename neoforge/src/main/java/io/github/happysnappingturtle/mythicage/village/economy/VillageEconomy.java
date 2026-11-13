@@ -88,6 +88,8 @@ public final class VillageEconomy extends SavedData {
         public final Set<String> builtPlots = new LinkedHashSet<>();
         public final List<Notice> notices = new ArrayList<>();
         public long nextProjectId = 1;
+        /** 「下一个」位（GA-11 §2.2）：玩家点名、当前项目落成后开工；空着为 null。 */
+        public io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Next nextProject;
         /** 在途移民（§1.6 H4，每村最多 1 名）：实体 UUID 与动身的世界刻；没有为 null。 */
         public UUID migrant;
         public long migrantSince;
@@ -102,6 +104,9 @@ public final class VillageEconomy extends SavedData {
         public long enlistCounter;
         /** 已有存档补发过初始兵装（T20 D11，只补一次）。 */
         public boolean soldierSeeded;
+        /** 村庄神庙（GA-13）：供奉者、信徒、献供、圣物。 */
+        public io.github.happysnappingturtle.mythicage.village.temple.TempleBook temple =
+                new io.github.happysnappingturtle.mythicage.village.temple.TempleBook();
 
         State(UUID village) {
             this.village = village;
@@ -232,6 +237,7 @@ public final class VillageEconomy extends SavedData {
                     s.notices.add(ProjectNbt.readNotice((CompoundTag) t2));
                 }
                 s.nextProjectId = Math.max(1, c.getLong("nextProjectId"));
+                s.nextProject = c.contains("nextProject") ? ProjectNbt.readNext(c.getCompound("nextProject")) : null;
                 s.migrant = c.hasUUID("migrant") ? c.getUUID("migrant") : null;
                 s.migrantSince = c.getLong("migrantSince");
                 s.calendarShift = c.getInt("calendarShift");
@@ -245,6 +251,10 @@ public final class VillageEconomy extends SavedData {
                 }
                 s.enlistCounter = c.getLong("enlistCounter");
                 s.soldierSeeded = c.getBoolean("soldierSeeded");
+                if (c.contains("temple")) {
+                    s.temple = io.github.happysnappingturtle.mythicage.village.temple.TempleBook.load(c.getCompound("temple"),
+                            registries);
+                }
                 e.states.put(s.village, s);
             } catch (RuntimeException ex) {
                 MythicAge.LOGGER.warn("跳过损坏的村庄运行数据：{}", ex.getMessage());
@@ -334,6 +344,9 @@ public final class VillageEconomy extends SavedData {
             s.notices.forEach(n -> notices.add(ProjectNbt.writeNotice(n)));
             c.put("notices", notices);
             c.putLong("nextProjectId", s.nextProjectId);
+            if (s.nextProject != null) {
+                c.put("nextProject", ProjectNbt.writeNext(s.nextProject));
+            }
             c.putInt("calendarShift", s.calendarShift);
             c.putLong("dailyDay", s.dailyDay);
             CompoundTag dc = new CompoundTag();
@@ -344,6 +357,7 @@ public final class VillageEconomy extends SavedData {
             c.put("soldiers", sol);
             c.putLong("enlistCounter", s.enlistCounter);
             c.putBoolean("soldierSeeded", s.soldierSeeded);
+            c.put("temple", s.temple.save(registries));
             if (s.migrant != null) {
                 c.putUUID("migrant", s.migrant);
                 c.putLong("migrantSince", s.migrantSince);

@@ -42,6 +42,11 @@ public record ShrineKind(String id, Civilization civ, Supplier<? extends Block> 
         default void onBound(ServerLevel level, BlockPos pos, Optional<ServerPlayer> placer) {
         }
 
+        /** 没有主人时保留方块（GA-13 的旧祭坛是装饰），不按「只能由玩家放置」移除。 */
+        default boolean keepUnowned() {
+            return false;
+        }
+
         /** 神庙被移除、登记已注销之后。 */
         default void onRemoved(ServerLevel level, GlobalPos pos) {
         }

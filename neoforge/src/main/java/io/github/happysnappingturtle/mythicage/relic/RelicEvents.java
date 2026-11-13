@@ -74,6 +74,9 @@ public final class RelicEvents {
                 RelicService.reconcile(p);
             }
         }
+        if (tick % TempleRelics.INDEX_PERIOD == 0) {
+            TempleRelics.refreshIndex(server);
+        }
         if (tick % PERIOD == 0) {
             RelicEffects.tickBelievers(server);
         }
@@ -95,17 +98,40 @@ public final class RelicEvents {
         }
     }
 
-    /** 手持圣物潜行右键神庙 = 供奉（D1）。两端都取消，避免物品自己的右键行为；服务器端执行。 */
+    /**
+     * 手持圣物潜行右键神庙 = 供奉（D1）。两端都取消，避免物品自己的右键行为；服务器端执行。
+     * 潜行且手里有东西时原版会跳过方块自己的右键处理，所以村庄神庙的祭坛（GA-13）也在这里接：
+     * 客户端认不出哪块是神庙祭坛，凡是村庄祭坛、奠基石都先取消（点击包照样发给服务器），服务器再确认是不是神庙祭坛。
+     */
     static void onRightClickBlock(PlayerInteractEvent.RightClickBlock e) {
-        if (!e.getEntity().isSecondaryUseActive() || !(e.getItemStack().getItem() instanceof RelicItem)
-                || !(e.getLevel().getBlockEntity(e.getPos()) instanceof ShrineBlockEntity be)
-                || RelicAnchor.Registry.forKind(be.kind()).isEmpty()) {
+        if (!e.getEntity().isSecondaryUseActive() || !(e.getItemStack().getItem() instanceof RelicItem)) {
             return;
         }
-        e.setCanceled(true);
-        e.setCancellationResult(InteractionResult.SUCCESS);
-        if (e.getEntity() instanceof ServerPlayer p && e.getLevel() instanceof ServerLevel level) {
-            RelicService.offer(p, level, e.getPos(), e.getHand());
+        if (e.getLevel().getBlockEntity(e.getPos()) instanceof ShrineBlockEntity be && RelicAnchor.Registry.forKind(be.kind()).isPresent()) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            if (e.getEntity() instanceof ServerPlayer p && e.getLevel() instanceof ServerLevel level) {
+                RelicService.offer(p, level, e.getPos(), e.getHand());
+            }
+            return;
+        }
+        var state = e.getLevel().getBlockState(e.getPos());
+        boolean altarLike = state.getBlock() instanceof io.github.happysnappingturtle.mythicage.content.greek.temple.VillageAltarBlock
+                || state.getBlock() instanceof io.github.happysnappingturtle.mythicage.village.found.FoundationStoneBlock;
+        if (!altarLike) {
+            return;
+        }
+        if (!(e.getLevel() instanceof ServerLevel level) || !(e.getEntity() instanceof ServerPlayer p)) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            return;
+        }
+        var temple = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.byAltar(level.getServer(),
+                net.minecraft.core.GlobalPos.of(level.dimension(), e.getPos().immutable()));
+        if (temple.isPresent()) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            TempleRelics.offer(p, level, temple.get(), p.getItemInHand(e.getHand()));
         }
     }
 

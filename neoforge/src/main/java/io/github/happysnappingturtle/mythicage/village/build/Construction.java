@@ -10,6 +10,7 @@ import io.github.happysnappingturtle.mythicage.core.village.build.BuildPlacement
 import io.github.happysnappingturtle.mythicage.core.village.build.BuildProject;
 import io.github.happysnappingturtle.mythicage.core.village.build.BuildSegments;
 import io.github.happysnappingturtle.mythicage.core.village.build.ProjectPicker;
+import io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue;
 import io.github.happysnappingturtle.mythicage.core.village.gen.Box;
 import io.github.happysnappingturtle.mythicage.core.village.gen.BuildingSpec;
 import io.github.happysnappingturtle.mythicage.core.village.gen.Pos;
@@ -113,7 +114,7 @@ public final class Construction {
         SITES.clear();
         LAST.clear();
         BUDGETS.clear(); SPEEDS.clear(); RECHECK.clear();
-        BuildJob.clear(); BuildSite.clearAttachments();
+        BuildJob.clear(); BuildSite.clearAttachments(); VillageProjects.clearCache();
     }
 
     static String key(UUID village, long project) {
@@ -142,7 +143,7 @@ public final class Construction {
             if (old == null || p.oldOrigin == null) {
                 return Optional.empty();
             }
-            made = BuildSite.replace(ctx.level(), ctx.data().buildCosts(), spec, at, old, placed(old, p.oldOrigin, p.oldTurn), p.tripSize, p.layoutVersion == 0);
+            made = BuildSite.replace(ctx.level(), ctx.data().buildCosts(), spec, at, old, placed(old, p.oldOrigin, p.oldTurn), p.tripSize, p.layoutVersion);
         }
         made.ifPresent(m -> {
             if (p.segments != 0 && p.segments != m.segments.size()) {
@@ -164,6 +165,63 @@ public final class Construction {
 
     /** 每 MC 日开始调用一次（§8.2）。返回新开的项目。 */
     public static Optional<BuildProject> daily(VillageContext ctx) {
+        VillageEconomy.State s = ctx.state();
+        Map<String, BuildingSpec> specs = VillageBuildings.all();
+        boolean busy = s.activeProject().isPresent();
+        // 奠基村庄还没有住居：第一个项目固定是起步住居（远古也开工，§1.13 K7）
+        String starter = ctx.data().foundation().starter();
+        if (ctx.village().origin() == io.github.happysnappingturtle.mythicage.village.VillageRegistry.Origin.FOUNDED
+                && ctx.anchors("home").isEmpty() && !busy && !ctx.data().rations().belowFloor(s.stock) && !starter.isEmpty()
+                && specs.containsKey(starter)) {
+            return AdHocSites.start(ctx, new ProjectPicker.Pick(starter, "", "", ""));
+        }
+        return advance(ctx, true);
+    }
+
+    /**
+     * 按项目队列开下一个项目（GA-11 §2.2）：黎明、当前项目落成或取消、玩家点名时调用。
+     * 「下一个」位空着、黎明、没有能放下的预留地块时，照 T19 临时找地。
+     */
+    public static Optional<BuildProject> advance(VillageContext current, boolean dawn) {
+        // 落成刚改过规划（旧建筑的包围盒、锚点）：取一份新的上下文，免得把刚升级完的那座又当成旧建筑
+        VillageContext ctx = VillageScheduler.contextOf(current.level(), current.village().id()).orElse(current);
+        Optional<ProjectPicker.Input> in = input(ctx);
+        if (in.isEmpty()) {
+            return Optional.empty();
+        }
+        VillageEconomy.State s = ctx.state();
+        ProjectQueue.Decision d = ProjectQueue.decide(in.get(), Optional.ofNullable(s.nextProject), dawn);
+        ProjectQueue.Next next = s.nextProject;
+        if (d.dropNext()) {
+            s.nextProject = null;
+            VillageEconomy.get(ctx.level().getServer()).setDirty();
+            if (!d.fromNext() && next != null) {
+                VillageProjects.dropped(ctx, next, d.dropReason());
+            }
+        }
+        if (d.pick().isPresent()) {
+            Optional<BuildProject> p = start(ctx, d.pick().get());
+            if (d.fromNext() && next != null) {
+                if (p.isPresent()) {
+                    VillageProjects.started(ctx, next);
+                } else {
+                    VillageProjects.dropped(ctx, next, ProjectQueue.GONE);
+                }
+            }
+            if (p.isPresent()) {
+                ctx.rt().setNeedsSpace("");
+                return p;
+            }
+        }
+        if (!dawn || in.get().busy() || s.nextProject != null) {
+            return Optional.empty();
+        }
+        // 想建、但没有能放下它的预留地块：临时找地（奠基、立原版村庄的一切项目，生成村庄的体育场等）
+        return ProjectPicker.wanted(in.get()).flatMap(want -> AdHocSites.start(ctx, want));
+    }
+
+    /** 选项目的输入（GA-11：黎明、落成、点名、候选列表共用）。本文明没有施工建筑时为空。 */
+    public static Optional<ProjectPicker.Input> input(VillageContext ctx) {
         VillageEconomy.State s = ctx.state();
         Map<String, BuildingSpec> specs = VillageBuildings.all();
         String civ = ctx.village().civ();
@@ -188,25 +246,16 @@ public final class Construction {
             }
         });
         built.forEach(b -> satisfied.add("building:" + b));
+        Set<String> inProgress = new LinkedHashSet<>();
+        s.projects.stream().filter(BuildProject::active).forEach(p -> {
+            BuildingSpec spec = specs.get(p.building);
+            inProgress.add(ProjectPicker.key(spec == null ? p.building : spec.civ() + ":" + spec.shortBase(), p.god));
+        });
         boolean busy = s.activeProject().isPresent();
         boolean hungry = ctx.data().rations().belowFloor(s.stock);
-        // 奠基村庄还没有住居：第一个项目固定是起步住居（远古也开工，§1.13 K7）
-        String starter = ctx.data().foundation().starter();
-        if (ctx.village().origin() == io.github.happysnappingturtle.mythicage.village.VillageRegistry.Origin.FOUNDED
-                && ctx.anchors("home").isEmpty() && !busy && !hungry && !starter.isEmpty() && specs.containsKey(starter)) {
-            return AdHocSites.start(ctx, new ProjectPicker.Pick(starter, "", "", ""));
-        }
-        ProjectPicker.Input in = new ProjectPicker.Input(ctx.village().stage(), busy, hungry, candidates, freePlots(ctx), built,
-                gods, shrines, satisfied, replaceable(ctx, candidates, specs));
-        Optional<BuildProject> p = ProjectPicker.pick(in).flatMap(pick -> start(ctx, pick));
-        if (p.isPresent()) {
-            ctx.rt().setNeedsSpace("");
-            return p;
-        }
-        // 想建、但没有能放下它的预留地块：临时找地（奠基、立原版村庄的一切项目，生成村庄的体育场等）
-        return ProjectPicker.wanted(in).flatMap(want -> AdHocSites.start(ctx, want));
+        return Optional.of(new ProjectPicker.Input(ctx.village().stage(), busy, hungry, candidates, freePlots(ctx), built,
+                gods, shrines, satisfied, existing(ctx, candidates, specs), inProgress, fit(ctx, specs)));
     }
-
     /** 本村已有的施工建筑 id（含去掉主神后缀的基础 id）。 */
     static Set<String> builtIds(VillageEconomy.State s, Map<String, BuildingSpec> specs) {
         Set<String> out = new LinkedHashSet<>();
@@ -263,26 +312,60 @@ public final class Construction {
         return all > 0 && ok * 10 >= all * 9;
     }
 
-    /** 能被原地替换的旧建筑：施工建成的直接查；生成的按锚点反推（§1.4 E2）。 */
+    /** 能被原地替换的旧建筑 id：施工建成的直接查；生成的按锚点反推（§1.4 E2）。 */
     static Set<String> replaceable(VillageContext ctx, List<BuildingSpec> candidates, Map<String, BuildingSpec> specs) {
+        Set<String> out = new LinkedHashSet<>();
+        existing(ctx, candidates, specs).forEach(e -> out.add(e.building()));
+        return out;
+    }
+
+    /**
+     * 能被原地升级的旧建筑，每座一行（GA-11）：施工建成的直接取位置；生成的按锚点找出全部（同种的住居有好几座）。
+     * 正在被进行中的项目替换的那一座不算。
+     */
+    static List<ProjectPicker.Existing> existing(VillageContext ctx, List<BuildingSpec> candidates, Map<String, BuildingSpec> specs) {
         Set<String> prefixes = new LinkedHashSet<>();
         candidates.forEach(c -> prefixes.addAll(c.replace()));
-        Set<String> out = new LinkedHashSet<>();
+        List<ProjectPicker.Existing> out = new ArrayList<>();
         if (prefixes.isEmpty()) {
             return out;
         }
+        Set<Pos> replacing = new java.util.HashSet<>();
+        ctx.state().projects.stream().filter(p -> p.active() && p.oldOrigin != null).forEach(p -> replacing.add(p.oldOrigin));
         for (VillageEconomy.Built b : ctx.state().constructed) {
-            if (prefixes.stream().anyMatch(b.building()::startsWith)) {
-                out.add(b.building());
+            if (prefixes.stream().anyMatch(b.building()::startsWith) && !replacing.contains(b.origin())) {
+                out.add(new ProjectPicker.Existing(b.building(), b.placed()));
             }
         }
         for (BuildingSpec s : specs.values()) {
-            if (s.generated() && prefixes.stream().anyMatch(s.id()::startsWith)
-                    && BuildPlacement.locate(s, ctx.plan().info().anchors(), ctx.plan().info().built()).isPresent()) {
-                out.add(s.id());
+            if (s.generated() && prefixes.stream().anyMatch(s.id()::startsWith)) {
+                for (BuildPlacement.Placed at : BuildPlacement.locateAll(s, ctx.plan().info().anchors(), ctx.plan().info().built())) {
+                    if (!replacing.contains(at.origin())) {
+                        out.add(new ProjectPicker.Existing(s.id(), at));
+                    }
+                }
             }
         }
         return out;
+    }
+
+    /** 原位判断（GA-11 §2.4）：多出来的格子不压别的建筑与地块，地面不是水。 */
+    static ProjectPicker.Fit fit(VillageContext ctx, Map<String, BuildingSpec> specs) {
+        List<Box> others = ctx.plan().info().built();
+        List<io.github.happysnappingturtle.mythicage.core.village.build.UpgradeFit.PlotArea> plots = ctx.plan().info().plots().stream()
+                .map(p -> new io.github.happysnappingturtle.mythicage.core.village.build.UpgradeFit.PlotArea(p.kind(), p.box())).toList();
+        ServerLevel level = ctx.level();
+        return (next, old) -> {
+            BuildingSpec oldSpec = specs.get(old.building());
+            if (oldSpec == null || old.at() == null) {
+                return "";
+            }
+            return io.github.happysnappingturtle.mythicage.core.village.build.UpgradeFit.check(next, oldSpec, old.at(), others, plots,
+                    p -> {
+                        BlockPos at = new BlockPos(p.x(), p.y(), p.z());
+                        return level.isLoaded(at) && (!level.getFluidState(at).isEmpty() || !level.getFluidState(at.below()).isEmpty());
+                    });
+        };
     }
 
     /** 开一个项目（选项目、开发命令、GameTest）：算位置、切段、账单，进入备料。 */
@@ -301,9 +384,11 @@ public final class Construction {
             if (oldSpec == null) {
                 return Optional.empty();
             }
-            old = s.constructed.stream().filter(b -> b.building().equals(pick.replaces())).map(VillageEconomy.Built::placed)
-                    .findFirst()
-                    .or(() -> BuildPlacement.locate(oldSpec, ctx.plan().info().anchors(), ctx.plan().info().built()))
+            Pos want = pick.replaceAt();
+            old = s.constructed.stream().filter(b -> b.building().equals(pick.replaces()) && (want == null || b.origin().equals(want)))
+                    .map(VillageEconomy.Built::placed).findFirst()
+                    .or(() -> BuildPlacement.locateAll(oldSpec, ctx.plan().info().anchors(), ctx.plan().info().built()).stream()
+                            .filter(x -> want == null || x.origin().equals(want)).findFirst())
                     .orElse(null);
             if (old == null) {
                 return Optional.empty();
@@ -429,6 +514,33 @@ public final class Construction {
             if (ctx.loaded(at) && (segment.kind() == BuildSegments.Kind.DEMOLISH || cell.air() || site.supported(ctx.level(), at, site.state(segment,cell)))) return true;
         }
         return false;
+    }
+
+    /** 开发诊断：还没放、也没记被挡或缺料的前几格（段类型、方块、世界里现在是什么、放不放得住）。 */
+    public static String stuck(VillageContext ctx, BuildProject p, int limit) {
+        Optional<BuildSite> so = site(ctx, p);
+        if (so.isEmpty()) {
+            return "?";
+        }
+        StringBuilder sb = new StringBuilder();
+        int n = 0;
+        for (var seg : so.get().segments) {
+            for (int i = 0; i < seg.cells().size() && n < limit; i++) {
+                if (p.cellPlaced(seg.index(), i)) continue;
+                var bl = p.blockedCells.get(seg.index());
+                var mi = p.missingCells.get(seg.index());
+                if ((bl != null && bl.get(i)) || (mi != null && mi.get(i))) continue;
+                var c = seg.cells().get(i);
+                BlockPos at = VillageContext.block(c.pos());
+                boolean place = seg.kind() == BuildSegments.Kind.PLACE;
+                sb.append(" | ").append(seg.index()).append(place ? " 放 " : " 拆 ").append(c.block()).append(" @").append(at.toShortString())
+                        .append(" 现 ").append(BuildSite.id(ctx.level().getBlockState(at)))
+                        .append(place && !c.air() ? (so.get().supported(ctx.level(), at, so.get().state(seg, c)) ? " 撑得住" : " 撑不住") : "")
+                        .append(c.last() ? " 最后" : "");
+                n++;
+            }
+        }
+        return sb.toString();
     }
 
     static void exhausted(VillageContext ctx, BuildProject p, BuildSite site) {
@@ -757,7 +869,7 @@ public final class Construction {
                 });
                 built.remove(oldAt.box());
             }
-            s.constructed.removeIf(b -> b.building().equals(p.replaces));
+            s.constructed.removeIf(b -> b.building().equals(p.replaces) && (p.oldOrigin == null || b.origin().equals(p.oldOrigin)));
         }
         BuildPlacement.worldAnchors(spec, site.at).forEach((k, v) -> anchors.computeIfAbsent(k, x -> new ArrayList<>()).addAll(v));
         built.add(site.box());
@@ -765,6 +877,7 @@ public final class Construction {
                 info.layoutVersion(), info.templateSet(), info.center(), anchors, built, info.plots()));
         s.constructed.add(new VillageEconomy.Built(spec.id(), site.at.origin(), site.at.turn(), site.box(), p.plot, p.god,
                 ctx.today()));
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.afterConstruction(server, ctx.village().id());
         if (!p.plot.isEmpty()) {
             s.builtPlots.add(p.plot);
         }
@@ -774,7 +887,38 @@ public final class Construction {
         ctx.rt().invalidateStations();
         s.log(ctx.today(), "mythic_age.village.log.project_done", nameArg(spec, p.god));
         BuildNotices.built(ctx, spec, p.god);
+        doorAccess(ctx, spec, site.at, built);
         VillageEconomy.get(server).setDirty();
+        advance(ctx, false);
+    }
+
+    /**
+     * 落成时的门前检查（GA-14 D2）：原地升级沿用旧位置，门可能被坡地整地的挡土墙堵着。门前要台阶就一次修好（只拆自然方块与村子
+     * 自己砌的挡土墙；玩家放的方块、别的建筑占地里的格一格都不碰，有一格拆不了就整条不修），写一行发展记录。返回修了几级。
+     */
+    public static int doorAccess(VillageContext ctx, BuildingSpec spec, BuildPlacement.Placed at, List<Box> built) {
+        ServerLevel level = ctx.level();
+        var door = io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.door(spec, at.origin(), at.turn());
+        var cols = io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.corridor(at.box(), door,
+                io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.MAX_STEPS);
+        for (var c : cols) {
+            if (!level.isLoaded(new BlockPos(c.x(), door.pos().y(), c.z()))) {
+                return 0;
+            }
+        }
+        List<Box> others = built.stream().filter(b -> !b.equals(at.box()) && !b.containsXZ(door.pos().x(), door.pos().z())).toList();
+        java.util.function.Predicate<BlockPos> can = q -> io.github.happysnappingturtle.mythicage.structure.TerrainOps.doorClearable(level.getBlockState(q))
+                && !PlayerConstructionEdits.contains(level, q) && others.stream().noneMatch(b -> b.containsXZ(q.getX(), q.getZ()));
+        int need = io.github.happysnappingturtle.mythicage.structure.TerrainOps.doorSteps(level, null, cols, door.pos().y(), can, true);
+        if (need < 0) {
+            ctx.state().log(ctx.today(), "mythic_age.village.log.door_blocked", nameArg(spec, ""));
+            return 0;
+        }
+        if (need > 0) {
+            io.github.happysnappingturtle.mythicage.structure.TerrainOps.doorSteps(level, null, cols, door.pos().y(), can, false);
+            ctx.state().log(ctx.today(), "mythic_age.village.log.door_steps", nameArg(spec, ""));
+        }
+        return need;
     }
 
     /** 神庙扩建后，祭司（守护者）的居所跟着神像站位走。 */
@@ -803,6 +947,7 @@ public final class Construction {
         SITES.remove(key(ctx.village().id(), p.id));
         ctx.state().log(ctx.today(), "mythic_age.village.log.project_cancelled", p.building);
         VillageEconomy.get(ctx.level().getServer()).setDirty();
+        advance(ctx, false);
         return back;
     }
 

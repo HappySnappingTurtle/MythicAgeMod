@@ -160,7 +160,7 @@ public final class PlaytestSetup {
     public static List<String> apply(ServerPlayer p, PlaytestStations.Spec spec) {
         List<String> missing = new ArrayList<>();
         if (spec.age().atLeast(Age.ARCHAIC)) {
-            TradeService.grantBlessing(p, CIV, spec.altarGift());
+            TradeService.grantBlessing(p, CIV, true);
         }
         while (MythData.get(p).civ(CIV).age().ordinal() < spec.age().ordinal()) {
             RiteCommand.promoteDirect(p, CIV, MythData.get(p).civ(CIV).age() == Age.ARCHAIC ? spec.god() : "");

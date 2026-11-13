@@ -4,12 +4,12 @@
   "columnMinHeight": 3,
   "tiers": [
     {"level": 0, "name": "open_altar", "age": "archaic", "prayerSlots": 2, "coefficient": 1.0},
-    {"level": 1, "name": "naiskos", "age": "archaic", "prayerSlots": 4, "coefficient": 1.5,
+    {"level": 1, "name": "naiskos", "age": "archaic", "prayerSlots": 4, "coefficient": 1.5, "building": "acropolis_archaic",
      "require": {"columns": 4, "roof": true, "openAltar": true, "litBraziers": 1}},
-    {"level": 2, "name": "prostylos", "age": "classical", "prayerSlots": 7, "coefficient": 2.0,
+    {"level": 2, "name": "prostylos", "age": "classical", "prayerSlots": 7, "coefficient": 2.0, "building": "acropolis_classical",
      "require": {"columns": 8, "roof": true, "openAltar": true, "crepidoma": true, "litBraziers": 2, "statues": 1,
                  "pediments": 2, "marbleFloor": 40}},
-    {"level": 3, "name": "peripteros", "age": "heroic", "prayerSlots": 10, "coefficient": 3.0,
+    {"level": 3, "name": "peripteros", "age": "heroic", "prayerSlots": 10, "coefficient": 3.0, "building": "acropolis_heroic",
      "require": {"columns": 14, "roof": true, "openAltar": true, "crepidoma": true, "litBraziers": 4, "statues": 1,
                  "pediments": 4, "marbleFloor": 80}}
   ]

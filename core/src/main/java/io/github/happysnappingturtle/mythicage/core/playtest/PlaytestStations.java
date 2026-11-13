@@ -48,8 +48,8 @@ public final class PlaytestStations {
      * @param age         希腊时代；NONE 表示未受祝福
      * @param god         晋升到古典时选的次神；空串表示不选
      * @param favor       恩宠（在时代定好之后加，受上限约束）
-     * @param altarGift   受祝福时是否发祭坛（首次见面赠礼）
-     * @param temple      预先搭好的神庙等级；-1 表示不搭
+     * @param upgrade     「神庙扩建」：开工站点村子神庙的下一级（备齐材料、施工加速），玩家看着它盖（GA-13）
+     * @param temple      站点村子的神庙至少要到的等级（不够就当场扩建上去）；-1 表示不管
      * @param items       另给的物品
      * @param offerings   晋升供品
      * @param quest       村里要有一件委托
@@ -57,7 +57,7 @@ public final class PlaytestStations {
      * @param handbook    补发手札
      * @param dayTime     设定的时间（取模 24000）；-1 表示不改
      */
-    public record Spec(Age age, String god, long favor, boolean altarGift, int temple, List<Give> items,
+    public record Spec(Age age, String god, long favor, boolean upgrade, int temple, List<Give> items,
                        Offerings offerings, boolean quest, boolean firstKill, boolean handbook, Spot spot, long dayTime) {
         public Spec {
             items = List.copyOf(items);
@@ -73,13 +73,6 @@ public final class PlaytestStations {
             return "mythic_age.playtest.station." + id;
         }
     }
-
-    /** 一级神庙的材料：4 根 3 高的柱子、9×9 屋顶、火盆、点火用具，留些余量。 */
-    public static final List<Give> TEMPLE_MATERIALS = List.of(
-            new Give("mythic_age:marble_pillar", 16),
-            new Give("mythic_age:smooth_marble", 128),
-            new Give("mythic_age:greek_brazier", 2),
-            new Give("minecraft:flint_and_steel", 1));
 
     /** 迷宫与 Boss 的战斗装备。 */
     public static final List<Give> COMBAT = List.of(
@@ -98,9 +91,8 @@ public final class PlaytestStations {
     public static final List<Station> ALL = List.of(
             new Station(1, "start", 5, new Spec(Age.NONE, "", 0, false, -1, List.of(), Offerings.NONE,
                     false, false, true, Spot.VILLAGE_EDGE, MORNING)),
-            new Station(2, "temple", 10, new Spec(Age.ARCHAIC, "", 0, true, -1, concat(TEMPLE_MATERIALS,
-                    List.of(new Give("mythic_age:libation", 1))), Offerings.NONE,
-                    false, false, false, Spot.VILLAGE_PRIEST, MORNING)),
+            new Station(2, "temple", 10, new Spec(Age.ARCHAIC, "", 0, true, -1, List.of(new Give("mythic_age:libation", 1)),
+                    Offerings.NONE, false, false, false, Spot.VILLAGE_PRIEST, MORNING)),
             new Station(3, "powers", 10, new Spec(Age.CLASSICAL, ATHENA, 150, false, 1, List.of(), Offerings.NONE,
                     false, false, false, Spot.VILLAGE_PRIEST, DAY)),
             new Station(4, "village", 5, new Spec(Age.ARCHAIC, "", 0, false, -1, List.of(), Offerings.NONE,

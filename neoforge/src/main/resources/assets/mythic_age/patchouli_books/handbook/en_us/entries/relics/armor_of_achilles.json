@@ -1,0 +1,21 @@
+{
+  "name": "Armor of Achilles",
+  "icon": "mythic_age:armor_of_achilles",
+  "category": "mythic_age:relics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:armor_of_achilles",
+      "text": "$(l)Worn$(): you take $(l)8%%$() less melee damage.$(br2)$(l)Enshrined$(): allies within 48 blocks of the temple take $(l)15%%$() less melee damage. Allies are villagers, residents, iron golems, and your summoned units and tamed animals, but not you. Arrows, explosions and thorns are not melee."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "After you defeat the $(l)Minotaur$(), the vault deep in the Labyrinth of Knossos opens for you, and the armor is inside. If you have not won, the vault stays shut; come back once you have."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Patroclus went into battle in Achilles' armor and was killed by Hector, who stripped the armor from him. Achilles' mother Thetis went to Hephaestus, and the smith god made Achilles a new shield, breastplate, helmet and greaves.$(br2)(Homer, Iliad, books 16 to 18)"
+    }
+  ]
+}

@@ -81,14 +81,19 @@ public final class VillageDevCommand {
             return;
         }
         String replaces = "";
+        io.github.happysnappingturtle.mythicage.core.village.gen.Pos replaceAt = null;
         String plotId = plot == null ? "" : plot;
         if (!spec.replace().isEmpty()) {
-            replaces = Construction.replaceableForCommand(ctx, spec).orElse("");
+            // 升级：取候选里那一项（第一座放得下的旧建筑，GA-11）；没有就照 T19 取第一座
+            var pick = Construction.input(ctx).flatMap(in -> io.github.happysnappingturtle.mythicage.core.village.build.ProjectPicker
+                    .candidates(in).stream().filter(x -> x.key().equals(building)).findFirst()).map(x -> x.pick());
+            replaces = pick.map(x -> x.replaces()).or(() -> Construction.replaceableForCommand(ctx, spec)).orElse("");
+            replaceAt = pick.map(x -> x.replaceAt()).orElse(null);
         } else if (plotId.isEmpty()) {
             plotId = Construction.firstPlotFor(ctx, spec).orElse("");
         }
         var p = Construction.start(ctx, new io.github.happysnappingturtle.mythicage.core.village.build.ProjectPicker.Pick(building,
-                plotId, spec.god().equals("*") ? "apollo" : spec.god(), replaces));
+                plotId, spec.god().equals("*") ? "apollo" : spec.god(), replaces, replaceAt));
         c.getSource().sendSuccess(() -> Component.literal(p.map(x -> "开工：" + x.building + " @ " + x.origin + " " + x.turn
                 + " 段 " + x.segments + " 账单 " + x.bill()).orElse("开不了工")), false);
     }
@@ -167,6 +172,21 @@ public final class VillageDevCommand {
                                     c.getSource().sendSuccess(() -> Component.literal(id + " +" + got), false);
                                     return 1;
                                 }).orElse(0)))))
+                        // 给自己记这个村子的贡献（GA-11：点名下一个项目要贡献达门槛）
+                        .then(Commands.literal("contribute").then(Commands.argument("points", IntegerArgumentType.integer(1, 100000))
+                                .executes(c -> here(c).map(v -> {
+                                    var player = c.getSource().getPlayer();
+                                    if (player == null) {
+                                        return 0;
+                                    }
+                                    var book = io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(c.getSource().getServer())
+                                            .book(v.id());
+                                    book.contribute(player.getUUID(), "dev", IntegerArgumentType.getInteger(c, "points"),
+                                            io.github.happysnappingturtle.mythicage.guardian.MythDays.today(c.getSource().getServer()));
+                                    io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(c.getSource().getServer()).setDirty();
+                                    c.getSource().sendSuccess(() -> Component.literal("贡献 → " + book.contribution(player.getUUID())), false);
+                                    return 1;
+                                }).orElse(0))))
                         // 从村库取走（不进背包，直接销毁）：村库满了腾地方、测试缺料时用
                         .then(Commands.literal("take").then(Commands.argument("item", ItemArgument.item(build))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 100000)).executes(c -> here(c).map(v -> {
@@ -232,6 +252,42 @@ public final class VillageDevCommand {
                                     + io.github.happysnappingturtle.mythicage.village.life.VillageLife.rations(ctx)
                                     + "\n神谕 " + oracle + " · 祭司 " + priest + "\n当日计数 " + ctx.state().daily), false);
                         })))
+                        // 村庄神庙（GA-13）：等级、祭坛、完好度、系数、祈祷位、供奉者与今日信徒；join 把自己加为供奉者
+                        .then(Commands.literal("temple").executes(c -> withCtx(c, ctx -> {
+                            var server = c.getSource().getServer();
+                            var book = ctx.state().temple;
+                            String body = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(server, ctx.village())
+                                    .map(t -> "神庙 " + t.level() + " 级（" + t.tierName() + "）· 祭坛 " + t.altar().pos().toShortString()
+                                            + " · 圆心 " + t.center().toShortString()
+                                            + String.format(java.util.Locale.ROOT, " · 完好度 %.2f · 系数 %.2f", t.integrity(), t.coefficient())
+                                            + " · 祈祷位 " + t.prayerSlots().size() + "/" + t.slotLimit())
+                                    .orElse("这个村子没有神庙");
+                            StringBuilder dev = new StringBuilder();
+                            book.devoteeView().forEach((id, dv) -> {
+                                var p = server.getPlayerList().getPlayer(id);
+                                dev.append(dev.isEmpty() ? "" : "、").append(p == null ? id.toString().substring(0, 8) : p.getGameProfile().getName())
+                                        .append("（").append(dv.via().name().toLowerCase(java.util.Locale.ROOT)).append("）");
+                            });
+                            c.getSource().sendSuccess(() -> Component.literal(body + "\n供奉者 " + (dev.isEmpty() ? "无" : dev)
+                                    + " · 今日信徒 " + book.believersToday(ctx.today()) + " · 近 7 日 " + book.believers(ctx.today())), false);
+                        }))
+                                .then(Commands.literal("join").executes(c -> withCtx(c, ctx -> {
+                                    var player = c.getSource().getPlayer();
+                                    if (player == null) {
+                                        return;
+                                    }
+                                    boolean added = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.addDevotee(
+                                            c.getSource().getServer(), ctx.village().id(), player.getUUID(), ctx.today(),
+                                            io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.JOIN);
+                                    c.getSource().sendSuccess(() -> Component.literal(added ? "已成为这里的供奉者" : "已经是这里的供奉者"), false);
+                                })))
+                                .then(Commands.literal("leave").executes(c -> withCtx(c, ctx -> {
+                                    var player = c.getSource().getPlayer();
+                                    if (player != null && !io.github.happysnappingturtle.mythicage.content.greek.temple.TempleMembership.leave(player,
+                                            ctx.village().id())) {
+                                        c.getSource().sendSuccess(() -> Component.literal("不是这里的供奉者"), false);
+                                    }
+                                }))))
                         .then(Commands.literal("migrate").executes(c -> withCtx(c, ctx -> {
                             var m = io.github.happysnappingturtle.mythicage.village.work.ResidentMigration.forceForCommand(ctx);
                             c.getSource().sendSuccess(() -> Component.literal(m.map(r -> "在途移民 " + r.getName().getString()
@@ -253,7 +309,8 @@ public final class VillageDevCommand {
                                             + (p.blockedReason.isEmpty() ? "" : "（" + p.blockedReason + "）")
                                             + " 施工牌 " + SiteMarkers.sign(ctx, p).map(BlockPos::toShortString).orElse("无")
                                             + " 缺 " + p.missing() + " 账单 " + p.bill()
-                                            + (p.blockedAt == null ? "" : " 停工 " + p.blockedAt)).orElse("没有进行中的项目");
+                                            + (p.blockedAt == null ? "" : " 停工 " + p.blockedAt)
+                                            + "\n待放" + Construction.stuck(ctx, p, 6)).orElse("没有进行中的项目");
                                     c.getSource().sendSuccess(() -> Component.literal(msg + " · 已建 " + ctx.state().constructed.size()
                                             + " · 储备 " + ctx.state().constructionBank), false);
                                 })))

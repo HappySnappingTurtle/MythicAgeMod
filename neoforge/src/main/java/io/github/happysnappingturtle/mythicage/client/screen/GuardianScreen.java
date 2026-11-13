@@ -103,7 +103,9 @@ public class GuardianScreen extends Screen {
         }
         view = r.view();
         if (r.reason() == TradeReason.OK) {
-            status = Component.translatable("mythic_age.trade.result.ok", r.given().getHoverName(), r.given().getCount());
+            // 受祝福、在这里供奉不发物品（GA-13）
+            status = r.given().isEmpty() ? Component.translatable("mythic_age.trade.result.devotee")
+                    : Component.translatable("mythic_age.trade.result.ok", r.given().getHoverName(), r.given().getCount());
             statusColor = OK;
             if (view.dialogue() == TradeView.Dialogue.NONE) {
                 tab = Tab.TRADE;
@@ -403,6 +405,9 @@ public class GuardianScreen extends Screen {
         } else if (view.dialogue() == TradeView.Dialogue.REISSUE) {
             addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.reissue", shrineName()),
                     b -> sendBlessing(true)).bounds(left + 8, y, 150, 20).build()).active = pending == null;
+        } else if (view.dialogue() == TradeView.Dialogue.JOIN) {
+            addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.join"),
+                    b -> sendBlessing(true)).bounds(left + 8, y, 150, 20).build()).active = pending == null;
         }
         if (view.dialogue() != TradeView.Dialogue.FIRST) {
             addRenderableWidget(Button.builder(Component.translatable("mythic_age.guardian.to_trade"), b -> {
@@ -519,6 +524,7 @@ public class GuardianScreen extends Screen {
         String key = "mythic_age.guardian." + view.civ().id() + ".talk." + switch (view.dialogue()) {
             case FIRST -> "first";
             case REISSUE -> "reissue";
+            case JOIN -> "join";
             case NONE -> "greet";
         };
         int y = line(g, Component.translatable(key), left + 12, top + 52, W - 24, TEXT);

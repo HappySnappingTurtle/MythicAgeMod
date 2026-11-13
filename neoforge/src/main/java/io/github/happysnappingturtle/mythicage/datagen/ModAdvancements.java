@@ -31,14 +31,14 @@ public final class ModAdvancements implements AdvancementProvider.AdvancementGen
 
     @Override
     public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver, ExistingFileHelper files) {
-        AdvancementHolder root = node(saver, "greek/root", null, GreekTemple.GREEK_ALTAR.get(), AdvancementType.TASK,
+        AdvancementHolder root = node(saver, "greek/root", null, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.VILLAGE_ALTAR.get(), AdvancementType.TASK,
                 MythEventTrigger.of(MythEvents.VILLAGE_ENTERED, GR), true);
         AdvancementHolder blessed = node(saver, "greek/blessed", root, GreekMaterials.LIBATION.get(), AdvancementType.TASK,
                 MythEventTrigger.of(MythEvents.BLESSED, GR), false);
         AdvancementHolder favor = node(saver, "greek/first_favor", blessed, GreekTemple.GREEK_BRAZIER.get(),
                 AdvancementType.TASK, MythEventTrigger.of(MythEvents.FAVOR_GAINED, GR), false);
         AdvancementHolder temple = node(saver, "greek/temple", favor, GreekArchitecture.MARBLE_COLUMN.get(),
-                AdvancementType.TASK, MythEventTrigger.atLeast(MythEvents.TEMPLE_LEVEL, GR, 1), false);
+                AdvancementType.TASK, MythEventTrigger.atLeast(MythEvents.TEMPLE_LEVEL, GR, 2), false);
         AdvancementHolder classical = node(saver, "greek/classical", temple, GreekArchitecture.IONIC_CAPITAL.get(),
                 AdvancementType.GOAL, MythEventTrigger.atLeast(MythEvents.AGE_REACHED, GR, Age.CLASSICAL.ordinal()), false);
         node(saver, "greek/heroic", classical, GreekArchitecture.CORINTHIAN_CAPITAL.get(), AdvancementType.GOAL,

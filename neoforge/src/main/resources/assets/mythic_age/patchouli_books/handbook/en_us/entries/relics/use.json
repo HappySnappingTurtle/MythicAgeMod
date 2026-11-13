@@ -1,0 +1,16 @@
+{
+  "name": "Wearing and Enshrining",
+  "icon": "mythic_age:rheia_crown",
+  "category": "mythic_age:relics",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "A relic can be used in two ways:$(li)$(l)Worn$(): put it in the Relic slot of your curios. The effect applies only to you.$(li)$(l)Enshrined$(): in a village you are devoted to, sneak-right-click the village altar while holding the relic. The effect covers 48 blocks around the acropolis.$(br)A relic is used one way at a time and sits in one place only."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "You start with $(l)1$() Relic slot, gain another in the Heroic age and one more in the Mythic age.$(br2)Offering slots are counted per village: 1 in the Archaic age, 2 in the Classical and Heroic, 3 in the Mythic. If your age drops, relics already enshrined stay; you just cannot add new ones.$(br2)To take one back, right-click the altar with an empty hand and press Take at the bottom of the temple inspector."
+    }
+  ]
+}

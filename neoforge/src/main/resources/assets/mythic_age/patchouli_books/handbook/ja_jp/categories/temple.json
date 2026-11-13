@@ -1,6 +1,6 @@
 {
   "name": "神殿と祈り",
-  "description": "恩寵の出どころ：祭壇、神殿の格、信徒の祈り、離れているあいだの計算。",
-  "icon": "mythic_age:greek_altar",
+  "description": "村で祝福を受けて奉納者になると、信徒が村の神殿であなたのために祈る。村が神殿を建て替えるほど恩寵は増える。離れている間も記帳される。",
+  "icon": "mythic_age:village_altar",
   "sortnum": 10
 }

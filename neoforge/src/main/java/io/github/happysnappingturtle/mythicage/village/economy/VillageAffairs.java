@@ -193,7 +193,7 @@ public final class VillageAffairs {
         return out;
     }
 
-    /** 施工项目（T19 §1.4 E7）：进度、缺料、停工坐标。 */
+    /** 施工项目（T19 §1.4 E7）：进度、缺料、停工坐标；GA-11 加「下一个：〈建筑〉（〈玩家〉点名）」。 */
     public static List<AffairsView.Line> projectLines(VillageEconomy.State s) {
         List<AffairsView.Line> out = new ArrayList<>();
         s.activeProject().ifPresent(p -> {
@@ -217,6 +217,10 @@ public final class VillageAffairs {
                 }
             }
         });
+        if (s.nextProject != null) {
+            out.add(AffairsView.Line.of("mythic_age.village.project.next",
+                    io.github.happysnappingturtle.mythicage.village.build.VillageProjects.nameArg(s.nextProject), s.nextProject.playerName()));
+        }
         return out;
     }
 

@@ -28,6 +28,12 @@ import io.github.happysnappingturtle.mythicage.summon.SummonService;
 import io.github.happysnappingturtle.mythicage.summon.SummonUnits;
 import io.github.happysnappingturtle.mythicage.summon.greek.SummonPegasusEntity;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
+import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
+import io.github.happysnappingturtle.mythicage.village.temple.TempleBook;
+import io.github.happysnappingturtle.mythicage.village.temple.VillageTemple;
+import io.github.happysnappingturtle.mythicage.village.temple.VillageTemples;
+import io.github.happysnappingturtle.mythicage.relic.OfferedIndex;
+import io.github.happysnappingturtle.mythicage.relic.TempleRelics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -78,8 +84,6 @@ public final class RelicGameTests {
     private static final String T = GameTestTemplates.EMPTY_17X16X20;
     private static final BlockPos ALTAR = new BlockPos(8, 2, 8);
     private static final BlockPos ALTAR_B = new BlockPos(3, 2, 3);
-    private static final BlockPos ALTAR_C = new BlockPos(13, 2, 3);
-    private static final BlockPos ALTAR_D = new BlockPos(3, 2, 14);
     private static final String RHEIA = "greek:rheia_crown";
     private static final String STATUE = "greek:pygmalion_statue";
 
@@ -125,26 +129,36 @@ public final class RelicGameTests {
         RelicService.reconcile(p);
     }
 
+    /**
+     * 一座村庄神庙（GA-13）：还没有卫城的希腊小村，钟 = 祭坛在 rel（放一块村庄祭坛），owner 是供奉者。返回祭坛坐标。
+     */
     private static BlockPos altar(GameTestHelper h, BlockPos rel, FakePlayer owner) {
         h.setBlock(rel.below(), Blocks.STONE);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
+        h.setBlock(rel, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.VILLAGE_ALTAR.get());
         BlockPos abs = h.absolutePos(rel);
-        ShrineService.bindForTest(h.getLevel(), abs, owner.getUUID(), owner.getGameProfile().getName(),
-                MythData.get(owner).civ(Civilization.GREEK).age(), Direction.SOUTH);
+        VillageRegistry.Village v = new VillageRegistry.Village(UUID.randomUUID(), GlobalPos.of(h.getLevel().dimension(), abs), "greek",
+                "zeus", VillageRegistry.Origin.VANILLA, null, "plains", -1);
+        VillageRegistry.get(h.getLevel().getServer()).add(v);
+        VillageTemples.invalidate(v.id());
+        VillageTemples.addDevotee(h.getLevel().getServer(), v.id(), owner.getUUID(), 0, TempleBook.Via.JOIN);
         return abs;
     }
 
-    private static ShrineBlockEntity shrine(GameTestHelper h, BlockPos abs) {
-        if (h.getLevel().getBlockEntity(abs) instanceof ShrineBlockEntity be) {
-            return be;
-        }
-        throw new GameTestAssertException("没有神庙方块实体 " + abs);
+    private static VillageTemple temple(GameTestHelper h, BlockPos abs) {
+        return VillageTemples.byAltar(h.getLevel().getServer(), GlobalPos.of(h.getLevel().dimension(), abs))
+                .orElseThrow(() -> new GameTestAssertException("没有村庄神庙 " + abs));
     }
 
-    /** 手持 s 潜行右键神坛；返回供奉后手里是否空了（= 放进去了）。 */
+    private static TempleBook book(GameTestHelper h, BlockPos abs) {
+        return VillageTemples.book(h.getLevel().getServer(), temple(h, abs).village());
+    }
+
+    /** 手持 s 潜行右键神庙祭坛；返回供奉后手里是否空了（= 放进去了）。 */
     private static boolean offer(GameTestHelper h, FakePlayer p, BlockPos abs, ItemStack s) {
         p.setItemInHand(InteractionHand.MAIN_HAND, s);
-        RelicService.offer(p, h.getLevel(), abs, InteractionHand.MAIN_HAND);
+        p.setShiftKeyDown(true);
+        io.github.happysnappingturtle.mythicage.content.greek.temple.VillageAltarUse.useItemOn(p.getMainHandItem(), h.getLevel(), abs, p);
+        p.setShiftKeyDown(false);
         boolean in = p.getMainHandItem().isEmpty();
         p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         return in;
@@ -172,6 +186,13 @@ public final class RelicGameTests {
 
     private static void cleanup(GameTestHelper h, List<FakePlayer> players, BlockPos... altars) {
         for (BlockPos a : altars) {
+            VillageTemples.byAltar(h.getLevel().getServer(), GlobalPos.of(h.getLevel().dimension(), a)).ifPresent(t -> {
+                OfferedIndex.removeVillage(t.village());
+                VillageRegistry.get(h.getLevel().getServer()).byId(t.village())
+                        .ifPresent(v -> VillageRegistry.get(h.getLevel().getServer()).remove(v.bell()));
+                VillageEconomy.get(h.getLevel().getServer()).clearForTest(t.village());
+                VillageTemples.invalidate(t.village());
+            });
             h.getLevel().removeBlock(a, false);
         }
         h.killAllEntitiesOfClass(ItemEntity.class);
@@ -272,29 +293,28 @@ public final class RelicGameTests {
 
     // ───────────── 3.2 供奉位 ─────────────
 
-    /** TC-T16-30：远古 1 位，多座神坛共用；晋升古典后可放第二件。 */
+    /** TC-T16-30（GA-13 改：供奉位按「人 × 村」）：远古这个村 1 位；晋升古典后这个村可放第二件。 */
     @GameTest(template = T, batch = BATCH)
     public static void tc30_pool_shared(GameTestHelper h) {
         FakePlayer p = player(h, "rl_pool", Age.ARCHAIC);
         BlockPos a = altar(h, ALTAR, p);
-        BlockPos b = altar(h, ALTAR_B, p);
-        h.assertTrue(offer(h, p, a, rheia()), "神坛 A 供奉瑞亚之冠");
-        h.assertFalse(offer(h, p, b, statue()), "远古 1 / 1，神坛 B 被拒");
+        h.assertTrue(offer(h, p, a, rheia()), "供奉瑞亚之冠");
+        h.assertFalse(offer(h, p, a, statue()), "远古 1 / 1，第二件被拒");
         age(p, Age.CLASSICAL);
-        h.assertTrue(offer(h, p, b, statue()), "古典 2 位，可以放");
+        h.assertTrue(offer(h, p, a, statue()), "古典 2 位，可以放");
         h.assertTrue(RelicService.offerUsage(p, Civilization.GREEK)[0] == 2, "用量 2");
-        cleanup(h, List.of(p), a, b);
+        cleanup(h, List.of(p), a);
         h.succeed();
     }
 
-    /** TC-T16-31：别人不能在我的神坛上供奉。 */
+    /** TC-T16-31（GA-13 改）：不是这里的供奉者不能供奉。 */
     @GameTest(template = T, batch = BATCH)
     public static void tc31_not_owner(GameTestHelper h) {
         FakePlayer owner = player(h, "rl_own", Age.ARCHAIC);
         FakePlayer other = player(h, "rl_other", Age.ARCHAIC);
         BlockPos a = altar(h, ALTAR, owner);
         h.assertFalse(offer(h, other, a, rheia()), "别人供奉被拒");
-        h.assertTrue(shrine(h, a).relics().isEmpty() && state(other, RHEIA) == RelicState.INACTIVE, "架上与绑定表都不变");
+        h.assertTrue(book(h, a).relics(other.getUUID()).isEmpty() && state(other, RHEIA) == RelicState.INACTIVE, "供奉位与绑定表都不变");
         cleanup(h, List.of(owner, other), a);
         h.succeed();
     }
@@ -305,8 +325,8 @@ public final class RelicGameTests {
         FakePlayer p = player(h, "rl_civ", Age.ARCHAIC);
         BlockPos a = altar(h, ALTAR, p);
         RelicCard egyptian = new RelicCard("egyptian:test_relic", "mythic_age:rheia_crown", Civilization.EGYPTIAN, List.of(), List.of());
-        h.assertTrue(RelicService.offerError(p, shrine(h, a), egyptian, rheia()).isPresent(), "埃及圣物被拒");
-        h.assertTrue(RelicService.offerError(p, shrine(h, a), RelicCards.byId(RHEIA).orElseThrow(), rheia()).isEmpty(),
+        h.assertTrue(TempleRelics.offerError(p, temple(h, a), egyptian, rheia()).isPresent(), "埃及圣物被拒");
+        h.assertTrue(TempleRelics.offerError(p, temple(h, a), RelicCards.byId(RHEIA).orElseThrow(), rheia()).isEmpty(),
                 "希腊圣物可以");
         cleanup(h, List.of(p), a);
         h.succeed();
@@ -327,36 +347,7 @@ public final class RelicGameTests {
         h.succeed();
     }
 
-    /** TC-T16-34：主人在线时拆神坛，圣物掉在原地、绑定删除。 */
-    @GameTest(template = T, batch = BATCH)
-    public static void tc34_break_online(GameTestHelper h) {
-        FakePlayer p = player(h, "rl_break", Age.ARCHAIC);
-        BlockPos a = altar(h, ALTAR, p);
-        offer(h, p, a, rheia());
-        h.getLevel().removeBlock(a, false);
-        List<ItemEntity> drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(a).inflate(2),
-                e -> e.getItem().is(GreekRelics.RHEIA_CROWN.get()));
-        h.assertTrue(drops.size() == 1, "圣物掉在原地，实际 " + drops.size());
-        h.assertTrue(state(p, RHEIA) == RelicState.INACTIVE, "绑定删除");
-        cleanup(h, List.of(p));
-        h.succeed();
-    }
-
-    /** TC-T16-35：主人不在线时神坛被拆，上线对账时删除绑定。 */
-    @GameTest(template = T, batch = BATCH)
-    public static void tc35_break_offline(GameTestHelper h) {
-        FakePlayer p = player(h, "rl_offline", Age.ARCHAIC);
-        BlockPos a = altar(h, ALTAR, p);
-        offer(h, p, a, rheia());
-        RelicService.onlineForTest(p, false);
-        h.getLevel().removeBlock(a, false);
-        h.assertTrue(state(p, RHEIA) == RelicState.OFFERED, "不在线：绑定先留着");
-        RelicService.onlineForTest(p, true);
-        RelicService.reconcile(p);
-        h.assertTrue(state(p, RHEIA) == RelicState.INACTIVE, "上线对账后删除");
-        cleanup(h, List.of(p));
-        h.succeed();
-    }
+    // TC-T16-34、35（拆神坛时圣物掉落 / 下线时延后删绑定）：GA-13 起圣物存在村子的神庙簿里，与祭坛方块无关，作废。
 
     /** TC-T16-36：神坛区块未加载时对账，OFFERED 绑定保留。 */
     @GameTest(template = T, batch = BATCH)
@@ -381,35 +372,22 @@ public final class RelicGameTests {
         h.succeed();
     }
 
-    /** TC-T16-37：神话时代在 3 座神坛各供奉 1 件后降到古典：3 件保持，第 4 件被拒（D7）。 */
+    /** TC-T16-37（GA-13 改为同一个村子）：神话时代供奉 3 件后降到古典：3 件保持，再放被拒（D7）。 */
     @GameTest(template = T, batch = PYGMALION)
     public static void tc37_age_drop_keeps(GameTestHelper h) {
         FakePlayer p = player(h, "rl_drop", Age.MYTHIC);
         BlockPos a = altar(h, ALTAR, p);
-        BlockPos b = altar(h, ALTAR_B, p);
-        BlockPos c = altar(h, ALTAR_C, p);
-        h.assertTrue(offer(h, p, a, rheia()) && offer(h, p, b, armor()) && offer(h, p, c, statue()), "神话时代可放 3 件");
+        h.assertTrue(offer(h, p, a, rheia()) && offer(h, p, a, armor()) && offer(h, p, a, statue()), "神话时代可放 3 件");
         age(p, Age.CLASSICAL);
         h.assertTrue(RelicService.offerUsage(p, Civilization.GREEK)[0] == 3, "3 件仍是供奉状态");
         close(h, 0.15, RelicService.prayerR(p.getUUID()), "R 仍生效");
-        BlockPos d = altar(h, ALTAR_D, p);
-        h.assertTrue(RelicService.offerError(p, shrine(h, d), RelicCards.byId(RHEIA).orElseThrow(), rheia()).isPresent(),
-                "第 4 件被拒");
-        cleanup(h, List.of(p), a, b, c, d);
-        h.succeed();
-    }
-
-    /** TC-T16-38：一座神坛只放一件；供奉位还有空也不行。 */
-    @GameTest(template = T, batch = BATCH)
-    public static void tc38_one_per_altar(GameTestHelper h) {
-        FakePlayer p = player(h, "rl_one", Age.MYTHIC);
-        BlockPos a = altar(h, ALTAR, p);
-        h.assertTrue(offer(h, p, a, rheia()), "第一件");
-        h.assertFalse(offer(h, p, a, statue()), "同一座神坛放第二件被拒");
-        h.assertTrue(shrine(h, a).relics().stacks().size() == 1 && state(p, STATUE) == RelicState.INACTIVE, "架上仍只有一件");
+        RelicCard extra = new RelicCard("greek:test_extra", "mythic_age:rheia_crown", Civilization.GREEK, List.of(), List.of());
+        h.assertTrue(TempleRelics.offerError(p, temple(h, a), extra, rheia()).isPresent(), "古典 2 位已用 3：再放被拒");
         cleanup(h, List.of(p), a);
         h.succeed();
     }
+
+    // TC-T16-38（一座神坛只放一件）：GA-13 起按「人 × 村」的供奉位算，见 VillageTempleGameTests.relic_slots_per_village。
 
     // ───────────── 3.3 瑞亚之冠 ─────────────
 
@@ -453,7 +431,7 @@ public final class RelicGameTests {
         h.succeed();
     }
 
-    /** TC-T16-43 / 44：供奉在神坛 → R = 0.15；主人不在线 → 0。 */
+    /** TC-T16-43 / 44：供奉在村庄神庙 → R = 0.15；主人不在线 → 0。 */
     @GameTest(template = T, batch = BATCH)
     public static void tc43_rheia_offered_r(GameTestHelper h) {
         FakePlayer p = player(h, "rl_r", Age.ARCHAIC);

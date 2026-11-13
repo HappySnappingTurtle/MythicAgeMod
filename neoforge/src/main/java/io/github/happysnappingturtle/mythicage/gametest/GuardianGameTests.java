@@ -135,31 +135,30 @@ public final class GuardianGameTests {
 
     // ───────────── 初见（TC-T9-40～43） ─────────────
 
+    /** TC-T9-40、41（GA-13 改）：初见祝福进入远古，不再发祭坛（神庙归村庄）；重复请求不重复。 */
     @GameTest(template = T, batch = BATCH)
-    public static void first_blessing_gives_altar_and_archaic(GameTestHelper h) {
+    public static void first_blessing_enters_archaic_without_altar(GameTestHelper h) {
         GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_bless");
         TradeService.openGuardian(p, g);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
         h.assertTrue(data(p).civ(GR).age() == Age.ARCHAIC, "进入远古");
-        h.assertTrue(count(p, GreekTemple.GREEK_ALTAR.get().asItem()) == 1, "得到 1 座祭坛");
+        h.assertTrue(count(p, GreekTemple.GREEK_ALTAR.get().asItem()) == 0, "GA-13：不发祭坛");
         h.assertTrue(data(p).civ(GR).favor() == 0, "A1：不送恩宠");
         // TC-T9-41：重复请求
         expect(h, TradeService.blessing(p, false), TradeReason.DUPLICATE);
-        h.assertTrue(count(p, GreekTemple.GREEK_ALTAR.get().asItem()) == 1, "重复请求不再给祭坛");
         h.succeed();
     }
 
+    /** TC-T9-42（GA-13 改）：希腊没有赠礼，背包满也能受祝福。 */
     @GameTest(template = T, batch = BATCH)
-    public static void first_blessing_needs_room(GameTestHelper h) {
+    public static void first_blessing_with_full_inventory(GameTestHelper h) {
         GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_full");
         fill(p);
         TradeService.openGuardian(p, g);
-        expect(h, TradeService.blessing(p, false), TradeReason.INVENTORY_FULL);
-        h.assertTrue(data(p).civ(GR).age() == Age.NONE, "满背包时不提交");
-        p.getInventory().items.set(0, ItemStack.EMPTY);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
+        h.assertTrue(data(p).civ(GR).age() == Age.ARCHAIC, "进入远古");
         h.succeed();
     }
 
@@ -172,8 +171,7 @@ public final class GuardianGameTests {
         TradeService.openGuardian(b, g);
         expect(h, TradeService.blessing(a, false), TradeReason.OK);
         expect(h, TradeService.blessing(b, false), TradeReason.OK);
-        h.assertTrue(count(a, GreekTemple.GREEK_ALTAR.get().asItem()) == 1
-                && count(b, GreekTemple.GREEK_ALTAR.get().asItem()) == 1, "各得 1 座");
+        h.assertTrue(data(a).civ(GR).age() == Age.ARCHAIC && data(b).civ(GR).age() == Age.ARCHAIC, "各自进入远古");
         h.succeed();
     }
 
@@ -283,40 +281,18 @@ public final class GuardianGameTests {
         h.succeed();
     }
 
-    // ───────────── 补领（TC-T9-55～56） ─────────────
+    // ───────────── 补领（TC-T9-55～56）：GA-13 起希腊没有补领，换成「在这里供奉」（见 VillageTempleGameTests） ─────────────
 
     @GameTest(template = T, batch = BATCH)
-    public static void reissue_once_per_day(GameTestHelper h) {
+    public static void greek_has_no_reissue(GameTestHelper h) {
         GuardianEntity g = guardian(h);
         FakePlayer p = player(h, g, "ma_reissue");
         TradeService.openGuardian(p, g);
         expect(h, TradeService.blessing(p, true), TradeReason.NOT_BLESSED);
         expect(h, TradeService.blessing(p, false), TradeReason.OK);
+        // 不在村子里的祭司：没有供奉，也没有补领
         expect(h, TradeService.blessing(p, true), TradeReason.HAS_SHRINE);
-        p.getInventory().clearContent();
-        expect(h, TradeService.blessing(p, true), TradeReason.OK);
-        p.getInventory().clearContent();
-        expect(h, TradeService.blessing(p, true), TradeReason.REISSUED_TODAY);
-        MythDays.advanceForTest(1);
-        try {
-            expect(h, TradeService.blessing(p, true), TradeReason.OK);
-        } finally {
-            MythDays.advanceForTest(-1);
-        }
-        h.succeed();
-    }
-
-    @GameTest(template = T, batch = BATCH)
-    public static void reissue_refused_with_placed_altar(GameTestHelper h) {
-        GuardianEntity g = guardian(h);
-        FakePlayer p = player(h, g, "ma_placed");
-        TradeService.openGuardian(p, g);
-        expect(h, TradeService.blessing(p, false), TradeReason.OK);
-        p.getInventory().clearContent();
-        BlockPos rel = new BlockPos(1, 1, 1);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        ShrineService.bindForTest(h.getLevel(), h.absolutePos(rel), p.getUUID(), "ma_placed", Age.ARCHAIC, net.minecraft.core.Direction.SOUTH);
-        expect(h, TradeService.blessing(p, true), TradeReason.HAS_SHRINE);
+        h.assertTrue(count(p, GreekTemple.GREEK_ALTAR.get().asItem()) == 0, "不发祭坛");
         h.succeed();
     }
 

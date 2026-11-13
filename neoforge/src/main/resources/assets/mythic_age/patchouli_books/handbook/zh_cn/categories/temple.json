@@ -1,6 +1,6 @@
 {
   "name": "神庙与祈祷",
-  "description": "你将安放神坛、引来信徒祈祷，再扩建宏伟的神庙以增添产出；即便远行在外，神庙也会为你记下香火。",
-  "icon": "mythic_age:greek_altar",
+  "description": "在村里受祝福、成为供奉者，信徒就会在村庄神庙为你祈祷；村子扩建神庙，恩宠随之增加。即便远行在外，神庙也替你记着香火。",
+  "icon": "mythic_age:village_altar",
   "sortnum": 10
 }

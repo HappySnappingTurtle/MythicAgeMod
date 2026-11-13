@@ -58,6 +58,19 @@ public final class LangKeys {
         add("mythic_age.altar.level", "神庙：%s（系数 %s）", "Temple: %s (×%s)", "神殿：%s（係数 %s）");
         add("mythic_age.altar.structural", "结构已达到：%s", "Structure qualifies for: %s", "構造は %s の条件を満たしています");
         add("mythic_age.altar.next", "升级到「%s」需要：", "To become %s:", "「%s」への条件：");
+        add("mythic_age.altar.missing.none_village", "神庙完好，没有缺什么", "The temple is intact; nothing is missing", "神殿は無傷で、欠けているものはありません");
+        add("mythic_age.altar.highlight.altar", "祭坛", "Altar", "祭壇");
+        add("mythic_age.altar.title.village", "%s · 神庙", "Temple · %s", "%sの神殿");
+        add("mythic_age.altar.devotee.yes", "你是这里的供奉者", "You are a devotee here", "あなたはここの奉納者");
+        add("mythic_age.altar.devotee.no", "你还不是这里的供奉者", "You are not a devotee here", "あなたはまだここの奉納者ではない");
+        add("mythic_age.altar.devotees", "供奉者 %s 人", "Devotees: %s", "奉納者 %s 人");
+        add("mythic_age.altar.next.village", "村子把神庙扩建成「%s」后升级", "Upgrades when the village rebuilds it as %s",
+                "村が神殿を「%s」に建て替えると昇格");
+        add("mythic_age.altar.row.integrity", "完好度（%%）", "Condition (%%)", "保全度（%%）");
+        add("mythic_age.altar.missing.devotee", "去守护者那里受祝福，成为供奉者", "Receive the guardian's blessing to become a devotee",
+                "守護者の祝福を受けて奉納者になる");
+        add("mythic_age.altar.not_devotee", "你不是供奉者，这里的祈祷不给你恩宠", "You are not a devotee: prayers here give you no favor",
+                "奉納者ではないので、ここの祈りはあなたに恩寵をもたらさない");
         add("mythic_age.altar.max", "已是最高等级", "Highest tier reached", "最高位に達しています");
         add("mythic_age.altar.row.columns", "希腊柱（高≥3）", "Greek columns (height ≥3)", "ギリシャ柱（高さ3以上）");
         add("mythic_age.altar.row.roof", "柱间屋顶", "Roof over the colonnade", "柱に囲まれた屋根");
@@ -67,10 +80,10 @@ public final class LangKeys {
         add("mythic_age.altar.row.marbleFloor", "大理石地面", "Marble floor", "大理石の床");
         add("mythic_age.altar.slots", "同时可祈祷：%s / %s 人", "Can pray at once: %s / %s", "同時に祈れる人数：%s / %s");
         add("mythic_age.altar.today_believers", "今日信徒：%s 人", "Believers today: %s", "今日の信徒：%s 人");
-        add("mythic_age.altar.offered", "今日已献供：这座祭坛今天的祈祷恩宠 %s", "Offering made today: prayer favor here %s today", "今日は供物を捧げた：この祭壇の今日の祈りの恩寵 %s");
+        add("mythic_age.altar.offered", "今日已献供：今天你在这个村子的祈祷恩宠 %s", "Offering made today: your prayer favor from this village %s today", "今日は供物を捧げた：今日のこの村からの祈りの恩寵 %s");
         add("mythic_age.altar.offer_hint", "今天还没献供：手持奠酒、蜂蜜瓶、熟肉、面包或小麦右键祭坛，今天的祈祷恩宠 %s", "No offering yet today: right-click the altar holding a libation, honey bottle, cooked meat, bread or wheat for %s prayer favor today", "今日はまだ供物なし：献酒、ハチミツ入りの瓶、焼いた肉、パン、小麦を持って祭壇を右クリックすると、今日の祈りの恩寵 %s");
-        add("mythic_age.offering.ok", "献上了%s：这座祭坛今天的祈祷恩宠 %s", "Offered %s: prayer favor at this altar %s today", "%sを捧げた：この祭壇の今日の祈りの恩寵 %s");
-        add("mythic_age.jei.offering", "献供：手持供品右键自己的奥林匹斯祭坛，每座祭坛每天一次，当天这座祭坛的祈祷恩宠 +50%%。供品任选一种：奠酒 1、蜂蜜瓶 1、熟牛肉 / 熟羊肉 / 熟猪排 2、面包 2、小麦 8。", "Offerings: right-click your own Olympian altar holding an offering, once per altar per day, for +50%% prayer favor at that altar today. Any one of: libation 1, honey bottle 1, cooked beef / mutton / porkchop 2, bread 2, wheat 8.", "供物：供物を持って自分のオリュンポスの祭壇を右クリック。祭壇ごとに一日一回、その日の祈りの恩寵 +50%%。供物はどれか一つ：献酒 1、ハチミツ入りの瓶 1、焼き牛肉 / 焼き羊肉 / 焼き豚肉 2、パン 2、小麦 8。");
+        add("mythic_age.offering.ok", "献上了%s：今天你在这个村子的祈祷恩宠 %s", "Offered %s: your prayer favor from this village %s today", "%sを捧げた：今日のこの村からの祈りの恩寵 %s");
+        add("mythic_age.jei.offering", "献供：你是供奉者的村子里，手持供品右键神庙前的村庄祭坛（还没有神庙的新村用奠基石）。每人每村每天一次，当天你在这个村子的祈祷恩宠 +50%%。供品任选一种：奠酒 1、蜂蜜瓶 1、熟牛肉 / 熟羊肉 / 熟猪排 2、面包 2、小麦 8。", "Offerings: in a village you are devoted to, right-click the village altar before the temple holding an offering (in a new village without a temple, use the foundation stone). Once per village per day, for +50%% of your prayer favor from that village today. Any one of: libation 1, honey bottle 1, cooked beef / mutton / porkchop 2, bread 2, wheat 8.", "供物：奉納している村で、供物を持って神殿前の村の祭壇を右クリック（神殿のない新しい村では礎石）。村ごとに一日一回、その日のその村からの祈りの恩寵 +50%%。供物はどれか一つ：献酒 1、ハチミツ入りの瓶 1、焼き牛肉 / 焼き羊肉 / 焼き豚肉 2、パン 2、小麦 8。");
         add("mythic_age.grape.tooltip.cutting", "种在葡萄架上：葡萄架放在泥土或耕地上，再拿插条右键", "Plant on a grape trellis: place the trellis on dirt or farmland, then right-click it with the cutting", "ブドウ棚に植える：棚を土か耕地に置き、挿し木を持って右クリック");
         add("mythic_age.grape.tooltip.cutting.source", "破坏野葡萄藤可以得到", "Dropped by wild grapevines", "野生のブドウの蔓を壊すと手に入る");
         add("mythic_age.grape.tooltip.trellis", "放在泥土或耕地上，拿葡萄插条右键种下", "Place on dirt or farmland, then right-click with a grape cutting to plant", "土か耕地に置き、ブドウの挿し木を持って右クリックで植える");
@@ -83,6 +96,8 @@ public final class LangKeys {
         add("mythic_age.jei.grape", "种葡萄：破坏野葡萄藤得到葡萄插条；6 根木棍合成 3 个葡萄架，放在泥土或耕地上；拿插条右键架子种下。长四个阶段后结果，右键采摘，架子留着继续结果。", "Growing grapes: break wild grapevines for grape cuttings; 6 sticks make 3 grape trellises, placed on dirt or farmland; right-click a trellis with a cutting to plant. It grows through four stages, then fruits; right-click to pick, and the trellis stays to fruit again.", "ブドウの育て方：野生のブドウの蔓を壊して挿し木を得る。棒 6 本でブドウ棚 3 つ、土か耕地に置く。挿し木を持って棚を右クリックで植える。4 段階育つと実り、右クリックで収穫、棚は残ってまた実る。");
         add("mythic_age.offering.already", "今天已经在这座祭坛献过供了", "You already made an offering at this altar today", "今日はこの祭壇にもう供物を捧げた");
         add("mythic_age.offering.not_owner", "这不是你的祭坛", "This is not your altar", "これはあなたの祭壇ではない");
+        add("mythic_age.offering.not_devotee", "你还不是这里的供奉者，先去守护者那里受祝福", "You are not a devotee here yet. Receive the guardian's blessing first.",
+                "まだここの奉納者ではない。先に守護者の祝福を受けよう");
         add("mythic_age.offering.not_enough", "献%s要 %s 个", "Offering %s takes %s", "%sを捧げるには %s 個必要");
         add("mythic_age.altar.slots.short", "只找到 %s 个可站立且可达的祈祷位", "Only %s standable, reachable prayer spot(s) found", "立てて到達できる祈りの場が %s か所しかありません");
         add("mythic_age.altar.estimate", "预计日产：%s 恩宠（估算）", "Expected: about %s favor per day", "見込み：1日あたり約 %s の恩寵");
@@ -117,6 +132,7 @@ public final class LangKeys {
         add("mythic_age.arena.hud.first_done", "已首杀", "First kill done", "初撃破済み");
         add("mythic_age.arena.hud.first_pending", "首次挑战", "First attempt", "初挑戦");
         add("mythic_age.favor.source.greek_temple", "神庙祈祷", "temple prayers", "神殿の祈り");
+        add("mythic_age.favor.source.village_temple", "村庄神庙的祈祷", "village temple prayers", "村の神殿の祈り");
         add("mythic_age.rite.preview_temple", "神庙达到%s", "Temple reaches %s", "神殿が%sに達する");
         add("mythic_age.quest.source.project", "因：工程缺料", "Why: construction short", "理由：工事の材料不足");
         add("mythic_age.quest.source.short", "因：作坊缺料", "Why: workshop short", "理由：工房の材料不足");
@@ -178,11 +194,13 @@ public final class LangKeys {
         add("mythic_age.recipe.age_locked", "%s 需要%s%s时代", "%s requires %s %s Age", "%sには%s・%s時代が必要です");
         // 守护者与兑换（T9）
         add("entity.mythic_age.greek_guardian", "神庙祭司", "Temple Priest", "神殿の神官");
-        add("mythic_age.guardian.greek.talk.first", "远方来的旅人，奥林匹斯的众神注视着你。接受祝福，带走这座祭坛，在你的居所为众神立起香火。", "Traveller from afar, the gods of Olympus are watching you. Accept their blessing and take this altar; kindle an offering to the gods where you dwell.", "遠方からの旅人よ、オリュンポスの神々があなたを見守っている。祝福を受け、この祭壇を持ち帰り、住まいで神々に灯をともしなさい。");
+        add("mythic_age.guardian.greek.talk.first", "远方来的旅人，奥林匹斯的众神注视着你。接受祝福，成为这里的供奉者：村民在神庙祈祷时，众神会记得你。", "Traveller from afar, the gods of Olympus are watching you. Accept their blessing and become a devotee here: when the villagers pray at the temple, the gods will remember you.", "遠方からの旅人よ、オリュンポスの神々があなたを見守っている。祝福を受け、ここの奉納者となりなさい。村人が神殿で祈るとき、神々はあなたを覚えているだろう。");
+        add("mythic_age.guardian.greek.talk.join", "你已受过众神的祝福。愿意在这里也做供奉者吗？这个村子的信徒会为你祈祷。", "The gods have already blessed you. Will you become a devotee here too? This village's faithful will pray for you.", "あなたはすでに神々の祝福を受けている。ここでも奉納者となるか？この村の信徒があなたのために祈るだろう。");
         add("mythic_age.guardian.greek.talk.reissue", "你的祭坛遗失了？众神仍记得你。我可以再给你一座，但每天只能一次。", "Your altar is lost? The gods still remember you. I can give you another, but only once a day.", "祭壇をなくしたのか？神々はまだあなたを覚えている。もう一基渡そう。ただし一日に一度だけだ。");
         add("mythic_age.guardian.greek.talk.greet", "愿众神庇佑你。需要什么，就到兑换页看看。", "May the gods protect you. See the exchange page for what I can offer.", "神々のご加護を。必要なものは交換のページを見てほしい。");
         add("mythic_age.guardian.accept_blessing", "接受祝福", "Accept the blessing", "祝福を受ける");
         add("mythic_age.guardian.reissue", "补领%s", "Ask for another %s", "%sを再び受け取る");
+        add("mythic_age.guardian.join", "在这里供奉", "Become a devotee here", "ここで奉納する");
         add("mythic_age.guardian.to_trade", "去兑换", "Exchange", "交換へ");
         add("mythic_age.trade.tab.talk", "对话", "Talk", "会話");
         add("mythic_age.trade.tab.trade", "兑换", "Exchange", "交換");
@@ -214,10 +232,11 @@ public final class LangKeys {
         add("mythic_age.rite.head.approved", "%s已认可你到%s：半价", "%s already favors you at %s: half price", "%sはすでに%sまで認めています：半額");
         add("mythic_age.rite.head.unapproved", "%s尚未认可你到%s：全价", "%s has not favored you at %s: full price", "%sはまだ%sまで認めていません：全額");
         add("mythic_age.rite.line.favor", "恩宠", "Favor", "恩寵");
-        add("mythic_age.rite.line.temple", "你的神庙达到%s（%s 级）", "Your temple reaches %s (level %s)", "あなたの神殿が%s（%s 級）に達する");
-        add("mythic_age.rite.line.temple_none", "你还没有希腊神坛（需要%s）", "You have no Greek altar yet (need %s)", "まだギリシャの祭壇がありません（%sが必要）");
-        add("mythic_age.unlock.greek.temple_prostylos", "神庙可认定为中神庙", "Temples can be recognized as Prostylos", "神殿が前柱式神殿として認められるようになります");
-        add("mythic_age.unlock.greek.temple_peripteros", "神庙可认定为大神庙", "Temples can be recognized as Peripteros", "神殿が周柱式神殿として認められるようになります");
+        add("mythic_age.rite.line.temple", "这个村子的神庙扩建成%s（%s 级）", "This village's temple is rebuilt as %s (level %s)", "この村の神殿が%s（%s 級）に建て替えられている");
+        add("mythic_age.rite.line.temple_none", "这个村子还没有神庙（需要%s）", "This village has no temple yet (need %s)", "この村にはまだ神殿がない（%sが必要）");
+        add("mythic_age.rite.line.temple_damaged", "这个村子的%s残破了：完好度 %s%%，要修到 80%% 以上", "This village's %s is damaged: condition %s%%, needs 80%% or more", "この村の%sが傷んでいる：保全度 %s%%、80%% 以上に修復が必要");
+        add("mythic_age.unlock.greek.temple_prostylos", "你在这里晋升后，村子可以把神庙扩建成中神庙", "After your promotion here, the village can rebuild its temple as a Prostyle Temple", "ここで昇格すると、村は神殿を中神殿に建て替えられるようになります");
+        add("mythic_age.unlock.greek.temple_peripteros", "你在这里晋升后，村子可以把神庙扩建成大神庙", "After your promotion here, the village can rebuild its temple as a Peripteral Temple", "ここで昇格すると、村は神殿を大神殿に建て替えられるようになります");
         add("advancements.mythic_age.greek.root.title", "英雄之路", "The Hero's Path", "英雄の道");
         add("advancements.mythic_age.greek.root.description", "走进一座希腊村庄", "Enter a Greek village", "ギリシャの村に入る");
         add("advancements.mythic_age.greek.blessed.title", "祭司的祝福", "The Priest's Blessing", "神官の祝福");
@@ -225,7 +244,7 @@ public final class LangKeys {
         add("advancements.mythic_age.greek.first_favor.title", "第一缕香火", "The First Incense", "最初の香煙");
         add("advancements.mythic_age.greek.first_favor.description", "第一次从信徒的祈祷中得到恩宠", "Receive favor from your worshippers' prayers for the first time", "信徒の祈りから初めて恩寵を得る");
         add("advancements.mythic_age.greek.temple.title", "柱廊之间", "Among the Columns", "柱廊の間");
-        add("advancements.mythic_age.greek.temple.description", "你的神庙被认定为小神庙", "Your temple is recognized as a Naiskos", "あなたの神殿が小神殿と認められる");
+        add("advancements.mythic_age.greek.temple.description", "你供奉的村子建成中神庙", "A village you are devoted to completes its Prostyle Temple", "あなたが奉納する村が中神殿を完成させる");
         add("advancements.mythic_age.greek.classical.title", "古典时代", "The Classical Age", "古典時代");
         add("advancements.mythic_age.greek.classical.description", "在村庄祭司处晋升到古典时代", "Ascend to the Classical Age at a village priest", "村の神官のもとで古典時代へ昇格する");
         add("advancements.mythic_age.greek.heroic.title", "英雄时代", "The Heroic Age", "英雄時代");
@@ -316,8 +335,8 @@ public final class LangKeys {
         add("commands.mythic_age.trial.granted", "%s 的 %s %s 凭证现为 %s", "%s %s %s tokens: %s", "%s の %s %s の証：%s");
         add("mythic_age.playtest.station.start", "起步", "Start", "出発");
         add("mythic_age.playtest.station.start.watch", "不看文档，能不能知道第一步做什么；手札首页能不能把你引到祭司那里", "Without the docs, can you tell what to do first? Does the handbook's first page lead you to the priest?", "資料なしで最初に何をするか分かるか。手札の最初のページで神官にたどり着けるか");
-        add("mythic_age.playtest.station.temple", "神庙与祈祷", "Temple and prayer", "神殿と祈り");
-        add("mythic_age.playtest.station.temple.watch", "放祭坛、检视、高亮；照「下一级缺什么」搭一级神庙；信徒走到祈祷位，恩宠开始增加", "Place the altar, inspect it, read the highlights; build a level 1 temple from \"what the next level needs\"; believers walk to their spots and favor starts rising", "祭壇を置き、検分とハイライトを見る。「次の段階に足りないもの」に従って1段階の神殿を建てる。信徒が祈りの位置に着き、恩寵が増え始めるか");
+        add("mythic_age.playtest.station.temple", "神庙扩建", "Temple expansion", "神殿の建て替え");
+        add("mythic_age.playtest.station.temple.watch", "村子进入古典、中神庙材料备齐，施工 ×8 开工：看工人把小神庙原地改建成中神庙；落成后右键祭坛检视，系数 1.5 → 2.0；手持奠酒右键祭坛献供", "The village enters the Classical age with the Prostyle Temple materials ready and builds at ×8: watch the workers rebuild the small temple in place; afterwards right-click the altar to inspect (coefficient 1.5 → 2.0) and offer the libation", "村が古典期に入り、中神殿の資材がそろって施工 ×8 で着工：職人が小神殿をその場で中神殿に建て替える様子を見る。完成後、祭壇を右クリックして検分（係数 1.5 → 2.0）、献酒を持って祭壇を右クリックして献供");
         add("mythic_age.playtest.station.powers", "神力与召唤", "Powers and summons", "神力と召喚");
         add("mythic_age.playtest.station.powers.watch", "在主神像和祭司处兑换；瞄准、吟唱、取消、冷却；召唤、传令杖、天马耐力", "Exchange at the patron statue and the priest; aiming, channeling, cancelling, cooldowns; summons, the herald staff, pegasus stamina", "主神像と神官で交換。照準、詠唱、取り消し、クールダウン。召喚、伝令杖、天馬のスタミナ");
         add("mythic_age.playtest.station.village", "村务与委托", "Village affairs and requests", "村務と依頼");
@@ -344,7 +363,8 @@ public final class LangKeys {
         add("commands.mythic_age.playtest.reason.no_village", "出生点 100 区块内没有希腊村庄，换个种子", "No Greek village within 100 chunks of spawn; try another seed", "スポーンから100チャンク以内にギリシャの村がありません。別のシードを使ってください");
         add("commands.mythic_age.playtest.reason.no_labyrinth", "出生点 100 区块内没有克诺索斯迷宫，换个种子", "No Knossos labyrinth within 100 chunks of spawn; try another seed", "スポーンから100チャンク以内にクノッソスの迷宮がありません。別のシードを使ってください");
         add("commands.mythic_age.playtest.reason.no_site", "村庄附近找不到 15×18 的平坦空地来搭神庙", "No flat 15×18 clearing near the village for the temple", "村の近くに神殿を建てる15×18の平らな空き地がありません");
-        add("commands.mythic_age.playtest.reason.temple_level", "神庙只认定到 %s 级，要 %s 级", "The temple was recognized at level %s; level %s is needed", "神殿は %s 段階と判定されました。%s 段階が必要です");
+        add("commands.mythic_age.playtest.reason.temple_level", "村庄神庙只扩建到 %s 级，要 %s 级", "The village temple only reached level %s; level %s is needed", "村の神殿は %s 段階までしか建て替えられませんでした。%s 段階が必要です");
+        add("commands.mythic_age.playtest.reason.no_upgrade", "这个村子的神庙开不了下一级（已是最高级，或原位放不下）", "This village's temple cannot start its next level (already highest, or no room in place)", "この村の神殿は次の段階に着工できません（最上段か、元の場所に収まりません）");
         add("commands.mythic_age.playtest.reason.items", "这些物品找不到，没有发：%s", "These items were not found and were not given: %s", "次のアイテムが見つからず、渡せませんでした：%s");
         add("commands.mythic_age.playtest.quest_none", "村里还是没有可接的委托，这一站先看村务界面", "The village still has no open request; look at the village pages for now", "村にはまだ受けられる依頼がありません。今回は村務画面を見てください");
         add("commands.mythic_age.playtest.step.locate", "找结构", "finding the structure", "構造物の検索");
@@ -376,6 +396,8 @@ public final class LangKeys {
         add("mythic_age.trade.state.no_items", "物品不足", "Missing items", "品物が足りません");
         add("mythic_age.trade.state.remaining", "今日剩余 %s", "%s left today", "本日残り %s");
         add("mythic_age.trade.result.ok", "获得 %s ×%s", "Received %s ×%s", "%s ×%s を受け取りました");
+        add("mythic_age.trade.result.devotee", "你成为了这里的供奉者。", "You are now a devotee here.", "ここの奉納者になりました。");
+        add("mythic_age.trade.result.already_devotee", "你已经是这里的供奉者。", "You are already a devotee here.", "すでにここの奉納者です。");
         add("mythic_age.trade.result.duplicate", "这次请求已经处理过了。", "This request has already been handled.", "この依頼はすでに処理されています。");
         add("mythic_age.trade.result.npc_gone", "祭司已离开。", "The priest has left.", "神官は立ち去りました。");
         add("mythic_age.trade.result.unknown_offer", "这件商品已经下架。", "This item is no longer offered.", "この品物はもう扱っていません。");
@@ -459,6 +481,33 @@ public final class LangKeys {
         add("mythic_age.village.log.project_repair", "%s 验收有 %s 段不对，重新备料修补", "Inspection of the %s found %s faulty sections; re-gathering materials to repair", "%s の検分で %s 区画に不備、材料を集め直して修繕する");
         add("mythic_age.village.log.project_done", "%s 落成", "The %s is finished", "%s が完成した");
         add("mythic_age.village.log.project_cancelled", "工程 %s 取消", "Project %s cancelled", "工事 %s を取りやめた");
+        // GA-11 项目选择与升级
+        add("mythic_age.village.log.door_steps", "给%s门前修了台阶", "Built steps up to the door of the %s", "%sの戸口に石段を付けた");
+        add("mythic_age.village.log.door_blocked", "%s门前有别人的方块，没法修台阶", "Someone else's blocks are in front of the %s; no steps could be built", "%sの戸口の前に他人のブロックがあり、石段を付けられない");
+        add("mythic_age.village.log.project_nominated", "%s 请村里接下来盖%s", "%s asked the village to build the %s next", "%s が次に%sを建ててほしいと頼んだ");
+        add("mythic_age.village.log.project_next_cleared", "%s 撤回了下一个工程（%s）", "%s withdrew the next project (%s)", "%s が次の工事（%s）を取り下げた");
+        add("mythic_age.village.log.project_next_dropped", "原定下一个盖的%s不盖了：%s", "The %s planned next was dropped: %s", "次に予定していた%sは取りやめ：%s");
+        add("mythic_age.village.project.name", "%s", "%s", "%s");
+        add("mythic_age.village.project.next", "下一个：%s（%s 点名）", "Next: %s (requested by %s)", "次：%s（%s の依頼）");
+        add("mythic_age.village.project.nominated", "%s 请村里接下来盖%s", "%s asked the village to build the %s next", "%s が次に%sを建ててほしいと頼んだ");
+        add("mythic_age.village.project.nominated_started", "%s 点名的%s开工了", "Work has begun on the %2$s requested by %1$s", "%s が頼んだ%sの工事が始まった");
+        add("mythic_age.village.project.nominate.low", "你在这个村子的贡献是 %s，要 %s 才能点名下一个工程（还差 %s）", "Your contribution to this village is %s; you need %s to choose the next project (%s more)", "この村への貢献は %s。次の工事を選ぶには %s 必要（あと %s）");
+        add("mythic_age.village.project.nominate.current", "这个工程已经在盖了，开工后不能换", "That project is already under way and can't be changed once started", "その工事はもう始まっている。着工後は変えられない");
+        add("mythic_age.village.project.nominate.unavailable", "现在不能盖：%s", "Can't be built right now: %s", "今は建てられない：%s");
+        add("mythic_age.village.project.reason.food_short", "村里缺粮，工程暂停", "the village is short of food, so building is paused", "村の食糧が足りず、工事は休止中");
+        add("mythic_age.village.project.reason.stage", "村子还没到这个时代", "the village hasn't reached that age yet", "村がまだその時代に達していない");
+        add("mythic_age.village.project.reason.no_plot", "没有放得下的空地块", "there's no free plot big enough", "入る空き区画がない");
+        add("mythic_age.village.project.reason.requires", "缺少前置建筑", "a required building is missing", "前提となる建物がない");
+        add("mythic_age.village.project.reason.no_fit", "原地放不下（会压到旁边的建筑、地块或水面）", "it won't fit in place (it would cover a neighbouring building, plot or water)", "その場に収まらない（隣の建物・区画・水面にかかる）");
+        add("mythic_age.village.project.reason.gone", "已经没有可盖或可升级的了", "there's nothing left to build or upgrade", "建てるもの・改築するものがもうない");
+        add("mythic_age.village.project.kind.new", "新建", "New", "新築");
+        add("mythic_age.village.project.kind.upgrade", "升级", "Upgrade", "改築");
+        add("mythic_age.village.project.kind.shrine", "次神祠", "Shrine", "小神の祠");
+        add("mythic_age.village.project.state.stocking", "备料中", "gathering materials", "材料集め中");
+        add("mythic_age.village.project.state.building", "施工中", "under construction", "施工中");
+        add("mythic_age.village.project.state.blocked", "停工", "halted", "中断");
+        add("mythic_age.village.project.state.done", "已落成", "finished", "完成");
+        add("mythic_age.village.project.state.cancelled", "已取消", "cancelled", "取りやめ");
         add("mythic_age.village.project.blocked", "%s 停工了：(%s, %s, %s) 有别人的方块（%s），村里不会拆", "Work on the %s has stopped: someone else's block (%5$s) is at (%2$s, %3$s, %4$s), and the village won't remove it", "%s の工事が止まった：(%s, %s, %s) に他人のブロック（%s）があり、村は撤去しない");
         add("mythic_age.village.project.stocking", "工程：%s · 备料中", "Project: %s · gathering materials", "工事：%s・材料集め中");
         add("mythic_age.village.project.missing", "　还缺 %s ×%s", "　still need %s ×%s", "　不足 %s ×%s");
@@ -477,6 +526,9 @@ public final class LangKeys {
         add("mythic_age.building.greek.storehouse", "大仓库", "Storehouse", "大倉庫");
         add("mythic_age.building.greek.house_court", "内院宅", "Courtyard House", "中庭の家");
         add("mythic_age.building.greek.house_small", "小屋", "Cottage", "小さな家");
+        add("mythic_age.building.greek.house_small_ii", "两层小屋", "Two-Storey Cottage", "二階建ての小さな家");
+        add("mythic_age.building.greek.granary", "谷仓", "Granary", "穀物倉");
+        add("mythic_age.building.greek.granary_ii", "带阁楼的谷仓", "Granary with Loft", "屋根裏付きの穀物倉");
         add("mythic_age.building.greek.stoa", "柱廊集市", "Stoa Market", "ストア（列柱市場）");
         add("mythic_age.building.greek.winery", "葡萄酒坊", "Winery", "ワイン工房");
         add("mythic_age.building.greek.shrine_athena", "雅典娜祠", "Shrine of Athena", "アテナの祠");
@@ -633,6 +685,22 @@ public final class LangKeys {
         add("mythic_age.relic.retrieved", "已取出%s", "Retrieved %s", "%sを取り出しました");
         add("mythic_age.altar.relics", "供奉位 %s / %s（含其他神庙）", "Offerings %s / %s (incl. other temples)", "奉納枠 %s / %s（他の神殿を含む）");
         add("mythic_age.altar.relics.how", "手持圣物潜行右键放入（一座神坛一件）", "Sneak-use a relic to offer (one per altar)", "スニーク右クリックで奉納（祭壇 1 基に 1 つ）");
+        add("mythic_age.altar.relics.village", "你在这里的供奉位 %s / %s", "Your offerings here %s / %s", "ここでのあなたの奉納枠 %s / %s");
+        add("mythic_age.altar.relics.how_village", "手持圣物潜行右键祭坛放入", "Sneak-use a relic on the altar to offer", "聖遺物を持ってスニーク右クリックで奉納");
+        add("mythic_age.altar.leave", "不再供奉此村", "Stop devotion here", "この村への奉納をやめる");
+        add("mythic_age.old_altar.hint", "这是旧祭坛，只是装饰。信徒现在在村庄神庙为供奉者祈祷。", "This old altar is only decoration now. The faithful pray at village temples for their devotees.",
+                "これは古い祭壇で、今は飾りにすぎない。信徒は村の神殿で奉納者のために祈る。");
+        add("mythic_age.temple.moved", "神庙已归村庄：今后信徒在村庄神庙为你祈祷；你以前的祭坛成了装饰。", "Temples now belong to villages: the faithful pray for you at village temples, and your old altar is only decoration.",
+                "神殿は村のものになった。これからは信徒が村の神殿であなたのために祈る。以前の祭壇は飾りになった。");
+        add("mythic_age.temple.moved_join", "神庙已归村庄：去村里守护者那里选「在这里供奉」，那里的信徒就会为你祈祷。", "Temples now belong to villages: ask a village guardian to become a devotee there, and its faithful will pray for you.",
+                "神殿は村のものになった。村の守護者の所で「ここで奉納する」を選べば、その村の信徒があなたのために祈る。");
+        add("mythic_age.temple.relics_returned", "旧祭坛上的 %s 件圣物放不进村庄神庙，已退回背包。", "%s relic(s) from your old altar could not go to a village temple and were returned to you.",
+                "古い祭壇の聖遺物 %s 個は村の神殿に移せなかったため、持ち物に戻した。");
+        add("mythic_age.temple.left", "你不再供奉这个村子。在这里的圣物已退回背包；在守护者处「在这里供奉」可以回来。",
+                "You are no longer a devotee of this village. Your relics here were returned; ask the guardian to become a devotee again.",
+                "この村への奉納をやめました。ここの聖遺物は持ち物に戻りました。守護者の所で「ここで奉納する」を選べば戻れます。");
+        add("mythic_age.relic.not_devotee", "只有这里的供奉者能供奉圣物，先去守护者那里受祝福", "Only devotees here can offer relics. Receive the guardian's blessing first.",
+                "ここの奉納者だけが聖遺物を奉納できる。先に守護者の祝福を受けよう");
         add("mythic_age.altar.relics.empty", "（没有供奉圣物）", "(no relics offered)", "（奉納された聖遺物なし）");
         add("mythic_age.altar.relics.take", "取出", "Take", "取り出す");
         add("commands.mythic_age.relic.unknown", "未知圣物：%s", "Unknown relic: %s", "不明な聖遺物：%s");
@@ -721,6 +789,15 @@ public final class LangKeys {
         add("commands.mythic_age.village.count", "共 %s 个村庄", "%s village(s)", "村 %s 件");
         add("commands.mythic_age.village.none", "附近没有已登记的村庄", "No registered village nearby", "近くに登録された村はありません");
         add("commands.mythic_age.village.reset", "已注销该村庄登记，稍后按当前配置重新登记", "Village registration removed; it will be re-registered with the current config", "村の登録を削除しました。現在の設定で再登録されます");
+        add("commands.mythic_age.village.projects.current", "当前工程：%s（%s）", "Current project: %s (%s)", "現在の工事：%s（%s）");
+        add("commands.mythic_age.village.projects.current_none", "当前没有工程", "No project under way", "進行中の工事なし");
+        add("commands.mythic_age.village.projects.next", "下一个：%s（%s 点名）", "Next: %s (requested by %s)", "次：%s（%s の依頼）");
+        add("commands.mythic_age.village.projects.entry", "%s. [%s] %s — %s · 材料 %s 种 %s 件", "%s. [%s] %s — %s · materials: %s kinds, %s items", "%s. [%s] %s — %s・材料 %s 種 %s 個");
+        add("commands.mythic_age.village.projects.rank", "可以盖（村子自己排第 %s）", "available (village's own order: #%s)", "建てられる（村の順番 %s 番目）");
+        add("commands.mythic_age.village.projects.contribution", "你的贡献 %s，点名门槛 %s", "Your contribution: %s; needed to choose: %s", "あなたの貢献 %s、選ぶのに必要 %s");
+        add("commands.mythic_age.village.nominate.index", "序号超出范围（共 %s 项）", "Index out of range (%s entries)", "番号が範囲外（全 %s 件）");
+        add("commands.mythic_age.village.nominate.ok", "已点名下一个工程", "Next project chosen", "次の工事を選んだ");
+        add("commands.mythic_age.village.nominate.cleared", "已清空下一个工程", "Next project cleared", "次の工事を取り消した");
         add("commands.mythic_age.guardian.spawned", "已在 %2$s %3$s %4$s 生成%1$s", "%1$s spawned at %2$s %3$s %4$s", "%2$s %3$s %4$s に%1$sを生成しました");
         add("commands.mythic_age.guardian.count", "共 %s 位祭司", "%s priest(s)", "神官 %s 人");
         add("commands.mythic_age.guardian.alive", "· %s %s %s (%s, %s, %s) 在世", "· %s %s %s (%s, %s, %s) alive", "· %s %s %s (%s, %s, %s) 健在");

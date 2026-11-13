@@ -5,14 +5,5 @@
   "shrine": "block.mythic_age.greek_altar",
   "favor": "mythic_age.favor.greek",
   "hint": "mythic_age.faith.greek.hint",
-  "firstMeetGifts": [
-    {
-      "item": "mythic_age:greek_altar",
-      "count": 1
-    }
-  ],
-  "reissue": {
-    "item": "mythic_age:greek_altar",
-    "shrineKind": "greek:altar"
-  }
+  "firstMeetGifts": []
 }

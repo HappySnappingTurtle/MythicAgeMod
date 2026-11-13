@@ -103,6 +103,16 @@ public final class BuildSite {
 
     public static Optional<BuildSite> replace(ServerLevel level, BuildCosts civCosts, BuildingSpec spec, BuildPlacement.Placed at,
                                               BuildingSpec oldSpec, BuildPlacement.Placed oldAt, int tripSize, boolean legacy) {
+        return replace(level, civCosts, spec, at, oldSpec, oldAt, tripSize, legacy ? 0 : 1);
+    }
+
+    /**
+     * @param layout 切段布局版本（存在项目里，进行中的项目不随代码改动换切法）：0 = T19 旧切法；1 = GA-10 逐块；
+     *               2 = GA-11：依附在「最后放」格上的格也排到最后（阁楼的油灯放在陶瓮上，陶瓮是工作站排到最后）
+     */
+    public static Optional<BuildSite> replace(ServerLevel level, BuildCosts civCosts, BuildingSpec spec, BuildPlacement.Placed at,
+                                              BuildingSpec oldSpec, BuildPlacement.Placed oldAt, int tripSize, int layout) {
+        boolean legacy = layout == 0;
         Optional<List<Blueprint.Cell>> bp = Blueprint.load(level, spec.template());
         Optional<List<Blueprint.Cell>> old = Blueprint.load(level, oldSpec.template());
         if (bp.isEmpty() || old.isEmpty()) {
@@ -128,6 +138,9 @@ public final class BuildSite {
             });
             nu = nu.stream().map(c -> c.withLast(c.last() || stations.contains(c.block()))).toList();
             ol = ol.stream().map(c -> c.withLast(c.last() || stations.contains(c.block()))).toList();
+            if (layout >= 2) {
+                nu = lateFollowsSupport(level, nu, states, last);
+            }
         }
         int ground = oldAt.origin().y() + oldSpec.floorY();
         return Optional.of(new BuildSite(spec, at, costsFor(civCosts, spec), states, oldStates,
@@ -163,17 +176,53 @@ public final class BuildSite {
             blueprint.put(new io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos(
                     c.pos().x(), c.pos().y(), c.pos().z()), attachmentState(states.get(c.index())));
         }
-        return segments.stream().map(seg -> BuildSegments.ordered(seg, c -> attached(states.get(c.index()), level), c -> {
-            java.util.Set<Pos> dependencies = new java.util.HashSet<>();
-            BlockState state = states.get(c.index());
-            if (attached(state, level)) dependencies.add(new Pos(c.pos().x(), c.pos().y() - 1, c.pos().z()));
-            var rules = attachments(level);
-            var at = new io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos(c.pos().x(), c.pos().y(), c.pos().z());
-            for (var support : rules.supports(at, attachmentState(state), blueprint::get)) {
-                dependencies.add(new Pos(support.x(), support.y(), support.z()));
+        return segments.stream().map(seg -> BuildSegments.ordered(seg, c -> attached(states.get(c.index()), level),
+                c -> dependencies(level, c, states.get(c.index()), blueprint))).toList();
+    }
+
+    /** 这一格放下前要先有的格：依附类方块的下一格，加依附表里的支撑。 */
+    private static java.util.Set<Pos> dependencies(ServerLevel level, BuildSegments.Cell c, BlockState state,
+            Map<io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos,
+                    io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.State> blueprint) {
+        java.util.Set<Pos> dependencies = new java.util.HashSet<>();
+        if (attached(state, level)) dependencies.add(new Pos(c.pos().x(), c.pos().y() - 1, c.pos().z()));
+        var rules = attachments(level);
+        var at = new io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos(c.pos().x(), c.pos().y(), c.pos().z());
+        for (var support : rules.supports(at, attachmentState(state), blueprint::get)) {
+            dependencies.add(new Pos(support.x(), support.y(), support.z()));
+        }
+        return dependencies;
+    }
+
+    /**
+     * 依附在「最后放」格上的格也排到最后（布局 2）：否则它在前一阶段等不到支撑，而下一阶段要等前一阶段放完，整座卡住。
+     * 「最后放」= 格自带的（工作站等）或在锚点范围内（{@code region}）；沿依附关系一路传上去（灯 → 陶瓮 → ……）。
+     */
+    private static List<BuildSegments.Cell> lateFollowsSupport(ServerLevel level, List<BuildSegments.Cell> cells, List<BlockState> states,
+                                                             Predicate<Pos> region) {
+        Map<io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos,
+                io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.State> blueprint = new HashMap<>();
+        Set<Pos> late = new HashSet<>();
+        for (var c : cells) {
+            blueprint.put(new io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.Pos(
+                    c.pos().x(), c.pos().y(), c.pos().z()), attachmentState(states.get(c.index())));
+            if (c.last() || region.test(c.pos())) late.add(c.pos());
+        }
+        Map<Pos, java.util.Set<Pos>> deps = new HashMap<>();
+        for (var c : cells) {
+            if (!c.air()) deps.put(c.pos(), dependencies(level, c, states.get(c.index()), blueprint));
+        }
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (var e : deps.entrySet()) {
+                if (!late.contains(e.getKey()) && e.getValue().stream().anyMatch(late::contains)) {
+                    late.add(e.getKey());
+                    changed = true;
+                }
             }
-            return dependencies;
-        })).toList();
+        }
+        return cells.stream().map(c -> late.contains(c.pos()) && !c.last() ? c.withLast(true) : c).toList();
     }
 
     static io.github.happysnappingturtle.mythicage.core.greek.temple.ArchitectureAttachments.State attachmentState(BlockState state) {

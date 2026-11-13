@@ -473,21 +473,33 @@ public final class MultiCivGameTests {
     public static void greek_temple_grace_source_lists_altars(GameTestHelper h) {
         floor(h);
         FakePlayer p = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "ma_grace"));
-        BlockPos a = new BlockPos(1, 1, 1);
-        BlockPos b = new BlockPos(9, 1, 9);
-        for (BlockPos rel : List.of(a, b)) {
-            h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-            ShrineService.bindForTest(h.getLevel(), h.absolutePos(rel), p.getUUID(), "ma_grace", Age.ARCHAIC, Direction.SOUTH);
+        // GA-13：每个供奉的村子一行（两个还没有卫城的小村，神庙祭坛在钟的位置）
+        List<io.github.happysnappingturtle.mythicage.village.VillageRegistry.Village> vs = new java.util.ArrayList<>();
+        for (BlockPos rel : List.of(new BlockPos(1, 1, 1), new BlockPos(9, 1, 9))) {
+            var v = new io.github.happysnappingturtle.mythicage.village.VillageRegistry.Village(UUID.randomUUID(), g(h, h.absolutePos(rel)),
+                    "greek", "zeus", io.github.happysnappingturtle.mythicage.village.VillageRegistry.Origin.VANILLA, null, "plains", -1);
+            io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(h.getLevel().getServer()).add(v);
+            io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.addDevotee(h.getLevel().getServer(), v.id(), p.getUUID(), 0,
+                    io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.JOIN);
+            vs.add(v);
         }
-        List<GraceSource> sources = GraceSources.of(GR);
-        h.assertTrue(sources.stream().anyMatch(s -> s.id().equals("greek:temple")), "希腊有神庙恩宠来源");
-        h.assertTrue(GraceSources.of(Civilization.NORSE).isEmpty(), "未开放的文明没有来源");
-        GraceSource temple = sources.stream().filter(s -> s.id().equals("greek:temple")).findFirst().orElseThrow();
-        List<GraceSource.Row> rows = temple.rows(p);
-        h.assertTrue(rows.size() == 2, "两座神坛两行：" + rows.size());
-        h.assertTrue(rows.stream().map(GraceSource.Row::pos).toList()
-                .containsAll(List.of(g(h, h.absolutePos(a)), g(h, h.absolutePos(b)))), "行里带坐标");
-        h.succeed();
+        try {
+            List<GraceSource> sources = GraceSources.of(GR);
+            h.assertTrue(sources.stream().anyMatch(s -> s.id().equals("greek:temple")), "希腊有神庙恩宠来源");
+            h.assertTrue(GraceSources.of(Civilization.NORSE).isEmpty(), "未开放的文明没有来源");
+            GraceSource temple = sources.stream().filter(s -> s.id().equals("greek:temple")).findFirst().orElseThrow();
+            List<GraceSource.Row> rows = temple.rows(p);
+            h.assertTrue(rows.size() == 2, "两个供奉的村子两行：" + rows.size());
+            h.assertTrue(rows.stream().map(GraceSource.Row::pos).toList()
+                    .containsAll(vs.stream().map(io.github.happysnappingturtle.mythicage.village.VillageRegistry.Village::bell).toList()), "行里带祭坛坐标");
+            h.succeed();
+        } finally {
+            for (var v : vs) {
+                io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(h.getLevel().getServer()).remove(v.bell());
+                io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(h.getLevel().getServer()).clearForTest(v.id());
+                io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(v.id());
+            }
+        }
     }
 
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = ON)

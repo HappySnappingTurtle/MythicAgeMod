@@ -1,7 +1,6 @@
 package io.github.happysnappingturtle.mythicage.relic;
 
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlockEntity;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.core.player.PlayerMythData;
@@ -133,6 +132,13 @@ public final class RelicService {
     }
 
     private static String describe(String where) {
+        // GA-13：供奉在村庄神庙的，写村钟坐标
+        Optional<UUID> village = TempleRelics.villageOf(where);
+        if (village.isPresent()) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            return server == null ? where : io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(server).byId(village.get())
+                    .map(v -> v.bell().pos().getX() + ", " + v.bell().pos().getY() + ", " + v.bell().pos().getZ()).orElse(where);
+        }
         Optional<GlobalPos> g = parseWhere(where);
         return g.map(p -> p.pos().getX() + ", " + p.pos().getY() + ", " + p.pos().getZ()).orElse(where);
     }
@@ -227,6 +233,13 @@ public final class RelicService {
 
     /** 神坛界面里点「取出」。 */
     public static boolean retrieve(ServerPlayer player, ServerLevel level, BlockPos pos, int slot) {
+        // GA-13：村庄神庙的祭坛
+        Optional<io.github.happysnappingturtle.mythicage.village.temple.VillageTemple> temple =
+                io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.byAltar(level.getServer(),
+                        GlobalPos.of(level.dimension(), pos.immutable()));
+        if (temple.isPresent()) {
+            return TempleRelics.retrieve(player, temple.get(), slot);
+        }
         if (!(level.getBlockEntity(pos) instanceof ShrineBlockEntity be)
                 || !be.owner().map(player.getUUID()::equals).orElse(false)) {
             player.displayClientMessage(Component.translatable("mythic_age.relic.not_owner"), true);
@@ -321,6 +334,14 @@ public final class RelicService {
             if (b.state() != RelicState.OFFERED) {
                 continue;
             }
+            if (b.where().startsWith(TempleRelics.WHERE_PREFIX)) {
+                // GA-13：供奉在村庄神庙的，村子没了或那里没有这一件就删
+                if (!TempleRelics.bindingValid(player.server, player.getUUID(), b)) {
+                    book.remove(e.getKey());
+                    changed = true;
+                }
+                continue;
+            }
             Optional<GlobalPos> g = parseWhere(b.where());
             if (g.isEmpty() || reg.get(g.get()).isEmpty()) {
                 book.remove(e.getKey());
@@ -332,6 +353,30 @@ public final class RelicService {
                     && !(level.getBlockEntity(g.get().pos()) instanceof ShrineBlockEntity be && be.relics().contains(b.instance()))) {
                 book.remove(e.getKey());
                 changed = true;
+            }
+        }
+        // GA-13：村庄神庙里有、绑定表里没有的（旧祭坛迁移过来的）补上绑定；这件已经戴着或在别处就退回背包
+        for (UUID v : io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.devotedVillages(player.server, player.getUUID())) {
+            var temple = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.book(player.server, v);
+            List<ItemStack> mine = temple.relics(player.getUUID());
+            for (int i = mine.size() - 1; i >= 0; i--) {
+                ItemStack s = mine.get(i);
+                Optional<RelicCard> c = RelicCards.of(s);
+                UUID inst = RelicItems.instance(s).orElse(null);
+                Optional<RelicBinding> b = c.flatMap(x -> book.get(x.id()));
+                if (c.isEmpty() || (b.isPresent() && b.get().instance().equals(inst) && b.get().state() == RelicState.OFFERED)) {
+                    continue;
+                }
+                if (b.isEmpty() && inst != null) {
+                    book.bind(c.get().id(), new RelicBinding(RelicState.OFFERED, inst, c.get().civ(), TempleRelics.where(v)));
+                } else {
+                    ItemStack out = temple.removeRelic(player.getUUID(), i);
+                    if (!player.getInventory().add(out)) {
+                        player.drop(out, false);
+                    }
+                }
+                changed = true;
+                io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.changed(player.server);
             }
         }
         applyWorn(player);
@@ -376,15 +421,14 @@ public final class RelicService {
         return false;
     }
 
-    /** 绑定表变化之后：同步（恩宠上限在同步包里）、刷新主人希腊神坛的产出估算（快照里的 R）。 */
+    /** 绑定表变化之后：同步（恩宠上限在同步包里）、刷新供奉的村子的产出估算（快照里的 R）。 */
     static void changed(ServerPlayer player) {
         MythData.changed(player);
         applyWorn(player);
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(player.server).ownedBy(player.getUUID(), Civilization.GREEK)) {
-            ServerLevel level = player.server.getLevel(e.pos().dimension());
-            if (level != null && level.isLoaded(e.pos().pos()) && level.getBlockEntity(e.pos().pos()) instanceof GreekAltarBlockEntity be) {
-                PrayerService.refreshEstimate(be);
-            }
+        // GA-13：供奉的村子的台账估算（快照里的 R）
+        for (UUID v : io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.devotedVillages(player.server, player.getUUID())) {
+            io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(player.server, v).ifPresent(t ->
+                    io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.ensureLedger(player.server, t, player.getUUID()));
         }
     }
 

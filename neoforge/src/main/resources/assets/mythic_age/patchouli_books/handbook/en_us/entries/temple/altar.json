@@ -1,25 +1,25 @@
 {
-  "name": "The Olympian Altar",
-  "icon": "mythic_age:greek_altar",
+  "name": "Village Temple",
+  "icon": "mythic_age:village_altar",
   "category": "mythic_age:temple",
   "sortnum": 0,
   "pages": [
     {
       "type": "patchouli:spotlight",
-      "item": "mythic_age:greek_altar",
-      "text": "The first time you talk to a $(l)temple priest$() in a Greek village, you get an altar for free. All your favor comes from it.$(br2)Place it $(l)inside a Greek village$() (or within 48 blocks of its edge), with $(l)open sky$() above."
+      "item": "mythic_age:village_altar",
+      "text": "Greek temples belong to villages. The $(l)village altar$() in front of the acropolis is where villagers pray, and where you make offerings and dedicate relics.$(br2)Receive the $(l)temple priest$()'s blessing and you become a $(l)devotee$() of that village: its prayers bring you $(l)favor$()."
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Limit$(): 1 altar in the Archaic age, 2 in the Classical, 3 in the Heroic and Mythic.$(br2)Villagers take turns kneeling at the $(l)prayer spots$() around the altar during the day; your favor comes from their prayers."
+      "text": "A village can have several devotees. Each prayer gives every devotee a full share of favor; the favor is not divided between them.$(br2)You can be devoted to several villages: choose $(l)Become a devotee here$() at another village's priest, or hold a promotion or consecration there. Villagers only go to pray if the village has at least one devotee."
     },
     {
       "type": "patchouli:text",
-      "text": "Right-click the altar with an empty hand to open the $(l)shrine inspector$(). Sneak-right-click with a relic to enshrine it here (one per altar)."
+      "text": "A new village without an acropolis uses its $(l)foundation stone$() as the altar; offerings work there too.$(br2)To leave, press $(l)Stop devotion here$() in the temple inspector. Your relics there are returned to you, and you can come back through the priest later."
     },
     {
       "type": "patchouli:text",
-      "text": "$(o)Source$(): Greek altars (bōmos) stood in the open in front of the temple door, and sacrifice happened at the altar, outside the temple. That is why the altar here needs open sky."
+      "text": "In Greek custom the altar stood in the open before the temple door, so the smoke of sacrifice could rise straight to the sky.$(br2)A new village without a temple brings its offerings to Hestia's common hearth. At every sacrifice, the Greeks honored Hestia first."
     }
   ]
 }

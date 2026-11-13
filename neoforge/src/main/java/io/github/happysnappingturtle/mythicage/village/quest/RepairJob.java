@@ -80,6 +80,7 @@ public final class RepairJob implements JobType {
         // 放上了：修好；格子被别的方块占了（玩家放了东西）：不再管这一格（不拆玩家方块）
         d.cells.remove(p.asLong());
         VillageQuests.get(ctx.level().getServer()).setDirty();
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(ctx.village().id());
         return placed;
     }
 }

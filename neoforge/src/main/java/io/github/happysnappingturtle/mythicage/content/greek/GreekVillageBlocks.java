@@ -122,9 +122,13 @@ public final class GreekVillageBlocks {
 
     // ───────────── 第 3 批：村庄与圣物（尺寸按实物，比 1 格高的往上伸出、碰撞箱同高，同栅栏） ─────────────
 
-    /** 装饰祭坛：外观同奥林匹斯祭坛，但没有主人、不登记、没有功能（村庄神庙前的露天祭坛）。 */
-    public static final DeferredBlock<FacingShapedBlock> VILLAGE_ALTAR = Content.block("village_altar", GREEK,
-                    p -> new FacingShapedBlock(p, false, Shapes.or(Block.box(0, 0, 0, 16, 3, 16),
+    /**
+     * 村庄祭坛：外观同奥林匹斯祭坛，没有主人、不登记。村庄神庙的那一块（卫城 ritual 旁）可以献供、检视（GA-13），
+     * 玩家合成放下的只是装饰。
+     */
+    public static final DeferredBlock<io.github.happysnappingturtle.mythicage.content.greek.temple.VillageAltarBlock> VILLAGE_ALTAR =
+            Content.block("village_altar", GREEK,
+                    p -> new io.github.happysnappingturtle.mythicage.content.greek.temple.VillageAltarBlock(p, Shapes.or(Block.box(0, 0, 0, 16, 3, 16),
                             Block.box(1, 3, 1, 15, 12, 15), Block.box(0, 12, 0, 16, 15, 16))))
             .properties(GreekVillageBlocks::carved)
             .model(new BlockModelSpec.StateModels(s -> "", true, ""))

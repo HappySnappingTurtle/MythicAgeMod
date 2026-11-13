@@ -40,8 +40,18 @@ public class ShrineInspectScreen extends Screen {
     private int top;
 
     public ShrineInspectScreen(ShrineSurvey payload) {
-        super(Component.translatable("mythic_age.altar.title"));
+        super(titleOf(payload));
         this.p = payload;
+    }
+
+    /** 村庄神庙（GA-13）的标题带村名。 */
+    private static Component titleOf(ShrineSurvey p) {
+        if (!p.temple().present()) {
+            return Component.translatable("mythic_age.altar.title");
+        }
+        Component village = p.temple().patron().isEmpty() ? Component.translatable("mythic_age.village.title.plain")
+                : Component.translatable("mythic_age.village.title", Component.translatable("mythic_age.god." + p.temple().patron()));
+        return Component.translatable("mythic_age.altar.title.village", village);
     }
 
     @Override
@@ -58,6 +68,14 @@ public class ShrineInspectScreen extends Screen {
             int w = font.width(replay) + 12;
             addRenderableWidget(Button.builder(replay, b -> PacketDistributor.sendToServer(new FaithPayloads.Replay(p.civ(), p.ownerAge())))
                     .bounds(left + W - 8 - w, top + 4, w, 14).build());
+        }
+        // 村庄神庙：退出供奉（GA-13 D3）
+        if (p.temple().present() && p.temple().devotee()) {
+            Component leave = Component.translatable("mythic_age.altar.leave");
+            int w = font.width(leave) + 12;
+            addRenderableWidget(Button.builder(leave, b -> PacketDistributor.sendToServer(
+                            new io.github.happysnappingturtle.mythicage.content.greek.temple.TempleMembership.Leave(p.pos())))
+                    .bounds(left + W - 138 - w, top + BODY - 26, w, 18).build());
         }
         RelicPayloads.Shelf shelf = ClientRelics.at(p.pos());
         if (shelf != null && shelf.viewerIsOwner()) {
@@ -134,7 +152,14 @@ public class ShrineInspectScreen extends Screen {
 
         // 左栏：身份与结构
         int y = y0;
-        y = line(g, Component.translatable("mythic_age.altar.owner", p.ownerName(), age(p.ownerAge().id())), c1, y, colW, TEXT);
+        ShrineSurvey.Temple temple = p.temple();
+        if (temple.present()) {
+            y = line(g, Component.translatable(temple.devotee() ? "mythic_age.altar.devotee.yes" : "mythic_age.altar.devotee.no"),
+                    c1, y, colW, temple.devotee() ? OK : BAD);
+            y = line(g, Component.translatable("mythic_age.altar.devotees", temple.devotees()), c1, y, colW, TEXT);
+        } else {
+            y = line(g, Component.translatable("mythic_age.altar.owner", p.ownerName(), age(p.ownerAge().id())), c1, y, colW, TEXT);
+        }
         if (!p.hasResult()) {
             line(g, Component.translatable("mythic_age.altar.no_result"), c1, y, colW, DIM);
         } else {
@@ -146,7 +171,8 @@ public class ShrineInspectScreen extends Screen {
             y += 4;
             boolean max = p.structuralLevel() >= p.tierKeys().size() - 1;
             y = line(g, max ? Component.translatable("mythic_age.altar.max")
-                    : Component.translatable("mythic_age.altar.next", tier(p.structuralLevel() + 1)), c1, y, colW, DIM);
+                    : Component.translatable(temple.present() ? "mythic_age.altar.next.village" : "mythic_age.altar.next",
+                    tier(p.structuralLevel() + 1)), c1, y, colW, DIM);
             for (ShrineSurvey.Row r : p.rows()) {
                 y = progress(g, r, c1, y, colW);
             }
@@ -189,6 +215,9 @@ public class ShrineInspectScreen extends Screen {
         y = y0;
         y = line(g, Component.translatable("mythic_age.altar.missing.title"), c3, y, colW, BORDER);
         List<Component> missing = new ArrayList<>();
+        if (temple.present() && !temple.devotee()) {
+            missing.add(Component.translatable("mythic_age.altar.missing.devotee"));
+        }
         if (p.unverified()) {
             missing.add(Component.translatable("mythic_age.altar.unverified"));
         }
@@ -204,8 +233,8 @@ public class ShrineInspectScreen extends Screen {
         }
         boolean allOk = missing.isEmpty();
         if (allOk) {
-            missing.add(Component.translatable(p.structuralLevel() >= p.tierKeys().size() - 1
-                    ? "mythic_age.altar.max" : "mythic_age.altar.missing.none"));
+            missing.add(Component.translatable(temple.present() ? "mythic_age.altar.missing.none_village"
+                    : p.structuralLevel() >= p.tierKeys().size() - 1 ? "mythic_age.altar.max" : "mythic_age.altar.missing.none"));
         }
         for (Component m : missing) {
             y = line(g, Component.literal("· ").append(m), c3, y, colW, allOk ? OK : BAD);
@@ -214,7 +243,8 @@ public class ShrineInspectScreen extends Screen {
         // 图例放在「高亮缺失格」按钮上方：标题 + 扫描范围 + 各组
         int ly = Math.max(y + 4, top + BODY - 30 - 10 * (p.highlights().size() + 2));
         ly = line(g, Component.translatable("mythic_age.altar.highlight.legend_title"), c3, ly, colW, DIM);
-        ly = line(g, Component.literal("□ ").append(Component.translatable("mythic_age.altar.highlight.scan")), c3, ly, colW, TEXT);
+        ly = line(g, Component.literal("□ ").append(Component.translatable(temple.present()
+                ? "mythic_age.altar.highlight.altar" : "mythic_age.altar.highlight.scan")), c3, ly, colW, TEXT);
         for (ShrineSurvey.Highlight h : p.highlights()) {
             ly = line(g, Component.literal(glyph(h.shape()) + " ").append(Component.translatable("mythic_age.altar.highlight." + h.kind())),
                     c3, ly, colW, h.color());
@@ -229,9 +259,13 @@ public class ShrineInspectScreen extends Screen {
         if (shelf == null) {
             return;
         }
-        Component usage = Component.translatable("mythic_age.altar.relics", shelf.used(), shelf.cap());
+        // 村庄神庙（GA-13）：每人每村的供奉位
+        boolean village = p.temple().present();
+        Component usage = Component.translatable(village ? "mythic_age.altar.relics.village" : "mythic_age.altar.relics",
+                shelf.used(), shelf.cap());
         g.drawString(font, usage, left + 8, y + 4, BORDER, false);
-        g.drawString(font, Component.translatable("mythic_age.altar.relics.how"), left + 20 + font.width(usage), y + 4, DIM, false);
+        g.drawString(font, Component.translatable(village ? "mythic_age.altar.relics.how_village" : "mythic_age.altar.relics.how"),
+                left + 20 + font.width(usage), y + 4, DIM, false);
         if (shelf.relics().isEmpty()) {
             g.drawString(font, Component.translatable("mythic_age.altar.relics.empty"), relicX(0), y + 24, DIM, false);
         }

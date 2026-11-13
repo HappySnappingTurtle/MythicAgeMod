@@ -2,20 +2,16 @@ package io.github.happysnappingturtle.mythicage.gametest;
 
 import com.mojang.authlib.GameProfile;
 import io.github.happysnappingturtle.mythicage.config.ModConfigs;
-import io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials;
+import io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.BelieverEvents;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.GreekPrayer;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayAtAltar;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerRecord;
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekShrineSurvey;
-import io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.BrazierBlock;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlock;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekAltarBlockEntity;
+import io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTempleSource;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.TempleService;
+import io.github.happysnappingturtle.mythicage.content.greek.temple.VillageTempleSurvey;
 import io.github.happysnappingturtle.mythicage.core.MythicAgeIds;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigHolder;
 import io.github.happysnappingturtle.mythicage.core.config.ConfigLoader;
@@ -33,13 +29,14 @@ import io.github.happysnappingturtle.mythicage.runtime.PlayerActivity;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeDriver;
 import io.github.happysnappingturtle.mythicage.runtime.RuntimeLedgers;
 import io.github.happysnappingturtle.mythicage.runtime.WorldClock;
-import io.github.happysnappingturtle.mythicage.shrine.ShrineRegistry;
-import io.github.happysnappingturtle.mythicage.shrine.ShrineService;
+import io.github.happysnappingturtle.mythicage.shrine.inspect.ShrineSurvey;
 import io.github.happysnappingturtle.mythicage.village.VillageRegistry;
+import io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy;
+import io.github.happysnappingturtle.mythicage.village.temple.TempleBook;
+import io.github.happysnappingturtle.mythicage.village.temple.VillageTemple;
+import io.github.happysnappingturtle.mythicage.village.temple.VillageTemples;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -47,15 +44,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -66,14 +62,11 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * T10 信徒祈祷的集成测试（TC-T10-40～59）。结构 17×16×36：地面在 y=2，神坛默认在 (8, 3, 2) 朝南。
+ * 信徒祈祷的集成测试（T10 TC-T10-40～59、GA-4；GA-13 改为村庄神庙）。结构 17×16×36：地面在 y=2，
+ * 每个用例自己建一个还没有卫城的希腊小村（0 级神庙，祭坛 = 钟的位置，默认在 (8, 3, 2)），测试玩家是它的供奉者。
  * <p>
- * 走路的用例（真实村民 AI）各自单独成批，避免一个测试的信徒被相邻测试的神坛吸走；
- * 产出用例直接放预留（{@link PrayerService#putClaimForTest}）并手动采样，在同一刻里读结果。
- * <p>
- * 前面批次留下的神坛也会吸走信徒：自家神坛扫描完成前，信徒按「村外 48 格内」兜底去找已有结果的神坛，
- * 若旁边恰好剩着别的批次的神坛，就会去占那边的祈祷位、走不到、放弃并冷却 600 刻而超时（2026-10-19，
- * 网格布局一变就复现）。所以每个用例清理时拆掉自己的神坛，每批开始前再拆掉其他批次（含失败用例）残留的希腊神坛。
+ * GA-13 起信徒只去本村神庙，不再在多座神坛间挑选；原来的「神坛选择、同日一主、村外兜底」（TC-T10-42～44）作废，
+ * 换成 {@link #prays_only_at_own_village}。走路的用例（真实村民 AI）仍各自单独成批。
  */
 @GameTestHolder(MythicAgeIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -83,69 +76,6 @@ public final class PrayerGameTests {
     private static final double EPS = 1e-9;
 
     private PrayerGameTests() {
-    }
-
-    // ───────────── 批次前：拆掉之前批次残留的神坛 ─────────────
-
-    /** 拆掉登记里所有希腊神坛（拆方块即注销登记）。只在批次开始前调用：此时之前的批次都已结束。 */
-    private static void clearStrayAltars(ServerLevel level) {
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id())) {
-            ServerLevel l = level.getServer().getLevel(e.pos().dimension());
-            if (l != null) {
-                l.removeBlock(e.pos().pos(), false);
-            }
-            ShrineRegistry.get(level.getServer()).remove(e.pos());
-        }
-    }
-
-    @BeforeBatch(batch = "prayer")
-    public static void beforePrayer(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_choose")
-    public static void beforeChoose(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_close")
-    public static void beforeClose(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_full")
-    public static void beforeFull(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_leash")
-    public static void beforeLeash(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_loner")
-    public static void beforeLoner(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_night")
-    public static void beforeNight(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_rain")
-    public static void beforeRain(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_restock")
-    public static void beforeRestock(ServerLevel level) {
-        clearStrayAltars(level);
-    }
-
-    @BeforeBatch(batch = "prayer_walk")
-    public static void beforeWalk(ServerLevel level) {
-        clearStrayAltars(level);
     }
 
     // ───────────── 搭建 ─────────────
@@ -167,25 +97,31 @@ public final class PrayerGameTests {
         return p;
     }
 
-    private static GlobalPos altar(GameTestHelper h, BlockPos rel, FakePlayer owner) {
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
+    /** 一个还没有卫城的希腊小村：钟（= 0 级神庙的祭坛）在 rel，放一块村庄祭坛当标记；devotees 是供奉者。 */
+    record TT(VillageRegistry.Village village, GlobalPos altar) {
+        UUID id() {
+            return village.id();
+        }
+    }
+
+    static TT temple(GameTestHelper h, BlockPos rel, FakePlayer... devotees) {
+        h.setBlock(rel, GreekVillageBlocks.VILLAGE_ALTAR.get());
         BlockPos abs = h.absolutePos(rel);
-        ShrineService.bindForTest(h.getLevel(), abs, owner.getUUID(), owner.getGameProfile().getName(), Age.ARCHAIC,
-                Direction.SOUTH);
-        return GlobalPos.of(h.getLevel().dimension(), abs);
+        VillageRegistry.Village v = new VillageRegistry.Village(UUID.randomUUID(), GlobalPos.of(h.getLevel().dimension(), abs),
+                "greek", "zeus", VillageRegistry.Origin.VANILLA, null, "plains", -1);
+        VillageRegistry.get(h.getLevel().getServer()).add(v);
+        VillageTemples.invalidate(v.id());
+        MinecraftServer server = h.getLevel().getServer();
+        for (FakePlayer p : devotees) {
+            VillageTemples.addDevotee(server, v.id(), p.getUUID(), today(h), TempleBook.Via.JOIN);
+            TemplePrayer.ensureLedger(server, t(h, v.id()), p.getUUID());
+        }
+        return new TT(v, t(h, v.id()).altar());
     }
 
-    private static GreekAltarBlockEntity be(GameTestHelper h, GlobalPos key) {
-        if (h.getLevel().getBlockEntity(key.pos()) instanceof GreekAltarBlockEntity be) {
-            return be;
-        }
-        throw new GameTestAssertException("没有神坛方块实体 " + key.pos());
-    }
-
-    private static void assertScanned(GameTestHelper h, GlobalPos... keys) {
-        for (GlobalPos k : keys) {
-            h.assertTrue(be(h, k).hasResult() && !TempleService.pending(h.getLevel(), k.pos()), "扫描尚未完成");
-        }
+    static VillageTemple t(GameTestHelper h, UUID village) {
+        return VillageTemples.of(h.getLevel().getServer(), village)
+                .orElseThrow(() -> new GameTestAssertException("村子没有神庙"));
     }
 
     private static VillageRegistry.Village village(GameTestHelper h, BlockPos absBell, String civ) {
@@ -213,48 +149,41 @@ public final class PrayerGameTests {
         return MythDays.today(h.getLevel().getServer());
     }
 
-    private static void cleanup(GameTestHelper h, List<VillageRegistry.Village> villages, GlobalPos... altars) {
+    private static TempleBook book(GameTestHelper h, TT tt) {
+        return VillageTemples.book(h.getLevel().getServer(), tt.id());
+    }
+
+    static void cleanup(GameTestHelper h, TT... temples) {
         h.killAllEntitiesOfClass(Villager.class);
         h.killAllEntitiesOfClass(io.github.happysnappingturtle.mythicage.guardian.GuardianEntity.class);
+        MinecraftServer server = h.getLevel().getServer();
+        for (TT tt : temples) {
+            for (UUID d : List.copyOf(book(h, tt).devotees())) {
+                TemplePrayer.dropLedger(server, tt.id(), d);
+            }
+            TemplePrayer.resetForTest(tt.id());
+            PrayerService.resetForTest(tt.altar());
+            VillageRegistry.get(server).remove(tt.village().bell());
+            VillageEconomy.get(server).clearForTest(tt.id());
+            VillageTemples.invalidate(tt.id());
+        }
+    }
+
+    private static void cleanupVillages(GameTestHelper h, VillageRegistry.Village... villages) {
         for (VillageRegistry.Village v : villages) {
             VillageRegistry.get(h.getLevel().getServer()).remove(v.bell());
         }
-        for (GlobalPos a : altars) {
-            PrayerService.resetForTest(a);
-            // 拆掉神坛（同时注销登记）：留着会被之后批次里的信徒当成「村外 48 格内」的神坛
-            h.getLevel().removeBlock(a.pos(), false);
-        }
-    }
-
-    /**
-     * 一个希腊村庄。钟只写进登记、放在 2000 格外（成员关系只看聚会点记忆）：失败的用例来不及清理时，
-     * 残留的村庄登记也不会被其他测试的「附近村庄」查询碰到。神坛因此走「村外 48 格内」的兜底。
-     */
-    private static VillageRegistry.Village greekVillage(GameTestHelper h) {
-        return village(h, h.absolutePos(new BlockPos(2, 3, 2000)), "greek");
     }
 
     /** 失败时的诊断：村民状态、行为、预留。 */
-    private static String describe(GameTestHelper h, Villager v, GlobalPos a) {
+    private static String describe(GameTestHelper h, Villager v, TT tt) {
         var brain = v.getBrain();
-        return "pos=" + h.relativePos(v.blockPosition()) + " running=" + PrayAtAltar.record(v)
-                + " flags=" + PrayAtAltar.record(v).praying() + " activities=" + brain.getActiveActivities()
+        return "pos=" + h.relativePos(v.blockPosition()) + " record=" + PrayAtAltar.record(v)
+                + " activities=" + brain.getActiveActivities()
                 + " walk=" + brain.getMemory(MemoryModuleType.WALK_TARGET).map(t -> h.relativePos(t.getTarget().currentBlockPosition()))
-                + " stuck=" + brain.getMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
-                + " running=" + brain.getRunningBehaviors().stream().map(Object::toString).toList()
-                + " claimants=" + PrayerService.claimants(a, h.getLevel().getServer())
-                + " slots=" + be(h, a).prayerSlots(TempleService.rules()).stream().map(h::relativePos).toList()
-                + " day=" + h.getLevel().getDayTime()
-                + " ABS origin=" + h.absolutePos(BlockPos.ZERO) + " altar=" + a.pos() + " v=" + v.blockPosition()
-                + " slotsAbs=" + be(h, a).prayerSlots(TempleService.rules())
-                + " path=" + (v.getNavigation().getPath() == null ? "null" : v.getNavigation().getPath().getTarget()
-                + " done=" + v.getNavigation().isDone()) + " exact=" + v.position()
-                + " nodes=" + (v.getNavigation().getPath() == null ? "" : java.util.stream.IntStream.range(0,
-                v.getNavigation().getPath().getNodeCount()).mapToObj(i -> v.getNavigation().getPath().getNode(i).asBlockPos()
-                + "/" + v.getNavigation().getPath().getNode(i).type).toList() + " next=" + v.getNavigation().getPath().getNextNodeIndex())
-                + " stuckNav=" + v.getNavigation().isStuck() + " now=" + h.getLevel().getGameTime()
-                + " home=" + brain.getMemory(MemoryModuleType.HOME) + " meet=" + brain.getMemory(MemoryModuleType.MEETING_POINT)
-                + " believer=" + BelieverEvents.isBeliever(v) + " unreachable=" + PrayerService.stats(be(h, a), TempleService.rules());
+                + " claimants=" + TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id()))
+                + " slots=" + t(h, tt.id()).prayerSlots().stream().map(h::relativePos).toList()
+                + " day=" + h.getLevel().getDayTime() + " believer=" + BelieverEvents.isBeliever(v);
     }
 
     // ───────────── 注入自检 ─────────────
@@ -267,7 +196,8 @@ public final class PrayerGameTests {
 
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = "prayer")
     public static void temple_blocks_block_pathfinding(GameTestHelper h) {
-        for (var block : List.of(GreekTemple.GREEK_ALTAR.get(), GreekTemple.GREEK_BRAZIER.get(), GreekTemple.GREEK_STATUE.get())) {
+        for (var block : List.of(GreekTemple.GREEK_ALTAR.get(), GreekTemple.GREEK_BRAZIER.get(), GreekTemple.GREEK_STATUE.get(),
+                GreekVillageBlocks.VILLAGE_ALTAR.get())) {
             h.assertTrue(!block.defaultBlockState().isPathfindable(net.minecraft.world.level.pathfinder.PathComputationType.LAND),
                     block + " 不应被寻路当作可穿过");
         }
@@ -279,21 +209,18 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer_walk", timeoutTicks = 800)
     public static void believer_walks_and_kneels(GameTestHelper h) {
         ground(h);
-        FakePlayer p = owner(h, "pr_walk");
-        GlobalPos a = altar(h, ALTAR, p);
-        VillageRegistry.Village village = greekVillage(h);
-        Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 32)));
+        TT tt = temple(h, ALTAR, owner(h, "pr_walk"));
+        Villager v = member(h, new BlockPos(8, 3, 14), tt.village(), h.absolutePos(new BlockPos(8, 3, 32)));
         h.assertTrue(BelieverEvents.isBeliever(v), "希腊村庄成员应是信徒");
         h.succeedWhen(() -> {
-            assertScanned(h, a);
             PrayerRecord rec = PrayAtAltar.record(v);
-            h.assertTrue(rec.praying(), "信徒应走到祈祷位跪拜：" + describe(h, v, a));
-            h.assertTrue(rec.prayedOn(today(h)) && p.getUUID().equals(rec.lastPrayOwner()) && a.equals(rec.lastAltar()),
-                    "应记下今天为这位主人在这座神坛祈祷：" + rec);
-            PrayerService.Stats st = PrayerService.stats(be(h, a), TempleService.rules());
-            // GA-4：跪满 600 刻才记为信徒并离开，跪拜当中信徒数还是 0（入账见 believer_prays_once_then_leaves）
+            h.assertTrue(rec.praying(), "信徒应走到本村神庙的祈祷位跪拜：" + describe(h, v, tt));
+            h.assertTrue(rec.prayedOn(today(h)) && tt.id().equals(rec.lastPrayOwner()) && tt.altar().equals(rec.lastAltar()),
+                    "应记下今天在本村神庙祈祷：" + rec);
+            TemplePrayer.Stats st = TemplePrayer.stats(h.getLevel().getServer(), t(h, tt.id()), UUID.randomUUID());
+            // GA-4：跪满 600 刻才记为信徒并离开，跪拜当中今日信徒还是 0（入账见 believer_prays_once_then_leaves）
             h.assertTrue(st.praying() == 1 && st.tooClose() == 0, "统计：" + st);
-            cleanup(h, List.of(village), a);
+            cleanup(h, tt);
         });
     }
 
@@ -302,18 +229,16 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer_full", timeoutTicks = 900)
     public static void slots_full_third_stays(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_full"));
-        VillageRegistry.Village village = greekVillage(h);
+        TT tt = temple(h, ALTAR, owner(h, "pr_full"));
         BlockPos home = h.absolutePos(new BlockPos(8, 3, 32));
-        Villager[] vs = {member(h, new BlockPos(5, 3, 14), village, home), member(h, new BlockPos(8, 3, 14), village, home),
-                member(h, new BlockPos(11, 3, 14), village, home)};
+        Villager[] vs = {member(h, new BlockPos(5, 3, 14), tt.village(), home), member(h, new BlockPos(8, 3, 14), tt.village(), home),
+                member(h, new BlockPos(11, 3, 14), tt.village(), home)};
         h.succeedWhen(() -> {
-            assertScanned(h, a);
-            List<UUID> claimants = PrayerService.claimants(a, h.getLevel().getServer());
-            h.assertTrue(claimants.size() == 2, "露天祭坛只有 2 个祈祷位，预留 " + claimants.size());
+            List<UUID> claimants = TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id()));
+            h.assertTrue(claimants.size() == 2, "0 级（露天祭坛）只有 2 个祈祷位，预留 " + claimants.size());
             long praying = java.util.Arrays.stream(vs).filter(v -> PrayAtAltar.record(v).praying()).count();
             h.assertTrue(praying == 2, "应有 2 人在跪拜，实际 " + praying);
-            cleanup(h, List.of(village), a);
+            cleanup(h, tt);
         });
     }
 
@@ -322,7 +247,7 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer_loner", timeoutTicks = 400)
     public static void loners_and_other_civs_do_not_pray(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_loner"));
+        TT tt = temple(h, ALTAR, owner(h, "pr_loner"));
         VillageRegistry.Village egypt = village(h, h.absolutePos(new BlockPos(2, 3, 2000)), "egyptian");
         BlockPos home = h.absolutePos(new BlockPos(8, 3, 32));
         Villager loner = h.spawn(EntityType.VILLAGER, new BlockPos(6, 3, 14));
@@ -330,9 +255,9 @@ public final class PrayerGameTests {
         Villager egyptian = member(h, new BlockPos(10, 3, 14), egypt, home);
         h.assertTrue(!BelieverEvents.isBeliever(loner) && !BelieverEvents.isBeliever(egyptian), "都不是希腊信徒");
         h.runAfterDelay(300, () -> {
-            assertScanned(h, a);
-            h.assertTrue(PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(), "不应有人去祈祷");
-            cleanup(h, List.of(egypt), a);
+            h.assertTrue(TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id())).isEmpty(), "不应有人去祈祷");
+            cleanupVillages(h, egypt);
+            cleanup(h, tt);
             h.succeed();
         });
     }
@@ -342,19 +267,18 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer_night", timeoutTicks = 1000)
     public static void leaves_when_window_ends(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_night"));
-        VillageRegistry.Village village = greekVillage(h);
-        Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 32)));
+        TT tt = temple(h, ALTAR, owner(h, "pr_night"));
+        Villager v = member(h, new BlockPos(8, 3, 14), tt.village(), h.absolutePos(new BlockPos(8, 3, 32)));
         h.startSequence()
-                .thenWaitUntil(() -> h.assertTrue(PrayAtAltar.record(v).praying(), "先到祈祷位：" + describe(h, v, a)))
+                .thenWaitUntil(() -> h.assertTrue(PrayAtAltar.record(v).praying(), "先到祈祷位：" + describe(h, v, tt)))
                 .thenExecute(() -> timeOfDay(h, 10000))
                 .thenWaitUntil(() -> h.assertTrue(!PrayAtAltar.record(v).praying()
-                        && PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(), "时段外应离开并释放祈祷位"))
+                        && TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id())).isEmpty(), "时段外应离开并释放祈祷位"))
                 .thenIdle(60)
                 .thenExecute(() -> {
-                    h.assertTrue(PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(), "时段外不再去祈祷");
+                    h.assertTrue(TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id())).isEmpty(), "时段外不再去祈祷");
                     timeOfDay(h, 3000);
-                    cleanup(h, List.of(village), a);
+                    cleanup(h, tt);
                 })
                 .thenSucceed();
     }
@@ -364,56 +288,48 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer_leash", timeoutTicks = 400)
     public static void leashed_riding_homeless_do_not_pray(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_leash"));
-        VillageRegistry.Village village = greekVillage(h);
+        TT tt = temple(h, ALTAR, owner(h, "pr_leash"));
         BlockPos home = h.absolutePos(new BlockPos(8, 3, 32));
         h.setBlock(4, 3, 16, Blocks.OAK_FENCE);
-        Villager leashed = member(h, new BlockPos(4, 3, 14), village, home);
+        Villager leashed = member(h, new BlockPos(4, 3, 14), tt.village(), home);
         LeashFenceKnotEntity knot = LeashFenceKnotEntity.getOrCreateKnot(h.getLevel(), h.absolutePos(new BlockPos(4, 3, 16)));
         leashed.setLeashedTo(knot, true);
-        Villager riding = member(h, new BlockPos(8, 3, 14), village, home);
+        Villager riding = member(h, new BlockPos(8, 3, 14), tt.village(), home);
         Minecart cart = h.spawn(EntityType.MINECART, new BlockPos(8, 3, 14));
         riding.startRiding(cart, true);
-        Villager homeless = member(h, new BlockPos(12, 3, 14), village, home);
+        Villager homeless = member(h, new BlockPos(12, 3, 14), tt.village(), home);
         homeless.getBrain().eraseMemory(MemoryModuleType.HOME);
         h.runAfterDelay(300, () -> {
-            assertScanned(h, a);
-            h.assertTrue(PrayerService.claimants(a, h.getLevel().getServer()).isEmpty(),
-                    "拴绳、乘坐、无家的信徒都不计入：" + PrayerService.claimants(a, h.getLevel().getServer()));
+            List<UUID> c = TemplePrayer.claimants(h.getLevel().getServer(), t(h, tt.id()));
+            h.assertTrue(c.isEmpty(), "拴绳、乘坐、无家的信徒都不计入：" + c);
             h.killAllEntitiesOfClass(Minecart.class);
             h.killAllEntitiesOfClass(LeashFenceKnotEntity.class);
-            cleanup(h, List.of(village), a);
+            cleanup(h, tt);
             h.succeed();
         });
     }
 
     // ───────────── 离家太近（TC-T10-49） ─────────────
 
-    // 超时 800 → 1600：整套并行时神坛扫描与村民出发偶尔偏晚，走 20 格还没到就超时（2026-10-16，8 轮里 2 次）
     @GameTest(template = T, batch = "prayer_close", timeoutTicks = 1600)
     public static void too_close_to_home_not_counted(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_close"));
-        VillageRegistry.Village village = greekVillage(h);
-        Villager v = member(h, new BlockPos(8, 3, 14), village, a.pos());
+        TT tt = temple(h, ALTAR, owner(h, "pr_close"));
+        Villager v = member(h, new BlockPos(8, 3, 14), tt.village(), tt.altar().pos());
         h.succeedWhen(() -> {
-            assertScanned(h, a);
-            h.assertTrue(PrayAtAltar.record(v).praying(), "仍会站到祈祷位：" + describe(h, v, a));
-            PrayerService.Stats st = PrayerService.stats(be(h, a), TempleService.rules());
+            h.assertTrue(PrayAtAltar.record(v).praying(), "仍会站到祈祷位：" + describe(h, v, tt));
+            TemplePrayer.Stats st = TemplePrayer.stats(h.getLevel().getServer(), t(h, tt.id()), UUID.randomUUID());
             h.assertTrue(st.praying() == 1 && st.tooClose() == 1, "面板「离家太近」计 1：" + st);
             h.assertTrue(!PrayAtAltar.record(v).prayedOn(today(h)), "不计入的祈祷不记录");
-            PrayerService.resetForTest(a);
-            PrayerService.putClaimForTest(a, v.getUUID(), ALTAR, false, h.getLevel().getGameTime());
-            PrayerService.sampleForTest(h.getLevel().getServer());
-            h.assertTrue(PrayerService.pending(a) == 0, "不计入的信徒没有产出");
-            cleanup(h, List.of(village), a);
+            h.assertTrue(book(h, tt).believersToday(today(h)) == 0, "不计入的信徒没有产出");
+            cleanup(h, tt);
         });
     }
 
-    // ───────────── 神坛选择、同日一主、迁村（TC-T10-42～44） ─────────────
+    // ───────────── 只去本村神庙（GA-13，取代 TC-T10-42～44） ─────────────
 
-    /** 让村民立即尝试一次；返回它预留到的神坛（没有则为 null），然后停下。 */
-    private static GlobalPos tryOnce(GameTestHelper h, Villager v, GlobalPos... altars) {
+    /** 让村民立即尝试一次；返回它预留到的祭坛（没有则为 null），然后停下。 */
+    private static GlobalPos tryOnce(GameTestHelper h, Villager v, TT... temples) {
         ServerLevel level = h.getLevel();
         PrayAtAltar.resetCheckForTest(v);
         PrayAtAltar b = new PrayAtAltar();
@@ -421,9 +337,9 @@ public final class PrayerGameTests {
             return null;
         }
         GlobalPos chosen = null;
-        for (GlobalPos a : altars) {
-            if (PrayerService.claimants(a, level.getServer()).contains(v.getUUID())) {
-                chosen = a;
+        for (TT tt : temples) {
+            if (TemplePrayer.claimants(level.getServer(), t(h, tt.id())).contains(v.getUUID())) {
+                chosen = tt.altar();
             }
         }
         b.doStop(level, v, level.getGameTime());
@@ -431,152 +347,86 @@ public final class PrayerGameTests {
     }
 
     @GameTest(template = T, batch = "prayer_choose", timeoutTicks = 300)
-    public static void altar_choice_and_one_owner_per_day(GameTestHelper h) {
+    public static void prays_only_at_own_village(GameTestHelper h) {
         ground(h);
-        FakePlayer ownerA = owner(h, "pr_choose_a");
-        FakePlayer ownerB = owner(h, "pr_choose_b");
-        GlobalPos a = altar(h, new BlockPos(4, 3, 2), ownerA);
-        GlobalPos b = altar(h, new BlockPos(12, 3, 33), ownerB);
-        // 村 1 的钟在 A 北 40 格（A 在村内、B 不在）；村 2 的钟在 B 南 40 格（B 在村内、A 不在）
-        VillageRegistry.Village v1 = village(h, a.pos().offset(0, 0, -40), "greek");
-        VillageRegistry.Village v2 = village(h, b.pos().offset(0, 0, 40), "greek");
-        BlockPos home = h.absolutePos(new BlockPos(8, 3, 20));
-        Villager v = member(h, new BlockPos(4, 3, 8), v1, home);
+        TT a = temple(h, new BlockPos(4, 3, 2), owner(h, "pr_own_a"));
+        TT b = temple(h, new BlockPos(12, 3, 33), owner(h, "pr_own_b"));
+        Villager v = member(h, new BlockPos(12, 3, 28), a.village(), h.absolutePos(new BlockPos(8, 3, 20)));
         v.setNoAi(true);
         h.succeedWhen(() -> {
-            assertScanned(h, a, b);
-            h.assertTrue(a.equals(tryOnce(h, v, a, b)), "村 1 成员：选村内的 A");
-            // TC-T10-42：今天已为 B 的主人祈祷过 → 只能去 B（即使 A 更近且在村内）
-            PrayAtAltar.record(v).record(today(h), ownerB.getUUID(), b);
-            h.assertTrue(tryOnce(h, v, a, b) == null, "A 不是今天的主人，村内又没有 B 的神坛 → 不去");
-            v.getBrain().setMemory(MemoryModuleType.MEETING_POINT, v2.bell());
-            h.assertTrue(b.equals(tryOnce(h, v, a, b)), "TC-T10-44：迁到村 2 → 按新村选村内的 B");
-            // TC-T10-43：第二天可以为另一位主人祈祷
-            v.getBrain().setMemory(MemoryModuleType.MEETING_POINT, v1.bell());
-            MythDays.advanceForTest(1);
-            try {
-                h.assertTrue(a.equals(tryOnce(h, v, a, b)), "次日可以为 A 的主人祈祷");
-            } finally {
-                MythDays.advanceForTest(-1);
-            }
-            cleanup(h, List.of(v1, v2), a, b);
+            h.assertTrue(a.altar().equals(tryOnce(h, v, a, b)), "甲村成员去甲村神庙（乙村的更近也不去）");
+            v.getBrain().setMemory(MemoryModuleType.MEETING_POINT, b.village().bell());
+            h.assertTrue(b.altar().equals(tryOnce(h, v, a, b)), "迁到乙村 → 去乙村神庙");
+            // 当天已入账就不再去
+            PrayAtAltar.record(v).markCredited(today(h));
+            h.assertTrue(tryOnce(h, v, a, b) == null, "今天已入账不再去");
+            cleanup(h, a, b);
         });
     }
 
-    @GameTest(template = T, batch = "prayer_choose", timeoutTicks = 300)
-    public static void fallback_outside_village(GameTestHelper h) {
-        ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_fallback"));
-        // 钟远在 200 格外：村内没有神坛 → 去村外 48 格内最近的
-        VillageRegistry.Village far = village(h, a.pos().offset(200, 0, 0), "greek");
-        Villager v = member(h, new BlockPos(8, 3, 14), far, h.absolutePos(new BlockPos(8, 3, 30)));
-        v.setNoAi(true);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            h.assertTrue(a.equals(tryOnce(h, v, a)), "村内无神坛时用村外 48 格内的");
-            cleanup(h, List.of(far), a);
-        });
-    }
-
-    // ───────────── 产出（TC-T10-50～52） ─────────────
+    // ───────────── 产出（TC-T10-50～52；GA-4 按今日信徒） ─────────────
 
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
     public static void yield_open_altar_two(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_yield"));
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            PrayerService.resetForTest(a);
-            // GA-4（TC-GA4-40、44）：两名信徒各祈祷满一次，按今日信徒 √2 入账；同一人第二次不再入账
+        FakePlayer p = owner(h, "pr_yield");
+        TT tt = temple(h, ALTAR, p);
+        try {
             UUID v1 = UUID.randomUUID();
-            h.assertTrue(PrayerService.credit(h.getLevel(), a, v1), "第一名入账");
-            h.assertTrue(PrayerService.credit(h.getLevel(), a, UUID.randomUUID()), "第二名入账");
-            h.assertFalse(PrayerService.credit(h.getLevel(), a, v1), "同一人当天第二次不入账");
+            h.assertTrue(TemplePrayer.credit(h.getLevel(), tt.id(), v1), "第一名入账");
+            h.assertTrue(TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID()), "第二名入账");
+            h.assertFalse(TemplePrayer.credit(h.getLevel(), tt.id(), v1), "同一人当天第二次不入账");
             double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.0;
-            h.assertTrue(Math.abs(PrayerService.pending(a) - expected) < EPS,
-                    "待领产出应为 " + expected + "，实际 " + PrayerService.pending(a));
-            PrayerService.Stats st = PrayerService.stats(be(h, a), TempleService.rules());
+            double got = TemplePrayer.pending(tt.id(), p.getUUID());
+            h.assertTrue(Math.abs(got - expected) < EPS, "待领产出应为 " + expected + "，实际 " + got);
+            TemplePrayer.Stats st = TemplePrayer.stats(h.getLevel().getServer(), t(h, tt.id()), p.getUUID());
             h.assertTrue(st.todayBelievers() == 2 && Math.abs(st.today() - expected) < EPS, "统计：" + st);
-            PrayerService.resetForTest(a);
-        });
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
+    /** TC-GA13-05（世界内）：同一供奉者两个村子，今日信徒合计算 √。 */
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
-    public static void yield_two_altars_share_sqrt(GameTestHelper h) {
+    public static void yield_two_villages_share_sqrt(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_two");
-        GlobalPos a = altar(h, new BlockPos(4, 3, 2), p);
-        GlobalPos b = altar(h, new BlockPos(12, 3, 33), p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a, b);
-            PrayerService.resetForTest(a);
-            PrayerService.resetForTest(b);
-            // GA-4（TC-GA4-43）：同一主人两座神坛，今日信徒合计算 √
-            for (int i = 0; i < 3; i++) {
-                PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            }
-            PrayerService.credit(h.getLevel(), b, UUID.randomUUID());
-            double pa = PrayerService.pending(a);
-            double pb = PrayerService.pending(b);
-            h.assertTrue(Math.abs(pa - PrayerFormula.DAILY_BASE * Math.sqrt(3)) < EPS, "前 3 名在 a：" + pa);
-            h.assertTrue(Math.abs(pa + pb - PrayerFormula.DAILY_BASE * Math.sqrt(4)) < EPS, "合计按 √4，实际 " + (pa + pb));
-            PrayerService.resetForTest(a);
-            PrayerService.resetForTest(b);
-        });
-    }
-
-    /** 下雨只在本刻内生效，不影响同时运行的其他测试。 */
-    private static double sampleInRain(GameTestHelper h, GlobalPos a) {
-        PrayerService.resetForTest(a);
-        PrayerService.overrideRainForTest((l, pos) -> true);
+        TT a = temple(h, new BlockPos(4, 3, 2), p);
+        TT b = temple(h, new BlockPos(12, 3, 33), p);
         try {
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            h.assertTrue(PrayerService.stats(be(h, a), TempleService.rules()).rainHalved()
-                    == (be(h, a).verdict(TempleService.rules()).grantedLevel() == 0), "面板雨天提示");
+            for (int i = 0; i < 3; i++) {
+                TemplePrayer.credit(h.getLevel(), a.id(), UUID.randomUUID());
+            }
+            TemplePrayer.credit(h.getLevel(), b.id(), UUID.randomUUID());
+            double pa = TemplePrayer.pending(a.id(), p.getUUID());
+            double pb = TemplePrayer.pending(b.id(), p.getUUID());
+            h.assertTrue(Math.abs(pa - PrayerFormula.DAILY_BASE * Math.sqrt(3)) < EPS, "前 3 名在甲村：" + pa);
+            h.assertTrue(Math.abs(pa + pb - PrayerFormula.DAILY_BASE * Math.sqrt(4)) < EPS, "合计按 √4，实际 " + (pa + pb));
+            h.succeed();
         } finally {
-            PrayerService.overrideRainForTest(null);
+            cleanup(h, a, b);
         }
-        double v = PrayerService.pending(a);
-        PrayerService.resetForTest(a);
-        return v;
     }
 
     @GameTest(template = T, batch = "prayer_rain", timeoutTicks = 200)
     public static void rain_halves_open_altar(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_rain_open"));
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            double v = sampleInRain(h, a);
+        FakePlayer p = owner(h, "pr_rain_open");
+        TT tt = temple(h, ALTAR, p);
+        PrayerService.overrideRainForTest((l, pos) -> true);
+        try {
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            h.assertTrue(TemplePrayer.stats(h.getLevel().getServer(), t(h, tt.id()), p.getUUID()).rainHalved(), "面板雨天提示");
+            double v = TemplePrayer.pending(tt.id(), p.getUUID());
             double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.0 * PrayerFormula.RAIN_FACTOR;
             h.assertTrue(Math.abs(v - expected) < EPS, "露天祭坛下雨减半：应为 " + expected + "，实际 " + v);
-        });
-    }
-
-    @GameTest(template = T, batch = "prayer_rain", timeoutTicks = 200)
-    public static void rain_spares_small_temple(GameTestHelper h) {
-        ground(h);
-        // 小神庙：4 根柱、柱顶整片屋顶、1 个点燃的圣火盆
-        for (int[] c : new int[][]{{4, 6}, {12, 6}, {4, 14}, {12, 14}}) {
-            for (int y = 3; y <= 5; y++) {
-                h.setBlock(c[0], y, c[1], GreekTemple.MARBLE_PILLAR.get());
-            }
+            h.succeed();
+        } finally {
+            PrayerService.overrideRainForTest(null);
+            cleanup(h, tt);
         }
-        for (int x = 4; x <= 12; x++) {
-            for (int z = 6; z <= 14; z++) {
-                h.setBlock(x, 6, z, GreekMaterials.SMOOTH_MARBLE.get());
-            }
-        }
-        h.setBlock(6, 3, 12, GreekTemple.GREEK_BRAZIER.get().defaultBlockState().setValue(BrazierBlock.LIT, true));
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_rain_temple"));
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            h.assertTrue(be(h, a).verdict(TempleService.rules()).grantedLevel() == 1, "前提：认定为小神庙");
-            double v = sampleInRain(h, a);
-            double expected = PrayerFormula.DAILY_BASE * Math.sqrt(2) * 1.5;
-            h.assertTrue(Math.abs(v - expected) < EPS, "小神庙下雨不减：应为 " + expected + "，实际 " + v);
-        });
     }
 
     // ───────────── 接入 T5（TC-T10-53～55） ─────────────
@@ -585,44 +435,46 @@ public final class PrayerGameTests {
     public static void real_settlement_credits_owner(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_real");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
+        TT tt = temple(h, ALTAR, p);
+        try {
             MinecraftServer server = h.getLevel().getServer();
             RuntimeLedgers ledgers = RuntimeLedgers.get(server);
-            ProducerLedger l = ledgers.get(PrayerService.ledgerId(a)).orElseThrow(() -> new GameTestAssertException("没有台账"));
+            ProducerLedger l = ledgers.get(TemplePrayer.ledgerId(tt.id(), p.getUUID()))
+                    .orElseThrow(() -> new GameTestAssertException("没有台账"));
             h.assertTrue(l.owner().equals(p.getUUID()) && l.civ() == Civilization.GREEK, "台账主人与文明");
             long now = WorldClock.now(server);
             PlayerActivity.markActive(p);
-            PrayerService.resetForTest(a);
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            double pending = PrayerService.pending(a);
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            double pending = TemplePrayer.pending(tt.id(), p.getUUID());
             long before = MythData.get(p).civ(Civilization.GREEK).favor();
             l.setLastSettledTick(now - 20);
             SettlementEngine.Settlement s = RuntimeDriver.settle(server, ledgers, l, now, ModConfigs.runtime().current().favor());
             long after = MythData.get(p).civ(Civilization.GREEK).favor();
             h.assertTrue(s.mode() == SettlementEngine.Mode.REAL, "区块加载、主人在线 → REAL，实际 " + s.mode());
-            h.assertTrue(s.credited() >= 2 && after - before == s.credited() && PrayerService.pending(a) == 0,
+            h.assertTrue(s.credited() >= 2 && after - before == s.credited() && TemplePrayer.pending(tt.id(), p.getUUID()) == 0,
                     "待领 " + pending + " 应被取走入账：+" + s.credited() + "，恩宠 " + before + " → " + after);
-            PrayerService.resetForTest(a);
+            h.succeed();
+        } finally {
             PlayerActivity.forget(p.getUUID());
-        });
+            cleanup(h, tt);
+        }
     }
 
     @GameTest(template = GameTestTemplates.EMPTY_3X3, batch = "prayer")
-    public static void unloaded_altar_uses_snapshot(GameTestHelper h) {
+    public static void unloaded_temple_uses_snapshot(GameTestHelper h) {
         MinecraftServer server = h.getLevel().getServer();
         FakePlayer p = owner(h, "pr_snap");
         long now = WorldClock.now(server);
-        GlobalPos far = GlobalPos.of(Level.OVERWORLD, new BlockPos(3_000_000, 64, 3_000_000 + (int) (h.getTick() % 1000)));
-        ProducerLedger l = new ProducerLedger(PrayerService.ledgerId(far), p.getUUID(), Civilization.GREEK, 24, now - 2400);
+        // 不存在的村子：探针报「没在运转」，按快照入账
+        ProducerLedger l = new ProducerLedger(TemplePrayer.ledgerId(UUID.randomUUID(), p.getUUID()), p.getUUID(), Civilization.GREEK,
+                24, now - 2400);
         l.recordObservation(24);
         RuntimeLedgers ledgers = RuntimeLedgers.get(server);
         ledgers.register(l);
         try {
             SettlementEngine.Settlement s = RuntimeDriver.settle(server, ledgers, l, now, ModConfigs.runtime().current().favor());
-            h.assertTrue(s.mode() == SettlementEngine.Mode.SNAPSHOT, "区块未加载 → SNAPSHOT，实际 " + s.mode());
+            h.assertTrue(s.mode() == SettlementEngine.Mode.SNAPSHOT, "神庙不在运转 → SNAPSHOT，实际 " + s.mode());
             h.assertTrue(s.credited() >= 1, "按快照入账：" + s);
         } finally {
             ledgers.remove(l.id());
@@ -635,25 +487,25 @@ public final class PrayerGameTests {
     public static void favor_full_stops_and_flags(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_full_cap");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
+        TT tt = temple(h, ALTAR, p);
+        try {
             MinecraftServer server = h.getLevel().getServer();
             long cap = MythData.cap(p, Civilization.GREEK);
             MythData.get(p).civ(Civilization.GREEK).setFavor(cap);
-            h.assertTrue(PrayerService.stats(be(h, a), TempleService.rules()).favorFull(), "面板应标记「已满」");
+            h.assertTrue(TemplePrayer.stats(server, t(h, tt.id()), p.getUUID()).favorFull(), "面板应标记「已满」");
             long now = WorldClock.now(server);
             PlayerActivity.markActive(p);
-            PrayerService.resetForTest(a);
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
             RuntimeLedgers ledgers = RuntimeLedgers.get(server);
-            ProducerLedger l = ledgers.get(PrayerService.ledgerId(a)).orElseThrow();
+            ProducerLedger l = ledgers.get(TemplePrayer.ledgerId(tt.id(), p.getUUID())).orElseThrow();
             l.setLastSettledTick(now - 20);
             RuntimeDriver.settle(server, ledgers, l, now, ModConfigs.runtime().current().favor());
             h.assertTrue(MythData.get(p).civ(Civilization.GREEK).favor() == cap, "恩宠不超过上限");
-            PrayerService.resetForTest(a);
+            h.succeed();
+        } finally {
             PlayerActivity.forget(p.getUUID());
-        });
+            cleanup(h, tt);
+        }
     }
 
     // ───────────── 补货减半（TC-T10-56） ─────────────
@@ -694,28 +546,26 @@ public final class PrayerGameTests {
         h.succeed();
     }
 
-    // ───────────── 神坛被拆（TC-T10-57） ─────────────
+    // ───────────── 村子没了（TC-T10-57 改） ─────────────
 
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
-    public static void removed_altar_unregisters(GameTestHelper h) {
+    public static void removed_village_clears_record(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_remove");
-        GlobalPos a = altar(h, ALTAR, p);
-        VillageRegistry.Village village = greekVillage(h);
-        Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 30)));
+        TT tt = temple(h, ALTAR, p);
+        Villager v = member(h, new BlockPos(8, 3, 14), tt.village(), h.absolutePos(new BlockPos(8, 3, 30)));
         v.setNoAi(true);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            MinecraftServer server = h.getLevel().getServer();
-            h.assertTrue(RuntimeLedgers.get(server).get(PrayerService.ledgerId(a)).isPresent(), "前提：有台账");
-            PrayAtAltar.record(v).record(today(h), p.getUUID(), a);
-            h.setBlock(ALTAR, Blocks.AIR);
-            h.assertTrue(RuntimeLedgers.get(server).get(PrayerService.ledgerId(a)).isEmpty(), "台账应注销");
-            tryOnce(h, v, a);
-            h.assertTrue(PrayAtAltar.record(v).lastAltar() == null, "信徒记录里的神坛应清空");
-            h.assertTrue(BelieverEvents.isBeliever(v), "仍是信徒");
-            cleanup(h, List.of(village), a);
-        });
+        try {
+            PrayAtAltar.record(v).record(today(h), tt.id(), tt.altar());
+            VillageRegistry.get(h.getLevel().getServer()).remove(tt.village().bell());
+            VillageTemples.invalidate(tt.id());
+            PrayAtAltar.resetCheckForTest(v);
+            new PrayAtAltar().tryStart(h.getLevel(), v, h.getLevel().getGameTime());
+            h.assertTrue(PrayAtAltar.record(v).lastAltar() == null, "信徒记录里的祭坛应清空");
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
     // ───────────── 存档往返（TC-T10-58） ─────────────
@@ -723,30 +573,26 @@ public final class PrayerGameTests {
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
     public static void save_load_round_trip(GameTestHelper h) {
         ground(h);
-        GlobalPos a = altar(h, ALTAR, owner(h, "pr_save"));
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
+        FakePlayer p = owner(h, "pr_save");
+        TT tt = temple(h, ALTAR, p);
+        try {
             PrayerRecord rec = new PrayerRecord();
-            rec.record(42, UUID.randomUUID(), a);
+            rec.record(42, UUID.randomUUID(), tt.altar());
             h.assertTrue(PrayerRecord.load(rec.save()).equals(rec), "祈祷记录往返一致");
             h.assertTrue(PrayerRecord.load(new PrayerRecord().save()).equals(new PrayerRecord()), "空记录往返一致");
-
-            GreekAltarBlockEntity be = be(h, a);
+            TempleBook b = book(h, tt);
             long today = today(h);
-            be.notePrayer(UUID.randomUUID(), today);
-            be.notePrayer(UUID.randomUUID(), today - 3);
-            be.notePrayer(UUID.randomUUID(), today - 9);
-            h.assertTrue(be.believers(today) == 2, "7 日以前的不计");
-            CompoundTag tag = be.saveWithoutMetadata(h.getLevel().registryAccess());
-            GreekAltarBlockEntity copy = new GreekAltarBlockEntity(be.getBlockPos(), be.getBlockState());
-            copy.loadWithComponents(tag, h.getLevel().registryAccess());
-            h.assertTrue(copy.recentPrayers().equals(be.recentPrayers()), "近 7 日信徒往返一致");
-
-            ProducerLedger l = RuntimeLedgers.get(h.getLevel().getServer()).get(PrayerService.ledgerId(a)).orElseThrow();
+            b.notePrayer(UUID.randomUUID(), today);
+            b.notePrayer(UUID.randomUUID(), today - 3);
+            b.notePrayer(UUID.randomUUID(), today - 9);
+            h.assertTrue(b.believers(today) == 2, "7 日以前的不计");
+            ProducerLedger l = RuntimeLedgers.get(h.getLevel().getServer()).get(TemplePrayer.ledgerId(tt.id(), p.getUUID())).orElseThrow();
             h.assertTrue(RuntimeLedgers.read(RuntimeLedgers.write(l)).equals(l), "台账往返一致");
-            h.assertTrue(l.id().equals(new ProducerId("greek_temple:" + a.dimension().location() + ":"
-                    + a.pos().getX() + "," + a.pos().getY() + "," + a.pos().getZ())), "台账 id 格式");
-        });
+            h.assertTrue(l.id().equals(new ProducerId("village_temple:" + tt.id() + ":" + p.getUUID())), "台账 id 格式");
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
     // ───────────── 信仰面板与检视界面一致（TC-T10-59） ─────────────
@@ -755,68 +601,61 @@ public final class PrayerGameTests {
     public static void grace_rows_match_survey(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_rows");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            GreekAltarBlockEntity be = be(h, a);
-            long today = today(h);
+        TT tt = temple(h, ALTAR, p);
+        try {
             for (int i = 0; i < 3; i++) {
-                be.notePrayer(UUID.randomUUID(), today);
+                TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
             }
-            long now = h.getLevel().getGameTime();
-            PrayerService.resetForTest(a);
-            PrayerService.putClaimForTest(a, UUID.randomUUID(), ALTAR.east(), true, now);
-            PrayerService.sampleForTest(h.getLevel().getServer());
-            PrayerService.Stats st = PrayerService.stats(be, TempleService.rules());
-            // GA-4：预计日产按近 7 日信徒，不再受祈祷位限制（succeedWhen 每刻重试会多记几名，按统计里的人数比）
-            h.assertTrue(st.believers() >= 3 && Math.abs(st.estimate() - PrayerFormula.estimate(st.believers(), 1.0, 0, 1)) < EPS,
+            MinecraftServer server = h.getLevel().getServer();
+            TemplePrayer.Stats st = TemplePrayer.stats(server, t(h, tt.id()), p.getUUID());
+            h.assertTrue(st.believers() == 3 && Math.abs(st.estimate() - PrayerFormula.estimate(3, 1.0, 0, 1)) < EPS,
                     "预计日产按近 7 日信徒：" + st);
-            ShrineSurvey payload = GreekShrineSurvey.of(be, p, TempleService.rules());
+            ShrineSurvey payload = VillageTempleSurvey.of(p, t(h, tt.id()));
             h.assertTrue(payload.estimate() == st.estimate() && payload.prayer().believers() == st.believers()
-                    && payload.prayer().today() == st.today() && payload.prayer().praying() == st.praying(),
-                    "检视界面与统计一致：" + payload.prayer());
-            GraceSource.Row row = GreekTempleSource.INSTANCE.rows(p).stream().filter(r -> r.pos().equals(a)).findFirst()
-                    .orElseThrow(() -> new GameTestAssertException("信仰面板没有这座神坛"));
+                    && payload.prayer().today() == st.today() && payload.prayer().praying() == st.praying()
+                    && payload.temple().present() && payload.temple().devotee(), "检视界面与统计一致：" + payload.prayer());
+            GraceSource.Row row = GreekTempleSource.INSTANCE.rows(p).stream().filter(r -> r.pos().equals(tt.altar())).findFirst()
+                    .orElseThrow(() -> new GameTestAssertException("信仰面板没有这个村子"));
             Object[] args = ((TranslatableContents) row.status().getContents()).getArgs();
             h.assertTrue(row.perDay() == st.estimate() && Integer.valueOf(st.believers()).equals(args[1])
                     && String.format(java.util.Locale.ROOT, "%.1f", st.today()).equals(args[2]),
                     "信仰面板与检视界面一致：" + java.util.Arrays.toString(args));
             // TC-T11a-66：信仰面板的恩宠来源区就是这些行
-            io.github.happysnappingturtle.mythicage.core.player.Age before = MythData.get(p).civ(Civilization.GREEK).age();
-            MythData.get(p).civ(Civilization.GREEK).setAge(io.github.happysnappingturtle.mythicage.core.player.Age.CLASSICAL);
+            Age before = MythData.get(p).civ(Civilization.GREEK).age();
+            MythData.get(p).civ(Civilization.GREEK).setAge(Age.CLASSICAL);
             var page = io.github.happysnappingturtle.mythicage.faith.FaithService.build(p).pages().get(Civilization.GREEK.ordinal());
             MythData.get(p).civ(Civilization.GREEK).setAge(before);
-            var panelRow = page.sources().stream().filter(r -> r.pos().equals(a.pos())).findFirst()
-                    .orElseThrow(() -> new GameTestAssertException("面板恩宠来源区没有这座神坛"));
+            var panelRow = page.sources().stream().filter(r -> r.pos().equals(tt.altar().pos())).findFirst()
+                    .orElseThrow(() -> new GameTestAssertException("面板恩宠来源区没有这个村子"));
             h.assertTrue(page.sources().size() == GreekTempleSource.INSTANCE.rows(p).size()
                     && panelRow.note().equals(row.status())
                     && String.format(java.util.Locale.ROOT, "%.1f", row.perDay()).equals(
                     ((TranslatableContents) panelRow.value().getContents()).getArgs()[0]), "面板行与来源一致：" + panelRow);
-            PrayerService.resetForTest(a);
-        });
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
-    // ───────────── GA-4：按今日信徒入账与供奉（TC-GA4-45、50～58） ─────────────
+    // ───────────── GA-4：按今日信徒入账与献供（TC-GA4-45、50～58） ─────────────
 
-    /** TC-GA4-45：原版信徒跪满 600 刻入一笔，然后离开，当天不再来。单独一批：和 believer_walks_and_kneels 同批时，两边的村民会去隔壁场地的祭坛。 */
+    /** TC-GA4-45：原版信徒跪满 600 刻入一笔，然后离开，当天不再来。 */
     @GameTest(template = T, batch = "prayer_once", timeoutTicks = 1400)
     public static void believer_prays_once_then_leaves(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_once");
-        GlobalPos a = altar(h, ALTAR, p);
-        VillageRegistry.Village village = greekVillage(h);
-        Villager v = member(h, new BlockPos(8, 3, 14), village, h.absolutePos(new BlockPos(8, 3, 32)));
+        TT tt = temple(h, ALTAR, p);
+        Villager v = member(h, new BlockPos(8, 3, 14), tt.village(), h.absolutePos(new BlockPos(8, 3, 32)));
         h.succeedWhen(() -> {
-            assertScanned(h, a);
             long today = today(h);
             PrayerRecord rec = PrayAtAltar.record(v);
-            h.assertTrue(rec.creditedOn(today), "跪满 600 刻后记为今天已入账：" + describe(h, v, a));
+            h.assertTrue(rec.creditedOn(today), "跪满 600 刻后记为今天已入账：" + describe(h, v, tt));
             h.assertTrue(!rec.praying(), "入账后离开祈祷位");
             // 入账后 T5 的定时结算可能已经把待领产出转成了恩宠：两边有一边大于 0 即可
-            boolean credited = PrayerService.pending(a) > 0 || MythData.get(p).civ(Civilization.GREEK).favor() > 0;
-            h.assertTrue(be(h, a).believersToday(today) == 1 && credited,
-                    "今日信徒 1、已入账：待领 " + PrayerService.pending(a) + "，恩宠 " + MythData.get(p).civ(Civilization.GREEK).favor());
-            cleanup(h, List.of(village), a);
+            boolean credited = TemplePrayer.pending(tt.id(), p.getUUID()) > 0 || MythData.get(p).civ(Civilization.GREEK).favor() > 0;
+            h.assertTrue(book(h, tt).believersToday(today) == 1 && credited,
+                    "今日信徒 1、已入账：待领 " + TemplePrayer.pending(tt.id(), p.getUUID()));
+            cleanup(h, tt);
         });
     }
 
@@ -824,76 +663,76 @@ public final class PrayerGameTests {
         return new ItemStack(io.github.happysnappingturtle.mythicage.content.greek.GreekMaterials.LIBATION.get(), n);
     }
 
-    /** TC-GA4-50、51：主人献奠酒：扣 1、记今天；已入账的部分按 +50% 补发，之后的每笔 ×1.5。 */
+    /** TC-GA4-50、51（TC-GA13-24）：供奉者献奠酒：扣 1、记今天；已入账的部分按 +50% 补发，之后的每笔 ×1.5。 */
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
     public static void offering_bonus_whole_day(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_offer");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            PrayerService.resetForTest(a);
-            GreekAltarBlockEntity be = be(h, a);
+        TT tt = temple(h, ALTAR, p);
+        try {
             long today = today(h);
-            be.markOffered(today - 1);
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            double before = PrayerService.pending(a);
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            double before = TemplePrayer.pending(tt.id(), p.getUUID());
             ItemStack st = libation(3);
-            h.assertTrue(PrayerService.offer(p, be, st) == PrayerService.OfferResult.OK, "献供成功");
-            h.assertTrue(st.getCount() == 2 && be.offeredOn(today), "扣 1 个、记今天");
-            h.assertTrue(Math.abs(PrayerService.pending(a) - before * 1.5) < EPS, "已入账部分补 50%：" + before + " → " + PrayerService.pending(a));
-            double mid = PrayerService.pending(a);
-            PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-            double third = PrayerService.pending(a) - mid;
+            h.assertTrue(TemplePrayer.offer(p, t(h, tt.id()), st) == PrayerService.OfferResult.OK, "献供成功");
+            h.assertTrue(st.getCount() == 2 && book(h, tt).offeredOn(p.getUUID(), today), "扣 1 个、记今天");
+            double now = TemplePrayer.pending(tt.id(), p.getUUID());
+            h.assertTrue(Math.abs(now - before * 1.5) < EPS, "已入账部分补 50%：" + before + " → " + now);
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            double third = TemplePrayer.pending(tt.id(), p.getUUID()) - now;
             h.assertTrue(Math.abs(third - 1.5 * PrayerFormula.credit(3, 1.0, 1, 0, 0, 1)) < EPS, "第 3 名按 ×1.5：" + third);
-            h.assertTrue(Math.abs(PrayerService.pending(a) - PrayerFormula.daily(3, 1.0, 0, 0.5, 1)) < EPS, "合计等于献供日产");
-            h.assertTrue(PrayerService.stats(be, TempleService.rules()).offered(), "统计显示今日已献");
-            PrayerService.resetForTest(a);
-        });
+            h.assertTrue(Math.abs(TemplePrayer.pending(tt.id(), p.getUUID()) - PrayerFormula.daily(3, 1.0, 0, 0.5, 1)) < EPS,
+                    "合计等于献供日产");
+            h.assertTrue(TemplePrayer.stats(h.getLevel().getServer(), t(h, tt.id()), p.getUUID()).offered(), "统计显示今日已献");
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
-    /** TC-GA4-52～55：再献、非主人、数量不够、不是供品：都不扣物品。 */
+    /** TC-GA4-52～55（TC-GA13-23）：再献、非供奉者、数量不够、不是供品：都不扣物品。 */
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
     public static void offering_refusals(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_offer_no");
         FakePlayer other = owner(h, "pr_offer_other");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            GreekAltarBlockEntity be = be(h, a);
+        TT tt = temple(h, ALTAR, p);
+        try {
+            VillageTemple t = t(h, tt.id());
             long today = today(h);
-            be.markOffered(today - 1);
             ItemStack beef = new ItemStack(Items.COOKED_BEEF, 1);
-            h.assertTrue(PrayerService.offer(p, be, beef) == PrayerService.OfferResult.NOT_ENOUGH && beef.getCount() == 1, "熟牛肉要 2 个");
+            h.assertTrue(TemplePrayer.offer(p, t, beef) == PrayerService.OfferResult.NOT_ENOUGH && beef.getCount() == 1, "熟牛肉要 2 个");
             ItemStack stone = new ItemStack(Items.STONE, 5);
-            h.assertTrue(PrayerService.offer(p, be, stone) == PrayerService.OfferResult.NOT_OFFERING && stone.getCount() == 5, "石头不是供品");
+            h.assertTrue(TemplePrayer.offer(p, t, stone) == PrayerService.OfferResult.NOT_OFFERING && stone.getCount() == 5, "石头不是供品");
             ItemStack mine = libation(1);
-            h.assertTrue(PrayerService.offer(other, be, mine) == PrayerService.OfferResult.NOT_OWNER && mine.getCount() == 1, "别人不能献");
-            h.assertTrue(PrayerService.offer(p, be, mine) == PrayerService.OfferResult.OK && mine.isEmpty(), "主人献成");
+            h.assertTrue(TemplePrayer.offer(other, t, mine) == PrayerService.OfferResult.NOT_DEVOTEE && mine.getCount() == 1,
+                    "不是供奉者不能献");
+            h.assertTrue(TemplePrayer.offer(p, t, mine) == PrayerService.OfferResult.OK && mine.isEmpty(), "供奉者献成");
             ItemStack again = libation(1);
-            h.assertTrue(PrayerService.offer(p, be, again) == PrayerService.OfferResult.ALREADY && again.getCount() == 1, "当天再献被拒");
-            h.assertFalse(be.offeredOn(today + 1), "TC-GA4-56 第二天可以再献");
-        });
+            h.assertTrue(TemplePrayer.offer(p, t, again) == PrayerService.OfferResult.ALREADY && again.getCount() == 1, "当天再献被拒");
+            h.assertFalse(book(h, tt).offeredOn(p.getUUID(), today + 1), "TC-GA4-56 第二天可以再献");
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
-    /** TC-GA4-57：「今天已献」存进方块实体，重载后保留。 */
+    /** TC-GA4-57：「今天已献」存进村庄运行数据，重载后保留。 */
     @GameTest(template = T, batch = "prayer", timeoutTicks = 200)
     public static void offering_survives_reload(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_offer_save");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            GreekAltarBlockEntity be = be(h, a);
+        TT tt = temple(h, ALTAR, p);
+        try {
             long today = today(h);
-            be.markOffered(today);
-            var tag = be.saveWithoutMetadata(h.getLevel().registryAccess());
-            GreekAltarBlockEntity copy = new GreekAltarBlockEntity(be.getBlockPos(), be.getBlockState());
-            copy.loadWithComponents(tag, h.getLevel().registryAccess());
-            h.assertTrue(copy.offeredOn(today) && !copy.offeredOn(today - 1), "重载后仍是今天已献");
-        });
+            book(h, tt).markOffered(p.getUUID(), today);
+            TempleBook copy = TempleBook.load(book(h, tt).save(h.getLevel().registryAccess()), h.getLevel().registryAccess());
+            h.assertTrue(copy.offeredOn(p.getUUID(), today) && !copy.offeredOn(p.getUUID(), today - 1), "重载后仍是今天已献");
+            h.succeed();
+        } finally {
+            cleanup(h, tt);
+        }
     }
 
     /** TC-GA4-58：服务器倍率 2 → 一名信徒入账翻倍。单独一批：改配置不影响同批其他用例。 */
@@ -901,22 +740,19 @@ public final class PrayerGameTests {
     public static void rate_multiplier_scales_credit(GameTestHelper h) {
         ground(h);
         FakePlayer p = owner(h, "pr_mult");
-        GlobalPos a = altar(h, ALTAR, p);
-        h.succeedWhen(() -> {
-            assertScanned(h, a);
-            ConfigHolder<WorldRulesConfig> holder = ModConfigs.worldRules();
-            WorldRulesConfig original = holder.current();
-            try {
-                holder.reload(ConfigLoader.toPrettyJson(holder.schema(),
-                        original.withGreek(original.greek().withPrayer(new WorldRulesConfig.Prayer(1, 2.0)))));
-                PrayerService.resetForTest(a);
-                PrayerService.credit(h.getLevel(), a, UUID.randomUUID());
-                h.assertTrue(Math.abs(PrayerService.pending(a) - 2 * PrayerFormula.DAILY_BASE) < EPS,
-                        "倍率 2：" + PrayerService.pending(a));
-            } finally {
-                holder.reload(ConfigLoader.toPrettyJson(holder.schema(), original));
-                PrayerService.resetForTest(a);
-            }
-        });
+        TT tt = temple(h, ALTAR, p);
+        ConfigHolder<WorldRulesConfig> holder = ModConfigs.worldRules();
+        WorldRulesConfig original = holder.current();
+        try {
+            holder.reload(ConfigLoader.toPrettyJson(holder.schema(),
+                    original.withGreek(original.greek().withPrayer(new WorldRulesConfig.Prayer(1, 2.0)))));
+            TemplePrayer.credit(h.getLevel(), tt.id(), UUID.randomUUID());
+            double got = TemplePrayer.pending(tt.id(), p.getUUID());
+            h.assertTrue(Math.abs(got - 2 * PrayerFormula.DAILY_BASE) < EPS, "倍率 2：" + got);
+            h.succeed();
+        } finally {
+            holder.reload(ConfigLoader.toPrettyJson(holder.schema(), original));
+            cleanup(h, tt);
+        }
     }
 }

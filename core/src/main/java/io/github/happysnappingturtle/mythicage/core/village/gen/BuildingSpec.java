@@ -24,12 +24,13 @@ import java.util.Map;
  * @param patron    主神变体（不单独作为施工候选，按村庄主神挑）；空串表示通用
  * @param buildCosts 本建筑的折算规则（JSON 原样保留，排在文明折算表前面）
  * @param jobs      本建筑提供的岗位：职业 → 人数（T19 §1.6 H1，移民按空缺分职业）
+ * @param doorWidth 门宽（GA-14 门前通道）：第二格在门朝向的顺时针一侧；默认 1
  */
 public record BuildingSpec(String id, String civ, String template, int sizeX, int sizeY, int sizeZ, int floorY,
                            String category, String stage, boolean generated, Pos door, String doorFacing,
                            Map<String, List<Pos>> anchors, Map<String, Integer> provides, List<String> plotKinds,
                            Pos frame, int priority, boolean unique, List<String> replace, String god, List<String> requires,
-                           String patron, JsonArray buildCosts, Map<String, Integer> jobs) {
+                           String patron, JsonArray buildCosts, Map<String, Integer> jobs, int doorWidth) {
     public BuildingSpec {
         Map<String, List<Pos>> a = new LinkedHashMap<>();
         anchors.forEach((k, v) -> a.put(k, List.copyOf(v)));
@@ -59,10 +60,12 @@ public record BuildingSpec(String id, String civ, String template, int sizeX, in
         }
         Pos door = new Pos(0, 0, 0);
         String facing = "south";
+        int doorWidth = 1;
         if (o.has("door")) {
             JsonObject d = o.getAsJsonObject("door");
             door = pos(d.getAsJsonArray("pos"));
             facing = d.get("facing").getAsString();
+            doorWidth = d.has("width") ? Math.max(1, d.get("width").getAsInt()) : 1;
         }
         return new BuildingSpec(o.get("id").getAsString(), o.get("civ").getAsString(), o.get("template").getAsString(),
                 size.get(0).getAsInt(), size.get(1).getAsInt(), size.get(2).getAsInt(),
@@ -75,7 +78,7 @@ public record BuildingSpec(String id, String civ, String template, int sizeX, in
                 !o.has("unique") || o.get("unique").getAsBoolean(), strings(o, "replace"),
                 o.has("god") ? o.get("god").getAsString() : "", strings(o, "requires"),
                 o.has("patron") ? o.get("patron").getAsString() : "",
-                o.has("buildCosts") ? o.getAsJsonArray("buildCosts") : new JsonArray(), counts(o, "jobs"));
+                o.has("buildCosts") ? o.getAsJsonArray("buildCosts") : new JsonArray(), counts(o, "jobs"), doorWidth);
     }
 
     private static Pos pos(JsonArray a) {

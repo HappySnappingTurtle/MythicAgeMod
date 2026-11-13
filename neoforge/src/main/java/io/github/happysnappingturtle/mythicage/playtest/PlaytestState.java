@@ -29,8 +29,6 @@ public final class PlaytestState extends SavedData {
     BlockPos villageCenter;
     @Nullable
     BlockPos labyrinthEntrance;
-    @Nullable
-    BlockPos templeSite;
     private final Map<UUID, CompoundTag> snapshots = new HashMap<>();
     private final Map<UUID, Set<String>> done = new HashMap<>();
 
@@ -41,7 +39,6 @@ public final class PlaytestState extends SavedData {
 
     void setVillage(BlockPos center) {
         villageCenter = center.immutable();
-        templeSite = null;
         setDirty();
     }
 
@@ -50,15 +47,9 @@ public final class PlaytestState extends SavedData {
         setDirty();
     }
 
-    void setTempleSite(BlockPos site) {
-        templeSite = site.immutable();
-        setDirty();
-    }
-
     void resetAnchors() {
         villageCenter = null;
         labyrinthEntrance = null;
-        templeSite = null;
         setDirty();
     }
 
@@ -103,7 +94,6 @@ public final class PlaytestState extends SavedData {
         PlaytestState s = new PlaytestState();
         s.villageCenter = NbtUtils.readBlockPos(tag, "village").orElse(null);
         s.labyrinthEntrance = NbtUtils.readBlockPos(tag, "labyrinth").orElse(null);
-        s.templeSite = NbtUtils.readBlockPos(tag, "temple").orElse(null);
         for (Tag t : tag.getList("players", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
             UUID id = c.getUUID("player");
@@ -128,9 +118,6 @@ public final class PlaytestState extends SavedData {
         }
         if (labyrinthEntrance != null) {
             tag.put("labyrinth", NbtUtils.writeBlockPos(labyrinthEntrance));
-        }
-        if (templeSite != null) {
-            tag.put("temple", NbtUtils.writeBlockPos(templeSite));
         }
         Set<UUID> ids = new HashSet<>(snapshots.keySet());
         ids.addAll(done.keySet());

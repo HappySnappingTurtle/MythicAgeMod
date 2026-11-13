@@ -392,6 +392,11 @@ public final class TradeService {
         if (data.civ(s.civ()).age() == Age.NONE) {
             return TradeView.Dialogue.FIRST;
         }
+        // GA-13：受过祝福、还不是本村供奉者 → 「在这里供奉」
+        if (s.villageId() != null && io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(player.server, s.villageId()).isPresent()) {
+            return io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.book(player.server, s.villageId())
+                    .isDevotee(player.getUUID()) ? TradeView.Dialogue.NONE : TradeView.Dialogue.JOIN;
+        }
         Optional<FaithProfile.Reissue> reissue = FaithProfiles.get(s.civ()).flatMap(FaithProfile::reissue);
         boolean can = reissue.isPresent()
                 && GuardianRules.canReissue(ShrineRegistry.get(player.server).countOwned(player.getUUID(),
@@ -603,6 +608,11 @@ public final class TradeService {
             return Outcome.of(TradeReason.NPC_GONE);
         }
         PlayerMythData data = MythData.get(player);
+        boolean temple = s.villageId() != null
+                && io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(player.server, s.villageId()).isPresent();
+        if (reissue && temple) {
+            return join(player, s, data);
+        }
         List<ItemStack> gifts = new ArrayList<>();
         Transactions.Request request;
         if (!reissue) {
@@ -649,11 +659,38 @@ public final class TradeService {
         if (!reissue && player.level().getEntity(s.guardianEntityId()) instanceof GuardianEntity g) {
             g.playGesture(GuardianGesture.ANNOUNCE);
         }
+        if (!reissue && temple) {
+            becomeDevotee(player, s.villageId(), io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.BLESSING);
+        }
         if (!reissue) {
             io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.BLESSED, civ);
             io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(player, io.github.happysnappingturtle.mythicage.advancement.MythEvents.AGE_REACHED, civ, Age.ARCHAIC.ordinal());
         }
         return new Outcome(TradeReason.OK, 0, gifts.isEmpty() ? ItemStack.EMPTY : gifts.getFirst());
+    }
+
+    /** 已受祝福的玩家在本村守护者处「在这里供奉」（GA-13 §2.2）：成为这个村子的供奉者，不发物品。 */
+    static Outcome join(ServerPlayer player, Session s, PlayerMythData data) {
+        if (data.civ(s.civ()).age() == Age.NONE) {
+            return Outcome.of(TradeReason.NOT_BLESSED);
+        }
+        if (!becomeDevotee(player, s.villageId(), io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.JOIN)) {
+            return Outcome.of(TradeReason.ALREADY_DEVOTEE);
+        }
+        return new Outcome(TradeReason.OK, 0, ItemStack.EMPTY);
+    }
+
+    /** 加为供奉者并开好台账；已经是时返回 false。 */
+    public static boolean becomeDevotee(ServerPlayer player, UUID village,
+                                        io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via via) {
+        var server = player.server;
+        boolean added = io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.addDevotee(server, village,
+                player.getUUID(), MythDays.today(server), via);
+        if (added) {
+            io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(server, village).ifPresent(t ->
+                    io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.ensureLedger(server, t, player.getUUID()));
+        }
+        return added;
     }
 
     /**

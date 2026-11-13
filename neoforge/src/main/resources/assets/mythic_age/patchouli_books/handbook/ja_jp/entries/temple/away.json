@@ -2,7 +2,7 @@
   "name": "神殿を離れているとき",
   "icon": "minecraft:clock",
   "category": "mythic_age:temple",
-  "sortnum": 4,
+  "sortnum": 5,
   "pages": [
     {
       "type": "patchouli:text",

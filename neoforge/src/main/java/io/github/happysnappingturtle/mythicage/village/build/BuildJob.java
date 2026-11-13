@@ -96,16 +96,23 @@ public final class BuildJob implements JobType {
         int slots = ctx.data().construction().maxBuilders() - busy.size();
         List<Job> out = new ArrayList<>();
         // Do not start a later phase until all cells in the demolition/late phase have completed.
+        // 例外：当前阶段一格都放不了、也没人在干（依附在后一阶段的格上），就放行下一阶段，免得整座卡住（GA-11 实机）
         BuildSegments.Kind phase = null;
         Boolean late = null;
+        boolean alive = false;
         for (var segment : site.segments) {
             if (p.placed.get(segment.index())) continue;
             boolean isLate = segment.cells().stream().anyMatch(BuildSegments.Cell::last);
             if (phase == null) { phase = segment.kind(); late = isLate; }
-            if (phase != segment.kind() || late != isLate) break;
+            if (phase != segment.kind() || late != isLate) {
+                if (alive) break;
+                phase = segment.kind(); late = isLate;
+            }
             if (slots <= 0) break;
-            if (busy.contains(segment.index()) || Construction.nextCell(p, segment) < 0) continue;
+            if (busy.contains(segment.index())) { alive = true; continue; }
+            if (Construction.nextCell(p, segment) < 0) continue;
             if (!Construction.ready(ctx,p,site,segment)) continue;
+            alive = true;
             var storage = fetchPoint(ctx, p, site);
             var steps = List.of(JobStep.moveTo(storage, ""), JobStep.act("haul_put", ctx.data().construction().fetchTicks()),
                     JobStep.act(ANIM, 24000), JobStep.settle());

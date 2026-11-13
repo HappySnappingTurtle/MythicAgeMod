@@ -516,20 +516,7 @@ public final class RiteGameTests {
         h.succeed();
     }
 
-    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
-    public static void shrines_refresh_after_age_change(GameTestHelper h) {
-        floor(h);
-        BlockPos rel = new BlockPos(8, 2, 2);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        FakePlayer p = player(h, "rt_refresh", GR, Age.ARCHAIC, 0);
-        BlockPos abs = h.absolutePos(rel);
-        ShrineService.bindForTest(h.getLevel(), abs, p.getUUID(), "rt_refresh", Age.ARCHAIC, Direction.SOUTH);
-        data(p, GR).setAge(Age.CLASSICAL);
-        RiteService.refreshShrines(p, GR);
-        h.assertTrue(h.getLevel().getBlockEntity(abs) instanceof GreekAltarBlockEntity be && be.ownerAge() == Age.CLASSICAL,
-                "神坛缓存的主人时代立即更新");
-        h.succeed();
-    }
+    // shrines_refresh_after_age_change（时代变化后玩家神坛缓存的主人时代立即刷新）：GA-13 起希腊没有玩家神坛，作废。
 
     @GameTest(template = T, batch = BATCH)
     public static void greek_promotion_not_hardcoded(GameTestHelper h) {

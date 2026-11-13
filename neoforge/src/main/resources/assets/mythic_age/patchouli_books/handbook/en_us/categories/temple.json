@@ -1,6 +1,6 @@
 {
   "name": "Temples & Prayer",
-  "description": "Where favor comes from: the altar, temple tiers, believers' prayers, and how it is counted while you are away.",
-  "icon": "mythic_age:greek_altar",
+  "description": "Become a devotee of a village and its believers pray for you at the village temple; as the village rebuilds its temple, your favor grows. It is counted even while you are away.",
+  "icon": "mythic_age:village_altar",
   "sortnum": 10
 }

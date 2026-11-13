@@ -80,12 +80,16 @@ public final class SentinelPower implements GodPower {
         return spots(ctx.level(), center(ctx)).isPresent() ? Optional.empty() : Optional.of(PowerReason.PLACEMENT_INVALID);
     }
 
-    /** 落点到施法者自己最近一座希腊神坛（同维度）的距离；没有时为无穷远。 */
+    /** 落点到施法者最近一座希腊神坛（GA-13：供奉的村庄神庙，及旧的玩家神坛；同维度）的距离；没有时为无穷远。 */
     static double nearestOwnShrine(ServerPlayer caster, ServerLevel level, Vec3 at) {
         double best = Double.POSITIVE_INFINITY;
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(level.getServer()).ownedBy(caster.getUUID(), Civilization.GREEK)) {
-            if (e.pos().dimension() == level.dimension()) {
-                best = Math.min(best, Vec3.atBottomCenterOf(e.pos().pos()).distanceTo(at));
+        List<net.minecraft.core.GlobalPos> altars = new java.util.ArrayList<>(
+                io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.devotedAltars(level.getServer(), caster.getUUID(),
+                        Civilization.GREEK));
+        ShrineRegistry.get(level.getServer()).ownedBy(caster.getUUID(), Civilization.GREEK).forEach(e -> altars.add(e.pos()));
+        for (net.minecraft.core.GlobalPos g : altars) {
+            if (g.dimension() == level.dimension()) {
+                best = Math.min(best, Vec3.atBottomCenterOf(g.pos()).distanceTo(at));
             }
         }
         return best;

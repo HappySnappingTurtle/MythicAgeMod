@@ -320,6 +320,10 @@ public final class RiteService {
         if (updated.stage() != v.stage()) {
             announceStage(player, v, updated);
         }
+        // GA-13：在这个村子晋升、立祀的人成为这里的供奉者
+        TradeService.becomeDevotee(player, v.id(), kind == RiteKind.PROMOTION
+                ? io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.PROMOTION
+                : io.github.happysnappingturtle.mythicage.village.temple.TempleBook.Via.RITE);
         if (kind == RiteKind.PROMOTION) {
             afterPromotion(player, civ, plan.target(), god, updated);
         }

@@ -51,9 +51,14 @@ public class OilLampBlock extends HorizontalDirectionalBlock {
         return SHAPE;
     }
 
+    /**
+     * 下方中心有支撑，或下面是陶瓮（陶瓮高 15 像素，顶面不算整面支撑；村里的灯常放在陶瓮上，
+     * 依附表 architecture_attach.json 也把陶瓮列为灯的支撑——GA-11：村民施工放灯要过这道检查）。
+     */
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        return canSupportCenter(level, pos.below(), Direction.UP);
+        return canSupportCenter(level, pos.below(), Direction.UP)
+                || level.getBlockState(pos.below()).getBlock() instanceof io.github.happysnappingturtle.mythicage.content.greek.village.PithosBlock;
     }
 
     @Override

@@ -1,0 +1,21 @@
+{
+  "name": "Pygmalion's Statue",
+  "icon": "mythic_age:pygmalion_statue",
+  "category": "mythic_age:relics",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:pygmalion_statue",
+      "text": "$(l)Worn$(): max health $(l)+4$(). Putting it on does not heal you.$(br2)$(l)Enshrined$(): believers within 48 blocks of the temple, meaning the villagers and residents of Greek villages, get $(l)+40%%$() max health. Vanilla villagers also cannot be turned into zombie villagers."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Found in the vault behind the $(l)abandoned temple$(), like Rheia's Crown."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Pygmalion, a sculptor of Cyprus, carved a girl out of ivory so lifelike that he fell in love with it. At the festival of Venus he prayed at the altar for a wife like his statue. When he went home and touched it, the ivory grew soft and warm.$(br2)(Ovid, Metamorphoses, book 10)"
+    }
+  ]
+}

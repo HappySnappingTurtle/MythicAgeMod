@@ -123,16 +123,13 @@ public final class MythicAge {
         game.addListener(EntityDevCommand::onRegisterCommands);
         game.addListener(io.github.happysnappingturtle.mythicage.wild.WildDevCommand::onRegisterCommands);
 
-        // 神庙通用职责（T10b）与希腊神庙判定（T8a）
+        // 神庙通用职责（T10b）；希腊神庙规则（T8a；GA-13 神庙归村庄）
         io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "shrine_service", ShrineService::onServerTickPost);
         game.addListener(ShrineService::onServerStopped);
         game.addListener(ShrineService::onBreak);
         game.addListener(TempleRulesLoader::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader::onAddReloadListeners);
         game.addListener(TempleService::onServerStarted);
-        game.addListener(TempleService::onServerStopped);
-        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "temple_service", TempleService::onServerTickPost);
-        game.addListener(TempleService::onNeighborNotify);
 
         // 文明档案（T10b）
         game.addListener(FaithProfiles::onAddReloadListeners);

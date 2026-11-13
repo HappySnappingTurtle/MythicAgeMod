@@ -48,10 +48,10 @@ public final class GreekTemple {
                     .noOcclusion().pushReaction(PushReaction.BLOCK))
             .model(new BlockModelSpec.StateModels(s -> "", true, ""))
             .tags(BlockTags.MINEABLE_WITH_PICKAXE)
-            .lang("奥林匹斯祭坛", "Olympian Altar", "オリュンポスの祭壇")
+            .lang("旧祭坛", "Old Altar", "古い祭壇")
             .register();
 
-    /** 希腊神坛这一种神庙（T10b）：同种间距的垂直范围 = 扫描体高度；扫描体相交、提示与扫描由 TempleService 接入。 */
+    /** 希腊神坛这一种神庙（T10b；GA-13 起只用于识别旧存档的玩家祭坛并迁移）：同种间距的垂直范围 = 扫描体高度；扫描体相交、提示与扫描由 TempleService 接入。 */
     public static final ShrineKind ALTAR_KIND = ShrineKinds.register(new ShrineKind("greek:altar", GREEK, GREEK_ALTAR,
             TempleService.VERTICAL_SPACING, TempleService.HOOKS));
 
@@ -101,11 +101,14 @@ public final class GreekTemple {
 
     public static void init() {
         GraceSources.register(GreekTempleSource.INSTANCE);
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.register("greek", GreekVillageTemple.INSTANCE);
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.registerAltarUse("greek", VillageAltarUse::useItemOn);
         io.github.happysnappingturtle.mythicage.rite.PromotionRequirements.register(GreekTempleRequirement.INSTANCE);
         // 登录时按登记补发神庙等级的进度事件（进度上线前就建好神庙的存档）
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e) -> {
                     if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer p) {
+                        LegacyAltars.onLogin(p);
                         int level = GreekTempleRequirement.bestLevel(p, TempleService.rules());
                         if (level > 0) {
                             io.github.happysnappingturtle.mythicage.advancement.MythEvents.fire(p,

@@ -88,6 +88,16 @@ public class FoundationStoneBlock extends BaseEntityBlock {
         }
     }
 
+    /** 还没有神庙的新村，奠基石就是神庙祭坛（GA-13 D19）：手持供品可以在这里献供。 */
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                                                Player player, net.minecraft.world.InteractionHand hand,
+                                                                BlockHitResult hit) {
+        return io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.altarUse(civ.id())
+                .map(u -> u.useItemOn(stack, level, pos, player))
+                .orElse(net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level instanceof ServerLevel server && player instanceof ServerPlayer sp

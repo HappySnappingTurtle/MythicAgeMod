@@ -105,30 +105,6 @@ class PrayerFormulaTest {
     }
 
     @Test
-    void tc11_oneOwnerPerDay() {
-        UUID a = UUID.randomUUID();
-        UUID b = UUID.randomUUID();
-        assertTrue(BelieverRules.canPrayFor(-1, null, 5, a));
-        assertTrue(BelieverRules.canPrayFor(5, a, 5, a));
-        assertFalse(BelieverRules.canPrayFor(5, a, 5, b));
-        assertTrue(BelieverRules.canPrayFor(5, a, 6, b));
-    }
-
-    @Test
-    void tc12_altarOrder() {
-        UUID o = UUID.randomUUID();
-        var near = new BelieverRules.Candidate<>("in5", o, true, 5);
-        var far = new BelieverRules.Candidate<>("in12", o, true, 12);
-        var outside = new BelieverRules.Candidate<>("out3", o, false, 3);
-        assertEquals(List.of("in5", "in12"),
-                BelieverRules.order(List.of(far, outside, near)).stream().map(BelieverRules.Candidate::altar).toList());
-        var tooFar = new BelieverRules.Candidate<>("out60", o, false, 60);
-        assertEquals(List.of("out3"),
-                BelieverRules.order(List.of(tooFar, outside)).stream().map(BelieverRules.Candidate::altar).toList());
-        assertTrue(BelieverRules.order(List.<BelieverRules.Candidate<String>>of()).isEmpty());
-    }
-
-    @Test
     void tc13_prayerWindow() {
         assertFalse(PrayerFormula.inWindow(1999));
         assertTrue(PrayerFormula.inWindow(2000));

@@ -2,7 +2,7 @@
   "name": "While You Are Away",
   "icon": "minecraft:clock",
   "category": "mythic_age:temple",
-  "sortnum": 4,
+  "sortnum": 5,
   "pages": [
     {
       "type": "patchouli:text",

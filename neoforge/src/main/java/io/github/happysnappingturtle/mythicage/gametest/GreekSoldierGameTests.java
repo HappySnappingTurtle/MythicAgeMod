@@ -151,14 +151,13 @@ public final class GreekSoldierGameTests {
         return m;
     }
 
-    /** 希腊祭坛（朝南），登记进神坛表。 */
-    static GlobalPos altar(GameTestHelper h, int x, int z) {
+    /** 本村神庙的祭坛放在 (x, 2, z)（GA-13：测试钩子定位置，放一块村庄祭坛当标记）。 */
+    static GlobalPos altar(GameTestHelper h, VillageWorkGameTests.TV tv, int x, int z) {
         BlockPos rel = new BlockPos(x, 2, z);
-        h.setBlock(rel, GreekTemple.GREEK_ALTAR.get().defaultBlockState().setValue(GreekAltarBlock.FACING, Direction.SOUTH));
-        BlockPos abs = h.absolutePos(rel);
-        FakePlayer owner = FakePlayerFactory.get(h.getLevel(), new GameProfile(UUID.randomUUID(), "gs_altar"));
-        ShrineService.bindForTest(h.getLevel(), abs, owner.getUUID(), "gs_altar", Age.ARCHAIC, Direction.SOUTH);
-        return GlobalPos.of(h.getLevel().dimension(), abs);
+        h.setBlock(rel, io.github.happysnappingturtle.mythicage.content.greek.GreekVillageBlocks.VILLAGE_ALTAR.get());
+        GlobalPos g = GlobalPos.of(h.getLevel().dimension(), h.absolutePos(rel));
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.forceAltarForTest(tv.id(), g);
+        return g;
     }
 
     static void cleanup(GameTestHelper h, VillageWorkGameTests.TV tv, Object... extra) {
@@ -166,7 +165,7 @@ public final class GreekSoldierGameTests {
             if (e instanceof Entity en && !en.isRemoved()) {
                 en.discard();
             } else if (e instanceof GlobalPos g) {
-                ShrineRegistry.get(h.getLevel().getServer()).remove(g);
+                io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.forceAltarForTest(tv.id(), null);
                 h.getLevel().removeBlock(g.pos(), false);
             }
         }
@@ -309,7 +308,7 @@ public final class GreekSoldierGameTests {
     @GameTest(template = T, batch = "greek_soldier_guard_a", timeoutTicks = 400)
     public static void prayer_guard_intercepts(GameTestHelper h) {
         VillageWorkGameTests.TV tv = village(h, Age.ARCHAIC, Map.of());
-        GlobalPos alt = altar(h, 8, 8);
+        GlobalPos alt = altar(h, tv, 8, 8);
         List<ResidentEntity> ls = laborers(h, tv, 5);
         ResidentEntity g = enlist(h, tv, ls.get(1), HOPLITE, SoldierProfile.Tier.FULL);
         // 卫兵从居民侧面出发：从敌人那头绕过来时，路过敌人身边会顺手刺它；从居民正后方出发要挤过居民身子，偶尔卡住（偶发失败）
@@ -337,7 +336,7 @@ public final class GreekSoldierGameTests {
     @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
     public static void prayer_guard_outside_area(GameTestHelper h) {
         VillageWorkGameTests.TV tv = village(h, Age.ARCHAIC, Map.of());
-        GlobalPos alt = altar(h, 8, 26);
+        GlobalPos alt = altar(h, tv, 8, 26);
         List<ResidentEntity> ls = laborers(h, tv, 5);
         ResidentEntity g = enlist(h, tv, ls.get(1), HOPLITE, SoldierProfile.Tier.FULL);
         // 卫兵从居民这一侧出发（从敌人那头绕过来时，路过敌人身边会顺手刺它）
@@ -360,7 +359,7 @@ public final class GreekSoldierGameTests {
     @GameTest(template = T, batch = "greek_soldier_guard_b", timeoutTicks = 300)
     public static void prayer_guard_one_at_a_time(GameTestHelper h) {
         VillageWorkGameTests.TV tv = village(h, Age.ARCHAIC, Map.of());
-        GlobalPos alt = altar(h, 8, 8);
+        GlobalPos alt = altar(h, tv, 8, 8);
         List<ResidentEntity> ls = laborers(h, tv, 6);
         ResidentEntity g = enlist(h, tv, ls.get(1), HOPLITE, SoldierProfile.Tier.FULL);
         g.moveTo(h.absoluteVec(new Vec3(8.5, 2, 4.5)));
@@ -416,11 +415,11 @@ public final class GreekSoldierGameTests {
         h.succeed();
     }
 
-    /** TC-T20-79：拦截中居民走出扫描范围：卫兵立即恢复普通值勤。 */
+    /** TC-T20-79：拦截中居民走出神庙祭坛周围：卫兵立即恢复普通值勤。 */
     @GameTest(template = T, batch = "greek_soldier_guard_c", timeoutTicks = 400)
     public static void prayer_guard_ends_outside(GameTestHelper h) {
         VillageWorkGameTests.TV tv = village(h, Age.ARCHAIC, Map.of());
-        GlobalPos alt = altar(h, 8, 8);
+        GlobalPos alt = altar(h, tv, 8, 8);
         List<ResidentEntity> ls = laborers(h, tv, 5);
         ResidentEntity g = enlist(h, tv, ls.get(1), HOPLITE, SoldierProfile.Tier.FULL);
         // 卫兵从居民这一侧出发（从敌人那头绕过来时，路过敌人身边会顺手刺它）
@@ -436,7 +435,8 @@ public final class GreekSoldierGameTests {
             PrayerGuard.prayingForTest(ward.getUUID(), h.getLevel().getGameTime());
             if (!moved[0] && g.soldierBrain().ward() == ward) {
                 moved[0] = true;
-                ward.moveTo(h.absoluteVec(new Vec3(8.5, 2, 4.5)));
+                // 走出神庙祭坛周围 8 格（GA-13：保护区是祭坛周围，不再是玩家神坛的扫描体）
+                ward.moveTo(h.absoluteVec(new Vec3(16.5, 2, 30.5)));
             }
         });
         h.succeedWhen(() -> {

@@ -19,11 +19,14 @@ import greek_farm
 import greek_heroic
 import greek_patron
 import greek_terrain
+import greek_upgrade
 
 
-def meta(category, plot, door, facing, terrain=("flat", "slope"), provides=None, stage="archaic", generated=True, **extra):
+def meta(category, plot, door, facing, terrain=("flat", "slope"), provides=None, stage="archaic", generated=True, door_width=1,
+         **extra):
     return {"category": category, "stage": stage, "generated": generated, "plot_kinds": [plot],
-            "terrain": list(terrain), "provides": provides or {}, **extra, "door": {"pos": door, "facing": facing}}
+            "terrain": list(terrain), "provides": provides or {}, **extra,
+            "door": {"pos": door, "facing": facing, "width": door_width}}
 
 
 def built(category, plot, door, facing, stage, priority, provides=None, terrain=("flat", "slope"), **extra):
@@ -44,7 +47,7 @@ GREEK = [
     (greek_core.agora, "agora", meta("core", "center", (7, 0, 14), "south", ("flat",), {"meeting": 1})),
     (greek_core.krene, "krene", meta("core", "center_side", (6, 0, 2), "east", ("flat",), {"water": 1})),
     (greek_core.house_small, "house_small", meta("basic", "house", (3, 0, 8), "south", provides={"beds": 2})),
-    (greek_core.granary, "granary", meta("basic", "storage", (8, 0, 3), "east", ("flat",), {"storage": 1})),
+    (greek_core.granary, "granary", meta("basic", "storage", (8, 0, 3), "east", ("flat",), {"storage": 1}, door_width=2)),
     (greek_farm.sheep_pen, "pen", meta("basic", "pen", (4, 0, 8), "south")),
     (greek_farm.olive_grove, "olive_grove", meta("profession", "grove", (7, 0, 14), "south", jobs={"greek:farmer": 2})),
     (greek_farm.vineyard, "vineyard", meta("profession", "grove", (5, 0, 12), "south", jobs={"greek:farmer": 1})),
@@ -78,6 +81,11 @@ BUILT = [
                                                      {"storage": 2}, ("flat",))),
     (greek_classical.house_court, "house_court", built("basic", "house", (5, 0, 10), "south", "classical", 30,
                                                        {"beds": 4}, unique=False)),
+    # 原地升级（GA-11 D1）：同占地加一层；谷仓排在大仓库之后、住居之前
+    (greek_upgrade.granary_ii, "granary_ii", built("basic", "storage", (8, 0, 3), "east", "classical", 22, {"storage": 2},
+                                                   ("flat",), unique=False, replace=["greek:granary"], door_width=2)),
+    (greek_upgrade.house_small_ii, "house_small_ii", built("basic", "house", (3, 0, 8), "south", "classical", 25,
+                                                           {"beds": 4}, unique=False, replace=["greek:house_small"])),
     (greek_classical.stoa, "stoa", built("stage", "market", (10, 0, 6), "south", "classical", 40, {"merchant": 4},
                                          ("flat",), jobs={"greek:merchant": 2})),
     (greek_classical.winery, "winery", built("feature", "workshop", (4, 0, 8), "south", "classical", 60, None, ("flat",),

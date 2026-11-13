@@ -415,6 +415,8 @@ def export_template(b: Building, short: str, meta: dict, civ="greek", kind="vill
     if "door" in meta:
         d = meta["door"]
         data["door"] = {"pos": rel(d["pos"]), "facing": d["facing"]}
+        if d.get("width", 1) > 1:
+            data["door"]["width"] = d["width"]  # 门宽（GA-14）：第二格在朝向的顺时针一侧
     js = DATA_ROOT / "mythic_age" / ("village_building" if kind == "village" else "structure_spec") / civ / f"{short}.json"
     js.parent.mkdir(parents=True, exist_ok=True)
     js.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

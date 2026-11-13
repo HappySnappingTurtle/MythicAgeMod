@@ -6,19 +6,19 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Build a temple around the altar (7 blocks to each side, 32 blocks in front). Higher tiers give more $(l)prayer spots$() and more favor per believer.$(br2)If the building qualifies but your age does not, it counts as the highest tier your age allows; the inspector says which age you need."
+      "text": "A village temple's tier follows the acropolis:$(li)$(l)No acropolis yet$(): open altar, coefficient $(l)1.0$(), 2 worshippers at a time.$(li)$(l)Naiskos$() (Archaic acropolis): $(l)1.5$(), 4.$(li)$(l)Prostyle Temple$(): $(l)2.0$(), 7.$(li)$(l)Peripteral Temple$(): $(l)3.0$(), 10.$(br)The $(l)coefficient$() multiplies favor: the higher the tier, the more each prayer gives."
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Open-air Altar$(): 2 prayer spots, factor 1.0.$(br2)$(l)Naiskos$() (Archaic): ≥4 Greek columns (≥3 tall), ≥60%% roofed between them, altar under open sky, ≥1 lit brazier. 4 spots, factor 1.5."
+      "text": "A temple never upgrades by itself. The village has to $(l)rebuild the acropolis in place$(). Work can start once the village reaches the Classical or Heroic age; materials come from the village store and builders lay it block by block. Promoting here moves the village into the new age too.$(br2)Once the rebuild is finished, the new coefficient applies at once."
     },
     {
       "type": "patchouli:text",
-      "text": "$(l)Prostylos$() (Classical): ≥8 columns on a raised platform you can walk onto, ≥2 braziers, 1 statue, ≥2 pediments, ≥40 marble floor. 7 spots, factor 2.0.$(br2)$(l)Peripteros$() (Heroic): ≥14 columns, ≥4 braziers, ≥4 pediments, ≥80 marble floor, the rest as above. 10 spots, factor 3.0."
+      "text": "Columns, roof tiles, braziers, the cult statue, pediments and the altar are the temple's $(l)key parts$(). For every part missing, the coefficient drops in proportion, but never below 30%%.$(br2)A promotion needs the tier and a $(l)condition$() of at least 80%%. Missing parts become repair requests; if nobody takes them, villagers repair them after a few days."
     },
     {
       "type": "patchouli:text",
-      "text": "Greek columns include the $(item)Marble Pillar$() and vanilla quartz pillars.$(br2)$(o)Source$(): prostylos and peripteros are Greek temple plans described in Vitruvius, $(o)De architectura$() 3.2. The numeric requirements for each tier are this mod's adaptation."
+      "text": "Greek builders favored two plans: the prostyle, with a row of columns before the door, and the peripteral, with columns all around the cella.$(br2)The Prostyle and Peripteral Temples are built to these plans."
     }
   ]
 }

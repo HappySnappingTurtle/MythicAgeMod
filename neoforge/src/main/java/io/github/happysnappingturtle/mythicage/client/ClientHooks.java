@@ -117,6 +117,17 @@ public final class ClientHooks {
         }
     }
 
+    /** 最近收到的项目候选列表（GA-11；GA-12 的「建设」分页读它）。 */
+    private static io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View lastProjects;
+
+    public static void villageProjects(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View payload) {
+        lastProjects = payload;
+    }
+
+    public static java.util.Optional<io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View> lastProjects() {
+        return java.util.Optional.ofNullable(lastProjects);
+    }
+
     /** 村务界面（T19）：已开着就刷新。 */
     public static void villageAffairs(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View payload) {
         Minecraft mc = Minecraft.getInstance();

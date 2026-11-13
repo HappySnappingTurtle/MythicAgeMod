@@ -93,7 +93,8 @@ public final class CivVillageStructure extends Structure {
             boolean shape = spec == null || !(spec.category().equals("terrain") || b.building().endsWith("_harbor"));
             builder.addPiece(new VillageBuildingPiece(manager, b.template(),
                     new BlockPos(b.origin().x(), b.origin().y(), b.origin().z()), rotation(b.turn()),
-                    spec == null ? 0 : spec.floorY(), shape));
+                    spec == null ? 0 : spec.floorY(), shape,
+                    spec == null || !shape ? null : io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.door(spec, b.origin(), b.turn())));
         }
         for (VillagePlan.Path path : p.paths()) {
             builder.addPiece(new VillagePathPiece(path.width(), path.points()));

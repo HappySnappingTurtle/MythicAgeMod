@@ -111,11 +111,12 @@ class PlaytestStationsTest {
         assertEquals(Spot.LABYRINTH_ENTRANCE, spec("labyrinth").spot());
         assertEquals(Spot.ARENA_GATE, spec("boss").spot());
         assertEquals(-1, spec("start").temple());
-        assertEquals(-1, spec("temple").temple(), "第 2 站要自己搭");
+        assertEquals(-1, spec("temple").temple(), "第 2 站不预先扩建");
         assertEquals(1, spec("powers").temple());
         assertEquals(1, spec("rite").temple());
         assertEquals(2, spec("hero").temple());
-        assertTrue(spec("temple").altarGift(), "第 2 站要拿到祭坛");
+        assertTrue(spec("temple").upgrade(), "第 2 站：神庙扩建（GA-13）");
+        PlaytestStations.ALL.stream().filter(s -> !s.id().equals("temple")).forEach(s -> assertFalse(s.spec().upgrade(), s.id()));
         assertTrue(spec("boss").items().stream().anyMatch(g -> g.item().equals("mythic_age:ariadne_thread")));
         assertFalse(spec("labyrinth").items().stream().anyMatch(g -> g.item().equals("mythic_age:ariadne_thread")),
                 "迷宫站自己取线团");

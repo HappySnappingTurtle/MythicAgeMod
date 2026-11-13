@@ -108,13 +108,9 @@ public final class GreekPromotionGameTests {
         TradeService.openGuardian(p, s.priest());
     }
 
-    /** 一座远处的、只写在登记里的希腊神坛（区块不加载，条件只能读登记）。 */
-    private static GlobalPos altarEntry(GameTestHelper h, FakePlayer p, int dx, int level) {
-        GlobalPos pos = GlobalPos.of(h.getLevel().dimension(), h.absolutePos(new BlockPos(0, 2, 0)).offset(5000 + dx, 0, 0));
-        ShrineRegistry reg = ShrineRegistry.get(h.getLevel().getServer());
-        reg.add(new ShrineRegistry.Entry(pos, p.getUUID(), p.getGameProfile().getName(), Direction.SOUTH, GR, ALTAR_KIND));
-        reg.setLevel(pos, level);
-        return pos;
+    /** GA-13：把这个村子的神庙定为 level 级（测试用，不盖卫城）。 */
+    private static void templeLevel(Site s, int level) {
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.forceLevelForTest(s.village().id(), level);
     }
 
     private static void give(FakePlayer p, net.minecraft.world.item.Item item, int n) {
@@ -138,11 +134,11 @@ public final class GreekPromotionGameTests {
         return c.getContents() instanceof TranslatableContents t ? t.getKey() : c.getString();
     }
 
-    private static void cleanup(GameTestHelper h, List<GlobalPos> altars, Site... sites) {
-        ShrineRegistry reg = ShrineRegistry.get(h.getLevel().getServer());
-        altars.forEach(reg::remove);
+    private static void cleanup(GameTestHelper h, Site... sites) {
         for (Site s : sites) {
             VillageRegistry.get(h.getLevel().getServer()).remove(s.village().bell());
+            io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.forceLevelForTest(s.village().id(), -1);
+            io.github.happysnappingturtle.mythicage.village.economy.VillageEconomy.get(h.getLevel().getServer()).clearForTest(s.village().id());
             s.priest().discard();
         }
         TradeService.clearForTest();
@@ -150,36 +146,31 @@ public final class GreekPromotionGameTests {
 
     // ───────────── 神庙等级条件（TC-T11b-12～14） ─────────────
 
+    /** TC-T11b-12～14（GA-13 改）：条件看仪式所在村的神庙等级，不看玩家时代；没有村子时为「还没有神庙」。 */
     @GameTest(template = T, batch = BATCH)
-    public static void temple_requirement_reads_registry(GameTestHelper h) {
+    public static void temple_requirement_reads_village(GameTestHelper h) {
+        floor(h);
+        Site s = site(h, "zeus", Age.ARCHAIC, Map.of(), 4, 4);
         FakePlayer p = player(h, "gp_temple", Age.ARCHAIC, 0);
         JsonObject one = new JsonObject();
         one.addProperty("level", 1);
         JsonObject two = new JsonObject();
         two.addProperty("level", 2);
         PromotionRequirement r = GreekTempleRequirement.INSTANCE;
-        PromotionRequirement.Line l = r.check(p, GR, Age.CLASSICAL, null, one);
-        h.assertTrue(!l.met() && key(l.label()).equals("mythic_age.rite.line.temple_none"), "没有神坛：" + l);
-        GlobalPos a = altarEntry(h, p, 0, 0);
-        l = r.check(p, GR, Age.CLASSICAL, null, one);
-        h.assertTrue(!l.met() && l.progress().getString().equals("0 / 1"), "0 级：" + l.progress().getString());
-        ShrineRegistry reg = ShrineRegistry.get(h.getLevel().getServer());
-        reg.setLevel(a, 1);
-        h.assertTrue(r.check(p, GR, Age.CLASSICAL, null, one).met(), "1 级满足（神坛区块未加载，只读登记）");
-        GlobalPos b = altarEntry(h, p, 100, 3);
-        l = r.check(p, GR, Age.HEROIC, null, two);
-        h.assertTrue(!l.met() && l.progress().getString().equals("1 / 2"), "远古封顶 1 级：" + l.progress().getString());
-        data(p).setAge(Age.CLASSICAL);
-        l = r.check(p, GR, Age.HEROIC, null, two);
-        h.assertTrue(l.met() && l.progress().getString().equals("2 / 2"), "古典封顶 2 级，取两座里最高：" + l.progress().getString());
-        // TC-T11b-14：存档往返；旧存档没有 level 字段
-        CompoundTag tag = reg.save(new CompoundTag(), h.getLevel().registryAccess());
-        h.assertTrue(ShrineRegistry.load(tag, h.getLevel().registryAccess()).level(b) == 3, "往返后 3 级");
-        ListTag list = tag.getList("altars", Tag.TAG_COMPOUND);
-        list.forEach(t -> ((CompoundTag) t).remove("level"));
-        h.assertTrue(ShrineRegistry.load(tag, h.getLevel().registryAccess()).level(b) == 0, "旧存档缺省 0");
-        cleanup(h, List.of(a, b));
-        h.succeed();
+        try {
+            PromotionRequirement.Line l = r.check(p, GR, Age.CLASSICAL, null, one);
+            h.assertTrue(!l.met() && key(l.label()).equals("mythic_age.rite.line.temple_none"), "没有村子：" + l);
+            l = r.check(p, GR, Age.CLASSICAL, s.village(), one);
+            h.assertTrue(!l.met() && l.progress().getString().equals("0 / 1"), "还没有卫城 0 级：" + l.progress().getString());
+            templeLevel(s, 1);
+            h.assertTrue(r.check(p, GR, Age.CLASSICAL, s.village(), one).met(), "1 级满足");
+            templeLevel(s, 3);
+            l = r.check(p, GR, Age.HEROIC, s.village(), two);
+            h.assertTrue(l.met() && l.progress().getString().equals("3 / 2"), "不再按玩家时代封顶：" + l.progress().getString());
+            h.succeed();
+        } finally {
+            cleanup(h, s);
+        }
     }
 
     // ───────────── 远古 → 古典 → 英雄（TC-T11b-20～25） ─────────────
@@ -197,8 +188,6 @@ public final class GreekPromotionGameTests {
         give(p, Items.WHEAT, 32);
         giveId(p, "mythic_age:libation", 4);
         give(p, Items.COPPER_INGOT, 16);
-        GlobalPos altar = altarEntry(h, p, 0, 0);
-        ShrineRegistry reg = ShrineRegistry.get(h.getLevel().getServer());
         at(p, s);
         // TC-T11b-21：神庙 0 级
         RitesView.Option o = promotion(p);
@@ -206,7 +195,7 @@ public final class GreekPromotionGameTests {
         RitesView.Line temple = o.lines().get(5);
         h.assertTrue(!temple.met() && temple.progress().getString().equals("0 / 1"), "神庙行 ✘ 0 / 1");
         // TC-T11b-20：1 级后全部满足；候选为宙斯名下的雅典娜、赫尔墨斯
-        reg.setLevel(altar, 1);
+        templeLevel(s, 1);
         o = promotion(p);
         h.assertTrue(o.ready() && o.favor() == 50, "可举行、50 恩宠：" + o.lines());
         h.assertTrue(o.candidates().stream().map(RitesView.Candidate::id).toList().equals(List.of("athena", "hermes")),
@@ -228,7 +217,7 @@ public final class GreekPromotionGameTests {
         give(p, Items.GOLD_INGOT, 8);
         give(p, Items.COOKED_MUTTON, 16);
         give(p, Items.HONEY_BOTTLE, 4);
-        reg.setLevel(altar, 2);
+        templeLevel(s, 2);
         at(p, s);
         RitesView.Option toHeroic = promotion(p);
         h.assertTrue(toHeroic.target() == Age.HEROIC && !toHeroic.ready(), "没有凭证不可举行：" + toHeroic.lines()
@@ -254,7 +243,7 @@ public final class GreekPromotionGameTests {
         h.assertTrue(!top.ready() && !top.blocking().isEmpty(), "神话不可举行：" + top.blocking());
         var page = FaithService.build(p).pages().get(GR.ordinal());
         h.assertTrue(page.nextAge() == Age.NONE && page.next().isEmpty(), "信仰面板：下一时代暂未开放");
-        cleanup(h, List.of(altar), s);
+        cleanup(h, s);
         h.succeed();
     }
 
@@ -299,13 +288,13 @@ public final class GreekPromotionGameTests {
         h.assertTrue(offer(fan, "patron_statue").orElseThrow().lock() == TradeReason.HAS_STATUE
                 && TradeService.buy(fan, "patron_statue", 30, UUID.randomUUID().toString()).reason() == TradeReason.HAS_STATUE,
                 "每主神限 1 座");
-        cleanup(h, List.of(), s);
+        cleanup(h, s);
         // TC-T11b-32、33：远古村庄（人为放了雅典娜祠）与古典村庄里的狄俄尼索斯祠
         Site archaic = site(h, "zeus", Age.ARCHAIC, Map.of(Age.CLASSICAL, List.of("athena"), Age.HEROIC, List.of("dionysus")), 4, 20);
         at(other, archaic);
         h.assertTrue(offer(other, "athena_olive_oil").orElseThrow().lock() == TradeReason.STAGE_LOCKED, "远古村庄：阶段不足");
         h.assertTrue(offer(other, "dionysus_grape").orElseThrow().lock() == TradeReason.STAGE_LOCKED, "英雄商品：阶段不足");
-        cleanup(h, List.of(), archaic);
+        cleanup(h, archaic);
         h.succeed();
     }
 
@@ -329,8 +318,9 @@ public final class GreekPromotionGameTests {
         h.assertTrue(matches(h, "greek/root", MythEvents.VILLAGE_ENTERED, GR, 0), "异乡人");
         h.assertTrue(matches(h, "greek/blessed", MythEvents.BLESSED, GR, 0), "祭司的祝福");
         h.assertTrue(matches(h, "greek/first_favor", MythEvents.FAVOR_GAINED, GR, 3), "第一缕香火");
-        h.assertTrue(!matches(h, "greek/temple", MythEvents.TEMPLE_LEVEL, GR, 0)
-                && matches(h, "greek/temple", MythEvents.TEMPLE_LEVEL, GR, 1), "柱廊之间：0 级不算、1 级算");
+        // GA-13 D2：供奉的村子建成中神庙（2 级）才算
+        h.assertTrue(!matches(h, "greek/temple", MythEvents.TEMPLE_LEVEL, GR, 1)
+                && matches(h, "greek/temple", MythEvents.TEMPLE_LEVEL, GR, 2), "柱廊之间：1 级不算、2 级算");
         h.assertTrue(!matches(h, "greek/classical", MythEvents.AGE_REACHED, GR, Age.ARCHAIC.ordinal())
                 && matches(h, "greek/classical", MythEvents.AGE_REACHED, GR, Age.CLASSICAL.ordinal()), "古典");
         // TC-T11b-42：直接到英雄，古典也成立
@@ -367,13 +357,13 @@ public final class GreekPromotionGameTests {
             give(p, Items.WHEAT, 32);
             giveId(p, "mythic_age:libation", 4);
             give(p, Items.COPPER_INGOT, 16);
-            GlobalPos altar = altarEntry(h, p, 0, 1);
+            templeLevel(s, 1);
             at(p, s);
             RiteService.Outcome r = RiteService.perform(p, RiteKind.PROMOTION, Age.NONE, "hermes", 50, UUID.randomUUID().toString());
             h.assertTrue(r.reason() == RiteService.Reason.OK
                     && fired.contains(new MythEvents.Fired(p.getUUID(), MythEvents.AGE_REACHED, GR, Age.CLASSICAL.ordinal())),
                     "晋升发出 age_reached：" + r + " " + fired);
-            cleanup(h, List.of(altar), s);
+            cleanup(h, s);
         } finally {
             MythEvents.testListener = null;
         }

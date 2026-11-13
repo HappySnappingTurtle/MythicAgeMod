@@ -136,6 +136,23 @@ public final class ProjectNbt {
         return new VillageEconomy.Notice(t.getLong("day"), t.getString("building"), t.getString("god"), sent);
     }
 
+    /** GA-11「下一个」位。 */
+    static CompoundTag writeNext(io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Next n) {
+        CompoundTag t = new CompoundTag();
+        t.putString("key", n.key());
+        t.putString("building", n.building());
+        t.putString("god", n.god());
+        t.putUUID("player", n.player());
+        t.putString("playerName", n.playerName());
+        t.putLong("day", n.day());
+        return t;
+    }
+
+    static io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Next readNext(CompoundTag t) {
+        return new io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Next(t.getString("key"),
+                t.getString("building"), t.getString("god"), t.getUUID("player"), t.getString("playerName"), t.getLong("day"));
+    }
+
     private static CompoundTag doubles(Map<String, Double> m) {
         CompoundTag t = new CompoundTag();
         m.forEach(t::putDouble);

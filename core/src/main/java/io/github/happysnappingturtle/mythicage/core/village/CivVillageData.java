@@ -19,7 +19,7 @@ import java.util.TreeSet;
 /**
  * 一个文明的村庄经济数据 {@code village_civ/<civ>.json}（T19 设计文档 §2、§6、§9、§10.1）：
  * 行为模块、作息与历法、仓储、口粮、燃料、采集点种类、作物、初始居民与名字表、S0 初始库存、施工折算表（§1.4 E1）、
- * 交易规则（§1.8）、生活与节庆（§1.10 {@code life}）、村民士兵（T20 {@code soldiers}）、NPC 任务（T21 {@code quests}）。
+ * 交易规则（§1.8）、生活与节庆（§1.10 {@code life}）、村民士兵（T20 {@code soldiers}）、NPC 任务（T21 {@code quests}）、施工节奏（GA-10 {@code construction}）、点名门槛（GA-11 {@code projectPick}）。
  * 职业与配方另有文件（{@code village_profession/<civ>/*}、{@code village_recipe/<civ>/*}）。
  */
 public record CivVillageData(String civ, String behavior, Schedule schedule, VillageCalendar calendar, int baseCapacity,
@@ -33,7 +33,8 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                              Foundation foundation,
                              io.github.happysnappingturtle.mythicage.core.village.soldier.SoldierCivRules soldiers,
                              io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules quests,
-                             io.github.happysnappingturtle.mythicage.core.village.build.BuildPacing.Settings construction) {
+                             io.github.happysnappingturtle.mythicage.core.village.build.BuildPacing.Settings construction,
+                             io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Settings projectPick) {
     /**
      * 奠基石（T19 §1.13 K1）：方块、可选主神、起步住居（没有住居时的第一个项目，远古也开工）、露宿名额。
      * 方块为空表示这个文明还没有奠基石。
@@ -169,13 +170,13 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
     public CivVillageData withConstruction(io.github.happysnappingturtle.mythicage.core.village.build.BuildPacing.Settings settings) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
                 fruits, stations, woodland, naturalPoints, residents, initialStock, professions, recipes, buildCosts, trade, life,
-                foundation, soldiers, quests, settings);
+                foundation, soldiers, quests, settings, projectPick);
     }
 
     public CivVillageData withProfessions(Map<String, Profession> p, Map<String, VillageRecipe> r) {
         return new CivVillageData(civ, behavior, schedule, calendar, baseCapacity, storageUnit, rations, fuel, points, crops,
                 fruits, stations, woodland, naturalPoints, residents, initialStock, p, r, buildCosts, trade, life, foundation,
-                soldiers, quests, construction);
+                soldiers, quests, construction, projectPick);
     }
 
     /** 兵种数据：职业是兵种时返回它的数据。 */
@@ -278,7 +279,9 @@ public record CivVillageData(String civ, String behavior, Schedule schedule, Vil
                 o.has("quests") ? io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules.parse(o.getAsJsonObject("quests"))
                         : io.github.happysnappingturtle.mythicage.core.village.quest.QuestCivRules.DEFAULT,
                 io.github.happysnappingturtle.mythicage.core.village.build.BuildPacing.Settings.parse(
-                        o.has("construction") ? o.getAsJsonObject("construction") : new JsonObject()));
+                        o.has("construction") ? o.getAsJsonObject("construction") : new JsonObject()),
+                io.github.happysnappingturtle.mythicage.core.village.build.ProjectQueue.Settings.parse(
+                        o.has("projectPick") ? o.getAsJsonObject("projectPick") : new JsonObject()));
     }
 
     static Foundation foundation(JsonObject f) {

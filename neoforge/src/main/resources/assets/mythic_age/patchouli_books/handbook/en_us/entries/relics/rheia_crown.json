@@ -1,0 +1,21 @@
+{
+  "name": "Rheia's Crown",
+  "icon": "mythic_age:rheia_crown",
+  "category": "mythic_age:relics",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:rheia_crown",
+      "text": "$(l)Worn$(): Greek favor cap $(l)+50$(). Taking it off does not remove favor above the cap; it just stops growing until you are below the cap again.$(br2)$(l)Enshrined$(): prayer favor $(l)+15%%$() from every village you are devoted to, no matter which village holds the crown."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Found in the vault behind the $(l)abandoned temple$(), together with Pygmalion's Statue. The vault gives each player one share, and gives you the relic you have not taken yet first."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Rheia was the wife of Kronos and the mother of Hestia, Demeter, Hera, Hades, Poseidon and Zeus. Kronos feared his children would overthrow him and swallowed each one at birth. When Zeus was born, Rheia gave Kronos a stone wrapped in swaddling clothes instead, and Zeus survived.$(br2)(Hesiod, Theogony)"
+    }
+  ]
+}

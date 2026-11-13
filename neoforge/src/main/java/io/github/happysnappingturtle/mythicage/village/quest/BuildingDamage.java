@@ -119,6 +119,8 @@ public final class BuildingDamage {
             d.cells.put(key, new VillageQuests.Cell(key, state, cause, today));
         }
         all.setDirty();
+        // GA-13：神庙完好度随损坏记录变化
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(loc.get().village().id());
     }
 
     /** 采集点（采石面、黏土坑等）不是设施：村民和玩家都会在那里取料。 */

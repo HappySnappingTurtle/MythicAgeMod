@@ -1,16 +1,16 @@
 {
-  "name": "Reading the Shrine Inspector",
+  "name": "Reading the Temple Inspector",
   "icon": "minecraft:spyglass",
   "category": "mythic_age:temple",
-  "sortnum": 3,
+  "sortnum": 4,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Right-click the altar with an empty hand:$(li)Left: the recognised tier and factor, and what the next tier still needs$(li)Middle: prayer spots, believers praying now and over 7 days, favor today, estimated daily output (an estimate only), and accrual while you are away$(li)Right: what is missing; unloaded chunks, too-low age and unreachable spots are each named"
+      "text": "Right-click the village altar with an empty hand to open the $(l)temple inspector$():$(li)$(l)Left$(): whether you are a devotee here, how many devotees there are, tier and coefficient, condition.$(li)$(l)Middle$(): worshippers at a time, today's believers, your favor from here today, the daily estimate, today's offering, and your while-away record.$(li)$(l)Right$(): what is missing, such as not being a devotee or low condition."
     },
     {
       "type": "patchouli:text",
-      "text": "Press \"Highlight gaps\" and outlines appear in the world for 10 seconds; their $(l)shapes$() mean:$(li)□ scanned area, counted columns$(li)☒ missing or altar-covering blocks, unlit braziers$(li)⬚ columns too short or on the ground$(li)▮ whole columns without roof$(li)▁ prayer spots$(br2)Only lines are drawn; no blocks are placed."
+      "text": "The bottom row shows your $(l)offering slots$() in this village: which relics are there and how many slots are free. Press Take to get one back.$(br2)$(l)Highlight$() marks the altar and prayer spots in the world for 10 seconds, as a guide only.$(br2)$(l)Stop devotion here$() ends your devotion."
     }
   ]
 }

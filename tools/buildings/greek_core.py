@@ -183,6 +183,9 @@ def granary() -> Building:
     b.set(x1, 0, 2, "socle")
     b.set(x1, 1, 2, "mudbrick")
     b.set(x1, 2, 2, "mudbrick")
+    # 门楣：双开门顶上一根橄榄木过梁（门洞清了 3 格高，门只占 2 格，原先门顶漏一个洞）
+    for z in (3, 4):
+        b.set(x1, 2, z, "beam", axis="z")
     # 陶瓮沿南北墙成排（货堆显示位）
     for x in range(1, x1):
         for z in (1, z1 - 1):

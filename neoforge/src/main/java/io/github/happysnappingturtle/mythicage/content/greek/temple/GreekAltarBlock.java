@@ -25,9 +25,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * 奥林匹斯祭坛 Bomos（T8a 设计文档 §2.1、修订 01）：露天立在神庙正门前，朝向指向神庙。
- * 放置时绑定主人并检查数量上限与间距；右键检视神庙；
- * 移除时注销登记。没有玩家的放置不成立（由 {@link ShrineService} 在下一刻移除）。
+ * 旧祭坛（原「奥林匹斯祭坛」，T8a）：GA-13 神庙归村庄之后只是装饰，外观不变。放下不登记、不产恩宠，右键提示一句。
+ * 旧存档里有主人的那些在方块实体加载时迁移（{@link LegacyAltars}），之后同样只是装饰。方块实体留着，只为读出旧存档里的主人与圣物。
  */
 public class GreekAltarBlock extends BaseEntityBlock {
     public static final MapCodec<GreekAltarBlock> CODEC = simpleCodec(GreekAltarBlock::new);
@@ -69,68 +68,18 @@ public class GreekAltarBlock extends BaseEntityBlock {
         return new GreekAltarBlockEntity(pos, state);
     }
 
+    /** GA-13：旧祭坛只是装饰，放下不登记、不检查数量与间距。 */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        if (ctx.getLevel() instanceof ServerLevel level && ctx.getPlayer() instanceof ServerPlayer player) {
-            var error = ShrineService.placementError(player, level, ctx.getClickedPos(), ctx.getHorizontalDirection(),
-                    GreekTemple.ALTAR_KIND);
-            if (error.isPresent()) {
-                player.displayClientMessage(error.get(), true);
-                return null;
-            }
-        }
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if (level instanceof ServerLevel server && placer instanceof ServerPlayer player
-                && level.getBlockEntity(pos) instanceof GreekAltarBlockEntity be) {
-            ShrineService.onPlaced(server, pos, player, be, state.getValue(FACING));
-        }
-    }
-
-    /** 手持供品右键：献供（GA-4）；拿的不是供品时照常走 {@link #useWithoutItem} 打开检视界面。 */
-    @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                                                Player player, net.minecraft.world.InteractionHand hand,
-                                                                BlockHitResult hit) {
-        String id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
-        var offering = io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader.greek().of(id);
-        if (offering.isEmpty()) {
-            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        }
-        if (level instanceof ServerLevel server && player instanceof ServerPlayer sp
-                && level.getBlockEntity(pos) instanceof GreekAltarBlockEntity be) {
-            // 名字要在扣物品之前取：扣到 0 个后物品堆变成空气
-            net.minecraft.network.chat.Component name = stack.getHoverName().copy();
-            var r = io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService.offer(sp, be, stack);
-            int percent = (int) Math.round(io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader.greek().bonus() * 100);
-            net.minecraft.network.chat.Component msg = switch (r) {
-                case OK -> net.minecraft.network.chat.Component.translatable("mythic_age.offering.ok", name, "+" + percent + "%");
-                case ALREADY -> net.minecraft.network.chat.Component.translatable("mythic_age.offering.already");
-                case NOT_OWNER -> net.minecraft.network.chat.Component.translatable("mythic_age.offering.not_owner");
-                case NOT_ENOUGH -> net.minecraft.network.chat.Component.translatable("mythic_age.offering.not_enough", name,
-                        offering.get().count());
-                case NOT_OFFERING -> net.minecraft.network.chat.Component.empty();
-            };
-            sp.displayClientMessage(msg, true);
-            if (r == io.github.happysnappingturtle.mythicage.content.greek.prayer.PrayerService.OfferResult.OK) {
-                server.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getX() + 0.5, pos.getY() + 1.1, pos.getZ() + 0.5,
-                        6, 0.15, 0.1, 0.15, 0.01);
-                server.sendParticles(ParticleTypes.FLAME, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 8, 0.2, 0.1, 0.2, 0.01);
-                server.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, net.minecraft.sounds.SoundSource.BLOCKS,
-                        0.6F, 1.2F);
-            }
-        }
-        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
-    }
-
+    /** 右键只提示一句：信徒现在在村庄神庙祈祷。 */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level instanceof ServerLevel server && player instanceof ServerPlayer sp) {
-            TempleService.inspect(sp, server, pos);
+        if (!level.isClientSide) {
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("mythic_age.old_altar.hint"), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

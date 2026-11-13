@@ -107,12 +107,14 @@ public final class RelicEffects {
         return best;
     }
 
-    /** 阿喀琉斯之甲供奉的「友方」（D4）：范围内的村民、铁傀儡；主人的召唤单位与驯服生物。玩家不算。 */
+    /** 阿喀琉斯之甲供奉的「友方」（D4）：范围内的村民（含本作居民）、铁傀儡；主人的召唤单位与驯服生物。玩家不算。 */
     public static boolean isAlly(LivingEntity e, UUID owner) {
         if (e instanceof net.minecraft.world.entity.player.Player) {
             return false;
         }
-        if (e instanceof Villager || e instanceof IronGolem) {
+        // 本作的村庄居民也算（GA-13 实机核对：希腊村子里住的主要是居民，不是原版村民）
+        if (e instanceof Villager || e instanceof IronGolem
+                || e instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity) {
             return true;
         }
         if (e instanceof MythSummon s) {
@@ -123,9 +125,19 @@ public final class RelicEffects {
 
     // ───────────── 信徒村民 ─────────────
 
-    /** 每 20 刻：范围内的信徒村民加生命上限，离开的拿掉（§6）。 */
+    /** 本文明的信徒：原版村民按锚点判断；本作居民属于这个文明的村子就算。 */
+    static boolean believer(RelicAnchor anchor, LivingEntity e) {
+        if (e instanceof Villager v) {
+            return anchor.believer(v);
+        }
+        return e instanceof io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity r && r.village()
+                .flatMap(id -> io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(r.getServer()).byId(id))
+                .map(v -> v.civ().equals(anchor.civ().id())).orElse(false);
+    }
+
+    /** 每 20 刻：范围内的信徒（原版村民与本作居民）加生命上限，离开的拿掉（§6）。 */
     public static void tickBelievers(MinecraftServer server) {
-        Map<UUID, Villager> now = new HashMap<>();
+        Map<UUID, LivingEntity> now = new HashMap<>();
         Map<UUID, Double> amount = new HashMap<>();
         for (OfferedIndex.Entry e : OfferedIndex.all()) {
             double v = 0;
@@ -138,8 +150,9 @@ public final class RelicEffects {
                 continue;
             }
             double r = anchor.searchRadius();
-            for (Villager vil : level.getEntitiesOfClass(Villager.class, new AABB(e.pos().pos()).inflate(r),
-                    x -> x.isAlive() && anchor.inRange(level, e.pos().pos(), x) && anchor.believer(x))) {
+            // 信徒：希腊村子里的原版村民与本作居民
+            for (LivingEntity vil : level.getEntitiesOfClass(LivingEntity.class, new AABB(e.pos().pos()).inflate(r),
+                    x -> x.isAlive() && anchor.inRange(level, e.pos().pos(), x) && believer(anchor, x))) {
                 now.put(vil.getUUID(), vil);
                 amount.merge(vil.getUUID(), v, Math::max);
             }
@@ -150,7 +163,7 @@ public final class RelicEffects {
             }
             BLESSED.remove(old.getKey());
             ServerLevel level = server.getLevel(old.getValue());
-            if (level != null && level.getEntity(old.getKey()) instanceof Villager v) {
+            if (level != null && level.getEntity(old.getKey()) instanceof LivingEntity v) {
                 RelicService.setHealthModifier(v, MAX_HEALTH_BELIEVER, 0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
             }
         }

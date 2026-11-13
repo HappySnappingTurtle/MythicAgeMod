@@ -1,7 +1,6 @@
 package io.github.happysnappingturtle.mythicage.relic.greek;
 
 import io.github.happysnappingturtle.mythicage.content.greek.prayer.BelieverEvents;
-import io.github.happysnappingturtle.mythicage.content.greek.temple.GreekTemple;
 import io.github.happysnappingturtle.mythicage.core.player.Civilization;
 import io.github.happysnappingturtle.mythicage.relic.RelicAnchor;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineKind;
@@ -12,7 +11,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * 希腊的圣物锚点：奥林匹斯祭坛，每座放一件；供奉范围 = 同维度、到神坛中心的三维距离 ≤ 48 格（01_希腊 §9，D6）；
+ * 希腊的圣物锚点：GA-13 起供奉在村庄神庙；供奉范围 = 同维度、到神庙圆心的三维距离 ≤ 48 格（01_希腊 §9，D6）；
  * 信徒 = 已登记希腊村庄里的成年村民（D5）。
  */
 public final class GreekRelicAnchor implements RelicAnchor {
@@ -23,9 +22,10 @@ public final class GreekRelicAnchor implements RelicAnchor {
         return Civilization.GREEK;
     }
 
+    /** GA-13：圣物供奉在村庄神庙（{@code TempleRelics}），旧祭坛不再接受。 */
     @Override
     public boolean accepts(ShrineKind kind) {
-        return kind.id().equals(GreekTemple.ALTAR_KIND.id());
+        return false;
     }
 
     @Override

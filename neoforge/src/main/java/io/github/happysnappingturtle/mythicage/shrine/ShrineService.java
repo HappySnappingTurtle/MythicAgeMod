@@ -93,7 +93,9 @@ public final class ShrineService {
     /** 方块实体加载：没有主人的（命令、结构放置）给绑定留出同一刻，下一刻仍无主就移除。 */
     static void onLoaded(ServerLevel level, ShrineBlockEntity be) {
         if (be.owner().isEmpty()) {
-            OWNER_CHECK.put(GlobalPos.of(level.dimension(), be.getBlockPos()), level.getGameTime() + 1);
+            if (!be.kind().hooks().keepUnowned()) {
+                OWNER_CHECK.put(GlobalPos.of(level.dimension(), be.getBlockPos()), level.getGameTime() + 1);
+            }
             return;
         }
         level.getServer().execute(() -> {

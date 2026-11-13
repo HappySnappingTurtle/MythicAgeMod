@@ -11,7 +11,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  * <ul>
  *   <li>占地每一列：地面下补土到实心地面（≤ 12 格），占地边缘的列用多边形砌石（低处露出的就是挡土墙）；</li>
  *   <li>模板顶上的山体削掉（≤ 10 格）；</li>
- *   <li>占地外一圈：高处比地面高 ≥ 2 格时砌挡土墙（≤ 5 格高，压顶方石）；低处按 1:1 培土成缓坡。</li>
+ *   <li>占地外一圈：高处比地面高 ≥ 2 格时砌挡土墙（≤ 5 格高，压顶方石）；低处按 1:1 培土成缓坡；</li>
+ *   <li>门前：挡土墙与山体挡住门时开一段方石台阶（GA-14）。</li>
  * </ul>
  * 桥、码头（shape = false）只把底层的实心方块往下补到水底（{@link TerrainTemplatePiece.Terrain#PILLARS}）。
  * 整地的实现在 {@link TerrainTemplatePiece}（T22 抽出，遗迹也用）。
@@ -19,8 +20,14 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 public final class VillageBuildingPiece extends TerrainTemplatePiece {
     public VillageBuildingPiece(StructureTemplateManager manager, String template, BlockPos origin, Rotation rotation,
                                 int floorY, boolean shape) {
+        this(manager, template, origin, rotation, floorY, shape, null);
+    }
+
+    /** @param door 门（世界坐标）：整地后在门前开台阶（GA-14）；null 不开 */
+    public VillageBuildingPiece(StructureTemplateManager manager, String template, BlockPos origin, Rotation rotation,
+                                int floorY, boolean shape, io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.Door door) {
         super(ModStructures.BUILDING_PIECE.get(), manager, template, origin, rotation, floorY,
-                shape ? Terrain.FULL : Terrain.PILLARS);
+                shape ? Terrain.FULL : Terrain.PILLARS, door);
     }
 
     public VillageBuildingPiece(StructureTemplateManager manager, CompoundTag tag) {

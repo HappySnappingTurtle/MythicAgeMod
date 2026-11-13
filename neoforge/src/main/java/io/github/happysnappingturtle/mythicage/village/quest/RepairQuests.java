@@ -147,6 +147,7 @@ final class RepairQuests {
             return false;
         }
         d.cells.remove(pos.asLong());
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidate(loc.village().id());
         UUID me = player.getUUID();
         long today = MythDays.today(level.getServer());
         Optional<Quest> q = book.quests.stream().filter(x -> x.type.equals(TYPE) && x.target.equals(d.key)

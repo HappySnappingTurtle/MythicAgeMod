@@ -63,11 +63,33 @@ public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> 
         public static final Requirement NONE = new Requirement(0, false, false, false, 0, 0, 0, 0);
     }
 
-    public record Tier(int level, String name, Age age, int prayerSlots, double coefficient, Requirement require) {
+    /**
+     * @param building GA-13：村庄神庙达到这一级所需的建筑（不带主神后缀的短名，如 {@code acropolis_classical}）；
+     *                 0 级为空（新村还没有神庙时）
+     */
+    public record Tier(int level, String name, Age age, int prayerSlots, double coefficient, Requirement require,
+                       String building) {
+        public Tier(int level, String name, Age age, int prayerSlots, double coefficient, Requirement require) {
+            this(level, name, age, prayerSlots, coefficient, require, "");
+        }
     }
 
     public Tier tier(int level) {
         return tiers.get(level);
+    }
+
+    /**
+     * 村庄神庙等级（GA-13 §2.1）：村里建成的建筑（短名）中，对应建筑在场的最高一级；一座都没有为 0。
+     * 只看建筑在不在，不看玩家时代。
+     */
+    public int levelOf(java.util.Collection<String> builtShortNames) {
+        int level = 0;
+        for (Tier t : tiers) {
+            if (!t.building().isEmpty() && builtShortNames.contains(t.building())) {
+                level = Math.max(level, t.level());
+            }
+        }
+        return level;
     }
 
     public int maxLevel() {
@@ -198,7 +220,11 @@ public record TempleRules(Scan scan, Roof roof, int columnMinHeight, List<Tier> 
             if (!tiers.isEmpty() && age.ordinal() < tiers.getLast().age().ordinal()) {
                 throw new TempleRulesException(path + ".age: 不能早于上一级的时代");
             }
-            tiers.add(new Tier(level, name, age, slots, coefficient, req));
+            String building = "";
+            if (t.has("building")) {
+                building = string(t, "building", path + ".building");
+            }
+            tiers.add(new Tier(level, name, age, slots, coefficient, req, building));
         }
         return new TempleRules(scan, roof, columnMinHeight, tiers);
     }

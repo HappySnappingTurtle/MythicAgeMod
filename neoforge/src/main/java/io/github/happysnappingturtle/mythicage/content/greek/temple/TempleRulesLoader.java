@@ -59,6 +59,6 @@ public final class TempleRulesLoader extends SimpleJsonResourceReloadListener {
         });
         next.keySet().retainAll(files.keySet());
         rules = Map.copyOf(next);
-        TempleService.onRulesReloaded();
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.invalidateAll();
     }
 }

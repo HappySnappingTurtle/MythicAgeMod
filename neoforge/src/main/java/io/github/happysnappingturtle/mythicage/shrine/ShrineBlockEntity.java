@@ -88,6 +88,13 @@ public abstract class ShrineBlockEntity extends BlockEntity {
         setChanged();
     }
 
+    /** 清掉主人（GA-13：旧祭坛迁移后只是装饰）。 */
+    public void clearOwner() {
+        this.owner = null;
+        this.ownerName = "";
+        setChanged();
+    }
+
     public void refreshOwnerAge(Age age) {
         if (age != ownerAge) {
             ownerAge = age;

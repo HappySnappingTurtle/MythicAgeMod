@@ -55,6 +55,7 @@ public final class PrayAtAltar extends Behavior<Villager> {
 
     private GlobalPos altar;
     private BlockPos slot;
+    /** GA-13：信徒所属的村子（原来是神坛主人）。 */
     private UUID owner;
     private long startedAt;
     private boolean arrived;
@@ -96,10 +97,11 @@ public final class PrayAtAltar extends Behavior<Villager> {
             return false;
         }
         rec.nextCheck = now + CHECK_INTERVAL;
-        if (rec.lastAltar() != null && !PrayerService.isGreekAltar(level.getServer(), rec.lastAltar())) {
+        Optional<VillageRegistry.Village> village = BelieverEvents.greekVillage(v);
+        if (rec.lastAltar() != null && (village.isEmpty()
+                || !TemplePrayer.isTempleAltar(level.getServer(), village.get().id(), rec.lastAltar()))) {
             rec.clearAltar();
         }
-        Optional<VillageRegistry.Village> village = BelieverEvents.greekVillage(v);
         BelieverEvents.sync(v, rec, village.isPresent(), false);
         if (village.isEmpty() || !free(v) || !PrayerFormula.inWindow(level.getDayTime())) {
             return false;
@@ -111,44 +113,30 @@ public final class PrayAtAltar extends Behavior<Villager> {
         return choose(level, v, rec, village.get());
     }
 
-    /** 按 BelieverRules 的顺序逐个尝试神坛：同日一主、已有判定结果、有空的祈祷位。 */
+    /** GA-13：去本村神庙的祭坛，占一个离自己最近的空祈祷位。 */
     private boolean choose(ServerLevel level, Villager v, PrayerRecord rec, VillageRegistry.Village village) {
-        TempleRules rules = TempleService.rules();
         long today = MythDays.today(level.getServer());
         if (rec.creditedOn(today)) {
             return false;
         }
-        BlockPos bell = village.bell().pos();
-        boolean sameDim = village.bell().dimension().equals(level.dimension());
-        List<BelieverRules.Candidate<GlobalPos>> candidates = new ArrayList<>();
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id())) {
-            if (!e.pos().dimension().equals(level.dimension())) {
-                continue;
-            }
-            BlockPos p = e.pos().pos();
-            boolean inVillage = sameDim && horizontal(bell.getX() + 0.5, bell.getZ() + 0.5, p) <= VillageService.RANGE;
-            candidates.add(new BelieverRules.Candidate<>(e.pos(), e.owner(), inVillage, horizontal(v.getX(), v.getZ(), p)));
+        Optional<io.github.happysnappingturtle.mythicage.village.temple.VillageTemple> temple =
+                TemplePrayer.templeOf(level.getServer(), village);
+        // 没有供奉者时不去（同居民）
+        if (temple.isEmpty() || !temple.get().altar().dimension().equals(level.dimension())
+                || !io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.hasDevotees(level.getServer(), village.id())) {
+            return false;
         }
-        for (BelieverRules.Candidate<GlobalPos> c : BelieverRules.order(candidates)) {
-            if (!BelieverRules.canPrayFor(rec.lastPrayDay(), rec.lastPrayOwner(), today, c.owner())) {
-                continue;
-            }
-            GreekAltarBlockEntity be = PrayerService.altarAt(level.getServer(), c.altar());
-            if (be == null || !be.hasResult()) {
-                continue;
-            }
-            // 空位里取离自己最近的：先到的信徒不会去占神坛另一侧的位置
-            List<BlockPos> slots = new ArrayList<>(be.prayerSlots(rules));
-            slots.sort(java.util.Comparator.comparingDouble(p -> p.distToCenterSqr(v.position())));
-            Optional<BlockPos> s = PrayerService.SLOTS.claim(c.altar(), slots, v.getUUID(), level.getGameTime());
-            if (s.isPresent()) {
-                altar = c.altar();
-                slot = s.get();
-                owner = c.owner();
-                return true;
-            }
+        // 空位里取离自己最近的：先到的信徒不会去占神坛另一侧的位置
+        List<BlockPos> slots = new ArrayList<>(temple.get().prayerSlots());
+        slots.sort(java.util.Comparator.comparingDouble(p -> p.distToCenterSqr(v.position())));
+        Optional<BlockPos> s = PrayerService.SLOTS.claim(temple.get().altar(), slots, v.getUUID(), level.getGameTime());
+        if (s.isEmpty()) {
+            return false;
         }
-        return false;
+        altar = temple.get().altar();
+        slot = s.get();
+        owner = village.id();
+        return true;
     }
 
     private static double horizontal(double x, double z, BlockPos p) {
@@ -179,7 +167,7 @@ public final class PrayAtAltar extends Behavior<Villager> {
     @Override
     protected boolean canStillUse(ServerLevel level, Villager v, long gameTime) {
         if (done || lost || !free(v) || !PrayerFormula.inWindow(level.getDayTime())
-                || !PrayerService.isGreekAltar(level.getServer(), altar)) {
+                || !TemplePrayer.isTempleAltar(level.getServer(), owner, altar)) {
             return false;
         }
         if (!arrived) {
@@ -223,7 +211,7 @@ public final class PrayAtAltar extends Behavior<Villager> {
             level.sendParticles(GOLD, v.getX(), v.getY() + 1.1, v.getZ(), 3, 0.3, 0.3, 0.3, 0);
         }
         if (arrived && counted && !done && gameTime - arrivedAt >= PrayerFormula.PRAY_TICKS) {
-            PrayerService.credit(level, altar, v.getUUID());
+            TemplePrayer.credit(level, owner, v.getUUID());
             record(v).markCredited(MythDays.today(level.getServer()));
             done = true;
         }
@@ -263,10 +251,10 @@ public final class PrayAtAltar extends Behavior<Villager> {
         PrayerRecord rec = record(v);
         rec.running = false;
         if (gaveUp) {
-            PrayerService.markUnreachable(altar, gameTime);
+            TemplePrayer.markUnreachable(owner, gameTime);
             rec.nextCheck = gameTime + RETRY_COOLDOWN;
         }
-        if (!PrayerService.isGreekAltar(level.getServer(), altar) && altar.equals(rec.lastAltar())) {
+        if (!TemplePrayer.isTempleAltar(level.getServer(), owner, altar) && altar.equals(rec.lastAltar())) {
             rec.clearAltar();
         }
         PrayerService.SLOTS.release(altar, v.getUUID());

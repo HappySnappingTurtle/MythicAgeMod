@@ -1,0 +1,21 @@
+{
+  "name": "Offerings",
+  "icon": "mythic_age:libation",
+  "category": "mythic_age:temple",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:libation",
+      "text": "In a village you are devoted to, right-click the village altar holding an offering (a new village without a temple uses its foundation stone). That is an $(l)offering$().$(br2)Once per village per day. Your prayer favor from that village is $(l)+50%%$() that day, including what was already credited, so early or late makes no difference."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Any one of:$(li)Libation 1$(li)Honey bottle 1$(li)Cooked beef, mutton or porkchop 2$(li)Bread 2$(li)Wheat 8$(br)Offerings have nothing to do with relic $(l)offering slots$(); they only boost that day's prayer favor."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each offering has its origin: the libation is the poured drink offering, cooked meat the animal sacrifice, bread the offering of cakes, and wheat the first share of the harvest given to the gods."
+    }
+  ]
+}

@@ -188,22 +188,23 @@ public final class PlaytestGameTests {
         h.assertTrue(MythData.get(p).civ(GREEK).age() == Age.ARCHAIC, "远古");
         h.assertTrue(MythData.get(p).receipts().contains(ReceiptBook.Scope.UNIQUE, GuardianRules.blessingReceipt("greek")), "祝福回执");
         h.assertTrue(events.contains(MythEvents.BLESSED) && events.contains(MythEvents.AGE_REACHED), "事件：" + events);
-        h.assertTrue(count(p, "mythic_age:greek_altar") == 1, "祭坛 1");
-        h.assertTrue(count(p, "mythic_age:marble_pillar") == 16 && count(p, "mythic_age:smooth_marble") == 128
-                && count(p, "mythic_age:greek_brazier") == 2 && p.getInventory().countItem(Items.FLINT_AND_STEEL) == 1, "一级材料");
+        // GA-13：受祝福不再发祭坛（temple 站在 GA-13 阶段 ⑤ 改成「神庙扩建」站）
+        h.assertTrue(count(p, "mythic_age:greek_altar") == 0, "不发祭坛");
+        // GA-13：神庙扩建站不再发建神庙的材料（材料放进村库，见 VillageTempleGameTests.playtest_upgrade_starts）
+        h.assertTrue(count(p, "mythic_age:marble_pillar") == 0, "不发神庙材料");
         h.assertTrue(count(p, "mythic_age:libation") == 1, "奠酒 1（试供奉）");
         h.assertTrue(p.getInventory().contains(Handbook.stack()), "每站都有手札");
         cleanup(h, p);
         h.succeed();
     }
 
-    /** TC-GA3-54：共用的祝福方法连调两次只发一次祭坛。 */
+    /** TC-GA3-54：共用的祝福方法连调两次只成功一次（GA-13：不发祭坛）。 */
     @GameTest(template = T, batch = BATCH)
     public static void blessing_once(GameTestHelper h) {
         FakePlayer p = player(h, "pt54");
         h.assertTrue(TradeService.grantBlessing(p, GREEK, true), "第一次成功");
         h.assertFalse(TradeService.grantBlessing(p, GREEK, true), "第二次拒绝");
-        h.assertTrue(count(p, "mythic_age:greek_altar") == 1, "只有一个祭坛：" + count(p, "mythic_age:greek_altar"));
+        h.assertTrue(count(p, "mythic_age:greek_altar") == 0, "不发祭坛：" + count(p, "mythic_age:greek_altar"));
         cleanup(h, p);
         h.succeed();
     }
@@ -277,54 +278,7 @@ public final class PlaytestGameTests {
         h.succeed();
     }
 
-    // ───────────── 神庙 ─────────────
-
-    private static void expectTemple(GameTestHelper h, Age age, int level) {
-        ground(h);
-        FakePlayer p = player(h, "pt6" + level);
-        MythData.get(p).civ(GREEK).setAge(age);
-        BlockPos altar = h.absolutePos(ALTAR);
-        h.assertTrue(PlaytestTemple.siteY(h.getLevel(), altar.getX(), altar.getZ(), altar.getY() + 10).isPresent(), "平地可以选址");
-        PlaytestTemple.build(h.getLevel(), altar, level, p);
-        h.succeedWhen(() -> {
-            var got = PlaytestTemple.scanned(h.getLevel(), altar);
-            h.assertTrue(got.isPresent(), "扫描尚未完成");
-            h.assertTrue(got.getAsInt() == level, "认定 " + level + " 级，实际 " + got.getAsInt());
-            cleanup(h, p);
-        });
-    }
-
-    /** TC-GA3-60：一级蓝图搭出来认定为一级。 */
-    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
-    public static void temple_level1(GameTestHelper h) {
-        expectTemple(h, Age.ARCHAIC, 1);
-    }
-
-    /** TC-GA3-60：二级蓝图搭出来认定为二级。 */
-    @GameTest(template = T, batch = BATCH, timeoutTicks = 200)
-    public static void temple_level2(GameTestHelper h) {
-        expectTemple(h, Age.CLASSICAL, 2);
-    }
-
-    /** TC-GA3-61：占地里有人造方块、坡太陡时不选。 */
-    @GameTest(template = T, batch = BATCH)
-    public static void temple_site_rejects(GameTestHelper h) {
-        ground(h);
-        BlockPos altar = h.absolutePos(ALTAR);
-        h.assertTrue(PlaytestTemple.siteY(h.getLevel(), altar.getX(), altar.getZ(), altar.getY() + 10).isPresent(), "平地可以");
-        h.setBlock(new BlockPos(5, 3, 9), Blocks.OAK_PLANKS);
-        h.assertTrue(PlaytestTemple.siteY(h.getLevel(), altar.getX(), altar.getZ(), altar.getY() + 10).isEmpty(), "压到木板不行");
-        h.setBlock(new BlockPos(5, 3, 9), Blocks.AIR);
-        for (int y = 3; y <= 8; y++) {
-            h.setBlock(new BlockPos(12, y, 14), Blocks.STONE);
-        }
-        h.assertTrue(PlaytestTemple.siteY(h.getLevel(), altar.getX(), altar.getZ(), altar.getY() + 10).isPresent(), "高差 6 可以（削平）");
-        for (int y = 9; y <= 10; y++) {
-            h.setBlock(new BlockPos(12, y, 14), Blocks.STONE);
-        }
-        h.assertTrue(PlaytestTemple.siteY(h.getLevel(), altar.getX(), altar.getZ(), altar.getY() + 10).isEmpty(), "高差 8 不行");
-        h.succeed();
-    }
+    // ───────────── 神庙（GA-13：神庙扩建站与「至少几级」的准备见 VillageTempleGameTests） ─────────────
 
     // ───────────── 任务与记录 ─────────────
 

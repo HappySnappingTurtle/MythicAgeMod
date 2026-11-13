@@ -61,7 +61,7 @@ public final class ResidentPrayer implements JobType {
         return List.of();
     }
 
-    /** ref = 神坛维度|坐标|祈祷位|主人。 */
+    /** ref = 神坛维度|坐标|祈祷位|村子（GA-13：原来是神坛主人）。 */
     static String ref(GlobalPos altar, BlockPos slot, UUID owner) {
         return altar.dimension().location() + "|" + altar.pos().asLong() + "|" + slot.asLong() + "|" + owner;
     }
@@ -96,13 +96,16 @@ public final class ResidentPrayer implements JobType {
         if (PrayerFormula.WINDOW_END - Math.floorMod(level.getDayTime(), 24000L) < SHIFT) {
             return List.of();
         }
-        List<ShrineRegistry.Entry> altars = ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id()).stream()
-                .filter(e -> e.pos().dimension().equals(level.dimension())).toList();
-        if (altars.isEmpty()) {
+        // GA-13：只去本村神庙的祭坛
+        Optional<io.github.happysnappingturtle.mythicage.village.temple.VillageTemple> temple =
+                TemplePrayer.templeOf(level.getServer(), ctx.village());
+        // 没有供奉者时不去（祈祷不给任何人恩宠，也不占居民的工时）
+        if (temple.isEmpty() || temple.get().prayerSlots().isEmpty()
+                || !temple.get().altar().dimension().equals(level.dimension()) || ctx.state().temple.devotees().isEmpty()) {
             return List.of();
         }
-        TempleRules rules = TempleService.rules();
-        BlockPos bell = ctx.center();
+        GlobalPos altar = temple.get().altar();
+        UUID village = ctx.village().id();
         List<Job> out = new ArrayList<>();
         for (ResidentEntity r : ctx.residents()) {
             if (!r.idle() || r.inTransit() || r.home() == null || !ctx.state().roster.containsKey(r.getUUID())) {
@@ -112,33 +115,17 @@ public final class ResidentPrayer implements JobType {
             if (rec.prayedOn(today)) {
                 continue;
             }
-            List<BelieverRules.Candidate<GlobalPos>> cands = new ArrayList<>();
-            for (ShrineRegistry.Entry e : altars) {
-                BlockPos p = e.pos().pos();
-                boolean inVillage = horizontal(bell.getX() + 0.5, bell.getZ() + 0.5, p) <= VillageService.RANGE;
-                cands.add(new BelieverRules.Candidate<>(e.pos(), e.owner(), inVillage, horizontal(r.getX(), r.getZ(), p)));
+            List<BlockPos> slots = new ArrayList<>(temple.get().prayerSlots());
+            slots.sort(Comparator.comparingDouble(p -> p.distToCenterSqr(r.position())));
+            Optional<BlockPos> s = PrayerService.SLOTS.claim(altar, slots, r.getUUID(), now);
+            if (s.isEmpty()) {
+                continue;
             }
-            for (BelieverRules.Candidate<GlobalPos> c : BelieverRules.order(cands)) {
-                if (!BelieverRules.canPrayFor(rec.lastPrayDay(), rec.lastPrayOwner(), today, c.owner())) {
-                    continue;
-                }
-                GreekAltarBlockEntity be = PrayerService.altarAt(level.getServer(), c.altar());
-                if (be == null || !be.hasResult()) {
-                    continue;
-                }
-                List<BlockPos> slots = new ArrayList<>(be.prayerSlots(rules));
-                slots.sort(Comparator.comparingDouble(p -> p.distToCenterSqr(r.position())));
-                Optional<BlockPos> s = PrayerService.SLOTS.claim(c.altar(), slots, r.getUUID(), now);
-                if (s.isEmpty()) {
-                    continue;
-                }
-                String anim = r.female() && Math.floorMod(r.getUUID().hashCode(), 2) == 0 ? KNEEL : STAND;
-                out.add(new Job(ctx.nextJobId(), ID, VillageContext.pos(s.get()), "pray:" + r.getUUID(),
-                        ref(c.altar(), s.get(), c.owner()), List.of(JobStep.move(), JobStep.act(anim, remaining), JobStep.settle()),
-                        Map.of(), Map.of(), Set.of(), Priority.SHORTAGE, WEIGHT, false, Job.DEFAULT_TIMEOUT + remaining,
-                        r.getUUID()));
-                break;
-            }
+            String anim = r.female() && Math.floorMod(r.getUUID().hashCode(), 2) == 0 ? KNEEL : STAND;
+            out.add(new Job(ctx.nextJobId(), ID, VillageContext.pos(s.get()), "pray:" + r.getUUID(),
+                    ref(altar, s.get(), village), List.of(JobStep.move(), JobStep.act(anim, remaining), JobStep.settle()),
+                    Map.of(), Map.of(), Set.of(), Priority.SHORTAGE, WEIGHT, false, Job.DEFAULT_TIMEOUT + remaining,
+                    r.getUUID()));
         }
         return out;
     }
@@ -154,12 +141,13 @@ public final class ResidentPrayer implements JobType {
     public Optional<Map<String, Integer>> escrow(VillageContext ctx, Job job) {
         GlobalPos altar = refAltar(ctx, job.ref());
         BlockPos slot = refSlot(job.ref());
-        GreekAltarBlockEntity be = PrayerService.altarAt(ctx.level().getServer(), altar);
-        if (be == null) {
+        Optional<io.github.happysnappingturtle.mythicage.village.temple.VillageTemple> temple =
+                TemplePrayer.templeOf(ctx.level().getServer(), ctx.village()).filter(t -> t.altar().equals(altar));
+        if (temple.isEmpty()) {
             return Optional.empty();
         }
         // 传入全部祈祷位：预留表会清掉位置不在列表里的预留（只传自己那一格会把别人的预留全清掉）
-        List<BlockPos> slots = new ArrayList<>(be.prayerSlots(TempleService.rules()));
+        List<BlockPos> slots = new ArrayList<>(temple.get().prayerSlots());
         slots.remove(slot);
         slots.add(0, slot);
         Optional<BlockPos> got = PrayerService.SLOTS.claim(altar, slots, job.assignee(), ctx.level().getGameTime());
@@ -210,7 +198,7 @@ public final class ResidentPrayer implements JobType {
         }
         // 祈祷将满：记为今日信徒并入账（一天只入一笔，重复调用无效；留 20 刻余量，不依赖最后一刻一定被调用）
         if (counted && ticks >= SHIFT - CREDIT_MARGIN) {
-            PrayerService.credit(level, altar, r.getUUID());
+            TemplePrayer.credit(level, refOwner(job.ref()), r.getUUID());
         }
     }
 

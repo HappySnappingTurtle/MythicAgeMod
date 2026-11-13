@@ -5,7 +5,7 @@
       "conditions": {
         "civilization": "greek",
         "event": "temple_level",
-        "min": 1
+        "min": 2
       },
       "trigger": "mythic_age:myth_event"
     }

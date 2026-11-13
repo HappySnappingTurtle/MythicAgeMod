@@ -28,7 +28,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  *   <li>{@link Terrain#PILLARS}（桥、码头）：只在模板底层的实心方块下面补同种方块到水底 / 地面；</li>
  *   <li>{@link Terrain#NONE}：只放模板。</li>
  * </ul>
- * 包围盒按 {@link #MARGIN} 格外扩（含补土与削山的高度），保证外圈所在的区块也会调用这里。
+ * 包围盒按 {@link #MARGIN} 格外扩（含补土与削山的高度），保证外圈所在的区块也会调用这里；有门数据（村庄建筑）时
+ * 整地后在门前开台阶（GA-14），包围盒再外扩 {@code DoorAccess.MAX_STEPS + 1} 格。
  */
 public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
     public static final int MARGIN = 2;
@@ -39,18 +40,36 @@ public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
     /** 体素 y = 0（地面上第一层）相对模板原点的高度（建筑数据的 floor_y）。 */
     protected final int floorY;
     protected final Terrain terrain;
+    /** 门（世界坐标、朝外方向、宽度）：整地时在门前开台阶（GA-14）；没有门数据（遗迹、旧存档）为 null。 */
+    protected final io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.Door door;
 
     protected TerrainTemplatePiece(StructurePieceType type, StructureTemplateManager manager, String template, BlockPos origin,
                                    Rotation rotation, int floorY, Terrain terrain) {
+        this(type, manager, template, origin, rotation, floorY, terrain, null);
+    }
+
+    protected TerrainTemplatePiece(StructurePieceType type, StructureTemplateManager manager, String template, BlockPos origin,
+                                   Rotation rotation, int floorY, Terrain terrain,
+                                   io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.Door door) {
         super(type, 0, manager, ResourceLocation.parse(template), template, settings(rotation), origin);
         this.floorY = floorY;
         this.terrain = terrain;
+        this.door = terrain == Terrain.FULL ? door : null;
     }
 
     protected TerrainTemplatePiece(StructurePieceType type, StructureTemplateManager manager, CompoundTag tag) {
         super(type, tag, manager, rl -> settings(Rotation.valueOf(tag.getString("Rot"))));
         this.floorY = tag.getInt("Floor");
         this.terrain = readTerrain(tag);
+        int[] d = tag.getIntArray("Door");
+        this.door = d.length == 4 && tag.contains("DoorFacing")
+                ? new io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.Door(
+                new io.github.happysnappingturtle.mythicage.core.village.gen.Pos(d[0], d[1], d[2]), tag.getString("DoorFacing"), d[3])
+                : null;
+    }
+
+    public io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.Door door() {
+        return door;
     }
 
     public Terrain terrain() {
@@ -72,8 +91,10 @@ public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
         if (terrain == Terrain.NONE) {
             return b;
         }
-        return new BoundingBox(b.minX() - MARGIN, b.minY() - TerrainOps.MAX_FILL, b.minZ() - MARGIN,
-                b.maxX() + MARGIN, b.maxY() + TerrainOps.MAX_CUT, b.maxZ() + MARGIN);
+        // 有门前台阶时多外扩几格，通道所在的区块也会调用整地
+        int m = MARGIN + (door == null ? 0 : io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.MAX_STEPS + 1);
+        return new BoundingBox(b.minX() - m, b.minY() - TerrainOps.MAX_FILL, b.minZ() - m,
+                b.maxX() + m, b.maxY() + TerrainOps.MAX_CUT, b.maxZ() + m);
     }
 
     @Override
@@ -82,6 +103,10 @@ public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
         tag.putString("Rot", placeSettings.getRotation().name());
         tag.putInt("Floor", floorY);
         tag.putString("Terrain", terrain.name());
+        if (door != null) {
+            tag.putIntArray("Door", new int[]{door.pos().x(), door.pos().y(), door.pos().z(), door.width()});
+            tag.putString("DoorFacing", door.facing());
+        }
     }
 
     @Override
@@ -131,6 +156,13 @@ public abstract class TerrainTemplatePiece extends TemplateStructurePiece {
             }
         }
         TerrainOps.ring(level, chunkBox, t.minX(), t.minZ(), t.maxX(), t.maxZ(), floor, MARGIN, MAX_WALL, walls);
+        if (door != null) {
+            // 门前台阶（GA-14）：外圈的挡土墙不认门，门朝上坡时会把门堵死
+            var box = new io.github.happysnappingturtle.mythicage.core.village.gen.Box(t.minX(), t.minY(), t.minZ(), t.maxX(), t.maxY(), t.maxZ());
+            TerrainOps.doorSteps(level, chunkBox, io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.corridor(box, door,
+                    io.github.happysnappingturtle.mythicage.core.village.gen.DoorAccess.MAX_STEPS), door.pos().y(),
+                    q -> TerrainOps.doorClearable(level.getBlockState(q)), false);
+        }
     }
 
     /** 只在模板底层的实心方块下面补同种方块（桥墩、码头石堤一直砌到水底）。 */

@@ -146,19 +146,12 @@ public final class PrayerGuard implements SoldierAbility {
         return true;
     }
 
-    /** 本村的祭坛扫描范围（村钟 48 格内、同一维度的希腊祭坛）。 */
+    /** 本村神庙祭坛周围（GA-13：信徒在这里祈祷）：祭坛水平 8 格、上下 4 格。 */
     static List<AABB> areas(ServerLevel level, UUID village) {
-        Optional<VillageRegistry.Village> v = VillageRegistry.get(level.getServer()).byId(village);
-        if (v.isEmpty()) {
-            return List.of();
-        }
-        BlockPos bell = v.get().bell().pos();
         List<AABB> out = new ArrayList<>();
-        for (ShrineRegistry.Entry e : ShrineRegistry.get(level.getServer()).ofKind(GreekTemple.ALTAR_KIND.id())) {
-            if (e.pos().dimension().equals(level.dimension()) && e.pos().pos().closerThan(bell, VillageService.RANGE)) {
-                out.add(TempleService.scanArea(level, e.pos().pos()));
-            }
-        }
+        io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.of(level.getServer(), village)
+                .filter(t -> t.altar().dimension().equals(level.dimension()))
+                .ifPresent(t -> out.add(new AABB(t.altar().pos()).inflate(8, 4, 8)));
         return out;
     }
 
