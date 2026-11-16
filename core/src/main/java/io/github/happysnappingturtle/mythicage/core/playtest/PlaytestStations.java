@@ -53,12 +53,13 @@ public final class PlaytestStations {
      * @param items       另给的物品
      * @param offerings   晋升供品
      * @param quest       村里要有一件委托
+     * @param contribution 玩家在站点村子的贡献至少补到多少（够点名项目，GA-12 建设页）；0 表示不管
      * @param firstKill   已结算一次弥诺陶洛斯首杀
      * @param handbook    补发手札
      * @param dayTime     设定的时间（取模 24000）；-1 表示不改
      */
     public record Spec(Age age, String god, long favor, boolean upgrade, int temple, List<Give> items,
-                       Offerings offerings, boolean quest, boolean firstKill, boolean handbook, Spot spot, long dayTime) {
+                       Offerings offerings, boolean quest, int contribution, boolean firstKill, boolean handbook, Spot spot, long dayTime) {
         public Spec {
             items = List.copyOf(items);
         }
@@ -90,22 +91,22 @@ public final class PlaytestStations {
 
     public static final List<Station> ALL = List.of(
             new Station(1, "start", 5, new Spec(Age.NONE, "", 0, false, -1, List.of(), Offerings.NONE,
-                    false, false, true, Spot.VILLAGE_EDGE, MORNING)),
+                    false, 0, false, true, Spot.VILLAGE_EDGE, MORNING)),
             new Station(2, "temple", 10, new Spec(Age.ARCHAIC, "", 0, true, -1, List.of(new Give("mythic_age:libation", 1)),
-                    Offerings.NONE, false, false, false, Spot.VILLAGE_PRIEST, MORNING)),
+                    Offerings.NONE, false, 0, false, false, Spot.VILLAGE_PRIEST, MORNING)),
             new Station(3, "powers", 10, new Spec(Age.CLASSICAL, ATHENA, 150, false, 1, List.of(), Offerings.NONE,
-                    false, false, false, Spot.VILLAGE_PRIEST, DAY)),
+                    false, 0, false, false, Spot.VILLAGE_PRIEST, DAY)),
             new Station(4, "village", 5, new Spec(Age.ARCHAIC, "", 0, false, -1, List.of(), Offerings.NONE,
-                    true, false, false, Spot.VILLAGE_KEEPER, DAY)),
+                    true, 64, false, false, Spot.VILLAGE_KEEPER, DAY)),
             new Station(5, "rite", 5, new Spec(Age.ARCHAIC, "", 50, false, 1, List.of(), Offerings.HALF_CLASSICAL,
-                    false, false, false, Spot.VILLAGE_PRIEST, DAY)),
+                    false, 0, false, false, Spot.VILLAGE_PRIEST, DAY)),
             new Station(6, "labyrinth", 10, new Spec(Age.CLASSICAL, ATHENA, 150, false, -1, COMBAT, Offerings.NONE,
-                    false, false, false, Spot.LABYRINTH_ENTRANCE, DAY)),
+                    false, 0, false, false, Spot.LABYRINTH_ENTRANCE, DAY)),
             new Station(7, "boss", 10, new Spec(Age.CLASSICAL, ATHENA, 150, false, -1, concat(COMBAT, List.of(
                     new Give("mythic_age:ariadne_thread", 1), new Give("mythic_age:gp_gr_restoration", 1))),
-                    Offerings.NONE, false, false, false, Spot.ARENA_GATE, DAY)),
+                    Offerings.NONE, false, 0, false, false, Spot.ARENA_GATE, DAY)),
             new Station(8, "hero", 5, new Spec(Age.CLASSICAL, ATHENA, 100, false, 2, List.of(), Offerings.ALL_HEROIC,
-                    false, true, false, Spot.VILLAGE_PRIEST, DAY)));
+                    false, 0, true, false, Spot.VILLAGE_PRIEST, DAY)));
 
     private PlaytestStations() {
     }

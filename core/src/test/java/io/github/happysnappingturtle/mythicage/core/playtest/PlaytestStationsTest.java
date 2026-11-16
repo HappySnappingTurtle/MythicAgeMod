@@ -68,6 +68,14 @@ class PlaytestStationsTest {
                 .forEach(s -> assertEquals(0, s.spec().favor(), s.id()));
     }
 
+    /** A3：村庄站给够点名门槛（64）的贡献，别的站不给。 */
+    @Test
+    void tc12VillageContribution() {
+        assertEquals(64, spec("village").contribution());
+        PlaytestStations.ALL.stream().filter(s -> !s.id().equals("village"))
+                .forEach(s -> assertEquals(0, s.spec().contribution(), s.id()));
+    }
+
     @Test
     void tc05RiteHalf() {
         PromotionTable t = promotion();

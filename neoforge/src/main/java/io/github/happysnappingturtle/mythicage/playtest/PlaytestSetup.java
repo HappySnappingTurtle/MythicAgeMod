@@ -224,6 +224,20 @@ public final class PlaytestSetup {
         return open(level, village);
     }
 
+    /**
+     * 玩家在这个村的贡献补到 target（够点名项目，GA-12 建设页）：只补差额，重复进站不会越加越多，本来就够的不动。返回补完后的贡献。
+     */
+    public static int ensureContribution(ServerLevel level, UUID village, UUID player, int target) {
+        var quests = io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(level.getServer());
+        var book = quests.book(village);
+        int lack = target - book.contribution(player);
+        if (lack > 0) {
+            book.contribute(player, "playtest", lack, io.github.happysnappingturtle.mythicage.guardian.MythDays.today(level.getServer()));
+            quests.setDirty();
+        }
+        return book.contribution(player);
+    }
+
     static int open(ServerLevel level, UUID village) {
         return (int) QuestService.quests(level.getServer(), village).stream().filter(q -> q.state == QuestState.OPEN).count();
     }

@@ -253,6 +253,9 @@ public final class PlaytestJobs {
         if (spec.quest() && job.village != null) {
             job.quests = PlaytestSetup.ensureQuest(ow, job.village);
         }
+        if (spec.contribution() > 0 && job.village != null) {
+            PlaytestSetup.ensureContribution(ow, job.village, p.getUUID(), spec.contribution());
+        }
         if (spec.spot() == Spot.ARENA_GATE) {
             arena.ifPresent(a -> {
                 BlockPos g = a.gate().size() > 2 ? a.gate().get(2).south(3) : a.bossOrigin();

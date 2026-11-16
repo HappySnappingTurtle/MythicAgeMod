@@ -235,6 +235,23 @@ public final class PlaytestGameTests {
         h.succeed();
     }
 
+    /** A3：村庄站把贡献补到点名门槛 64：从 10 补到 64；再进一次不重复加；本来就有 100 的不动。 */
+    @GameTest(template = T, batch = "quest_supply")
+    public static void station_village_contribution(GameTestHelper h) {
+        VillageWorkGameTests.TV tv = QuestGameTests.village(h);
+        java.util.UUID low = java.util.UUID.randomUUID();
+        java.util.UUID rich = java.util.UUID.randomUUID();
+        var book = io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(h.getLevel().getServer()).book(tv.id());
+        book.contribute(low, "test", 10, 0);
+        book.contribute(rich, "test", 100, 0);
+        int target = io.github.happysnappingturtle.mythicage.core.playtest.PlaytestStations.byId("village").orElseThrow().spec().contribution();
+        h.assertTrue(PlaytestSetup.ensureContribution(h.getLevel(), tv.id(), low, target) == 64, "10 补到 64：" + book.contribution(low));
+        h.assertTrue(PlaytestSetup.ensureContribution(h.getLevel(), tv.id(), low, target) == 64, "再进一次不重复加");
+        h.assertTrue(PlaytestSetup.ensureContribution(h.getLevel(), tv.id(), rich, target) == 100, "本来够的不动");
+        QuestGameTests.cleanup(h, tv);
+        h.succeed();
+    }
+
     /** TC-GA3-57、58：仪式站给一半古典供品与 50 恩宠；Boss 站有线团、复原神力、青铜全套。 */
     @GameTest(template = T, batch = BATCH)
     public static void station_rite_and_boss(GameTestHelper h) {
