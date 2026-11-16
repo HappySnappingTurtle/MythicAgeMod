@@ -7,7 +7,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 /** 网络负载注册。版本号变化时，新旧版本客户端与服务端互相拒绝连接。 */
 public final class MythNetwork {
     // GA-11：新增项目选择负载（候选列表、点名）；GA-13：神坛检视加村庄神庙段、圣物展示、退出供奉。新旧客户端不能混用。
-    private static final String PROTOCOL_VERSION = "28";
+    private static final String PROTOCOL_VERSION = "29";
 
     private MythNetwork() {
     }
@@ -117,7 +117,7 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageAffairs(payload))
-                // 项目选择（GA-11）：界面在 GA-12
+                // 项目选择（GA-11）：界面是村庄界面的「建设」分页（GA-12）
                 .playToServer(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Request.TYPE,
                         io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.Request.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads::handleRequest)
@@ -130,10 +130,24 @@ public final class MythNetwork {
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Donate.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleDonate)
-                // 村庄总览分页、村界、升级 toast（T24 阶段 ①）
-                .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open.TYPE,
-                        io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.Open.STREAM_CODEC,
-                        io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleOpen)
+                // 村庄界面（GA-12）：状态栏、地图全量 / 增量、村民、信仰、建筑详情；打开、关闭、详情请求、操作
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Opened.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Opened.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenOpened(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.HeaderUpdate.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.HeaderUpdate.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenHeader(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.MapPacket.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.MapPacket.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenMap(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.People.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.People.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenPeople(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Faith.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Faith.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenFaith(payload))
+                .playToClient(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Detail.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Detail.STREAM_CODEC,
+                        (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageScreenDetail(payload))
+                .playToServer(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Open.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Open.STREAM_CODEC, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService::handleOpen)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Close.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Close.STREAM_CODEC, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService::handleClose)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.DetailRequest.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.DetailRequest.STREAM_CODEC, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService::handleDetail)
+                .playToServer(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Act.TYPE, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Act.STREAM_CODEC, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService::handleAct)
+                // 村界、升级 toast（T24 阶段 ①）
                 .playToServer(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.BoundsRequest.TYPE,
                         io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.BoundsRequest.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs::handleBounds)
@@ -161,9 +175,6 @@ public final class MythNetwork {
                 .playToClient(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.TYPE,
                         io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View.STREAM_CODEC,
                         (payload, context) -> io.github.happysnappingturtle.mythicage.client.ClientHooks.villageQuests(payload))
-                .playToServer(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Open.TYPE,
-                        io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Open.STREAM_CODEC,
-                        io.github.happysnappingturtle.mythicage.village.quest.QuestService::handleOpen)
                 .playToServer(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Act.TYPE,
                         io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.Act.STREAM_CODEC,
                         io.github.happysnappingturtle.mythicage.village.quest.QuestService::handleAct)

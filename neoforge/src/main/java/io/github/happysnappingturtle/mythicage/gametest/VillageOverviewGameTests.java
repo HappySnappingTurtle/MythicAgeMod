@@ -300,7 +300,7 @@ public final class VillageOverviewGameTests {
         h.runAfterDelay(5, () -> {
             h.assertTrue(VillageAffairs.resolve(near, tv.id()).isPresent(), "管事身边可以");
             h.assertTrue(VillageAffairs.resolve(far, tv.id()).isEmpty(), "远处不行");
-            h.assertTrue(VillageAffairs.resolve(near, AffairsPayloads.Open.FROM_PRIEST).isEmpty(), "没有祭司会话");
+            h.assertTrue(VillageAffairs.resolve(near, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.FROM_PRIEST).isEmpty(), "没有祭司会话");
             QuestGameTests.cleanup(h, tv, near, far);
             h.succeed();
         });

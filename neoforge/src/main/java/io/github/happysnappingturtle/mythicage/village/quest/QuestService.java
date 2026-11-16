@@ -224,16 +224,6 @@ public final class QuestService {
 
     // ───────────── 玩家操作 ─────────────
 
-    public static void handleOpen(QuestPayloads.Open payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            // 谷仓管事身边，或本村祭司的会话里（T24 D8：祭司对话页的「村务」）
-            if (context.player() instanceof ServerPlayer p) {
-                io.github.happysnappingturtle.mythicage.village.economy.VillageAffairs.resolve(p, payload.village())
-                        .ifPresent(v -> open(p, v));
-            }
-        });
-    }
-
     public static void handleAct(QuestPayloads.Act payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer p) {
@@ -500,7 +490,11 @@ public final class QuestService {
         VillageQuests.get(player.server).setDirty();
     }
 
+    /** 刷新村庄界面的委托分页（GA-12：界面没开时客户端不理会）。 */
     public static void open(ServerPlayer player, UUID village) {
+        if (player.connection == null || player instanceof net.neoforged.neoforge.common.util.FakePlayer) {
+            return;
+        }
         view(player, village).ifPresent(v -> PacketDistributor.sendToPlayer(player, new QuestPayloads.View(v)));
     }
 

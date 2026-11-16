@@ -46,6 +46,10 @@ public final class VillagePathPiece extends StructurePiece {
         this.points = pts;
     }
 
+    public io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path path() {
+        return new io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path(width, points);
+    }
+
     private static BoundingBox box(int width, List<Pos> pts) {
         int r = width / 2;
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;

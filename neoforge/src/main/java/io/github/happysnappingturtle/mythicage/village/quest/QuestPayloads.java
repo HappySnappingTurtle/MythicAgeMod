@@ -28,18 +28,6 @@ public final class QuestPayloads {
         }
     }
 
-    /** 客户端 → 服务端：从村务界面打开委托页。 */
-    public record Open(UUID village) implements CustomPacketPayload {
-        public static final Type<Open> TYPE = payloadType("village_quests_open");
-        public static final StreamCodec<FriendlyByteBuf, Open> STREAM_CODEC = StreamCodec.of(
-                (buf, o) -> buf.writeUUID(o.village), buf -> new Open(buf.readUUID()));
-
-        @Override
-        public Type<Open> type() {
-            return TYPE;
-        }
-    }
-
     /**
      * 客户端 → 服务端：接取、交付、放弃。{@code requestId} 每次点击新生成、重发时不变（防双击、网络重发，§3.3）。
      */

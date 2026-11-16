@@ -103,6 +103,24 @@ public final class GreekTemple {
         GraceSources.register(GreekTempleSource.INSTANCE);
         io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.register("greek", GreekVillageTemple.INSTANCE);
         io.github.happysnappingturtle.mythicage.village.temple.VillageTemples.registerAltarUse("greek", VillageAltarUse::useItemOn);
+        // 村庄界面的信仰分页（GA-12 §3.6）：今日信徒与恩宠、献供、退出供奉
+        io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.registerFaith("greek",
+                new io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.FaithHooks() {
+                    @Override
+                    public io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.Today today(
+                            net.minecraft.server.MinecraftServer server,
+                            io.github.happysnappingturtle.mythicage.village.temple.VillageTemple t, java.util.UUID viewer) {
+                        var st = io.github.happysnappingturtle.mythicage.content.greek.prayer.TemplePrayer.stats(server, t, viewer);
+                        return new io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.Today(st.todayBelievers(),
+                                st.today(), st.offered(), (int) Math.round(
+                                io.github.happysnappingturtle.mythicage.content.greek.prayer.OfferingLoader.greek().bonus() * 100));
+                    }
+
+                    @Override
+                    public boolean leave(net.minecraft.server.level.ServerPlayer player, java.util.UUID village) {
+                        return TempleMembership.leave(player, village);
+                    }
+                });
         io.github.happysnappingturtle.mythicage.rite.PromotionRequirements.register(GreekTempleRequirement.INSTANCE);
         // 登录时按登记补发神庙等级的进度事件（进度上线前就建好神庙的存档）
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(

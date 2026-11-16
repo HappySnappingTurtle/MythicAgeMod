@@ -114,6 +114,7 @@ public final class VillageRegistration {
                 i.civ(), i.patron(), VillageRegistry.Origin.GENERATED, null, "", -1));
         reg.add(v);
         plans.put(new VillagePlans.Plan(v.id(), level.dimension(), structure, chunk, i, false));
+        plans.setRoads(v.id(), roads(start));
         MythicAge.LOGGER.info("登记文明村庄：{} {}（{}）于 {}", i.civ(), i.patron(), structure, bell.pos());
         return Optional.of(v);
     }
@@ -123,6 +124,17 @@ public final class VillageRegistration {
         StructureStart start = level.structureManager().getStructureWithPieceAt(pos,
                 h -> h.value() instanceof CivVillageStructure);
         return start.isValid() ? register(level, start) : Optional.empty();
+    }
+
+    /** 结构里的道路片段（GA-12 村庄地图）。 */
+    public static List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> roads(StructureStart start) {
+        List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> out = new java.util.ArrayList<>();
+        for (StructurePiece piece : start.getPieces()) {
+            if (piece instanceof VillagePathPiece path) {
+                out.add(path.path());
+            }
+        }
+        return out;
     }
 
     static Optional<VillageInfoPiece.Info> info(StructureStart start) {

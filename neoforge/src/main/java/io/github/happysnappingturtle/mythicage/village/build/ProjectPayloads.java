@@ -94,7 +94,8 @@ public final class ProjectPayloads {
      * @param contribution 这名玩家的贡献；{@code threshold} 是他的点名门槛
      */
     public record View(UUID village, List<AffairsView.Line> current, String nextKey, String nextPlayer, List<Entry> entries,
-                       int contribution, int threshold) implements CustomPacketPayload {
+                       int contribution, int threshold, Map<String, Integer> missing, int blocked, int workers, int placed,
+                       int total) implements CustomPacketPayload {
         public static final Type<View> TYPE = payloadType("village_projects_view");
         public static final StreamCodec<FriendlyByteBuf, View> STREAM_CODEC = StreamCodec.of(
                 (buf, v) -> {
@@ -105,8 +106,15 @@ public final class ProjectPayloads {
                     buf.writeCollection(v.entries, Entry.CODEC);
                     buf.writeVarInt(v.contribution);
                     buf.writeVarInt(v.threshold);
+                    buf.writeMap(v.missing, FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
+                    buf.writeVarInt(v.blocked);
+                    buf.writeVarInt(v.workers);
+                    buf.writeVarInt(v.placed);
+                    buf.writeVarInt(v.total);
                 }, buf -> new View(buf.readUUID(), buf.readList(AffairsView.LINE), buf.readUtf(), buf.readUtf(),
-                        buf.readList(Entry.CODEC), buf.readVarInt(), buf.readVarInt()));
+                        buf.readList(Entry.CODEC), buf.readVarInt(), buf.readVarInt(),
+                        Map.copyOf(buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)), buf.readVarInt(),
+                        buf.readVarInt(), buf.readVarInt(), buf.readVarInt()));
 
         @Override
         public Type<View> type() {
@@ -135,9 +143,24 @@ public final class ProjectPayloads {
         }
         List<AffairsView.Line> current = VillageAffairs.projectLines(s).stream()
                 .filter(l -> !l.key().equals("mythic_age.village.project.next")).toList();
+        Map<String, Integer> missing = Map.of();
+        int blocked = 0;
+        int workers = 0;
+        int placed = 0;
+        int total = 0;
+        Optional<io.github.happysnappingturtle.mythicage.core.village.build.BuildProject> active = s.activeProject();
+        if (active.isPresent()) {
+            var p = active.get();
+            missing = Map.copyOf(p.missing());
+            blocked = io.github.happysnappingturtle.mythicage.core.village.build.BuildProject.count(p.blockedCells);
+            placed = io.github.happysnappingturtle.mythicage.core.village.build.BuildProject.count(p.placedCells);
+            total = Construction.site(ctx, p).map(site -> site.segments.stream().mapToInt(seg -> seg.cells().size()).sum()).orElse(0);
+            workers = (int) VillageScheduler.loaded(ctx.village().id()).stream()
+                    .filter(r -> r.job().filter(j -> j.type().equals(BuildJob.ID)).isPresent()).count();
+        }
         return Optional.of(new View(ctx.village().id(), current, s.nextProject == null ? "" : s.nextProject.key(),
                 s.nextProject == null ? "" : s.nextProject.playerName(), entries, VillageProjects.contribution(player, ctx),
-                VillageProjects.threshold(player, ctx)));
+                VillageProjects.threshold(player, ctx), missing, blocked, workers, placed, total));
     }
 
     public static void handleRequest(Request payload, IPayloadContext context) {
@@ -150,22 +173,29 @@ public final class ProjectPayloads {
 
     public static void handleNominate(Nominate payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (!(context.player() instanceof ServerPlayer p)) {
-                return;
+            if (context.player() instanceof ServerPlayer p) {
+                nominate(p, payload);
             }
-            Optional<VillageContext> ctx = context(p, payload.village());
-            if (ctx.isEmpty()) {
-                return;
-            }
-            VillageProjects.Outcome o = payload.key().isEmpty() ? VillageProjects.clear(p, ctx.get())
-                    : VillageProjects.nominate(p, ctx.get(), payload.key());
-            p.displayClientMessage(message(o), true);
-            send(p, payload.village());
         });
     }
 
+    /** 村庄界面的「点名」「清空」（GA-12 建设页）：与命令 {@code village nominate} 走同一条路。看不了这个村子时为空。 */
+    public static Optional<VillageProjects.Outcome> nominate(ServerPlayer p, Nominate payload) {
+        Optional<VillageContext> ctx = context(p, payload.village());
+        if (ctx.isEmpty()) {
+            return Optional.empty();
+        }
+        VillageProjects.Outcome o = payload.key().isEmpty() ? VillageProjects.clear(p, ctx.get())
+                : VillageProjects.nominate(p, ctx.get(), payload.key());
+        p.displayClientMessage(message(o), true);
+        send(p, payload.village());
+        return Optional.of(o);
+    }
+
     static void send(ServerPlayer p, UUID village) {
-        context(p, village).flatMap(ctx -> view(p, ctx)).ifPresent(v -> PacketDistributor.sendToPlayer(p, v));
+        if (p.connection != null && !(p instanceof net.neoforged.neoforge.common.util.FakePlayer)) {
+            context(p, village).flatMap(ctx -> view(p, ctx)).ifPresent(v -> PacketDistributor.sendToPlayer(p, v));
+        }
     }
 
     /** 点名结果的提示（动作栏）。 */

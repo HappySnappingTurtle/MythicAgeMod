@@ -180,6 +180,11 @@ public final class MythicAge {
         game.addListener(io.github.happysnappingturtle.mythicage.village.FoundationService::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.village.work.VillageScheduler::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.village.build.Construction::onServerStopped);
+        // 村庄界面（GA-12）：开着的界面每 20 刻发地图增量；地图物品入口与村庄标记
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "village_screen", io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService::onServerTickPost);
+        game.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent e) -> io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.onServerStopped());
+        game.addListener(io.github.happysnappingturtle.mythicage.village.map.VillageMapItems::onRightClickItem);
+        game.addListener(io.github.happysnappingturtle.mythicage.village.map.VillageMapItems::onTooltip);
         game.addListener(io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onChunkLoad);
         game.addListener(EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onPlace);
         game.addListener(EventPriority.LOWEST, io.github.happysnappingturtle.mythicage.village.build.PlayerConstructionEdits::onBreak);

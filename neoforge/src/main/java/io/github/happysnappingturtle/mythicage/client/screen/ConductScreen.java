@@ -145,7 +145,7 @@ public class ConductScreen extends Screen {
             if (y > top + H - 50) {
                 break;
             }
-            Component head = VillageAffairsScreen.line(v.title()).copy().append("  " + v.points());
+            Component head = io.github.happysnappingturtle.mythicage.village.economy.AffairsView.toComponent(v.title()).copy().append("  " + v.points());
             g.drawString(font, font.split(head, w).get(0), x, y, TEXT, false);
             y += 11;
             for (ConductView.Event e : v.recent()) {

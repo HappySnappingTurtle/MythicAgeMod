@@ -103,7 +103,7 @@ public final class VillageOverview {
         return cache == null ? Optional.empty() : cache.get(id).map(com.mojang.authlib.GameProfile::getName);
     }
 
-    static List<AffairsView.Line> alerts(MinecraftServer server, UUID village, VillageEconomy.State s) {
+    public static List<AffairsView.Line> alerts(MinecraftServer server, UUID village, VillageEconomy.State s) {
         List<AffairsView.Line> out = new ArrayList<>();
         if (VillageScheduler.runtime(village).alarmed(WorldClock.now(server))) {
             out.add(AffairsView.Line.of("mythic_age.village.overview.alarm"));

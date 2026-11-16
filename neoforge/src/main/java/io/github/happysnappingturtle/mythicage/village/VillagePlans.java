@@ -53,6 +53,8 @@ public final class VillagePlans extends SavedData {
     private final Map<UUID, Plan> plans = new LinkedHashMap<>();
     /** 被玩家占用的预留地块：村庄 → 地块 id → 冲突坐标（V0 §5.3）。 */
     private final Map<UUID, Map<String, net.minecraft.core.BlockPos>> blocked = new HashMap<>();
+    /** 道路（GA-12 §4，村庄地图用）：登记时从道路片段读出；没有这一项表示还没读到（老村子），空表表示没有路。 */
+    private final Map<UUID, List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path>> roads = new HashMap<>();
     private final Map<String, UUID> byStart = new HashMap<>();
     private final Map<ResourceKey<Level>, SpaceIndex<UUID>> space = new HashMap<>();
 
@@ -80,15 +82,20 @@ public final class VillagePlans extends SavedData {
             return;
         }
         Map<String, net.minecraft.core.BlockPos> keep = blocked.get(village);
+        List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> keepRoads = roads.get(village);
         put(new Plan(old.village(), old.dim(), old.structure(), old.start(), info, old.populated()));
         if (keep != null) {
             blocked.put(village, keep);
+        }
+        if (keepRoads != null) {
+            roads.put(village, keepRoads);
         }
     }
 
     public void remove(UUID village) {
         Plan old = plans.remove(village);
         blocked.remove(village);
+        roads.remove(village);
         if (old != null) {
             byStart.remove(startKey(old.dim(), old.structure(), old.start()));
             SpaceIndex<UUID> idx = space.get(old.dim());
@@ -137,6 +144,18 @@ public final class VillagePlans extends SavedData {
         return Map.copyOf(blocked.getOrDefault(village, Map.of()));
     }
 
+    /** 道路；还没读到时为空（与「没有路」的空表不同）。 */
+    public Optional<List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path>> roads(UUID village) {
+        return Optional.ofNullable(roads.get(village));
+    }
+
+    public void setRoads(UUID village, List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> paths) {
+        if (plans.containsKey(village)) {
+            roads.put(village, List.copyOf(paths));
+            setDirty();
+        }
+    }
+
     public List<Plan> all() {
         return new ArrayList<>(plans.values());
     }
@@ -164,6 +183,18 @@ public final class VillagePlans extends SavedData {
                         ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(c.getString("dim"))),
                         c.getString("structure"), c.getLong("start"), VillageInfoPiece.read(c.getCompound("info")),
                         c.getBoolean("populated")));
+                if (c.contains("roads", Tag.TAG_LIST)) {
+                    List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> paths = new ArrayList<>();
+                    for (Tag rt : c.getList("roads", Tag.TAG_COMPOUND)) {
+                        CompoundTag rc = (CompoundTag) rt;
+                        List<Pos> pts = new ArrayList<>();
+                        for (long l : rc.getLongArray("p")) {
+                            pts.add(VillageInfoPiece.unpack(l));
+                        }
+                        paths.add(new io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path(rc.getInt("w"), pts));
+                    }
+                    r.roads.put(c.getUUID("village"), List.copyOf(paths));
+                }
                 CompoundTag bl = c.getCompound("blocked");
                 for (String k : bl.getAllKeys()) {
                     r.blocked.computeIfAbsent(c.getUUID("village"), x -> new HashMap<>())
@@ -188,6 +219,17 @@ public final class VillagePlans extends SavedData {
             c.putLong("start", p.start());
             c.put("info", VillageInfoPiece.write(p.info()));
             c.putBoolean("populated", p.populated());
+            List<io.github.happysnappingturtle.mythicage.core.village.gen.VillagePlan.Path> rs = roads.get(p.village());
+            if (rs != null) {
+                ListTag rl = new ListTag();
+                for (var path : rs) {
+                    CompoundTag rc = new CompoundTag();
+                    rc.putInt("w", path.width());
+                    rc.putLongArray("p", path.points().stream().mapToLong(VillageInfoPiece::pack).toArray());
+                    rl.add(rc);
+                }
+                c.put("roads", rl);
+            }
             CompoundTag bl = new CompoundTag();
             blocked.getOrDefault(p.village(), Map.of()).forEach((k, v) -> bl.putLong(k, v.asLong()));
             c.put("blocked", bl);

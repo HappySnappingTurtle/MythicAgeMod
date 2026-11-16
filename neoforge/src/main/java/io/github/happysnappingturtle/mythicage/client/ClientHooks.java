@@ -108,34 +108,54 @@ public final class ClientHooks {
     }
 
     /** 委托页（T21）：已开着就刷新。 */
-    public static void villageQuests(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View payload) {
+    // ───────────── 村庄界面（GA-12）：各分页的数据都送进开着的界面；界面没开（或开的是别的村）就不理会 ─────────────
+
+    private static java.util.Optional<io.github.happysnappingturtle.mythicage.client.screen.village.VillageScreen> villageScreen(java.util.UUID village) {
+        return Minecraft.getInstance().screen instanceof io.github.happysnappingturtle.mythicage.client.screen.village.VillageScreen s && s.village().equals(village)
+                ? java.util.Optional.of(s) : java.util.Optional.empty();
+    }
+
+    public static void villageScreenOpened(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Opened payload) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.VillageQuestScreen open) {
-            open.update(payload.view());
+        java.util.Optional<io.github.happysnappingturtle.mythicage.client.screen.village.VillageScreen> open = villageScreen(payload.village());
+        if (open.isPresent()) {
+            open.get().header(payload.header());
+            open.get().switchTab(payload.tab());
         } else {
-            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.VillageQuestScreen(payload.view()));
+            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.village.VillageScreen(payload.village(), payload.tab(), payload.header()));
         }
     }
 
-    /** 最近收到的项目候选列表（GA-11；GA-12 的「建设」分页读它）。 */
-    private static io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View lastProjects;
+    public static void villageScreenHeader(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.HeaderUpdate payload) {
+        villageScreen(payload.village()).ifPresent(s -> s.header(payload.header()));
+    }
+
+    public static void villageScreenMap(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.MapPacket payload) {
+        villageScreen(payload.village()).ifPresent(s -> s.map(payload));
+    }
+
+    public static void villageScreenPeople(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.People payload) {
+        villageScreen(payload.village()).ifPresent(s -> s.people(payload));
+    }
+
+    public static void villageScreenFaith(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Faith payload) {
+        villageScreen(payload.village()).ifPresent(s -> s.faith(payload));
+    }
+
+    public static void villageScreenDetail(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.Detail payload) {
+        villageScreen(payload.village()).ifPresent(s -> s.detail(payload));
+    }
+
+    public static void villageQuests(io.github.happysnappingturtle.mythicage.village.quest.QuestPayloads.View payload) {
+        villageScreen(payload.view().village()).ifPresent(s -> s.quests(payload.view()));
+    }
 
     public static void villageProjects(io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View payload) {
-        lastProjects = payload;
+        villageScreen(payload.village()).ifPresent(s -> s.projects(payload));
     }
 
-    public static java.util.Optional<io.github.happysnappingturtle.mythicage.village.build.ProjectPayloads.View> lastProjects() {
-        return java.util.Optional.ofNullable(lastProjects);
-    }
-
-    /** 村务界面（T19）：已开着就刷新。 */
     public static void villageAffairs(io.github.happysnappingturtle.mythicage.village.economy.AffairsPayloads.View payload) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.screen instanceof io.github.happysnappingturtle.mythicage.client.screen.VillageAffairsScreen open) {
-            open.update(payload.view());
-        } else {
-            mc.setScreen(new io.github.happysnappingturtle.mythicage.client.screen.VillageAffairsScreen(payload.view()));
-        }
+        villageScreen(payload.view().village()).ifPresent(s -> s.affairs(payload.view()));
     }
 
     /** 试炼 Boss 血条下的一行（T24 §5.3）。 */

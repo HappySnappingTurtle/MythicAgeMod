@@ -128,7 +128,8 @@ public final class VillageDevCommand {
                 .then(Commands.literal("affairs").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     return here(c).map(v -> {
-                        VillageAffairs.open(p, v.id());
+                        io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.open(p, v.id(),
+                                io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.TAB_MAP);
                         return 1;
                     }).orElse(0);
                 }))));

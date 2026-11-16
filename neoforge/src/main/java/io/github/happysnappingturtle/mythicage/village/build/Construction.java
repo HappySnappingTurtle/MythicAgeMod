@@ -157,7 +157,7 @@ public final class Construction {
         return made;
     }
 
-    static BuildPlacement.Placed placed(BuildingSpec s, Pos origin, io.github.happysnappingturtle.mythicage.core.village.gen.Turn t) {
+    public static BuildPlacement.Placed placed(BuildingSpec s, Pos origin, io.github.happysnappingturtle.mythicage.core.village.gen.Turn t) {
         return new BuildPlacement.Placed(s.id(), origin, t, TemplateTransform.worldBox(origin, s.sizeX(), s.sizeY(), s.sizeZ(), t));
     }
 

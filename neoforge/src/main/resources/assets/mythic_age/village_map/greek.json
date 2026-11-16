@@ -1,0 +1,52 @@
+{
+  "categories": {
+    "temple":   { "fill": "#D4A72C", "border": "#8A6A12", "symbol": "Π" },
+    "dwelling": { "fill": "#C06A45", "border": "#7A3A1E", "symbol": "⌂" },
+    "workshop": { "fill": "#6F8AA0", "border": "#3D5466", "symbol": "⚒" },
+    "storage":  { "fill": "#9C9850", "border": "#5E5B26", "symbol": "▤" },
+    "farm":     { "fill": "#7FA25A", "border": "#4E6A33", "symbol": "♣" },
+    "shrine":   { "fill": "#8A6AA8", "border": "#4F3A66", "symbol": "✦" },
+    "public":   { "fill": "#4F9A96", "border": "#2C5E5B", "symbol": "◎" }
+  },
+  "buildings": {
+    "greek:acropolis": "temple",
+    "greek:house": "dwelling",
+    "greek:pottery": "workshop",
+    "greek:forge": "workshop",
+    "greek:bronze_workshop": "workshop",
+    "greek:stoneworks": "workshop",
+    "greek:winery": "workshop",
+    "greek:granary": "storage",
+    "greek:storehouse": "storage",
+    "greek:wheat_field": "farm",
+    "greek:olive_grove": "farm",
+    "greek:vineyard": "farm",
+    "greek:pen": "farm",
+    "greek:shrine": "shrine",
+    "greek:great_altar": "shrine",
+    "greek:oracle": "shrine",
+    "greek:zeus_oak": "shrine",
+    "greek:hades_cemetery": "shrine",
+    "greek:poseidon_spring": "shrine",
+    "greek:agora": "public",
+    "greek:krene": "public",
+    "greek:stoa": "public",
+    "greek:theater": "public",
+    "greek:gymnasion": "public",
+    "greek:palaestra": "public",
+    "greek:poseidon_harbor": "public",
+    "greek:bridge": "public"
+  },
+  "plots": {
+    "temple_ext": "temple",
+    "house": "dwelling",
+    "workshop": "workshop",
+    "storage": "storage",
+    "shrine": "shrine",
+    "altar": "shrine",
+    "market": "public",
+    "theater": "public",
+    "training": "public",
+    "feature": "public"
+  }
+}

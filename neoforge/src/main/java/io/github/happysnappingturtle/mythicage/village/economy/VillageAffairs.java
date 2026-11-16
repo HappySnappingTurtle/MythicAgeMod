@@ -45,7 +45,8 @@ public final class VillageAffairs {
         boolean keeper = VillageEconomy.get(player.server).peek(v.get())
                 .map(s -> s.roster.get(r.getUUID())).map(VillageEconomy.Member::keeper).orElse(false);
         if (keeper) {
-            open(player, v.get());
+            io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.open(player, v.get(),
+                    io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.TAB_MAP);
         } else if (ResidentTrade.trades(r)) {
             ResidentTrade.open(player, r);
         }
@@ -55,12 +56,11 @@ public final class VillageAffairs {
         return "mythic_age.profession." + profession.replace(':', '.');
     }
 
-    public static void open(ServerPlayer player, UUID village) {
-        open(player, village, AffairsView.TAB_OVERVIEW);
-    }
-
-    public static void open(ServerPlayer player, UUID village, int tab) {
-        view(player, village, tab).ifPresent(v -> PacketDistributor.sendToPlayer(player, new AffairsPayloads.View(v)));
+    /** 刷新村庄界面里的仓库、记录与缺口（GA-12：界面没开时客户端不理会）。 */
+    public static void refresh(ServerPlayer player, UUID village) {
+        if (player.connection != null && !(player instanceof net.neoforged.neoforge.common.util.FakePlayer)) {
+            view(player, village).ifPresent(v -> PacketDistributor.sendToPlayer(player, new AffairsPayloads.View(v)));
+        }
     }
 
     public static Optional<AffairsView> view(ServerPlayer player, UUID village) {
@@ -236,24 +236,12 @@ public final class VillageAffairs {
         return BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse(id)).getDescriptionId();
     }
 
-    /**
-     * 切换分页 / 从祭司对话页打开（T24 §4.1，D8）：要在谷仓管事 {@value #REACH} 格内，或者正和本村祭司说话。
-     * village 为全零时用当前祭司会话所在的村。
-     */
-    public static void handleOpen(AffairsPayloads.Open payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer p) {
-                resolve(p, payload.village()).ifPresent(v -> open(p, v, payload.tab()));
-            }
-        });
-    }
-
     public static void handleBounds(AffairsPayloads.BoundsRequest payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer p) {
-                // 村界不是隐私：能看村务的人，或站在钟附近的人都能看
-                Optional<UUID> v = resolve(p, payload.village()).or(() -> nearBell(p, payload.village()) ? Optional.of(payload.village())
-                        : Optional.empty());
+                // 村界不是隐私：能看村庄界面的人都能看
+                Optional<UUID> v = io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.canView(p, payload.village())
+                        ? Optional.of(payload.village()) : Optional.empty();
                 v.flatMap(id -> io.github.happysnappingturtle.mythicage.village.VillageBounds.build(p.server, id))
                         .ifPresent(b -> PacketDistributor.sendToPlayer(p, b));
             }
@@ -273,7 +261,7 @@ public final class VillageAffairs {
         Optional<UUID> priest = io.github.happysnappingturtle.mythicage.trade.TradeService.session(player)
                 .filter(s -> io.github.happysnappingturtle.mythicage.trade.TradeService.valid(player, s))
                 .map(io.github.happysnappingturtle.mythicage.trade.TradeService.Session::villageId);
-        if (requested.equals(AffairsPayloads.Open.FROM_PRIEST)) {
+        if (requested.equals(io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.FROM_PRIEST)) {
             return priest;
         }
         // 管理员（权限 2，可以用 /mythicage village affairs）在哪都能看
@@ -289,7 +277,7 @@ public final class VillageAffairs {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer p) {
                 donate(p, payload.village());
-                open(p, payload.village(), AffairsView.TAB_STOCK);
+                refresh(p, payload.village());
             }
         });
     }
@@ -323,7 +311,7 @@ public final class VillageAffairs {
     }
 
     /** 捐献记贡献（T24 §3.3）：每件与委托交付同权重；贡献只是记录，不换东西（D7）。 */
-    static void creditDonation(ServerPlayer player, UUID village, int count) {
+    public static void creditDonation(ServerPlayer player, UUID village, int count) {
         VillageRegistry.get(player.server).byId(village).flatMap(v -> VillageData.civ(v.civ())).ifPresent(d -> {
             int points = count * d.quests().contribution().item();
             io.github.happysnappingturtle.mythicage.village.quest.VillageQuests.get(player.server).book(village)

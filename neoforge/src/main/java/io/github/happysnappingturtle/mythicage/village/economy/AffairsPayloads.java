@@ -69,22 +69,6 @@ public final class AffairsPayloads {
         }
     }
 
-    /** 客户端 → 服务端：切换分页（T24 §4.1）。village 为全零时用当前祭司会话所在的村（祭司对话页的「村务」按钮，D8）。 */
-    public record Open(UUID village, int tab) implements CustomPacketPayload {
-        public static final UUID FROM_PRIEST = new UUID(0, 0);
-        public static final Type<Open> TYPE = payloadType("village_affairs_open");
-        public static final StreamCodec<FriendlyByteBuf, Open> STREAM_CODEC = StreamCodec.of(
-                (buf, o) -> {
-                    buf.writeUUID(o.village);
-                    buf.writeVarInt(o.tab);
-                }, buf -> new Open(buf.readUUID(), buf.readVarInt()));
-
-        @Override
-        public Type<Open> type() {
-            return TYPE;
-        }
-    }
-
     /** 客户端 → 服务端：显示村界（T24 §4.4）。 */
     public record BoundsRequest(UUID village) implements CustomPacketPayload {
         public static final Type<BoundsRequest> TYPE = payloadType("village_bounds_request");

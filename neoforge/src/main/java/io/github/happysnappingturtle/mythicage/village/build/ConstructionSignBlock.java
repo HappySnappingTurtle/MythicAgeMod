@@ -29,7 +29,12 @@ public final class ConstructionSignBlock extends Block {
         return Shapes.empty();
     }
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (level instanceof ServerLevel server) SiteMarkers.describe(server, pos).ifPresent(message -> player.displayClientMessage(message, false));
+        // 右键施工牌打开村庄界面的建设页（GA-12 §5）；打不开时照旧在聊天里说一句工地状态
+        if (level instanceof ServerLevel server && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            boolean opened = SiteMarkers.villageOf(server, pos).map(v -> io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService
+                    .open(sp, v, io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.TAB_BUILD)).orElse(false);
+            if (!opened) SiteMarkers.describe(server, pos).ifPresent(message -> player.displayClientMessage(message, false));
+        }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

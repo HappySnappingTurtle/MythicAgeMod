@@ -54,7 +54,8 @@ public final class QuestDevCommand {
         var open = Commands.literal("open").executes(c -> withCtx(c, ctx -> {
             ServerPlayer p = c.getSource().getPlayer();
             if (p != null) {
-                QuestService.open(p, ctx.village().id());
+                io.github.happysnappingturtle.mythicage.village.screen.VillageScreenService.open(p, ctx.village().id(),
+                        io.github.happysnappingturtle.mythicage.village.screen.VillageScreenPayloads.TAB_QUESTS);
             }
         }));
         var act = Commands.literal("act").then(Commands.argument("quest", StringArgumentType.word())

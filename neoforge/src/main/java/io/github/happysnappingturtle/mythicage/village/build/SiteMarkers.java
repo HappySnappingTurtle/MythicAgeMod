@@ -54,6 +54,17 @@ public final class SiteMarkers {
                 PacketDistributor.sendToPlayer(player, payload);
         }
     }
+    /** 只发给一名玩家（村庄界面「在世界里标出」，GA-12 §3.2）：不论离工地多远。 */
+    public static void sendTo(net.minecraft.server.level.ServerPlayer player, VillageContext ctx, BuildProject p) {
+        Construction.site(ctx, p).ifPresent(site -> {
+            var box = site.box();
+            List<BlockPos> blocked = new ArrayList<>();
+            p.blockedCells.forEach((seg, bits) -> bits.stream().forEach(i -> blocked.add(VillageContext.block(site.segments.get(seg).cells().get(i).pos()))));
+            PacketDistributor.sendToPlayer(player, new ConstructionSitePayload(owner(ctx, p), ctx.level().dimension().location(),
+                    new BlockPos(box.minX(), site.groundY, box.minZ()), new BlockPos(box.maxX(), box.maxY(), box.maxZ()), true, blocked));
+        });
+    }
+
     public static void clear(VillageContext ctx, BuildProject p) {
         UUID owner = owner(ctx, p);
         var entries = new ArrayList<>(TempBlocks.get(ctx.level().getServer()).entries());
@@ -64,6 +75,18 @@ public final class SiteMarkers {
         }
         Construction.site(ctx, p).ifPresent(s -> send(ctx, p, s, false));
     }
+    /** 施工牌属于哪个村子的项目。 */
+    public static Optional<UUID> villageOf(ServerLevel level, BlockPos sign) {
+        var entry = TempBlocks.get(level.getServer()).entries().stream().filter(e -> e.pos().dimension().equals(level.dimension()) && e.pos().pos().equals(sign)).findFirst();
+        if (entry.isEmpty()) return Optional.empty();
+        for (var village : io.github.happysnappingturtle.mythicage.village.VillageRegistry.get(level.getServer()).all()) {
+            var context = VillageScheduler.contextOf(level, village.id());
+            if (context.isEmpty()) continue;
+            for (var p : context.get().state().projects) if (owner(context.get(), p).equals(entry.get().owner())) return Optional.of(village.id());
+        }
+        return Optional.empty();
+    }
+
     public static Optional<Component> describe(ServerLevel level, BlockPos sign) {
         var entry = TempBlocks.get(level.getServer()).entries().stream().filter(e -> e.pos().dimension().equals(level.dimension()) && e.pos().pos().equals(sign)).findFirst();
         if (entry.isEmpty()) return Optional.empty();

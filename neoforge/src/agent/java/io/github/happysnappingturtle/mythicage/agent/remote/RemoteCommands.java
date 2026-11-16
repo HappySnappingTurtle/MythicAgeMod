@@ -81,6 +81,13 @@ final class RemoteCommands {
                 mc.options.hideGui = "hide".equals(optString(a, "action", "show"));
                 return field("hud", mc.options.hideGui ? "hide" : "show");
             });
+            // GUI 缩放：0 = 自动，1–4（看界面在各缩放下放不放得下，不用改 options.txt 重启）
+            case "gui_scale" -> simple(mc -> {
+                int scale = optInt(a, "scale", 0);
+                mc.options.guiScale().set(scale);
+                mc.resizeDisplay();
+                return field("guiScale", Integer.toString((int) mc.getWindow().getGuiScale()));
+            });
             default -> simple(mc -> {
                 throw new CommandFailure("未知指令：" + cmd.cmd());
             });
