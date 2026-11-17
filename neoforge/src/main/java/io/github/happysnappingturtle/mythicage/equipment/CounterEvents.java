@@ -1,5 +1,7 @@
 package io.github.happysnappingturtle.mythicage.equipment;
 
+import io.github.happysnappingturtle.mythicage.combat.DamagePipeline;
+import io.github.happysnappingturtle.mythicage.core.combat.DamageZones;
 import io.github.happysnappingturtle.mythicage.core.equipment.CounterWindow;
 import io.github.happysnappingturtle.mythicage.core.equipment.EquipmentTable;
 import io.github.happysnappingturtle.mythicage.relic.RelicEffects;
@@ -8,10 +10,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,14 +73,14 @@ public final class CounterEvents {
         return true;
     }
 
-    public static void onIncomingDamage(LivingIncomingDamageEvent e) {
-        if (THRUST.get() || !(e.getSource().getEntity() instanceof Player p) || p.level().isClientSide
-                || !RelicEffects.isMelee(e.getSource())) {
+    /** 举盾刺击窗口内的近战：基础区加固定值（T25.1：交给 {@link DamagePipeline} 合算）。 */
+    public static void collect(DamagePipeline.Hit hit, List<DamageZones.Mod> out) {
+        if (THRUST.get() || !(hit.attacker() instanceof Player p) || p.level().isClientSide || !RelicEffects.isMelee(hit.source())) {
             return;
         }
         Open o = WINDOWS.get(p.getUUID());
         if (o != null && o.window().consume(p.level().getGameTime())) {
-            e.setAmount(e.getAmount() + (float) o.bonus());
+            out.add(DamageZones.Mod.of(DamageZones.Zone.BASE, "counter_thrust", o.bonus()));
             WINDOWS.remove(p.getUUID());
         }
     }

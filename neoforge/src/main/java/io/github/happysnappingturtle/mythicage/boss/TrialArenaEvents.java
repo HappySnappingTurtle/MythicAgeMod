@@ -29,6 +29,7 @@ public final class TrialArenaEvents {
         game.addListener(TrialArenaEvents::onPlace);
         game.addListener(TrialArenaEvents::onExplosion);
         game.addListener(TrialArenaEvents::onDamage);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(TrialArenaEvents::collect);
         game.addListener(TrialArenaEvents::onDeath);
         game.addListener(ArenaSpec.Loader::onAddReloadListeners);
         game.addListener(ArenaCommand::onRegisterCommands);
@@ -80,9 +81,17 @@ public final class TrialArenaEvents {
             blame.player().ifPresent(id -> a.participants().damage(id, blame.via() != Responsibility.Via.SOLDIER
                     && blame.via() != Responsibility.Via.NONE && !creative(level, id)));
         });
-        float m = boss.damageTakenMultiplier();
-        if (m != 1.0F) {
-            e.setAmount(e.getAmount() * m);
+    }
+
+    /** Boss 机制窗口（弥诺陶洛斯硬直 ×2）：窗口区（T25.1），对 Boss 最多 ×2。 */
+    static void collect(io.github.happysnappingturtle.mythicage.combat.DamagePipeline.Hit hit,
+                        java.util.List<io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Mod> out) {
+        if (hit.victim() instanceof TrialBoss boss) {
+            float m = boss.damageTakenMultiplier();
+            if (m != 1.0F) {
+                out.add(io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Mod.of(
+                        io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Zone.WINDOW, "trial_mechanic", m));
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package io.github.happysnappingturtle.mythicage.entity.karkinos;
 
+import io.github.happysnappingturtle.mythicage.core.combat.DamageZones;
 import io.github.happysnappingturtle.mythicage.core.wild.WildCombatRules;
 import io.github.happysnappingturtle.mythicage.entity.MythVariantHolder;
 import io.github.happysnappingturtle.mythicage.summon.SummonUnits;
@@ -207,16 +208,30 @@ public class KarkinosEntity extends Monster implements GeoEntity, MythVariantHol
         flipArmedAt = level().getGameTime();
     }
 
-    /** 这次伤害的倍率：翻倒 ×2；否则来源在前方 120° 内 ×0.2；没有来源位置（摔落、中毒等）×1。 */
-    public double damageMultiplier(DamageSource source) {
+    /**
+     * 这次伤害的修正（T25.1 伤害乘区）：翻倒 → 窗口区 ×2（翻过来后铁壳不朝前，正面也是 ×2，T15 TC-41）；
+     * 否则来源在前方 120° 内 → 抗性区 −80%；没有来源位置（摔落、中毒等）不修正。
+     */
+    public void damageMods(DamageSource source, java.util.List<DamageZones.Mod> out) {
         if (flipped()) {
-            return WildCombatRules.FLIPPED_MULTIPLIER;
+            out.add(DamageZones.Mod.of(DamageZones.Zone.WINDOW, "karkinos_flipped", WildCombatRules.FLIPPED_MULTIPLIER));
+        } else if (shellFacing(source)) {
+            out.add(DamageZones.Mod.of(DamageZones.Zone.RESIST, "karkinos_shell", FRONT_REDUCTION));
         }
+    }
+
+    /** 没翻倒、来源在前方 120° 内：铁壳挡住。 */
+    public boolean shellFacing(DamageSource source) {
         Vec3 from = source.getSourcePosition();
-        if (from == null) {
-            return 1.0;
+        return !flipped() && from != null
+                && WildCombatRules.frontalMultiplier(yBodyRot, from.x - getX(), from.z - getZ(), FRONT_ARC, FRONT_REDUCTION) < 1.0;
+    }
+
+    /** 伤害乘区的提供者：挨打的是卡尔基诺斯时登记它的修正。 */
+    public static void collect(io.github.happysnappingturtle.mythicage.combat.DamagePipeline.Hit hit, java.util.List<DamageZones.Mod> out) {
+        if (hit.victim() instanceof KarkinosEntity k) {
+            k.damageMods(hit.source(), out);
         }
-        return WildCombatRules.frontalMultiplier(yBodyRot, from.x - getX(), from.z - getZ(), FRONT_ARC, FRONT_REDUCTION);
     }
 
     @Override
@@ -225,11 +240,11 @@ public class KarkinosEntity extends Monster implements GeoEntity, MythVariantHol
             return super.hurt(source, amount);
         }
         boolean wasBuried = buried();
-        double mult = damageMultiplier(source);
-        if (mult < 1.0) {
+        // 倍率由伤害乘区算（collect）；这里只放铁壳挡住的声音
+        if (shellFacing(source)) {
             playSound(SoundEvents.SHIELD_BLOCK, 0.8F, 0.6F);
         }
-        boolean hurt = super.hurt(source, (float) (amount * mult));
+        boolean hurt = super.hurt(source, amount);
         if (!hurt || isDeadOrDying()) {
             return hurt;
         }

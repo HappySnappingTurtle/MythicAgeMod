@@ -14,7 +14,7 @@ public final class EquipmentEvents {
         game.addListener(EventPriority.LOWEST, WeaponMotionState::onCritical);
         // 最后看结果：别的处理器取消了格挡就不开窗口
         game.addListener(EventPriority.LOWEST, CounterEvents::onShieldBlock);
-        game.addListener(CounterEvents::onIncomingDamage);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(CounterEvents::collect);
         game.addListener(CounterEvents::onServerStopped);
     }
 }

@@ -269,6 +269,10 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.playtest.PlaytestLog.init();
         game.addListener(io.github.happysnappingturtle.mythicage.rite.UnlockService::onLoggedIn);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEvents::onPlayerAttack);
+        // 伤害乘区（T25.1）：唯一改伤害量的地方；各内容登记提供者
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.register(game);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity::collect);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity::collect);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onRightClickBlock);
 

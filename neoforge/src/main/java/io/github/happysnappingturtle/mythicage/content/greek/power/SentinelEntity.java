@@ -58,7 +58,14 @@ import java.util.UUID;
  * 到期（或被新的一组替换）时碎化 20 刻后移除；载入时已过期的不加入世界（{@link SentinelPower#onEntityJoin}）。
  * 实现 {@link OwnedSummon}（临时）：复原能给它回血。
  */
-public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerProduct, GeoEntity, MythVariantHolder {
+public class SentinelEntity extends PathfinderMob implements OwnedSummon, PowerProduct, GeoEntity, MythVariantHolder,
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.Attacker {
+    /** 伤害乘区里哨兵石像与士兵同类（T25.1 §1.2）。 */
+    @Override
+    public io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Source damageKind() {
+        return io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Source.SOLDIER;
+    }
+
     /** 同步给客户端的动画状态。 */
     public enum Pose { RISE, IDLE, DRAW, SHOOT, CRUMBLE }
 

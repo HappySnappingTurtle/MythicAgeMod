@@ -106,6 +106,8 @@ public final class GreekPowers {
 
     /** 触发类加载（物品、效果注册项）并登记效果代码与事件。 */
     public static void init(net.neoforged.bus.api.IEventBus modBus, net.neoforged.bus.api.IEventBus game) {
+        // 雷击的伤害类型按神力算（施法者是玩家，也不吃装备与弹药区，T25.1 D6）
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.powerType(DIVINE_BOLT);
         modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
                 e.put(CURSED_PIG.get(), net.minecraft.world.entity.animal.Pig.createAttributes().build()));
         modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->

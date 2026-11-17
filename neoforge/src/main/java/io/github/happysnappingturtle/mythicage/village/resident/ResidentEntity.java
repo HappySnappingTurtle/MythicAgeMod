@@ -49,7 +49,7 @@ import java.util.UUID;
  * </ul>
  */
 public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVariantHolder,
-        io.github.happysnappingturtle.mythicage.conduct.VillageDefender {
+        io.github.happysnappingturtle.mythicage.conduct.VillageDefender, io.github.happysnappingturtle.mythicage.combat.DamagePipeline.Attacker {
     public static final double REACH = 2.0;
     /** 移动速度属性（与原版村民相同）。下面几个倍率按它换算成目标米/秒（GA-1）。 */
     public static final double ATTRIBUTE = 0.5;
@@ -723,14 +723,32 @@ public class ResidentEntity extends PathfinderMob implements GeoEntity, MythVari
         }
     }
 
+    /**
+     * 伤害乘区的提供者（T25.1）：士兵举盾挡住正面 → 抗性区；不是士兵、被士兵护着（拦截投射物，T20 §9.1）→ 抗性区。
+     */
+    public static void collect(io.github.happysnappingturtle.mythicage.combat.DamagePipeline.Hit hit,
+                               java.util.List<io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Mod> out) {
+        if (!(hit.victim() instanceof ResidentEntity r)) {
+            return;
+        }
+        float m = r.isSoldier() ? (r.soldier != null ? r.soldier.shieldMultiplier(hit.source()) : 1.0F)
+                : io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.wardMultiplier(r, hit.source());
+        if (m < 1.0F) {
+            out.add(io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Mod.of(
+                    io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Zone.RESIST,
+                    r.isSoldier() ? "soldier_shield" : "soldier_ward", 1.0 - m));
+        }
+    }
+
+    @Override
+    public io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Source damageKind() {
+        return isSoldier() ? io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Source.SOLDIER
+                : io.github.happysnappingturtle.mythicage.core.combat.DamageZones.Source.MOB;
+    }
+
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!level().isClientSide && isSoldier() && soldier != null) {
-            amount *= soldier.shieldMultiplier(source);
-        } else if (!level().isClientSide && !isSoldier()) {
-            // 被士兵护着（拦截）：独有机制可以挡掉一部分（护祷拦截的投射物掩护，T20 §9.1）
-            amount *= io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.wardMultiplier(this, source);
-        }
+        // 士兵举盾、被士兵护着的减伤由伤害乘区算（collect，T25.1）
         boolean hurt = super.hurt(source, amount);
         if (hurt && isSoldier() && source.getEntity() != null && level() instanceof ServerLevel sl) {
             io.github.happysnappingturtle.mythicage.village.soldier.Soldiers.onHit(sl, this);

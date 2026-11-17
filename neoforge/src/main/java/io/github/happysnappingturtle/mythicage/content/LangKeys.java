@@ -1193,6 +1193,23 @@ public final class LangKeys {
         add("mythic_age.village.map.legend.site", "在建", "Building", "建設中");
         add("mythic_age.village.map.legend.plot", "空地块", "Empty plot", "空き区画");
         add("mythic_age.village.map.legend.you", "你", "You", "あなた");
+        // 伤害乘区调试（T25.1）
+        add("mythic_age.dev.damage.on", "伤害明细已打开：你打出或挨到的每次伤害都会列出各区倍率", "Damage breakdown on: every hit you deal or take lists each zone's multiplier", "ダメージ内訳オン：与えた・受けたダメージごとに各区の倍率を表示");
+        add("mythic_age.dev.damage.off", "伤害明细已关闭", "Damage breakdown off", "ダメージ内訳オフ");
+        add("mythic_age.dev.damage.line", "[伤害] %s ← %s：%s", "[Damage] %s ← %s: %s", "[ダメージ] %s ← %s：%s");
+        add("mythic_age.dev.damage.before_armor", "（护甲前）", " (before armor)", "（防具前）");
+        add("mythic_age.dev.damage.source.player", "玩家", "player", "プレイヤー");
+        add("mythic_age.dev.damage.source.summon", "召唤单位", "summon", "召喚ユニット");
+        add("mythic_age.dev.damage.source.power", "神力", "god power", "神力");
+        add("mythic_age.dev.damage.source.soldier", "士兵", "soldier", "兵士");
+        add("mythic_age.dev.damage.source.mob", "生物或环境", "mob or environment", "生物・環境");
+        add("mythic_age.dev.damage.zone.base", "基础", "base", "基礎");
+        add("mythic_age.dev.damage.zone.gear", "装备", "gear", "装備");
+        add("mythic_age.dev.damage.zone.ammo", "弹药", "ammo", "弾薬");
+        add("mythic_age.dev.damage.zone.blessing", "祝福", "blessing", "祝福");
+        add("mythic_age.dev.damage.zone.move", "招式", "move", "技");
+        add("mythic_age.dev.damage.zone.window", "窗口", "window", "隙");
+        add("mythic_age.dev.damage.zone.resist", "抗性", "resistance", "耐性");
         add("mythic_age.village.plot.shrine", "祠", "shrine", "祠");
         add("mythic_age.village.plot.market", "集市", "market", "市場");
         add("mythic_age.village.plot.workshop", "作坊", "workshop", "工房");

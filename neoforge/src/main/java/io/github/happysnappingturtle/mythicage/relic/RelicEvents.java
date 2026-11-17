@@ -1,6 +1,8 @@
 package io.github.happysnappingturtle.mythicage.relic;
 
-import io.github.happysnappingturtle.mythicage.core.relic.DamageRules;
+import io.github.happysnappingturtle.mythicage.combat.DamagePipeline;
+import io.github.happysnappingturtle.mythicage.core.combat.DamageZones;
+import io.github.happysnappingturtle.mythicage.core.relic.EffectGroups;
 import io.github.happysnappingturtle.mythicage.shrine.ShrineBlockEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -9,7 +11,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -35,7 +36,7 @@ public final class RelicEvents {
         game.addListener(RelicEvents::onChangedDimension);
         game.addListener(RelicEvents::onCurioChange);
         io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "relic_events", RelicEvents::onServerTickPost);
-        game.addListener(RelicEvents::onIncomingDamage);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(RelicEvents::collect);
         game.addListener(RelicEvents::onConversion);
         game.addListener(RelicEvents::onRightClickBlock);
         game.addListener(RelicEvents::onServerStopped);
@@ -82,13 +83,17 @@ public final class RelicEvents {
         }
     }
 
-    static void onIncomingDamage(LivingIncomingDamageEvent e) {
-        if (e.getEntity().level().isClientSide) {
+    /** 圣物近战减伤：抗性区（T25.1）；自身与范围两组各是一个效果组。 */
+    static void collect(DamagePipeline.Hit hit, List<DamageZones.Mod> out) {
+        if (!RelicEffects.isMelee(hit.source())) {
             return;
         }
-        List<Double> r = RelicEffects.meleeReductions(e.getEntity(), e.getSource());
-        if (!r.isEmpty()) {
-            e.setAmount(DamageRules.reduce(e.getAmount(), r, 0));
+        if (hit.victim() instanceof net.minecraft.server.level.ServerPlayer) {
+            List<Double> r = RelicEffects.meleeReductions(hit.victim(), hit.source());
+            r.forEach(v -> out.add(DamageZones.Mod.of(DamageZones.Zone.RESIST, EffectGroups.MELEE_TAKEN_SELF, v)));
+        } else {
+            RelicEffects.meleeReductions(hit.victim(), hit.source())
+                    .forEach(v -> out.add(DamageZones.Mod.of(DamageZones.Zone.RESIST, EffectGroups.MELEE_TAKEN_AREA_ALLIES, v)));
         }
     }
 
