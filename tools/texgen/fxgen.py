@@ -435,6 +435,66 @@ def plague_band() -> Image.Image:
     return img
 
 
+def ceasefire_seal() -> Image.Image:
+    """停火的停战标记（128，自带颜色）：信使金双圈 + 中间一根传令杖（kerykeion：杖身、两条缠绕的蛇、顶端一对翅膀），天青描边。
+    出处：传令杖是传令官安全通行的标志（Burkert《希腊宗教》III.2「赫尔墨斯」）。"""
+    c = Canvas(128)
+    gold, deep, sky = "#e2b33c", "#8a6a12", "#7cc4e0"
+
+    def fn(r, th):
+        # 画布的 y 朝下：取反，让翅膀与顶球在上
+        x, y = r * math.cos(th), -r * math.sin(th)
+        a, col = 0.0, gold
+        a = max(a, 0.95 * band(r, 0.93, 0.02, 0.02))
+        if band(r, 0.86, 0.008, 0.01) > 0.3:
+            a, col = max(a, 0.8), sky
+        # 杖身：竖直细条 y ∈ [-0.62, 0.5]
+        if abs(x) < 0.035 and -0.62 < y < 0.5:
+            a, col = 0.95, gold
+        # 两条蛇：正弦缠绕，振幅 0.16，在杖身上交叉三次
+        for sign in (1, -1):
+            sx = sign * 0.16 * math.sin((y + 0.45) / 0.85 * 3 * math.pi)
+            if -0.45 < y < 0.38 and abs(x - sx) < 0.03:
+                a, col = 0.95, deep
+        # 顶端圆球与一对翅膀（向两侧上扬的弧）
+        if math.hypot(x, y - 0.55) < 0.06:
+            a, col = 0.95, gold
+        for sign in (1, -1):
+            wx = sign * x
+            if 0.05 < wx < 0.42:
+                wy = 0.48 + 0.25 * (wx - 0.05) - 0.9 * (wx - 0.2) ** 2
+                if abs(y - wy) < 0.035 or (abs(y - (wy - 0.08)) < 0.025 and wx < 0.34):
+                    a, col = 0.9, sky
+        a = max(a, 0.12 * (1 - smooth(0.0, 0.9, r)))
+        return None if a <= 0.01 else with_alpha(col, a)
+
+    c.polar(fn)
+    return c.img
+
+
+def ceasefire_curtain() -> Image.Image:
+    """停火边界光幕（32×32，沿圆周平铺，竖直贴）：底部一道天青细线 + 信使金向上渐隐，每 16 像素一个朝上的小三角（旗帜锯齿）。
+    图上方是光幕顶（v=0），下方贴地（v=1）。"""
+    w, h = 32, 32
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    px = img.load()
+    for y in range(h):
+        for x in range(w):
+            v = (y + 0.5) / h
+            a = 0.75 * smooth(0.15, 1.0, v) ** 1.6
+            col = "#e2b33c"
+            k = (x % 16 + 0.5) / 16
+            tri = 0.5 - abs(k - 0.5)
+            if 0.7 < v < 0.9 and (0.9 - v) < tri * 0.4:
+                a = max(a, 0.85)
+            if v > 0.92:
+                a, col = 0.9, "#7cc4e0"
+            if a > 0.01:
+                r, g, b, _ = hexc(col)
+                px[x, y] = (r, g, b, int(a * 255))
+    return img
+
+
 def curse_ring() -> Image.Image:
     """诅咒符圈（128）：玫瑰粉双圈 + 12 朵五瓣小花 + 内圈心形连环（自带颜色）。"""
     c = Canvas(128)
@@ -640,6 +700,8 @@ def all_textures() -> dict[str, Image.Image]:
         "fx/plague_seal": plague_seal(),
         "fx/plague_band": plague_band(),
         "fx/curse_ring": curse_ring(),
+        "fx/ceasefire_seal": ceasefire_seal(),
+        "fx/ceasefire_curtain": ceasefire_curtain(),
         "fx/lure_band": lure_band(),
         "fx/sentinel_rune": sentinel_rune(),
         "particle/plague_mark": pixels(PLAGUE_MARK, PMARK),

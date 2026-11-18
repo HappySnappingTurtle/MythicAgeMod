@@ -68,6 +68,55 @@ public final class FxDraw {
         }
     }
 
+    /** 某个水平位置的地面高度（光幕的落脚点）。 */
+    @FunctionalInterface
+    public interface Ground {
+        double at(double x, double z);
+    }
+
+    /**
+     * 一圈竖直的光幕：半径 {@code r}、高 {@code height}，每个顶点都落在那里的地面上（大半径的边界跨过起伏的地形也不会埋进地里）。
+     * 贴图沿圆周平铺（每 {@code tileLength} 格一次），v 从顶 0 到底 1；只画离 {@code eye} 水平 {@code near} 格内的那几段，
+     * 两面都画（从圈内圈外都看得见）。
+     */
+    public static void curtain(PoseStack pose, MultiBufferSource buffers, ResourceLocation tex, Vec3 c, float r, float height,
+                               float tileLength, int argb, Ground ground, Vec3 eye, double near) {
+        if (r <= 0.05f) {
+            return;
+        }
+        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(tex));
+        PoseStack.Pose last = pose.last();
+        int segments = Mth.clamp((int) (r * 1.5f), 24, 256);
+        float tiles = Math.max(1, Math.round((float) (2 * Math.PI * r / tileLength)));
+        double near2 = near * near;
+        for (int i = 0; i < segments; i++) {
+            float a0 = (float) (Math.PI * 2 * i / segments);
+            float a1 = (float) (Math.PI * 2 * (i + 1) / segments);
+            float x0 = (float) c.x + Mth.cos(a0) * r;
+            float z0 = (float) c.z + Mth.sin(a0) * r;
+            float x1 = (float) c.x + Mth.cos(a1) * r;
+            float z1 = (float) c.z + Mth.sin(a1) * r;
+            double mx = (x0 + x1) / 2.0 - eye.x;
+            double mz = (z0 + z1) / 2.0 - eye.z;
+            if (mx * mx + mz * mz > near2) {
+                continue;
+            }
+            float y0 = (float) ground.at(x0, z0);
+            float y1 = (float) ground.at(x1, z1);
+            float u0 = tiles * i / segments;
+            float u1 = tiles * (i + 1) / segments;
+            vertex(vc, last, x0, y0 + height, z0, u0, 0, argb);
+            vertex(vc, last, x0, y0, z0, u0, 1, argb);
+            vertex(vc, last, x1, y1, z1, u1, 1, argb);
+            vertex(vc, last, x1, y1 + height, z1, u1, 0, argb);
+            // 背面
+            vertex(vc, last, x1, y1 + height, z1, u1, 0, argb);
+            vertex(vc, last, x1, y1, z1, u1, 1, argb);
+            vertex(vc, last, x0, y0, z0, u0, 1, argb);
+            vertex(vc, last, x0, y0 + height, z0, u0, 0, argb);
+        }
+    }
+
     private static void vertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, float u, float v, int argb) {
         vc.addVertex(p, x, y, z).setColor(argb).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(LightTexture.FULL_BRIGHT).setNormal(p, 0, 1, 0);

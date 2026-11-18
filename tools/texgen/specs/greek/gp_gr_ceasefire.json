@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/gp_gr_ceasefire",
+  "size": 16,
+  "palette": {
+    "o": "#3b2412",
+    "R": "#b9844a",
+    "r": "#87592c",
+    "p": "#ecdcb0",
+    "q": "#c9b07a",
+    "Y": "#d9a520",
+    "k": "#8a6a12",
+    "b": "#6fb7d6"
+  },
+  "params": {
+    "kind": "item",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      "..oooooooooooo..",
+      "..opbbpYpbbpqo..",
+      "..oppbbYbbppqo..",
+      "..opppkYkpppqo..",
+      "..oppkpYpkppqo..",
+      "..opppkYkpppqo..",
+      "..oppkpYpkppqo..",
+      "..opppkYkpppqo..",
+      "..oooooooooooo..",
+      ".oRRRRRRRRRRRRo.",
+      ".orrrrrrrrrrrro.",
+      ".oooooooooooooo."
+    ]
+  }
+}

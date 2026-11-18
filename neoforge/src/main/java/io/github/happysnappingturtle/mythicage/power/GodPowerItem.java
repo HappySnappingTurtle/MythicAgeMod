@@ -33,11 +33,11 @@ public class GodPowerItem extends Item {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 
-    /** 物品说明：效果摘要（{@code .tip}）与「主神 · 吟唱 · 冷却」（{@code .tip2}），有翻译才显示。 */
+    /** 物品说明：效果摘要（{@code .tip}）、「主神 · 吟唱 · 冷却」（{@code .tip2}）与补充说明（{@code .tip3}），有翻译才显示。 */
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<net.minecraft.network.chat.Component> lines,
                                 net.minecraft.world.item.TooltipFlag flag) {
-        for (String suffix : new String[]{".tip", ".tip2"}) {
+        for (String suffix : new String[]{".tip", ".tip2", ".tip3"}) {
             String key = getDescriptionId() + suffix;
             if (net.minecraft.locale.Language.getInstance().has(key)) {
                 lines.add(net.minecraft.network.chat.Component.translatable(key)

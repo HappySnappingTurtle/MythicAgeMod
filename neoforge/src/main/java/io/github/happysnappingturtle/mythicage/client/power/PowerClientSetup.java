@@ -37,6 +37,7 @@ public final class PowerClientSetup {
         PowerFxRenderer.Registry.register(GreekPowers.CURSE, new io.github.happysnappingturtle.mythicage.client.power.greek.CurseFx());
         PowerFxRenderer.Registry.register(GreekPowers.LURE, new LureFx());
         PowerFxRenderer.Registry.register(GreekPowers.SENTINEL, new SentinelFx());
+        PowerFxRenderer.Registry.register(GreekPowers.CEASEFIRE, new io.github.happysnappingturtle.mythicage.client.power.greek.CeasefireFx());
     }
 
     @SubscribeEvent

@@ -34,6 +34,7 @@ public final class GreekPowers {
     public static final String BRONZE = "gp_gr_bronze";
     public static final String PESTILENCE = "gp_gr_pestilence";
     public static final String CURSE = "gp_gr_curse";
+    public static final String CEASEFIRE = "gp_gr_ceasefire";
 
     public static final DeferredItem<GodPowerItem> BOLT_ITEM = item(BOLT, "雷击", "Bolt", "雷撃");
     public static final DeferredItem<GodPowerItem> LURE_ITEM = item(LURE, "诱兽石", "Lure", "誘獣石");
@@ -42,6 +43,7 @@ public final class GreekPowers {
     public static final DeferredItem<GodPowerItem> BRONZE_ITEM = item(BRONZE, "青铜", "Bronze", "青銅");
     public static final DeferredItem<GodPowerItem> PESTILENCE_ITEM = item(PESTILENCE, "瘟疫", "Pestilence", "疫病");
     public static final DeferredItem<GodPowerItem> CURSE_ITEM = item(CURSE, "诅咒", "Curse", "呪い");
+    public static final DeferredItem<GodPowerItem> CEASEFIRE_ITEM = item(CEASEFIRE, "停火", "Ceasefire", "停戦");
 
     public static final DeferredHolder<MobEffect, BronzeBodyEffect> BRONZE_BODY =
             PowerRegistries.EFFECTS.register("bronze_body", BronzeBodyEffect::new);
@@ -131,6 +133,18 @@ public final class GreekPowers {
         GodPowers.register(new RestorationPower());
         GodPowers.register(new BronzePower());
         Auras.register(BRONZE_BODY.getKey(), "bronze");
+        // 停火（T25a）：区域、伤害判定（T25.1 Gate）、破约、失去目标、不生成、刷怪笼停摆
+        io.github.happysnappingturtle.mythicage.power.PowerZones.registerKind(CeasefirePower.KIND, CeasefirePower.ZONE);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.gate(CeasefirePower::gate);
+        game.addListener(CeasefirePower::onAttack);
+        game.addListener(CeasefirePower::onEntityJoin);
+        game.addListener(CeasefirePower::onChangeTarget);
+        game.addListener(CeasefirePower::onSpawnCheck);
+        game.addListener(CeasefirePower::onDeath);
+        game.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent e) -> CeasefirePower.onServerStopped());
+        io.github.happysnappingturtle.mythicage.power.SpawnerStall.register((level, pos) ->
+                io.github.happysnappingturtle.mythicage.power.PowerZones.covered(level, pos, CeasefirePower.KIND));
+        GodPowers.register(new CeasefirePower());
     }
 
     /** 在某处播放神力音效（所有附近玩家都听得到）。 */

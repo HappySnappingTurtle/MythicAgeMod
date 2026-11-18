@@ -901,6 +901,15 @@ public final class LangKeys {
         add("item.mythic_age.gp_gr_pestilence.tip2", "阿瑞斯 · 吟唱 2 秒 · 冷却 180 秒 · 投掷 24 格", "Ares · 2 s cast · 180 s cooldown · throw 24 blocks", "アレス・詠唱2秒・クールダウン180秒・投擲24ブロック");
         add("item.mythic_age.gp_gr_curse.tip", "掷出金苹果，落点半径 8 内的敌人按生命从低到高变成猪（生命总预算 60）；精英与 Boss 免疫", "Throw the golden apple: enemies within 8 blocks turn into pigs from weakest up (60 total max health); elites and bosses are immune", "金の林檎を投げ、半径8内の敵を体力の低い順に豚へ変える（最大体力の合計60まで）。エリートとボスは無効");
         add("item.mythic_age.gp_gr_curse.tip2", "阿佛洛狄忒 · 吟唱 2 秒 · 冷却 300 秒 · 投掷 24 格", "Aphrodite · 2 s cast · 300 s cooldown · throw 24 blocks", "アフロディーテ・詠唱2秒・クールダウン300秒・投擲24ブロック");
+        add("mythic_age.power.gp_gr_ceasefire", "停火", "Ceasefire", "停戦");
+        add("item.mythic_age.gp_gr_ceasefire.tip", "以你为中心、半径 64 的休战地，30 秒：区内谁都伤不了谁，敌人失去目标，不刷怪；你移速 +30%。谁先动手，休战立刻结束", "A truce ground of radius 64 around you for 30 s: nobody inside can hurt anyone, enemies lose their targets and nothing hostile spawns; you move 30% faster. Whoever strikes first ends the truce at once", "自分を中心に半径64の休戦地を30秒張る。区内では誰も傷つけ合えず、敵は狙いを失い、敵は湧かない。移動速度+30%。先に手を出した者がいれば休戦はすぐ終わる");
+        add("item.mythic_age.gp_gr_ceasefire.tip2", "赫尔墨斯 · 吟唱 2 秒 · 冷却 180 秒 · 半径 64", "Hermes · 2 s cast · 180 s cooldown · radius 64", "ヘルメス・詠唱2秒・クールダウン180秒・半径64");
+        add("item.mythic_age.gp_gr_ceasefire.tip3", "Boss 只停手 8 秒；同一场 Boss 战再用，Boss 不再受影响", "A boss holds off for only 8 s; used again in the same boss fight, the boss is no longer affected", "ボスは8秒だけ手を止める。同じボス戦で再び使うとボスには効かない");
+        add("mythic_age.power.ceasefire.broken", "%s 动手了，休战结束", "%s struck first; the truce is over", "%s が手を出した。休戦は終わった");
+        add("subtitles.mythic_age.gp.gr.ceasefire.begin", "休战开始", "Truce begins", "休戦が始まる");
+        add("subtitles.mythic_age.gp.gr.ceasefire.boss_release", "Boss 不再停手", "Boss resumes", "ボスが再び動く");
+        add("subtitles.mythic_age.gp.gr.ceasefire.break", "休战被打破", "Truce broken", "休戦が破られる");
+        add("subtitles.mythic_age.gp.gr.ceasefire.end", "休战结束", "Truce ends", "休戦が終わる");
         add("effect.mythic_age.plagued", "瘟疫", "Plagued", "疫病");
         add("entity.mythic_age.cursed_pig", "被诅咒的猪", "Cursed Pig", "呪われた豚");
         add("death.attack.mythic_age.divine_bolt", "%1$s被宙斯的雷霆击中", "%1$s was struck by the thunderbolt of Zeus", "%1$sはゼウスの雷霆に撃たれた");

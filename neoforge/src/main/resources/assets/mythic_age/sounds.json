@@ -359,5 +359,49 @@
         "volume": 0.35
       }
     ]
+  },
+  "gp.gr.ceasefire.begin": {
+    "subtitle": "subtitles.mythic_age.gp.gr.ceasefire.begin",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "gp.gr.ceasefire.boss_release": {
+    "subtitle": "subtitles.mythic_age.gp.gr.ceasefire.boss_release",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "gp.gr.ceasefire.break": {
+    "subtitle": "subtitles.mythic_age.gp.gr.ceasefire.break",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "gp.gr.ceasefire.end": {
+    "subtitle": "subtitles.mythic_age.gp.gr.ceasefire.end",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.8
+      }
+    ]
   }
 }

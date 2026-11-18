@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "gp_gr_ceasefire",
+  "card": "GP-GR-05",
+  "civilization": "greek",
+  "form": "scroll",
+  "castTicks": 40,
+  "cooldownTicks": 3600,
+  "targetProfile": "WORLD_AREA",
+  "selfCentered": true,
+  "radius": 64,
+  "durationTicks": 600,
+  "matrix": {
+    "caster": "truce",
+    "own_villager": "truce",
+    "own_soldier": "truce",
+    "other_village": "truce",
+    "own_summon": "truce",
+    "other_summon": "truce",
+    "guardian": "truce",
+    "neutral_animal": "truce",
+    "hostile": "truce",
+    "elite": "truce",
+    "boss": "truce_boss",
+    "enemy_player": "truce"
+  }
+}
