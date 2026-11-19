@@ -1,0 +1,31 @@
+{
+  "parent": "mythic_age:greek/root",
+  "criteria": {
+    "event": {
+      "conditions": {
+        "civilization": "greek",
+        "event": "cyclops_nobody"
+      },
+      "trigger": "mythic_age:myth_event"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.mythic_age.greek.nobody.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "mythic_age:maronean_wine"
+    },
+    "title": {
+      "translate": "advancements.mythic_age.greek.nobody.title"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

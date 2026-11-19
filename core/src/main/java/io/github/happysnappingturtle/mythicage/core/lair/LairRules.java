@@ -48,4 +48,48 @@ public final class LairRules {
     public static boolean mustReturn(double distSqFromLair) {
         return distSqFromLair > (double) LEASH * LEASH;
     }
+
+    // ───────────── 夜间封洞（独眼巨人洞穴，T25a §5.3、D15） ─────────────
+
+    /** 傍晚从这一刻起封洞。 */
+    public static final int SEAL_FROM = 12500;
+    /** 天亮在这一刻移开巨石。 */
+    public static final int SEAL_UNTIL = 23000;
+    /** 洞内贴着巨石潜行右键多少刻能推开（D15：3 秒）。 */
+    public static final int PUSH_TICKS = 60;
+    /** 两次右键之间隔多久就算松手、从头计时。 */
+    public static final int PUSH_GAP = 10;
+
+    /** 现在（一天内的刻数 0–23999）是不是封洞时段。 */
+    public static boolean sealTime(long dayTime) {
+        long t = Math.floorMod(dayTime, 24000L);
+        return t >= SEAL_FROM && t < SEAL_UNTIL;
+    }
+
+    /** 离天亮移开巨石还有多少刻（不在封洞时段为 0）。 */
+    public static long ticksUntilDawn(long dayTime) {
+        long t = Math.floorMod(dayTime, 24000L);
+        return sealTime(t) ? SEAL_UNTIL - t : 0;
+    }
+
+    /** 该不该（重新）封洞：封洞时段、区块载入、精英活着且在洞里、今晚还没被推开过。 */
+    public static boolean shouldSeal(long dayTime, boolean chunkLoaded, boolean eliteInside, boolean pushedTonight) {
+        return sealTime(dayTime) && chunkLoaded && eliteInside && !pushedTonight;
+    }
+
+    /** 「今晚」的编号（12500 到 23000 在同一个 24000 周期内，算同一晚）：用来记今晚巨石有没有被推开。 */
+    public static long nightIndex(long absoluteDayTime) {
+        return Math.floorDiv(absoluteDayTime - SEAL_FROM, 24000L);
+    }
+
+    /**
+     * 推巨石的累计（D15）：这一下右键距上一下 ≤ {@link #PUSH_GAP} 刻就接着计，否则从头计。返回新的累计刻数。
+     */
+    public static int pushProgress(int progress, long lastTick, long now) {
+        long gap = now - lastTick;
+        if (gap < 0 || gap > PUSH_GAP) {
+            return 0;
+        }
+        return progress + (int) gap;
+    }
 }

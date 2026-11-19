@@ -1,0 +1,31 @@
+{
+  "name": "独眼巨人",
+  "icon": "mythic_age:cyclops_fire",
+  "category": "mythic_age:bestiary",
+  "sortnum": 20,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:cyclops",
+      "scale": 0.35,
+      "offset": 0.1,
+      "text": "住在海边石岸、风袭丘陵和草甸的山坡洞里。洞口冒着烟，洞外常有一群羊。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "白天他在洞外放羊。离得远时，他会用左手举起一块巨石，地上出现一圈红点，大约 $(l)1.2 秒$()后巨石落进红圈，砸中掉 $(l)12$() 点血。离得近了，他把棒子举过肩，停一下再砸下来，看到举棒就躲开。$(br2)天黑他回洞睡觉，用巨石把洞口封上，天亮再挪开。被关在里面的话，贴着巨石潜行右键 $(l)3 秒$()，能推开一道缝。",
+      "advancement": "mythic_age:bestiary/greek/cyclops/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)马洛涅烈酒$()用 $(l)4$() 串葡萄和 $(l)1$() 瓶蜂蜜做成。扔到他附近，他会走过去喝光，接着仰面醉倒 $(l)8 秒$()，这时打他伤害 $(l)×3$()。醒来后 $(l)30 秒$()内他不会再碰酒。$(br2)打倒他会得到 $(l)2$() 团$(l)库克罗普斯之火$()（锻造宙斯雷霆的材料）、一些羊毛和一张$(l)英雄锻造模板$()。洞空出来 $(l)7 天$()后，会有新的牧人住进来。",
+      "advancement": "mythic_age:bestiary/greek/cyclops/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "荷马《奥德赛》第九卷里，奥德修斯一行被独眼巨人波吕斐摩斯关在洞里。奥德修斯说自己叫「无人」，用带来的烈酒把他灌醉，趁他睡着用烧红的木桩刺瞎了他的眼睛。别的独眼巨人听见喊声跑来问是谁在害他，他答：「无人在害我。」$(br2)赫西俄德《神谱》里另有三位独眼巨人，替宙斯打造了雷电。阿瑞斯的祭司那里也能换到召出独眼巨人的召唤符。",
+      "advancement": "mythic_age:bestiary/greek/cyclops/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/cyclops/sighted"
+}

@@ -306,8 +306,11 @@ class Building:
 
 
 def _font(size):
+    """中文字体：macOS → Windows → Linux，都没有时退回 Pillow 默认字体（不显示中文）。"""
     for p in ("/System/Library/Fonts/PingFang.ttc", "/System/Library/Fonts/STHeiti Medium.ttc",
-              "/System/Library/Fonts/Hiragino Sans GB.ttc"):
+              "/System/Library/Fonts/Hiragino Sans GB.ttc",
+              "C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/simhei.ttf", "C:/Windows/Fonts/simsun.ttc",
+              "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"):
         if Path(p).exists():
             return ImageFont.truetype(p, size)
     return ImageFont.load_default()
@@ -345,8 +348,8 @@ def export_template(b: Building, short: str, meta: dict, civ="greek", kind="vill
     """把体素导出成结构模板（.nbt）+ 建筑数据（.json）。
 
     原点 = 体素包围盒最小角；y ≥ 0 的空格写成空气（建筑内部与上方清空），y < 0 的空格不写（保留地形）。
-    kind：village（村庄建筑，数据在 village_building/）或其他结构类别（ruin、labyrinth，T22；数据在 structure_spec/，
-    村庄系统读不到它们）。
+    kind：village（村庄建筑，数据在 village_building/）或其他结构类别（ruin、labyrinth，T22；lair，T25a；数据在 structure_spec/，
+    村庄系统读不到它们）。meta 带 keep_terrain 时 y ≥ 0 的空格也不写（保留地形）。
     返回 (模板路径, 数据路径)。
     """
     import json
@@ -355,10 +358,12 @@ def export_template(b: Building, short: str, meta: dict, civ="greek", kind="vill
     x0, y0, z0, x1, y1, z1 = b.bounds()
     size = (x1 - x0 + 1, y1 - y0 + 1, z1 - z0 + 1)
     cells = dict(b.blocks)
-    for x in range(x0, x1 + 1):
-        for y in range(max(0, y0), y1 + 1):
-            for z in range(z0, z1 + 1):
-                cells.setdefault((x, y, z), "minecraft:air")
+    if not meta.get("keep_terrain"):
+        # keep_terrain（嵌进山体的巢穴，T25a）：只写明确给出的格子，其余保留原地形
+        for x in range(x0, x1 + 1):
+            for y in range(max(0, y0), y1 + 1):
+                for z in range(z0, z1 + 1):
+                    cells.setdefault((x, y, z), "minecraft:air")
     palette, index, blocks = [], {}, []
     materials = {}
     for (x, y, z), state in sorted(cells.items(), key=lambda kv: (kv[0][1], kv[0][0], kv[0][2])):
@@ -419,5 +424,5 @@ def export_template(b: Building, short: str, meta: dict, civ="greek", kind="vill
             data["door"]["width"] = d["width"]  # 门宽（GA-14）：第二格在朝向的顺时针一侧
     js = DATA_ROOT / "mythic_age" / ("village_building" if kind == "village" else "structure_spec") / civ / f"{short}.json"
     js.parent.mkdir(parents=True, exist_ok=True)
-    js.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    js.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     return tpl, js

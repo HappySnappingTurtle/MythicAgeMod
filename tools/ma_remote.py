@@ -3,7 +3,8 @@
 
   python3 tools/ma_remote.py start [--fresh] [--world 名字] [--lang zh_cn] [--realtime] [--structures] [--foreground]
       后台启动 runClient -Pagent=remote，等待新的 ready.json（默认最多 6 分钟）。
-      默认把游戏窗口隐藏，并把焦点还给之前在用的程序；--foreground 让窗口留在前台。
+      默认把游戏窗口隐藏（macOS）或压到底层（Windows），并把焦点还给之前在用的程序；--foreground 让窗口留在前台。
+Windows 上把命令里的 python3 换成 python 即可（或用 py -3）。
   python3 tools/ma_remote.py send '<指令>' ['<指令>' ...]     或    send -f 指令文件（每行一条，# 开头为注释）
       自动编号、追加到 commands.jsonl、等待全部结果、每条打印一行中文摘要；--raw 打印原始 JSON。
   python3 tools/ma_remote.py stop        发送 quit，等待客户端退出
@@ -21,6 +22,9 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import procutil  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 RUN = ROOT / "neoforge" / "runs" / "client"
 REMOTE = RUN / "agent_out" / "remote"
@@ -36,16 +40,16 @@ def read_json(p):
         return None
 
 
-def client_alive():
+def is_agent_client(cmdline, read=None):
     """遥控模式的开发客户端：MDG 把客户端参数写在 clientRunVmArgs 文件里，
-    遥控模式下 fml.modFolders 中还带有 agent 源集的输出目录。"""
-    out = subprocess.run(["pgrep", "-f", "clientRunVmArgs"], capture_output=True, text=True).stdout.split()
-    pids = []
-    for pid in out:
-        cmd = subprocess.run(["ps", "-o", "command=", "-p", pid], capture_output=True, text=True).stdout
-        if "classes/java/agent" in cmd:
-            pids.append(pid)
-    return pids
+    遥控模式下 fml.modFolders 中还带有 agent 源集的输出目录（可能在命令行上，也可能在 @参数文件里）。"""
+    if "clientrunvmargs" not in cmdline.lower():
+        return False
+    return "classes/java/agent" in procutil.norm(procutil.expanded_cmdline(cmdline, read))
+
+
+def client_alive():
+    return [str(pid) for pid, cmd in procutil.java_processes() if is_agent_client(cmd)]
 
 
 def next_id():
@@ -80,17 +84,33 @@ def responsive(timeout=15):
 
 def kill_clients():
     """锁屏时启动的客户端可能卡在报错对话框上：进程还在却不处理指令，只能强制结束。"""
-    for sig in ("-TERM", "-KILL"):
+    for force in (False, True):
         pids = client_alive()
         if not pids:
             return
-        subprocess.run(["kill", sig, *pids], capture_output=True)
+        procutil.terminate(pids, force=force)
         time.sleep(3)
 
 
-# ── 不抢前台：游戏窗口出现后隐藏，并把焦点还给之前在用的程序（macOS） ──
+# ── 不抢前台：游戏窗口出现后隐藏（macOS）或压到底层（Windows），并把焦点还给之前在用的程序 ──
+
+_game_pids = {"at": 0.0, "pids": []}
+
+
+def game_pids(max_age=5.0):
+    """Windows 上每 0.5 秒都要找游戏窗口；查进程要起 PowerShell，结果缓存几秒。"""
+    if time.time() - _game_pids["at"] > max_age:
+        _game_pids.update(at=time.time(), pids=client_alive())
+    return _game_pids["pids"]
+
+
+def app_name(prev):
+    return procutil.win_title(prev) if procutil.IS_WINDOWS else prev
+
 
 def front_app():
+    if procutil.IS_WINDOWS:
+        return procutil.win_foreground()
     if sys.platform != "darwin":
         return None
     try:
@@ -108,6 +128,8 @@ def is_game_app(name):
 
 
 def give_back(prev):
+    if procutil.IS_WINDOWS:
+        return procutil.win_give_back(prev, game_pids())
     if not prev or is_game_app(prev):
         return False
     cur = front_app()
@@ -118,7 +140,10 @@ def give_back(prev):
 
 
 def hide_game():
-    """等于对游戏进程按 ⌘H（macOS 自带接口，不需要额外授权）。"""
+    """macOS：等于对游戏进程按 ⌘H（自带接口，不需要额外授权）。
+    Windows：压到底层；不能最小化（最小化后 Minecraft 不渲染，capture 会失败）。"""
+    if procutil.IS_WINDOWS:
+        return procutil.win_send_to_back(game_pids())
     if sys.platform != "darwin":
         return False
     hid = False
@@ -158,10 +183,11 @@ def cmd_start(a):
     old = (read_json(READY) or {}).get("sessionId")
     prev = None if a.foreground else front_app()
     LOG.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG, "w") as log:
-        proc = subprocess.Popen(["./gradlew", ":neoforge:runClient", *props], cwd=ROOT,
-                                stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-    PIDFILE.write_text(str(proc.pid))
+    with open(LOG, "w", encoding="utf-8") as log:
+        proc = subprocess.Popen([*procutil.gradlew(ROOT), ":neoforge:runClient", *props], cwd=ROOT,
+                                stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
+                                **procutil.detached_kwargs())
+    PIDFILE.write_text(str(proc.pid), encoding="utf-8")
     print(f"已在后台启动（gradle pid {proc.pid}），日志：{LOG}")
     deadline = time.time() + a.timeout
     gave = False
@@ -178,12 +204,12 @@ def cmd_start(a):
                     gave = give_back(prev) or gave
                 time.sleep(0.5)
             if gave:
-                print(f"已把焦点还给「{prev}」（游戏窗口在后台运行）")
+                print(f"已把焦点还给「{app_name(prev)}」（游戏窗口在后台运行）")
             print("就绪：", json.dumps(r, ensure_ascii=False))
             return 0
         if proc.poll() is not None:
             print(f"gradle 进程已退出（{proc.returncode}），日志末尾：")
-            print("\n".join(LOG.read_text(errors="ignore").splitlines()[-25:]))
+            print("\n".join(LOG.read_text(encoding="utf-8", errors="ignore").splitlines()[-25:]))
             return 1
         time.sleep(0.5)
     print("等待 ready.json 超时")

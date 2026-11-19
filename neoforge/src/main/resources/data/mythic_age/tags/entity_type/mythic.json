@@ -1,0 +1,20 @@
+{
+  "values": [
+    "mythic_age:minotaur",
+    "mythic_age:minotaur_boss",
+    "mythic_age:summon_minotaur",
+    "mythic_age:summon_pegasus",
+    "mythic_age:summon_centaur",
+    "mythic_age:summon_cyclops",
+    "mythic_age:cyclops",
+    "mythic_age:centaur",
+    "mythic_age:stymphalian_bird",
+    "mythic_age:harpy",
+    "mythic_age:karkinos",
+    "mythic_age:hamadryad",
+    "mythic_age:sentinel",
+    "mythic_age:ruin_sentinel",
+    "#mythic_age:elite",
+    "#mythic_age:boss"
+  ]
+}

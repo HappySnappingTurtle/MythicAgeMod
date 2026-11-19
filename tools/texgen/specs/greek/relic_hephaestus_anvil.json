@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "relic/relic_hephaestus_anvil",
+  "size": 16,
+  "palette": {
+    "d": "#3e434b",
+    "m": "#606873",
+    "h": "#8c949e",
+    "H": "#b9c1c9",
+    "b": "#9a5a24",
+    "B": "#d08a3c",
+    "o": "#22252a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "ddddmmmmhhhhHHHH",
+      "ddddmmmmhhhhHHHH",
+      "ddddmmmmhhhhHHHH",
+      "ddddmmmmhhhhHHHH",
+      "bbbbBBBBoooodddd",
+      "bbbbBBBBoooodddd",
+      "bbbbBBBBoooodddd",
+      "bbbbBBBBoooodddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd",
+      "dddddddddddddddd"
+    ]
+  }
+}

@@ -60,7 +60,7 @@ def save(name, img, border_px):
     OUT.mkdir(parents=True, exist_ok=True)
     img.save(OUT / f"{name}.png")
     meta = {"gui": {"scaling": {"type": "nine_slice", "width": img.size[0], "height": img.size[1], "border": border_px}}}
-    (OUT / f"{name}.png.mcmeta").write_text(json.dumps(meta, indent=2) + "\n")
+    (OUT / f"{name}.png.mcmeta").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def frame():

@@ -1,0 +1,6 @@
+{
+  "item": "mythic_age:hephaestus_anvil",
+  "civ": "greek",
+  "worn": [{"group": "anvil_xp_cost", "value": 0.3}],
+  "offered": [{"group": "anvil_no_damage", "value": 1}]
+}

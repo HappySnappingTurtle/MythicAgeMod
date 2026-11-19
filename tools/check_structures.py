@@ -88,7 +88,9 @@ def check_registry(root, table):
         types |= children
     registered, audited = {}, set()
     for p in sources:
-        for kind, name in re.findall(r'DeferredBlock<(\w+)>\s+\w+\s*=\s*(?:Content\.block|shape)\(\s*"([^"]+)"', p.read_text()):
+        # 泛型参数可能写全限定名（如 VILLAGE_ALTAR），取最后一段类名
+        for kind, name in re.findall(r'DeferredBlock<([\w.]+)>\s+\w+\s*=\s*(?:Content\.block|shape)\(\s*"([^"]+)"', p.read_text(encoding="utf-8")):
+            kind = kind.rsplit('.', 1)[-1]
             key = 'mythic_age:' + name
             registered[key] = p.stem
             if kind in types:

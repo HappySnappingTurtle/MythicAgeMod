@@ -8,7 +8,12 @@
     const fs = req('fs');
     const path = req('path');
     const crypto = req('crypto');
-    const REPO = window.MA_REPO || '/Users/hongyuwu/Documents/MythicAgeMod';
+    // 仓库根目录：优先用 window.MA_REPO；没设时在已知的开发机路径里找第一个存在的（Windows 路径用 / 也可以）。
+    const KNOWN_REPOS = ['D:/project/MythicAgeMod', '/Users/hongyuwu/Documents/MythicAgeMod'];
+    const REPO = window.MA_REPO || KNOWN_REPOS.find((p) => fs.existsSync(path.join(p, 'tools/blockbench/lib/bb.js')));
+    if (!REPO) {
+        throw new Error('找不到仓库根目录：先设 window.MA_REPO = \'<仓库绝对路径>\'');
+    }
 
     const MA = (window.MA = window.MA || {});
     MA.REPO = REPO;

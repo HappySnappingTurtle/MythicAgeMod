@@ -1,0 +1,14 @@
+{
+  "_note": "召唤版独眼巨人（T25a 设计文档 §3.1）：生命 110、棒击 10，慢而硬；抓投：伸手 20 刻（1 秒）、冷却 400 刻（20 秒）、抓空冷却 100 刻（5 秒，D7）、落地 12、落点 2 格内溅射 6；扔出距离 8 格在 core HurlRules",
+  "max_health": 110,
+  "attack_damage": 10,
+  "movement_speed": 0.25,
+  "armor": 6,
+  "special": {
+    "windup_ticks": 20,
+    "cooldown_ticks": 400,
+    "miss_cooldown_ticks": 100,
+    "hit_damage": 12,
+    "splash_damage": 6
+  }
+}

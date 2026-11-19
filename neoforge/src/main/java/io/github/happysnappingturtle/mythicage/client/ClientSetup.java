@@ -55,6 +55,19 @@ public final class ClientSetup {
         // 召唤版弥诺陶洛斯（T14）：与 T7 共用模型与动画
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.MINOTAUR.get(),
                 ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("minotaur", Set.of("stone_r")), 1.1F).glowing());
+        // 召唤版独眼巨人（T25a）：不披羊皮（牧人才有）、不显示投掷巨石
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.CYCLOPS.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("cyclops", Set.of("fleece", "boulder")), 1.4F));
+        // T25a ⑥：马洛涅烈酒（扔出、地上的酒碗）、牧人投出的巨石（放大 3 倍的封洞巨石）
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.THROWN_WINE.get(),
+                net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.WINE_BOWL.get(),
+                WineBowlRenderer::new);
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.THROWN_BOULDER.get(),
+                ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 3.0F, false));
+        // 独眼巨人·牧人（T25a）：披羊皮；投掷巨石平时隐藏（阶段 ⑥ 举石时由动画显示）
+        event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.SHEPHERD.get(),
+                ctx -> new MythGeoRenderer<>(ctx, new MythGeoModel<>("cyclops", Set.of("boulder")), 1.4F));
         // 召唤版天马（T14 阶段 ②）：眼睛金光只在天眼时画
         event.registerEntityRenderer(io.github.happysnappingturtle.mythicage.summon.greek.GreekSummons.PEGASUS.get(),
                 ctx -> {

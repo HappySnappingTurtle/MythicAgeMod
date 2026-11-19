@@ -1,0 +1,21 @@
+{
+  "name": "赫菲斯托斯之砧",
+  "icon": "mythic_age:hephaestus_anvil",
+  "category": "mythic_age:relics",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:hephaestus_anvil",
+      "text": "$(l)佩戴$()：用铁砧修理、合并附魔花的经验 $(l)−30%%$()。原本就「过于昂贵」的操作，戴上也还是做不了。$(br2)$(l)供奉$()：神庙 $(l)48 格$()内的铁砧用不坏。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "在独眼巨人洞穴最里面的宝库里。每人能拿一次，再开就没有了。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "赫菲斯托斯是锻造之神，跛着脚，在锻炉前干活。《伊利亚特》第十八卷写他为阿喀琉斯打造新盾：把巨砧安在砧座上，一手握重锤，一手握火钳。"
+    }
+  ]
+}

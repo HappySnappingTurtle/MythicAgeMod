@@ -74,6 +74,21 @@ public final class GreekSummons {
             .lang("弥诺陶洛斯召唤符", "Minotaur Summoning Tablet", "ミノタウロス召喚の札")
             .register();
 
+    /** 召唤版独眼巨人（T25a §3）：碰撞 1.8 × 3.8（RIG-CYCLOPS）。 */
+    public static final DeferredHolder<EntityType<?>, EntityType<SummonCyclopsEntity>> CYCLOPS =
+            ModRegistries.ENTITY_TYPES.register("summon_cyclops",
+                    () -> EntityType.Builder.of(SummonCyclopsEntity::new, MobCategory.MISC)
+                            .sized(1.8F, 3.8F)
+                            .eyeHeight(3.35F)
+                            .clientTrackingRange(10)
+                            .build("mythic_age:summon_cyclops"));
+
+    public static final DeferredItem<SummonTokenItem> CYCLOPS_TOKEN = Content.item("summon_token_cyclops", GREEK,
+                    p -> new SummonTokenItem("greek:cyclops", p))
+            .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .lang("独眼巨人召唤符", "Cyclops Summoning Tablet", "キュクロプス召喚の札")
+            .register();
+
     public static final DeferredItem<KerykeionItem> KERYKEION = Content.item("kerykeion", GREEK, KerykeionItem::new)
             .properties(p -> p.rarity(Rarity.UNCOMMON))
             .lang("传令杖", "Kerykeion", "ケリュケイオン")
@@ -89,5 +104,7 @@ public final class GreekSummons {
                 e.put(PEGASUS.get(), SummonPegasusEntity.createSummonAttributes().build()));
         modBus.addListener((EntityAttributeCreationEvent e) ->
                 e.put(CENTAUR.get(), SummonCentaurEntity.createSummonAttributes().build()));
+        modBus.addListener((EntityAttributeCreationEvent e) ->
+                e.put(CYCLOPS.get(), SummonCyclopsEntity.createAttributes().build()));
     }
 }

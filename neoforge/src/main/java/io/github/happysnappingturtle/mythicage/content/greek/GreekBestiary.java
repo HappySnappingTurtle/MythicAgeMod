@@ -8,7 +8,7 @@ import java.util.List;
  */
 public final class GreekBestiary {
     public static final List<String> ENTRIES = List.of("greek/centaur", "greek/stymphalian_bird", "greek/harpy", "greek/karkinos",
-            "greek/hamadryad", "greek/ruin_sentinel", "greek/minotaur", "greek/pegasus");
+            "greek/hamadryad", "greek/ruin_sentinel", "greek/minotaur", "greek/pegasus", "greek/cyclops");
 
     private GreekBestiary() {
     }

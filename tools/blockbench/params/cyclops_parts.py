@@ -11,7 +11,7 @@
 - 《奥德赛》9.319–320：巨人的大棒是一根青橄榄木——右手握一根带树疤与断枝的橄榄树干；
 - 古风瓶画里的波吕斐摩斯（埃莱夫西斯双耳瓶，约公元前 670 年；拉科尼亚杯，约公元前 565 年）：大胡子、长发——蓬发、浓须。
 召唤版（阿瑞斯）只系皮裹裙与腰绳；牧人精英多一张搭在左肩、斜挂到右腰的羊皮（骨骼 fleece，召唤版隐藏），
-投掷用的巨石（骨骼 boulder）平时缩成 0，由动画显示。
+投掷用的巨石（骨骼 boulder，挂在左手上）平时由渲染器隐藏，举石、投石时显示（阶段 ⑥：右手握棍，单手举石）。
 识别方向（07 号）：中央独眼 / 粗棍 / 大手。握棍点（club_grip）与抓取点（grab_palm）分开；头部判定体单独给定位点（head_hit）。
 握持：右前臂平端向前，拳心竖直（拇指在上），棍身竖直穿过拳心的握孔；棍骨骼相对手只绕棍身自转（检查清单 §三.1）。
 运行：python3 tools/blockbench/params/cyclops_parts.py
@@ -45,7 +45,7 @@ SHOULDER = (12.4, 44.2, 0.6)
 ELBOW = (13.0, 33.6, 0.8)
 HEAD_C = (0.0, 53.4, 5.0)
 GRIP = [-13.2, 33.6, 11.6]  # 右拳中心 = 棍的握点（右前臂平端向前）
-ROCK = [0.0, 66.0, 3.0]     # 双手举过头顶的巨石中心
+ROCK = [6.4, 15.6, 2.0]     # 投掷巨石的中心：贴在左手掌心内侧（T25a ⑥：右手握棍，只能左手单手举石）
 
 BONES = [
     ("root", None, [0, 0, 0]),
@@ -62,7 +62,7 @@ BONES = [
     ("hand_r", "forearm_r", [-13.2, 33.6, 9.0]),
     ("club", "hand_r", GRIP),
     ("fleece", "chest", [0, 44.0, 0.4]),
-    ("boulder", "chest", ROCK),
+    ("boulder", "hand_l", ROCK),
     ("leg_l", "body", [5.6, HIP_Y, 0]),
     ("shin_l", "leg_l", [5.8, 13.0, 0.6]),
     ("leg_r", "body", [-5.6, HIP_Y, 0]),
@@ -272,9 +272,10 @@ def main():
     d["revisions"] = ["白模 v1（2026-11-17）：前额正中构造圆眼、驼背厚肩长臂、右手竖握橄榄木大棒、左手张开（抓投）、"
                       "皮裹裙与腰绳；牧人版羊皮（fleece）；投掷巨石平时缩成 0。",
                       "白模 v2（2026-11-17，自查）：大棒加粗（倒角中段与棒头、四个树疤）；虹膜也做成横竖交叉的圆；鼻子收小、加鼻梁；"
-                      "胡须下移露出嘴、改深褐、加上唇须；蓬发加头顶三簇、额前两绺、后脑垂到肩；左手放大；头颈前移、驼背加厚。"]
+                      "胡须下移露出嘴、改深褐、加上唇须；蓬发加头顶三簇、额前两绺、后脑垂到肩；左手放大；头颈前移、驼背加厚。",
+                      "阶段 ⑥（2026-11-18）：投掷巨石改挂左手掌心内侧（原来挂胸口、固定在头顶上方；右手握着棍，只能左手单手举石）。"]
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")
     area = sum(2 * (p["size_model_units"][0] * p["size_model_units"][1] + p["size_model_units"][1] * p["size_model_units"][2]
                     + p["size_model_units"][0] * p["size_model_units"][2]) for p in PARTS + extra
                if p["uv_share"] is None or p["id"].endswith("_l") or not p["id"].endswith("_r"))

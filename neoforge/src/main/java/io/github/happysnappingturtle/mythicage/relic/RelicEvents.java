@@ -40,7 +40,33 @@ public final class RelicEvents {
         game.addListener(RelicEvents::onConversion);
         game.addListener(RelicEvents::onRightClickBlock);
         game.addListener(RelicEvents::onServerStopped);
+        game.addListener(RelicEvents::onAnvilRepair);
         game.addListener(RelicCommand::onRegisterCommands);
+    }
+
+    // ───────────── 赫菲斯托斯之砧（T25a §7） ─────────────
+
+    /** 佩戴：铁砧经验消耗按 {@code anvil_xp_cost} 折扣（过于昂贵按折前价判，core {@link io.github.happysnappingturtle.mythicage.core.relic.AnvilDiscount}）。由 AnvilMenu 的 mixin 调用。 */
+    public static int anvilCost(ServerPlayer player, int originalCost) {
+        double d = RelicService.worn(player, EffectGroups.ANVIL_XP_COST);
+        return io.github.happysnappingturtle.mythicage.core.relic.AnvilDiscount.cost(originalCost, d);
+    }
+
+    /** 供奉：神庙 48 格内的铁砧不损坏。玩家站在铁砧旁边，按玩家所在格判断（误差几格，对 48 格的范围可以忽略）。 */
+    public static boolean anvilProtected(ServerPlayer player) {
+        return player.level() instanceof ServerLevel level
+                && RelicEffects.areaValueAt(level, player.blockPosition(), EffectGroups.ANVIL_NO_DAMAGE) > 0;
+    }
+
+    static void onAnvilRepair(net.neoforged.neoforge.event.entity.player.AnvilRepairEvent e) {
+        if (e.getEntity() instanceof ServerPlayer p && anvilProtected(p)) {
+            e.setBreakChance(0);
+            // 铁砧相关效果生效时迸一次火星（06 号卡片）：在玩家看着的那一格
+            if (p.level() instanceof ServerLevel level && p.pick(6, 0, false) instanceof net.minecraft.world.phys.BlockHitResult hit) {
+                var c = hit.getLocation();
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA, c.x, c.y + 0.2, c.z, 4, 0.2, 0.05, 0.2, 0.0);
+            }
+        }
     }
 
     static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {

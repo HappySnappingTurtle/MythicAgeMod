@@ -1,0 +1,21 @@
+{
+  "name": "ヘパイストスの金床",
+  "icon": "mythic_age:hephaestus_anvil",
+  "category": "mythic_age:relics",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:hephaestus_anvil",
+      "text": "$(l)身につける$()：金床での修理とエンチャントの合成にかかる経験値 $(l)−30%%$()。もともと「高価すぎます！」の操作は、身につけてもできない。$(br2)$(l)奉納$()：神殿から $(l)48 ブロック$()以内の金床は壊れない。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "キュクロプスの洞窟のいちばん奥の宝物庫にある。もらえるのは一人一回で、もう一度開けても何も出ない。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "ヘパイストスは足の不自由な鍛冶の神。『イリアス』第十八歌では、アキレウスのために新しい盾を作る。大きな金床を台に据え、片手に重い槌、もう片手に火ばさみを取った。"
+    }
+  ]
+}

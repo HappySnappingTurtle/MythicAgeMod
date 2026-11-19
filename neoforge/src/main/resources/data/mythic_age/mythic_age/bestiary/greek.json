@@ -8,6 +8,7 @@
     "greek/hamadryad": {"entities": ["mythic_age:hamadryad"]},
     "greek/ruin_sentinel": {"entities": ["mythic_age:ruin_sentinel"]},
     "greek/minotaur": {"entities": ["mythic_age:minotaur", "mythic_age:summon_minotaur", "mythic_age:minotaur_boss"]},
-    "greek/pegasus": {"entities": ["mythic_age:summon_pegasus"]}
+    "greek/pegasus": {"entities": ["mythic_age:summon_pegasus"]},
+    "greek/cyclops": {"entities": ["mythic_age:cyclops", "mythic_age:summon_cyclops"]}
   }
 }

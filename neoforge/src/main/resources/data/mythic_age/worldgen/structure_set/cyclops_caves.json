@@ -1,0 +1,10 @@
+{
+  "structures": [{"structure": "mythic_age:cyclops_cave", "weight": 1}],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 20,
+    "separation": 8,
+    "salt": 25080501,
+    "exclusion_zone": {"other_set": "minecraft:villages", "chunk_count": 8}
+  }
+}

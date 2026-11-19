@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "mythic_age:grape"
+    },
+    {
+      "item": "minecraft:honey_bottle"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mythic_age:maronean_wine"
+  }
+}

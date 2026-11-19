@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "block/cheese_rack",
+  "size": 16,
+  "palette": {
+    "w": "#5e4228",
+    "W": "#7c5a38",
+    "d": "#3e2a18",
+    "k": "#b08e52",
+    "K": "#cfae6c",
+    "c": "#e9b84a",
+    "C": "#c98a2a",
+    "f": "#f8e7a0"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wwwwWWWWddddkkkk",
+      "wwwwWWWWddddkkkk",
+      "wwwwWWWWddddkkkk",
+      "wwwwWWWWddddkkkk",
+      "KKKKccccCCCCffff",
+      "KKKKccccCCCCffff",
+      "KKKKccccCCCCffff",
+      "KKKKccccCCCCffff",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww"
+    ]
+  }
+}

@@ -59,6 +59,15 @@ public final class TargetFactsCollector {
         }
     }
 
+    /** 神话生物（T25a D6）：本模组的野外生物、精英、召唤与 Boss，由标签 {@code #mythic_age:mythic} 收录。 */
+    public static final TagKey<EntityType<?>> MYTHIC = TagKey.create(Registries.ENTITY_TYPE,
+            ResourceLocation.fromNamespaceAndPath(MythicAgeIds.MOD_ID, "mythic"));
+
+    /** 神话生物：在标签里，或是 Boss、精英、常驻神话单位。 */
+    public static boolean isMythic(Entity e) {
+        return e.getType().is(MYTHIC) || isBoss(e) || isElite(e) || e instanceof io.github.happysnappingturtle.mythicage.summon.MythSummon;
+    }
+
     public static boolean isElite(Entity e) {
         return e.getType().is(ELITE) || TEST_ELITE.contains(e.getType());
     }

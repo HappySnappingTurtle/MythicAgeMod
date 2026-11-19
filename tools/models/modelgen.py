@@ -26,7 +26,7 @@ def spec(name: str, grid: list[str], palette: dict[str, str], size: int = 16, fo
     data = {"template": "pixels", "out": folder + name, "size": size,
             "palette": {k: v for k, v in palette.items() if k in used},
             "params": {"kind": "block", "rows": grid}}
-    (SPECS / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (SPECS / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def box(frm, to, t, faces="nsewud", uv=None, comment=None, rotation=None, shade=True) -> dict:
@@ -79,7 +79,7 @@ def model(name: str, textures: dict, elements: list, parent="minecraft:block/blo
         m["render_type"] = render_type
     if display:
         m["display"] = display
-    (MODELS / f"{name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (MODELS / f"{name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def rotate_y90(elements: list) -> list:

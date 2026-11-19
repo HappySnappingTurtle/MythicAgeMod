@@ -160,7 +160,12 @@ class DamageZonesTest {
         try (Stream<Path> files = Files.walk(src)) {
             for (Path f : files.filter(p -> p.toString().endsWith(".java")).toList()) {
                 String name = f.getFileName().toString();
-                if (name.equals("DamagePipeline.java") || f.toString().contains("/gametest/")) {
+                // 按路径分段判断，Windows 上的分隔符是 \
+                boolean inGameTest = false;
+                for (Path part : src.relativize(f)) {
+                    inGameTest |= part.toString().equals("gametest");
+                }
+                if (name.equals("DamagePipeline.java") || inGameTest) {
                     continue;
                 }
                 List<String> lines = Files.readAllLines(f);

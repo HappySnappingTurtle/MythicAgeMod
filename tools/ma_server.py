@@ -7,6 +7,7 @@
 
 server.properties 的原样备份在 neoforge/runs/server/server.properties.ma_server_backup，stop 时恢复。
 遥控客户端用 `python3 tools/ma_remote.py start --server localhost:25599` 连进来。
+Windows 上用 python 代替 python3；进程的查找与结束见 procutil.py。
 """
 from __future__ import annotations
 
@@ -15,13 +16,13 @@ import json
 import os
 import re
 import secrets
-import signal
 import subprocess
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import procutil  # noqa: E402
 import server_smoke as ss  # noqa: E402
 
 STATE = ss.RUN_DIR / "ma_server.json"
@@ -49,11 +50,11 @@ def start(a) -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     proc = None
     try:
-        with open(OUT, "w") as log:
-            proc = subprocess.Popen(["./gradlew", ":neoforge:runServer", "--offline", "--console=plain"],
+        with open(OUT, "w", encoding="utf-8") as log:
+            proc = subprocess.Popen([*procutil.gradlew(ss.ROOT), ":neoforge:runServer", "--offline", "--console=plain"],
                                     cwd=ss.ROOT, stdin=subprocess.DEVNULL,
-                                    stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-        with os.fdopen(os.open(STATE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as state:
+                                    stdout=log, stderr=subprocess.STDOUT, **procutil.detached_kwargs())
+        with os.fdopen(os.open(STATE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w", encoding="utf-8") as state:
             json.dump({"pid": proc.pid, "password": password, "world": a.world, "properties_existed": existed}, state)
         if not ss.wait_for("Done (", a.timeout, proc) or not ss.wait_for("RCON running", 60, proc):
             raise RuntimeError(f"没有在时限内启动完成，见 {OUT}")
@@ -78,10 +79,8 @@ def restore_properties(existed: bool) -> None:
 
 
 def group_alive(pid: int) -> bool:
-    """忽略已结束但尚未回收的僵尸；同时检查 Gradle 拉起的 Minecraft 子进程。"""
-    rows = subprocess.run(["ps", "-axo", "pgid=,stat="], capture_output=True, text=True, check=True).stdout
-    return any(parts[0] == str(pid) and not parts[1].startswith("Z")
-               for row in rows.splitlines() if len(parts := row.split()) >= 2)
+    """忽略已结束但尚未回收的僵尸；Gradle 拉起的 Minecraft 子进程另由 ss.server_pids() 检查。"""
+    return procutil.group_alive(pid)
 
 
 def cmd(a) -> int:
@@ -117,16 +116,9 @@ def stop(a) -> int:
         time.sleep(2)
     else:
         forced = True
-        for sig in (signal.SIGTERM, signal.SIGKILL):
-            for pid in ss.server_pids():
-                try:
-                    os.kill(pid, sig)
-                except ProcessLookupError:
-                    pass
-            try:
-                os.killpg(st["pid"], sig)
-            except ProcessLookupError:
-                pass
+        for force in (False, True):
+            procutil.terminate(ss.server_pids(), force=force)
+            procutil.terminate_group(st["pid"], force=force)
             time.sleep(2)
             if not group_alive(st["pid"]) and not ss.server_pids():
                 break

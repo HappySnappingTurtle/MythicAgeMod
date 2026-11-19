@@ -29,6 +29,12 @@ public final class GreekRelics {
             .lang("皮格马利翁雕像", "Pygmalion's Statue", "ピュグマリオンの像")
             .register();
 
+    /** RE-GR-12（T25a §7）：佩戴 铁砧经验消耗 −30%；供奉 神庙 48 格内的铁砧不损坏。来源：独眼巨人洞穴的宝库。 */
+    public static final DeferredItem<RelicItem> HEPHAESTUS_ANVIL = Content.item("hephaestus_anvil", GREEK, RelicItem::new)
+            .tags(RelicItems.CURIOS_TAG)
+            .lang("赫菲斯托斯之砧", "Anvil of Hephaestus", "ヘパイストスの金床")
+            .register();
+
     private GreekRelics() {
     }
 

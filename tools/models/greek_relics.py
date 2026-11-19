@@ -4,11 +4,14 @@
   - 瑞亚之冠 rheia_crown：低矮月桂冠环，前方一个大叶簇；白石底托、青铜叶脉箍、橄榄绿叶（3 色）。
   - 阿喀琉斯之甲 armor_of_achilles：胸甲正面与肩扣；暗铜甲片、皮革棕肩扣、象牙白边饰（3 色）。
   - 皮格马利翁雕像 pygmalion_statue：修长的站立人像与基座；白石、浅金发带与基座镶边（2 色）。
+  - 赫菲斯托斯之砧 hephaestus_anvil（T25a ⑦，RE-GR-12）：砧面、外伸的砧角、收腰底座三组；冷铁砧身、暖铜的箍与砧面边（2 色）。
+    出处：《伊利亚特》18.468–477 赫菲斯托斯在锻炉前把巨砧安在砧座上，一手握锤、一手握钳；希腊铁砧多为方墩形，
+    带角的形制按 06 号卡片（识别点要一眼看出是砧）。
 供奉模型先按卡片的外廓（u，16u = 1 格）在 0–16 坐标里以 (8, 8) 为中心、底面 y = 0 建模，正面朝南（+Z），
 再用 scaled() 放大到真实大小（冠 = 人头大小、胸甲 = 玩家躯干大小、雕像 = 一格高的小立像），
 由 ShrineRelicRenderer 按 1:1 摆在神坛顶面（每座神坛只放一件），正面朝走近神坛的人（神坛 facing 的反方向）。贴图是 4 × 4 的色块表（每块 4 × 4 像素，大色块、不加噪声，06 号 §0.8），
 面的 UV 取色块内部 2 × 2。
-运行：python3 tools/models/greek_relics.py && for n in rheia_crown armor_of_achilles pygmalion_statue; do
+运行：python3 tools/models/greek_relics.py && for n in rheia_crown armor_of_achilles pygmalion_statue hephaestus_anvil; do
       python3 tools/texgen/texgen.py --force tools/texgen/specs/greek/$n.json tools/texgen/specs/greek/relic_$n.json; done
 """
 from __future__ import annotations
@@ -76,6 +79,25 @@ STATUE = [".......oo.......",
           "...oooooooooo..."]
 
 
+# 赫菲斯托斯之砧：侧面看的铁砧——左边外伸的砧角、平的砧面（暖铜包边）、收腰、宽底座
+ANVIL_PAL = {"o": "#16181c", "d": "#3a3f47", "m": "#5d646e", "h": "#8a929c", "H": "#b8c0c8", "b": "#9a5a24", "B": "#d08a3c"}
+ANVIL = ["................",
+         "................",
+         "................",
+         "................",
+         "..oooooooooooo..",
+         ".oHHBBBBBBBBBBo.",
+         "oHhhhhhhhhhhhhmo",
+         ".oommmmhhhhmmmo.",
+         "....oommmmmdo...",
+         ".....odmmmdo....",
+         ".....odmmmdo....",
+         "....obBBBBBbo...",
+         "...odmmmmmmmdo..",
+         "..odmmmmmmmmmdo.",
+         "..oooooooooooo..",
+         "................"]
+
 # ───────────────────────────── 供奉小模型 ─────────────────────────────
 
 def swatches(name: str, cells: dict[str, str]) -> dict[str, list[float]]:
@@ -128,7 +150,8 @@ def write_model(name: str, elements: list) -> None:
     RELIC_MODELS.mkdir(parents=True, exist_ok=True)
     m = {"textures": {"0": "mythic_age:relic/relic_" + name, "particle": "mythic_age:relic/relic_" + name},
          "elements": elements}
-    (RELIC_MODELS / f"{name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (RELIC_MODELS / f"{name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
+                                               newline="\n")
 
 
 def crown_model():
@@ -215,6 +238,26 @@ def statue_model():
     write_model("pygmalion_statue", scaled(e, 1.5, 1.5, 1.5))
 
 
+def anvil_model():
+    """赫菲斯托斯之砧：砧面、砧角、收腰底座三组（外廓 10 × 6 × 4），冷铁 + 暖铜；供奉时平放在神坛上，砧角朝右。"""
+    uv = swatches("hephaestus_anvil", {"d": "#3e434b", "m": "#606873", "h": "#8c949e", "H": "#b9c1c9",
+                                       "b": "#9a5a24", "B": "#d08a3c", "o": "#22252a"})
+    e = [el((3.0, 0, 5.5), (13.0, 1.0, 10.5), "d", uv, comment="底座（宽）"),
+         el((4.0, 1.0, 6.0), (12.0, 1.6, 10.0), "m", uv, comment="底座上沿"),
+         el((4.2, 1.6, 6.2), (11.8, 1.9, 9.8), "B", uv, comment="铜箍"),
+         el((5.5, 1.9, 6.6), (10.5, 3.7, 9.4), "m", uv, comment="收腰"),
+         el((3.5, 3.7, 6.0), (12.5, 5.2, 10.0), "h", uv, comment="砧身"),
+         el((3.4, 5.2, 5.9), (12.6, 5.6, 10.1), "B", uv, comment="砧面铜包边"),
+         el((3.8, 5.6, 6.2), (12.2, 5.9, 9.8), "H", uv, comment="砧面（磨亮）"),
+         el((12.5, 4.0, 6.8), (14.5, 5.4, 9.2), "h", uv, comment="砧角（外伸，渐细）"),
+         el((14.5, 4.4, 7.3), (15.6, 5.2, 8.7), "h", uv),
+         el((15.6, 4.7, 7.7), (16.0, 5.1, 8.3), "H", uv),
+         el((1.8, 4.3, 7.0), (3.5, 5.4, 9.0), "m", uv, comment="砧尾方台"),
+         el((5.0, 5.9, 7.6), (5.8, 6.0, 8.4), "o", uv, comment="砧面方孔")]
+    # 真实大小：一件能拿在手里的小砧，约 3/4 格长
+    write_model("hephaestus_anvil", scaled(e, 0.85, 0.85, 0.85))
+
+
 def main():
     spec("rheia_crown", CROWN, CROWN_PAL, 16, "item/")
     spec("armor_of_achilles", ARMOR, ARMOR_PAL, 16, "item/")
@@ -222,7 +265,9 @@ def main():
     crown_model()
     armor_model()
     statue_model()
-    print("rheia_crown armor_of_achilles pygmalion_statue")
+    spec("hephaestus_anvil", ANVIL, ANVIL_PAL, 16, "item/")
+    anvil_model()
+    print("rheia_crown armor_of_achilles pygmalion_statue hephaestus_anvil")
 
 
 if __name__ == "__main__":

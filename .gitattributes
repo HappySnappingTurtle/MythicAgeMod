@@ -1,0 +1,15 @@
+# 换行统一：仓库里一律 LF（macOS 与 Windows 两边开发，Windows 上 Python 文本写入默认是 CRLF）
+* text=auto eol=lf
+
+# Windows 批处理必须是 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制
+*.png binary
+*.webp binary
+*.jpg binary
+*.nbt binary
+*.jar binary
+*.ogg binary
+*.zip binary

@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/hephaestus_anvil",
+  "size": 16,
+  "palette": {
+    "o": "#16181c",
+    "d": "#3a3f47",
+    "m": "#5d646e",
+    "h": "#8a929c",
+    "H": "#b8c0c8",
+    "b": "#9a5a24",
+    "B": "#d08a3c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "................",
+      "................",
+      "................",
+      "..oooooooooooo..",
+      ".oHHBBBBBBBBBBo.",
+      "oHhhhhhhhhhhhhmo",
+      ".oommmmhhhhmmmo.",
+      "....oommmmmdo...",
+      ".....odmmmdo....",
+      ".....odmmmdo....",
+      "....obBBBBBbo...",
+      "...odmmmmmmmdo..",
+      "..odmmmmmmmmmdo.",
+      "..oooooooooooo..",
+      "................"
+    ]
+  }
+}

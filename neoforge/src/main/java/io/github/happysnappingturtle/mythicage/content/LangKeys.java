@@ -249,6 +249,8 @@ public final class LangKeys {
         add("advancements.mythic_age.greek.classical.description", "在村庄祭司处晋升到古典时代", "Ascend to the Classical Age at a village priest", "村の神官のもとで古典時代へ昇格する");
         add("advancements.mythic_age.greek.heroic.title", "英雄时代", "The Heroic Age", "英雄時代");
         add("advancements.mythic_age.greek.heroic.description", "在村庄祭司处晋升到英雄时代", "Ascend to the Heroic Age at a village priest", "村の神官のもとで英雄時代へ昇格する");
+        add("advancements.mythic_age.greek.nobody.title", "我的名字叫「无人」", "My Name Is Nobody", "わが名は「誰でもない」");
+        add("advancements.mythic_age.greek.nobody.description", "把独眼巨人·牧人灌醉，趁他醉倒时打倒他", "Get a Cyclops Shepherd drunk and bring him down while he sleeps it off", "キュクロプスの羊飼いを酔いつぶし、寝ているうちに倒す");
         add("mythic_age.rite.line.voucher", "%s凭证", "%s token", "%sの証");
         add("mythic_age.trial.classical", "古典试炼", "Classical Trial", "古典の試練");
         add("mythic_age.trial.heroic", "英雄试炼", "Heroic Trial", "英雄の試練");
@@ -412,6 +414,17 @@ public final class LangKeys {
         add("item.mythic_age.summon_token_minotaur.tip", "召出一头为你而战的弥诺陶洛斯：挥斧 8 点；顶飞——刨地后把敌人顶上半空，令其暂时脱战", "Summons a Minotaur that fights for you: axe 8; Toss—paws the ground, then hurls an enemy into the air and makes it lose interest", "あなたのために戦うミノタウロスを召喚：斧 8；突き上げ——地を掻いた後、敵を宙に放り上げ一時的に戦意を失わせる");
         add("mythic_age.summon.token_tip", "按住右键吟唱 1 秒召唤 · 占用 1 个神话单位名额 · 死亡后不会复活", "Hold use for 1 s to summon · takes 1 myth unit slot · does not return after death", "使用を 1 秒長押しで召喚・神話ユニット枠 1・死亡後は復活しない");
         add("item.mythic_age.kerykeion.tip", "右键方块：附近单位驻守于此 · 右键敌人：集火 · 潜行右键：特殊攻击 · 右键空中：管理单位", "Use on block: nearby units guard here · use on enemy: focus fire · sneak-use: special attack · use in air: manage units", "ブロックに使用：近くのユニットがここを守る・敵に使用：集中攻撃・スニーク使用：特殊攻撃・空中で使用：ユニット管理");
+        add("entity.mythic_age.cyclops", "独眼巨人·牧人", "Cyclops Shepherd", "キュクロプスの羊飼い");
+        add("mythic_age.lair.pushing", "推巨石……%s%%", "Pushing the boulder… %s%%", "大岩を押している……%s%%");
+        add("mythic_age.lair.pushed", "巨石挪开了一道缝", "The boulder rolls aside, leaving a gap", "大岩がずれて隙間ができた");
+        add("entity.mythic_age.summon_cyclops", "独眼巨人", "Cyclops", "キュクロプス");
+        add("item.mythic_age.summon_token_cyclops.tip", "召出一位为你而战的独眼巨人：橄榄木大棒 10 点；抓投——伸手抓起一个敌人扔出约 8 格，落地 12 点、砸到旁边的敌人 6 点（抓不起神话生物与 Boss）", "Summons a Cyclops that fights for you: olive-wood club 10; Hurl—grabs an enemy and throws it about 8 blocks, 12 on landing and 6 to enemies it lands near (cannot lift mythic creatures or bosses)", "あなたのために戦うキュクロプスを召喚：オリーブ材の棍棒 10；投げ飛ばし——敵をつかんで約 8 ブロック投げ、着地で 12、そばの敵に 6（神話の生き物とボスはつかめない）");
+        add("entity.mythic_age.maronean_wine", "马洛涅烈酒", "Maronean Wine", "マロネイアの強いぶどう酒");
+        add("entity.mythic_age.wine_bowl", "一碗烈酒", "Bowl of Wine", "ぶどう酒の椀");
+        add("entity.mythic_age.cyclops_boulder", "巨石", "Boulder", "大岩");
+        add("item.mythic_age.maronean_wine.tip", "甜如蜜、没兑水的红酒。扔到独眼巨人附近，他会走过去喝光，接着醉倒 8 秒，这时打他伤害 ×3", "Honey-sweet wine, unmixed with water. Throw it near a Cyclops: he walks over, drains it and passes out for 8 seconds, taking ×3 damage meanwhile", "蜜のように甘い、水で割っていないぶどう酒。キュクロプスの近くに投げると歩いてきて飲み干し、8 秒酔いつぶれる。その間に受けるダメージ ×3");
+        add("item.mythic_age.cyclops_fire.tip", "库克罗普斯为宙斯打造雷电用的火，锻造宙斯雷霆的材料", "The fire the Cyclopes used to forge Zeus's thunderbolts; a material for forging the Thunderbolt of Zeus", "キュクロプスがゼウスの雷霆を鍛えた火。ゼウスの雷霆を鍛える素材");
+        add("item.mythic_age.hero_smithing_template.tip", "英雄时代在锻造台升级阿达曼装备", "Upgrades adamant gear at a smithing table in the Heroic Age", "英雄時代に鍛冶台でアダマント装備を強化する");
         add("entity.mythic_age.summon_pegasus", "天马", "Pegasus", "ペガサス");
         add("item.mythic_age.summon_token_pegasus.tip", "召出一匹天马：在你头顶盘旋侦察，每 10 秒用「天眼」标出 32 格内的敌人（只有你看得见）；空手右键可以骑乘飞行", "Summons Pegasus: circles above you as a scout and every 10 s its Sky Eye marks enemies within 32 blocks (only you see them); use it empty-handed to ride and fly", "ペガサスを召喚：頭上を旋回して偵察し、10 秒ごとに「天眼」で 32 ブロック内の敵を示す（あなたにだけ見える）。素手で使うと騎乗して飛べる");
         add("item.mythic_age.summon_token_pegasus.rule", "按住右键吟唱 1 秒召唤 · 占用 1 个神话单位名额 · 倒下 1 天后在你的神坛旁归来", "Hold use for 1 s to summon · takes 1 myth unit slot · returns beside your altar 1 day after falling", "使用を 1 秒長押しで召喚・神話ユニット枠 1・倒れても 1 日後に祭壇のそばへ戻る");
@@ -683,6 +696,8 @@ public final class LangKeys {
         add("mythic_age.relic.tooltip.how", "放进圣物槽佩戴，或手持潜行右键自己的本文明神庙供奉；二选一", "Wear it in a relic slot, or sneak-use it on your own temple of its civilization to offer it — one or the other", "聖遺物スロットに装備するか、手に持ってスニークしながら自分の同文明の神殿を右クリックして奉納する（どちらか一方）");
         add("item.mythic_age.rheia_crown.worn", "希腊恩宠上限 +50", "Greek favor cap +50", "ギリシャの恩寵上限 +50");
         add("item.mythic_age.rheia_crown.offered", "祈祷产出 +15%", "Prayer yield +15%", "祈りの産出 +15%");
+        add("item.mythic_age.hephaestus_anvil.worn", "铁砧经验消耗 −30%", "Anvil experience cost −30%", "金床の経験値コスト −30%");
+        add("item.mythic_age.hephaestus_anvil.offered", "神庙 48 格内的铁砧不会损坏", "Anvils within 48 blocks of the temple never break", "神殿から 48 ブロック以内の金床が壊れない");
         add("item.mythic_age.armor_of_achilles.worn", "受到的近战伤害 −8%", "Melee damage taken −8%", "受ける近接ダメージ −8%");
         add("item.mythic_age.armor_of_achilles.offered", "神坛 48 格内的村民、铁傀儡、你的召唤单位与驯服生物受近战伤害 −15%", "Villagers, iron golems, your summons and your tamed animals within 48 blocks of the altar take −15% melee damage", "祭壇から 48 ブロック以内の村人・アイアンゴーレム・あなたの召喚ユニットと飼い慣らした動物が受ける近接ダメージ −15%");
         add("item.mythic_age.pygmalion_statue.worn", "生命上限 +4", "Max health +4", "最大体力 +4");

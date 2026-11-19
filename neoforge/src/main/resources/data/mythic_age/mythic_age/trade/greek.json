@@ -15,6 +15,7 @@
     {"id": "kerykeion", "category": "supplies", "result": {"item": "mythic_age:kerykeion", "count": 1}, "price": {"favor": 5}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "summon_centaur", "category": "summon", "result": {"item": "mythic_age:summon_token_centaur", "count": 1}, "price": {"favor": 18}, "minAge": "classical", "venues": ["guardian"], "minorGod": "hermes"},
     {"id": "summon_minotaur", "category": "summon", "result": {"item": "mythic_age:summon_token_minotaur", "count": 1}, "price": {"favor": 18}, "minAge": "classical", "venues": ["guardian"], "minorGod": "athena"},
+    {"id": "summon_cyclops", "category": "summon", "result": {"item": "mythic_age:summon_token_cyclops", "count": 1}, "price": {"favor": 24}, "minAge": "classical", "venues": ["guardian"], "minorGod": "ares"},
     {"id": "village_guide", "category": "supplies", "result": {"item": "minecraft:filled_map", "count": 1}, "price": {"items": [{"item": "minecraft:emerald", "count": 8}]}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "knossos_map", "category": "supplies", "result": {"item": "minecraft:filled_map", "count": 1}, "price": {"items": [{"item": "minecraft:emerald", "count": 8}]}, "minAge": "archaic", "venues": ["guardian"]},
     {"id": "patron_statue", "category": "supplies", "result": {"item": "mythic_age:patron_statue", "count": 1}, "price": {"favor": 30}, "minAge": "archaic", "venues": ["guardian"]},

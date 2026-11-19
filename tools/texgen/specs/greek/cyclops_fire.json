@@ -1,0 +1,39 @@
+{
+  "template": "pixels",
+  "out": "item/cyclops_fire",
+  "size": 16,
+  "palette": {
+    "o": "#3a1d10",
+    "R": "#c56b3a",
+    "r": "#a2532a",
+    "s": "#7e3d1d",
+    "w": "#f2e3c6",
+    "k": "#1e120c",
+    "y": "#ffe9a0",
+    "Y": "#fff8dc",
+    "f": "#ffb43c",
+    "F": "#ff7a1a",
+    "e": "#d9431a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      ".......Y........",
+      "......yY........",
+      "......yYy.......",
+      ".....fyYyf......",
+      ".....fyYYf......",
+      "....FfyYyfF.....",
+      "....FffyyfFe....",
+      "...eFFffffFFe...",
+      ".ooooooooooooo..",
+      ".oRRRRwwwRRRro..",
+      "..oRRwwkwwRrro..",
+      "..oRRRwwwRRrso..",
+      "...orrrrrrrso...",
+      "....oooooooo....",
+      "................"
+    ]
+  }
+}

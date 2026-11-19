@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/maronean_wine",
+  "size": 16,
+  "palette": {
+    "o": "#3b2414",
+    "s": "#8a5a34",
+    "S": "#a8754a",
+    "h": "#c99a68",
+    "d": "#6b4426",
+    "c": "#d8c08a",
+    "r": "#7a1426",
+    "R": "#a8203a"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "........cc......",
+      ".......occo.....",
+      "........dd......",
+      ".......osSo.....",
+      "......osSShoo...",
+      ".....osSShhSSo..",
+      "....osSShhSSSso.",
+      "...osSSShSSSSso.",
+      "...osSSSSSSSdso.",
+      "..osSSSSSSSdsso.",
+      "..osSSSSSSdssoo.",
+      "..osSSSSSdssso..",
+      "...ossddssssoR..",
+      "....oooooooo.r..",
+      "................"
+    ]
+  }
+}

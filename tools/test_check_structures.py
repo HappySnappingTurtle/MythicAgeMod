@@ -1,6 +1,7 @@
 """GA-6：真实 NBT 正负例、登记完整性与模型/物品继承回归。"""
 import copy
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -38,8 +39,10 @@ class StructureAttachmentsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / 'floating_antefix.nbt'
             fixture(path)
+            # 子进程输出统一按 UTF-8（Windows 上管道默认用 GBK）
             result = subprocess.run([sys.executable, str(cs.ROOT / 'tools/check_structures.py'), str(path)],
-                                    capture_output=True, text=True)
+                                    capture_output=True, text=True, encoding='utf-8',
+                                    env={**os.environ, 'PYTHONIOENCODING': 'utf-8'})
             self.assertEqual(1, result.returncode, result.stdout + result.stderr)
             self.assertIn('floating_antefix.nbt', result.stdout)
             self.assertIn('(1, 1, 1)', result.stdout)
@@ -101,10 +104,10 @@ class StructureAttachmentsTest(unittest.TestCase):
 
     def test_block_geometry_and_item_parent(self):
         assets = cs.ROOT / 'neoforge/src/main/resources/assets/mythic_age/models'
-        model = json.loads((assets / 'block/terracotta_antefix.json').read_text())
+        model = json.loads((assets / 'block/terracotta_antefix.json').read_text(encoding='utf-8'))
         self.assertEqual([(15, 15), (14, 16)], [(e['from'][2], e['to'][2]) for e in model['elements']])
         item = cs.ROOT / 'neoforge/src/generated/resources/assets/mythic_age/models/item/terracotta_antefix.json'
-        self.assertEqual('mythic_age:block/terracotta_antefix', json.loads(item.read_text())['parent'])
+        self.assertEqual('mythic_age:block/terracotta_antefix', json.loads(item.read_text(encoding='utf-8'))['parent'])
 
 
 if __name__ == '__main__':

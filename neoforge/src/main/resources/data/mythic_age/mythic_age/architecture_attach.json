@@ -293,6 +293,14 @@
         }
       },
       "note": "底部 y=0，原有 canSurvive 要求下方中心支撑。排查出赫尔墨斯祠、庭院住宅各一盏灯在下半台阶上浮空；两处改用同材质整块支撑。台阶只允许顶面到格顶的 top/double。"
+    },
+    "mythic_age:cheese_rack": {
+      "owner": "GreekCyclops",
+      "directions": [
+        "down"
+      ],
+      "allowed_supports": [],
+      "note": "奶酪架立柱落地（T25a 独眼巨人洞穴）。"
     }
   }
 }

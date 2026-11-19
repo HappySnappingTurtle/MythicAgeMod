@@ -1,0 +1,10 @@
+{
+  "type": "mythic_age:lair",
+  "biomes": "#mythic_age:structure/cyclops_cave",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "spec": "greek:cyclops_cave",
+  "kind": "greek:cyclops_cave",
+  "cave_height": 6
+}

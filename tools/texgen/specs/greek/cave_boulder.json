@@ -1,0 +1,19 @@
+{
+  "template": "stone",
+  "out": "block/cave_boulder",
+  "seed": 2509,
+  "size": 16,
+  "palette": {
+    "dark": "#5d5a55",
+    "mid": "#76726b",
+    "light": "#8f8a81",
+    "vein": "#45423e"
+  },
+  "params": {
+    "thresholds": [
+      0.38,
+      0.68
+    ],
+    "veins": 2
+  }
+}

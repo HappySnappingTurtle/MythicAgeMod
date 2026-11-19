@@ -107,6 +107,29 @@ public final class RelicEffects {
         return best;
     }
 
+    /** 某个方块位置（铁砧）落在哪些供奉了该组圣物的神庙范围内，取该组的最大值（赫菲斯托斯之砧：范围内铁砧不损坏）。 */
+    public static double areaValueAt(ServerLevel level, net.minecraft.core.BlockPos pos, String group) {
+        double best = 0;
+        for (OfferedIndex.Entry e : OfferedIndex.all()) {
+            if (e.pos().dimension() != level.dimension()) {
+                continue;
+            }
+            double v = 0;
+            for (RelicCard c : e.cards()) {
+                v = Math.max(v, c.value(RelicState.OFFERED, group));
+            }
+            if (v <= best) {
+                continue;
+            }
+            RelicAnchor anchor = RelicAnchor.Registry.of(e.civ()).orElse(null);
+            double r = anchor == null ? 0 : anchor.searchRadius();
+            if (anchor != null && e.pos().pos().getCenter().distanceToSqr(pos.getCenter()) <= r * r) {
+                best = v;
+            }
+        }
+        return best;
+    }
+
     /** 阿喀琉斯之甲供奉的「友方」（D4）：范围内的村民（含本作居民）、铁傀儡；主人的召唤单位与驯服生物。玩家不算。 */
     public static boolean isAlly(LivingEntity e, UUID owner) {
         if (e instanceof net.minecraft.world.entity.player.Player) {

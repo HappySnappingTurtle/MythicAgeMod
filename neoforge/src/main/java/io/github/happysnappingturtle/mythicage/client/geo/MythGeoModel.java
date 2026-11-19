@@ -80,7 +80,9 @@ public class MythGeoModel<T extends GeoAnimatable & MythVariantHolder> extends G
     @Override
     public void setCustomAnimations(T animatable, long instanceId, AnimationState<T> state) {
         for (String bone : hiddenBones) {
-            getBone(bone).ifPresent(b -> b.setHidden(true));
+            // 实体可以按状态临时显示某块默认隐藏的骨骼（独眼巨人举石时的巨石）；骨骼对象跨帧复用，所以每帧都要设
+            boolean show = animatable instanceof io.github.happysnappingturtle.mythicage.entity.BoneVisibility v && v.showBone(bone);
+            getBone(bone).ifPresent(b -> b.setHidden(!show));
         }
         EntityModelData look = state.getData(DataTickets.ENTITY_MODEL_DATA);
         if (look != null && !animatable.headLookLocked()) {

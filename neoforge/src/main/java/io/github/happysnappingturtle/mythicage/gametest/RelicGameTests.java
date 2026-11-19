@@ -726,4 +726,73 @@ public final class RelicGameTests {
         close(h, 50, RelicCards.byId(RHEIA).orElseThrow().value(RelicState.WORN, EffectGroups.favorCap(Civilization.GREEK)), "瑞亚之冠数值");
         h.succeed();
     }
+
+    // ───────────── 赫菲斯托斯之砧（T25a ⑦，TC-T25a-90～92） ─────────────
+
+    private static ItemStack anvil() {
+        return new ItemStack(GreekRelics.HEPHAESTUS_ANVIL.get());
+    }
+
+    /** TC-T25a-90、37～39：佩戴后铁砧经验 −30%（10 → 7、39 → 27）；原价 45 仍过于昂贵；不戴照原价。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 60)
+    public static void tc_t25a_90_anvil_worn(GameTestHelper h) {
+        FakePlayer p = player(h, "rl_anvil_worn", Age.CLASSICAL);
+        try {
+            h.assertTrue(io.github.happysnappingturtle.mythicage.relic.RelicEvents.anvilCost(p, 10) == 10, "不戴：原价");
+            wear(p, 0, anvil());
+            h.assertTrue(io.github.happysnappingturtle.mythicage.relic.RelicEvents.anvilCost(p, 10) == 7, "10 → 7");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.relic.RelicEvents.anvilCost(p, 39) == 27, "39 → 27");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.relic.RelicEvents.anvilCost(p, 45) == 45, "45 仍过于昂贵");
+            unwear(p, 0);
+        } finally {
+            cleanup(h, List.of(p));
+        }
+        h.succeed();
+    }
+
+    /** TC-T25a-91：供奉后神庙 48 格内用铁砧不损坏（破损概率改成 0）；49 格外照常。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 60)
+    public static void tc_t25a_91_anvil_offered(GameTestHelper h) {
+        FakePlayer owner = player(h, "rl_anvil_owner", Age.ARCHAIC);
+        BlockPos a = altar(h, ALTAR, owner);
+        try {
+            h.assertTrue(offer(h, owner, a, anvil()), "供奉了砧");
+            var near = new net.neoforged.neoforge.event.entity.player.AnvilRepairEvent(owner, new ItemStack(Items.IRON_SWORD),
+                    new ItemStack(Items.IRON_INGOT), new ItemStack(Items.IRON_SWORD));
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(near);
+            h.assertTrue(near.getBreakChance() == 0, "48 格内不损坏，实际破损概率 " + near.getBreakChance());
+            Vec3 c = Vec3.atCenterOf(a);
+            owner.moveTo(c.x + 49, c.y, c.z);
+            var far = new net.neoforged.neoforge.event.entity.player.AnvilRepairEvent(owner, new ItemStack(Items.IRON_SWORD),
+                    new ItemStack(Items.IRON_INGOT), new ItemStack(Items.IRON_SWORD));
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(far);
+            h.assertTrue(far.getBreakChance() > 0, "49 格外照常有破损概率");
+        } finally {
+            cleanup(h, List.of(owner), a);
+        }
+        h.succeed();
+    }
+
+    /** TC-T25a-92：洞穴宝库每人首开拿到赫菲斯托斯之砧，重开不再给。 */
+    @GameTest(template = T, batch = BATCH, timeoutTicks = 60)
+    public static void tc_t25a_92_anvil_vault(GameTestHelper h) {
+        BlockPos rel = new BlockPos(5, 2, 14);
+        h.setBlock(rel, io.github.happysnappingturtle.mythicage.structure.RuinVaults.VAULT.get());
+        var be = (io.github.happysnappingturtle.mythicage.structure.RuinVaultBlockEntity) h.getLevel().getBlockEntity(h.absolutePos(rel));
+        be.setTable(io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.VAULT_TABLE);
+        FakePlayer p = player(h, "rl_anvil_vault", Age.CLASSICAL);
+        p.getInventory().clearContent();
+        try {
+            h.assertTrue(io.github.happysnappingturtle.mythicage.structure.RuinVaults.open(p, be)
+                    == io.github.happysnappingturtle.mythicage.structure.RuinVaults.Outcome.GIVEN, "第一次开到");
+            h.assertTrue(p.getInventory().countItem(GreekRelics.HEPHAESTUS_ANVIL.get()) == 1, "拿到砧");
+            h.assertTrue(io.github.happysnappingturtle.mythicage.structure.RuinVaults.open(p, be)
+                    != io.github.happysnappingturtle.mythicage.structure.RuinVaults.Outcome.GIVEN, "重开不再给");
+            h.assertTrue(p.getInventory().countItem(GreekRelics.HEPHAESTUS_ANVIL.get()) == 1, "还是 1 件");
+        } finally {
+            p.getInventory().clearContent();
+            cleanup(h, List.of(p));
+        }
+        h.succeed();
+    }
 }

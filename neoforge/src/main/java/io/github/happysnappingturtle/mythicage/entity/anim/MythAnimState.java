@@ -23,7 +23,17 @@ public enum MythAnimState {
     STUN("stun"),
     ROAR("roar"),
     THROW("throw"),
-    DEATH("death");
+    DEATH("death"),
+    /** 召唤版独眼巨人（T25a）：抓投的伸手前摇、举起并投出。 */
+    GRAB("grab"),
+    HURL("hurl"),
+    /** 独眼巨人·牧人（T25a ⑥）：举石（投石预警）、投石、慢挥棒、喝酒、醉倒、睡觉。 */
+    LIFT_ROCK("lift_rock"),
+    THROW_ROCK("throw_rock"),
+    CLUB_SMASH("club_smash"),
+    DRINK("drink"),
+    DRUNK("drunk"),
+    SLEEP("sleep");
 
     private static final MythAnimState[] VALUES = values();
     private final String animation;

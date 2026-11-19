@@ -1,0 +1,21 @@
+{
+  "name": "Anvil of Hephaestus",
+  "icon": "mythic_age:hephaestus_anvil",
+  "category": "mythic_age:relics",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "mythic_age:hephaestus_anvil",
+      "text": "$(l)Worn$(): repairing and combining enchantments at an anvil costs $(l)30%%$() less experience. Anything already \"Too Expensive!\" still is.$(br2)$(l)Offered$(): anvils within $(l)48 blocks$() of the temple never get damaged."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Kept in the vault at the back of a Cyclops cave. Everyone gets it once; opening the vault again gives nothing."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Hephaestus is the lame god of the forge. In Book 18 of the $(o)Iliad$() he makes Achilles a new shield: he sets the great anvil on its block and takes up the hammer in one hand and the tongs in the other."
+    }
+  ]
+}

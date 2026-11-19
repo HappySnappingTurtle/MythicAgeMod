@@ -27,6 +27,10 @@ public final class EffectGroups {
     public static final String MELEE_TAKEN_AREA_ALLIES = "melee_damage_taken.area_allies";
     public static final String MAX_HEALTH_SELF_FLAT = "max_health.self_flat";
     public static final String MAX_HEALTH_BELIEVER_VILLAGER = "max_health.believer_villager";
+    /** 铁砧修理与附魔合并的经验消耗减免（佩戴，事件型；赫菲斯托斯之砧，以后与埃及卜塔权杖、中华女娲五色石同组）。 */
+    public static final String ANVIL_XP_COST = "anvil_xp_cost";
+    /** 范围内的铁砧不会损坏（供奉，范围型；值 1 = 生效）。 */
+    public static final String ANVIL_NO_DAMAGE = "anvil_no_damage";
 
     private static final Map<String, Kind> KNOWN = new LinkedHashMap<>();
 
@@ -39,6 +43,8 @@ public final class EffectGroups {
         KNOWN.put(MELEE_TAKEN_AREA_ALLIES, Kind.PERCENT_REDUCTION);
         KNOWN.put(MAX_HEALTH_SELF_FLAT, Kind.FLAT);
         KNOWN.put(MAX_HEALTH_BELIEVER_VILLAGER, Kind.PERCENT_BONUS);
+        KNOWN.put(ANVIL_XP_COST, Kind.PERCENT_REDUCTION);
+        KNOWN.put(ANVIL_NO_DAMAGE, Kind.FLAT);
     }
 
     private EffectGroups() {

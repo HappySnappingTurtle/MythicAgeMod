@@ -1,0 +1,36 @@
+{
+  "template": "pixels",
+  "out": "item/hero_smithing_template",
+  "size": 16,
+  "palette": {
+    "o": "#2a1e14",
+    "b": "#8c5a24",
+    "B": "#b07a34",
+    "h": "#d6a456",
+    "d": "#5e3c18",
+    "m": "#6e4a1c",
+    "M": "#c48a3a",
+    "e": "#1e140c"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      "..oooooooooooo..",
+      ".ohhBBBBBBBBBBdo",
+      ".ohBBmmmmmmBBBdo",
+      ".oBBmMMMMMMmBBdo",
+      ".oBmMMhMMhMMmBdo",
+      ".oBmMMeMMeMMmBdo",
+      ".oBmMMMMMMMMmBdo",
+      ".oBmMMMddMMMmBdo",
+      ".oBBmMMddMMmBBdo",
+      ".oBBBmmMMmmBBBdo",
+      ".oBBBBBmmBBBBBdo",
+      ".oBBBBBBBBBBBBdo",
+      ".obddddddddddddo",
+      "..oooooooooooooo",
+      "................"
+    ]
+  }
+}

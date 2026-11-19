@@ -2,9 +2,10 @@
 """专服冒烟（T24 设计文档 §10.1）。
 
   python3 tools/server_smoke.py [--seed 20261013] [--timeout 600] [--keep-world]
+  （Windows 上用 python 代替 python3。）
 
 1. 临时改 neoforge/runs/server/server.properties：新存档名、固定种子、打开 RCON（结束后原样恢复）；
-2. 后台跑 ./gradlew :neoforge:runServer，等日志出现 "Done ("；
+2. 后台跑 ./gradlew（Windows：gradlew.bat）:neoforge:runServer，等日志出现 "Done ("；
 3. 经 RCON 发几条控制台命令（配置、定位迷宫、竞技场、村庄、性能采样），把回应写进报告；
 4. 发 stop，等进程退出；
 5. 检查日志：没有客户端类加载错误、没有 mythic_age 相关 ERROR（允许清单除外）。
@@ -14,10 +15,8 @@
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import secrets
-import signal
 import shutil
 import socket
 import struct
@@ -25,6 +24,9 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import procutil  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = ROOT / "neoforge/runs/server"
@@ -105,33 +107,29 @@ def ensure_ports_free() -> None:
                 raise RuntimeError(f"端口 {port} 已被占用；不修改正在使用的专服配置") from exc
 
 
+def is_server_cmdline(cmdline: str, root: Path = ROOT) -> bool:
+    """命令行是否为本项目的专服 JVM（路径比较不分 / 与 \\，Windows 上不分大小写）。"""
+    marker = procutil.norm(str(Path(root) / "neoforge/build/moddev/serverRunVmArgs.txt"))
+    return marker in procutil.norm(cmdline) and "java" in cmdline.lower()
+
+
 def server_pids() -> list[int]:
     """Gradle daemon 的子进程不一定属于启动器进程组，按本项目专服参数文件精确识别。"""
-    marker = str(ROOT / "neoforge/build/moddev/serverRunVmArgs.txt")
-    rows = subprocess.run(["ps", "-axo", "pid=,stat=,command="], capture_output=True, text=True, check=True).stdout
-    return [int(p[0]) for line in rows.splitlines() if len(p := line.split(None, 2)) == 3
-            and not p[1].startswith("Z") and marker in p[2] and "java" in p[2]]
+    return [pid for pid, cmd in procutil.java_processes() if is_server_cmdline(cmd)]
 
 
 def stop_process(proc: subprocess.Popen, timeout: float = 180) -> bool:
-    """等待正常退出；超时时结束整个独立进程组，防止遗留 Minecraft 子进程。"""
+    """等待正常退出；超时时结束整个独立进程组（Windows：进程树），防止遗留 Minecraft 子进程。"""
     try:
         proc.wait(timeout=timeout)
         if not server_pids():
             return False
     except subprocess.TimeoutExpired:
         pass
-    for sig in (signal.SIGTERM, signal.SIGKILL):
-        for pid in server_pids():
-            try:
-                os.kill(pid, sig)
-            except ProcessLookupError:
-                pass
+    for force in (False, True):
+        procutil.terminate(server_pids(), force=force)
         if proc.poll() is None:
-            try:
-                os.killpg(proc.pid, sig)
-            except ProcessLookupError:
-                pass
+            procutil.terminate_group(proc.pid, force=force)
         try:
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
@@ -242,8 +240,9 @@ def main(argv=None) -> int:
     output = (REPORT.parent / "smoke_gradle.log").open("w", encoding="utf-8")
     t0 = time.time()
     try:
-        proc = subprocess.Popen(["./gradlew", ":neoforge:runServer", "--offline", "--console=plain"], cwd=ROOT,
-                                stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+        proc = subprocess.Popen([*procutil.gradlew(ROOT), ":neoforge:runServer", "--offline", "--console=plain"],
+                                cwd=ROOT, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
+                                **procutil.detached_kwargs())
         if not wait_for("Done (", a.timeout, proc):
             problems.append("服务器没有在时限内启动完成")
         else:

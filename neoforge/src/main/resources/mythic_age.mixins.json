@@ -4,10 +4,12 @@
   "package": "io.github.happysnappingturtle.mythicage.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AnvilMenuMixin",
     "BaseSpawnerMixin",
     "BellBlockMixin",
     "ChunkGeneratorStructureStateMixin",
     "CraftingMenuMixin",
+    "ItemCombinerMenuAccessor",
     "LivingEntityHurtByPlayerAccessor",
     "LivingEntityJumpingAccessor",
     "LivingEntitySwingMixin",

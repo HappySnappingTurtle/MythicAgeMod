@@ -1,0 +1,35 @@
+{
+  "template": "pixels",
+  "out": "item/summon_token_cyclops",
+  "size": 16,
+  "palette": {
+    "o": "#3a1d10",
+    "R": "#d2834e",
+    "r": "#b4602f",
+    "s": "#8e4521",
+    "k": "#1e120c",
+    "h": "#e7a873",
+    "w": "#f1d3a8"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "................",
+      ".oooooooooooooo.",
+      ".ohhkkkkkkRRkko.",
+      ".oRkkkkkkkkRkko.",
+      ".oRkkwwwwkkRkko.",
+      ".oRkwwkkwwkRRko.",
+      ".oRkwkkkkwkRkko.",
+      ".oRkwwkkwwkRRko.",
+      ".oRkkwwwwkkRRko.",
+      ".oRkkkkkkkkRkko.",
+      ".oRkkwwwwkkRRko.",
+      ".oRRkkkkkkRRRko.",
+      ".oRRRkkkkRRRRko.",
+      ".orrrrrrrrrrsso.",
+      ".oooooooooooooo.",
+      "................"
+    ]
+  }
+}

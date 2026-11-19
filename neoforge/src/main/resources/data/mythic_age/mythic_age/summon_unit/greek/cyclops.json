@@ -1,0 +1,7 @@
+{
+  "entity": "mythic_age:summon_cyclops",
+  "cost": 1,
+  "combat": true,
+  "respawn": "none",
+  "token": "mythic_age:summon_token_cyclops"
+}

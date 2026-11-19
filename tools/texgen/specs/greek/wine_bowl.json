@@ -1,0 +1,33 @@
+{
+  "template": "pixels",
+  "out": "item/wine_bowl",
+  "size": 16,
+  "palette": {
+    "w": "#6a5a32",
+    "W": "#8a7644",
+    "g": "#4a5a28",
+    "r": "#5a0f1e",
+    "R": "#8a1a2e"
+  },
+  "params": {
+    "kind": "block",
+    "rows": [
+      "wwwwWWWWggggrrrr",
+      "wwwwWWWWggggrrrr",
+      "wwwwWWWWggggrrrr",
+      "wwwwWWWWggggrrrr",
+      "RRRRwwwwwwwwwwww",
+      "RRRRwwwwwwwwwwww",
+      "RRRRwwwwwwwwwwww",
+      "RRRRwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww",
+      "wwwwwwwwwwwwwwww"
+    ]
+  }
+}

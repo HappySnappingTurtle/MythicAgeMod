@@ -78,6 +78,7 @@ public final class MythicAge {
         io.github.happysnappingturtle.mythicage.relic.greek.GreekRelics.init();
         io.github.happysnappingturtle.mythicage.structure.RuinVaults.init();
         io.github.happysnappingturtle.mythicage.content.greek.ruin.GreekRuins.init(modBus);
+        io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.init(modBus);
         io.github.happysnappingturtle.mythicage.content.greek.knossos.GreekKnossos.init(modBus);
         io.github.happysnappingturtle.mythicage.content.greek.equipment.GreekEquipment.init(modBus);
         io.github.happysnappingturtle.mythicage.statue.PatronStatues.init(modBus, NeoForge.EVENT_BUS);
@@ -166,6 +167,10 @@ public final class MythicAge {
         // T22 遗迹与迷宫：生成即登记、遗迹宝库表
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onChunkLoad);
         io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "structure_registration", io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerTickPost);
+        // 精英巢穴（T25a）：再入住、夜间封洞、推巨石
+        io.github.happysnappingturtle.mythicage.perf.Perf.tick(game, "elite_lairs", io.github.happysnappingturtle.mythicage.lair.EliteLairs::onServerTickPost);
+        game.addListener(io.github.happysnappingturtle.mythicage.lair.EliteLairs::onDeath);
+        game.addListener(io.github.happysnappingturtle.mythicage.lair.EliteLairs::onRightClickBlock);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureRegistration::onServerStopped);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.RuinVaults::onAddReloadListeners);
         game.addListener(io.github.happysnappingturtle.mythicage.structure.StructureSpecs::onAddReloadListeners);
@@ -272,6 +277,7 @@ public final class MythicAge {
         // 伤害乘区（T25.1）：唯一改伤害量的地方；各内容登记提供者
         io.github.happysnappingturtle.mythicage.combat.DamagePipeline.register(game);
         io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(io.github.happysnappingturtle.mythicage.entity.karkinos.KarkinosEntity::collect);
+        io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(io.github.happysnappingturtle.mythicage.entity.cyclops.ShepherdCyclopsEntity::collect);
         io.github.happysnappingturtle.mythicage.combat.DamagePipeline.provider(io.github.happysnappingturtle.mythicage.village.resident.ResidentEntity::collect);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onBreak);
         game.addListener(io.github.happysnappingturtle.mythicage.entity.hamadryad.HamadryadEvents::onRightClickBlock);

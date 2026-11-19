@@ -1,0 +1,31 @@
+{
+  "name": "Cyclops",
+  "icon": "mythic_age:cyclops_fire",
+  "category": "mythic_age:bestiary",
+  "sortnum": 20,
+  "pages": [
+    {
+      "type": "patchouli:entity",
+      "entity": "mythic_age:cyclops",
+      "scale": 0.35,
+      "offset": 0.1,
+      "text": "Lives in hillside caves on stony shores, windswept hills and meadows. Look for smoke at the cave mouth and a flock of sheep outside."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "By day he grazes his sheep outside the cave. If you keep your distance, he lifts a boulder in his left hand and a ring of red dots shows up on the ground. About $(l)1.2 seconds$() later the boulder lands in the ring and hits for $(l)12$(). Up close, he raises his club over his shoulder, holds it a moment, then brings it down. When the club goes up, get out of the way.$(br2)At nightfall he goes back in to sleep and rolls a boulder over the entrance until morning. If you're shut in, sneak and hold use against the boulder for $(l)3 seconds$() to push it aside a little.",
+      "advancement": "mythic_age:bestiary/greek/cyclops/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Maronean Wine$() is made from $(l)4$() grapes and $(l)1$() honey bottle. Throw it near him and he'll walk over, drink it all, and pass out on his back for $(l)8 seconds$(), taking $(l)×3$() damage meanwhile. For $(l)30 seconds$() after he wakes he won't touch wine.$(br2)He drops $(l)2 Cyclopean Fire$() (used to forge the Thunderbolt of Zeus), some wool and a $(l)Hero Smithing Template$(). $(l)7 days$() after the cave is emptied, a new shepherd moves in.",
+      "advancement": "mythic_age:bestiary/greek/cyclops/engaged"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "In Book 9 of Homer's $(o)Odyssey$(), the Cyclops Polyphemus traps Odysseus and his men in his cave. Odysseus tells him his name is Nobody, gets him drunk on the wine he brought, and blinds his eye with a heated stake while he sleeps. When the other Cyclopes come asking who is hurting him, he shouts: \"Nobody is hurting me!\"$(br2)Hesiod's $(o)Theogony$() names three other Cyclopes, who made Zeus his thunderbolts. Ares' priests also trade a tablet that summons a Cyclops.",
+      "advancement": "mythic_age:bestiary/greek/cyclops/defeated"
+    }
+  ],
+  "advancement": "mythic_age:bestiary/greek/cyclops/sighted"
+}

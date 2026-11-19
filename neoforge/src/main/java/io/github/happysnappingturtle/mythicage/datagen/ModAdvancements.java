@@ -43,6 +43,10 @@ public final class ModAdvancements implements AdvancementProvider.AdvancementGen
                 AdvancementType.GOAL, MythEventTrigger.atLeast(MythEvents.AGE_REACHED, GR, Age.CLASSICAL.ordinal()), false);
         node(saver, "greek/heroic", classical, GreekArchitecture.CORINTHIAN_CAPITAL.get(), AdvancementType.GOAL,
                 MythEventTrigger.atLeast(MythEvents.AGE_REACHED, GR, Age.HEROIC.ordinal()), false);
+        // T25a：把独眼巨人·牧人灌醉后击败他（《奥德赛》9.366「我的名字叫『无人』」）
+        node(saver, "greek/nobody", root, io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.MARONEAN_WINE.get(),
+                AdvancementType.CHALLENGE, MythEventTrigger.of(
+                        io.github.happysnappingturtle.mythicage.entity.cyclops.ShepherdCyclopsEntity.NOBODY_EVENT, GR), false);
         bestiary(saver);
     }
 

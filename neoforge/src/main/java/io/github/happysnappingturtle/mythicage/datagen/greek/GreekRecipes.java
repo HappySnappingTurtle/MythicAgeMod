@@ -235,6 +235,11 @@ public final class GreekRecipes {
                 .requires(GreekAgriculture.GRAPE, 3).requires(WOODEN_PLATTER)
                 .unlockedBy("has_grape", has(GreekAgriculture.GRAPE))
                 .save(out, id("grape_platter"));
+        // 马洛涅烈酒（T25a D9；《奥德赛》9.196–211「甜如蜜、未兑水」）：葡萄 ×4 + 蜂蜜瓶，无序合成
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, io.github.happysnappingturtle.mythicage.content.greek.cyclops.GreekCyclops.MARONEAN_WINE)
+                .requires(GreekAgriculture.GRAPE, 4).requires(net.minecraft.world.item.Items.HONEY_BOTTLE)
+                .unlockedBy("has_grape", has(GreekAgriculture.GRAPE))
+                .save(out, id("maronean_wine"));
         ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, GreekFoods.GREEK_TRAVEL_MEAL)
                 .requires(GreekFoods.OLIVE_FLATBREAD).requires(ModTags.cItem("foods/cooked_fish"))
                 .unlockedBy("has_olive_flatbread", has(GreekFoods.OLIVE_FLATBREAD))
